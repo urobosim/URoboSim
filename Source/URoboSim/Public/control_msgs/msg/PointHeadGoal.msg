@@ -1,0 +1,5 @@
+geometry_msgs/PointStamped target
+geometry_msgs/Vector3 pointing_axis
+string pointing_frame
+duration min_duration
+float64 max_velocity

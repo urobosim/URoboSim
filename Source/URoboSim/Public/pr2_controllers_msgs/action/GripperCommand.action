@@ -1,0 +1,22 @@
+float64 position
+float64 max_effort
+---
+# The current gripper gap size (in meters)
+float64 position
+# The current effort exerted (in Newtons)
+float64 effort
+# True iff the gripper is exerting max effort and not moving
+bool stalled
+# True iff the gripper position has reached the commanded setpoint
+bool reached_goal
+---
+# The current gripper gap size (in meters)
+float64 position
+# The current effort exerted (in Newtons)
+float64 effort
+# True iff the gripper is exerting max effort and not moving
+bool stalled
+# True iff the gripper position has reached the commanded setpoint
+bool reached_goal
+
+

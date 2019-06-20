@@ -1,0 +1,42 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "URoboSim",
+	"Description": "",
+	"Category": "RobCoG",
+	"CreatedBy": "Andrei Haidu",
+	"CreatedByURL": "http://haidu.eu",
+	"DocsURL": "https://github.com/robcog-iai/URoboSim",
+	"MarketplaceURL": "",
+	"SupportURL": "http://robcog.org/",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+		  "Name": "URoboSim",
+		  "Type": "Developer",
+		  "LoadingPhase": "Default"
+		}
+		],
+	"Plugins": [
+		{
+			"Name": "UUtils",
+			"Enabled": true
+		},
+		{
+			"Name": "URoboVision",
+			"Enabled": true
+		},
+		{
+			"Name": "UROSBridge",
+			"Enabled": true
+		},
+		{
+			"Name": "UROSWorldControl",
+			"Enabled": true
+		}
+
+	]
+}

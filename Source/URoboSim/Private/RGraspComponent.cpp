@@ -1,0 +1,186 @@
+#include "RGraspComponent.h"
+#include "Physics/RModel.h"
+#include "Physics/RLink.h"
+
+
+URGraspComponent::URGraspComponent()
+{
+  InitSphereRadius(10.f);
+  SetGenerateOverlapEvents(true);
+  bWeldFixation = true;
+  ObjectMaxLength = 50.f;
+  ObjectMaxMass = 15.f;
+}
+
+void URGraspComponent::Init(URStaticMeshComponent* InGripper)
+{
+  Gripper = InGripper;
+
+  OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
+  OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
+
+}
+
+void URGraspComponent::BeginPlay()
+{
+  Super::BeginPlay();
+
+  ARModel* Owner = Cast<ARModel>(GetOuter());
+  if(Owner)
+    {
+      URLink* GripperP = *Owner->Links.Find(GripperName);
+      if(GripperP)
+        {
+          Init(GripperP->GetCollision());
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Gripper not found"));
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Not attached to RModel"));
+    }
+
+}
+
+void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+                                                       class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+{
+
+  if (ARModel* SMA = Cast<ARModel>(OtherActor))
+    {
+      return;
+    }
+  UE_LOG(LogTemp, Error, TEXT("Objectname: %s"), *OtherActor->GetName());
+  if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
+    {
+      ObjectsInReach.Emplace(OtherSMA);
+    }
+
+}
+
+
+
+void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+                                                     class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+  // Remove actor from array (if present)
+
+
+
+  if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
+    {
+      ObjectsInReach.Remove(SMA);
+    }
+}
+
+// Try to fixate object to hand
+bool URGraspComponent::TryToFixate()
+{
+  bool bSuccess = false;
+  if(!FixatedObject && ObjectsInReach.Num() > 0)
+    {
+      // Pop a SMA
+      AStaticMeshActor* SMA = ObjectsInReach.Pop();
+
+      // Check if the actor is graspable
+      if (CanBeGrasped(SMA))
+        {
+          UE_LOG(LogTemp, Error, TEXT("Found Graspeble Object"));
+          FixateObject(SMA);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Object not a Graspeble Object"));
+        }
+    }
+
+  if(FixatedObject)
+    {
+      UE_LOG(LogTemp, Error, TEXT("Grasp success"));
+      bSuccess = true;
+    }
+
+  return bSuccess;
+}
+
+// Fixate object to hand
+void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
+{
+  // Disable physics and overlap events
+  UStaticMeshComponent* SMC = InSMA->GetStaticMeshComponent();
+  SMC->SetSimulatePhysics(false);
+
+  InSMA->AttachToComponent(Gripper, FAttachmentTransformRules(
+                                                              EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, bWeldFixation));
+
+  // Disable overlap checks during fixation grasp
+
+  SetGenerateOverlapEvents(true);
+  // Set the fixated object
+  FixatedObject = InSMA;
+
+  // Clear objects in reach array
+  ObjectsInReach.Empty();
+}
+
+// Detach fixation
+void URGraspComponent::TryToDetach()
+{
+  if (FixatedObject)
+    {
+      // Get current velocity before detachment (gets reseted)
+      const FVector CurrVel = FixatedObject->GetVelocity();
+
+      // Detach object from hand
+      UStaticMeshComponent* SMC = FixatedObject->GetStaticMeshComponent();
+      SMC->DetachFromComponent(FDetachmentTransformRules(
+                                                         EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, EDetachmentRule::KeepWorld, true));
+
+      // Enable physics with and apply current hand velocity, clear pointer to object
+      SMC->SetSimulatePhysics(true);
+      SMC->SetGenerateOverlapEvents(true);
+      SMC->SetPhysicsLinearVelocity(CurrVel);
+
+      // Enable and update overlaps
+      SetGenerateOverlapEvents(true);
+      UpdateOverlaps();
+
+      // Clear fixate object reference
+      FixatedObject = nullptr;
+    }
+
+}
+
+// Check if object is graspable
+bool URGraspComponent::CanBeGrasped(AStaticMeshActor* InSMA)
+{
+  // Check if the object is movable
+  if (!InSMA->IsRootComponentMovable())
+    {
+      return false;
+    }
+
+  // Check if actor has a static mesh component
+  if (UStaticMeshComponent* SMC = InSMA->GetStaticMeshComponent())
+    {
+      // Check if component has physics on
+      if (!SMC->IsSimulatingPhysics())
+        {
+          return false;
+
+        }
+
+      // Check if object fits size
+      if (SMC->GetMass() < ObjectMaxMass
+          && InSMA->GetComponentsBoundingBox().GetSize().Size() < ObjectMaxLength)
+        {
+          return true;
+
+        }
+
+    }
+  return false;
+}
