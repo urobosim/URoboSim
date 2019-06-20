@@ -45,7 +45,6 @@ public class URoboSim : ModuleRules
                                 "XmlParser",
 				"UConversions",
 				"URoboVision",
-				"UROSControl",
 				"UROSBridge"
 				// ... add private dependencies that you statically link with here ...
 			}

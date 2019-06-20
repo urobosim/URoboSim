@@ -32,11 +32,6 @@
 		{
 			"Name": "UROSBridge",
 			"Enabled": true
-		},
-		{
-			"Name": "UROSWorldControl",
-			"Enabled": true
 		}
-
 	]
 }
