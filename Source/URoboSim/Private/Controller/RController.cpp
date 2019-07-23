@@ -357,7 +357,8 @@ void URBaseController::TurnTick(float InDeltaTime)
 			Link.Value->GetCollision()->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
 			// UE_LOG(LogTemp, Warning, TEXT("%s: %f"), *Link.Value->GetName(), realtimeSeconds);
 		}
-		AngularVelocity = 0.0f;
+                UE_LOG(LogTemp, Warning, TEXT("angular vel %f"), TestRotation.Yaw);
+		// AngularVelocity = 0.0f;
 	}
 }
 
