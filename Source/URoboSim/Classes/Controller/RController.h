@@ -141,6 +141,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
     float HackOffset = 0;
+
+        UPROPERTY()
+          double ActionDuration;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -238,6 +241,11 @@ public:
 	virtual bool Grasp();
 	virtual void Release();
 	virtual void UpdateGripper();
+	virtual void SetupCollisionEvent();
+        UFUNCTION()
+        virtual void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+
 	virtual void CheckGripperActionResult(float InError, float InThreshold);
 	virtual void Tick(float InDeltaTime);
 
@@ -253,6 +261,9 @@ public:
 	UPROPERTY()
 	float MaxEffort;
 
+	UPROPERTY()
+	bool bStalled;
+
     UPROPERTY()
     FGraspResult Result;
 
@@ -261,6 +272,29 @@ public:
 
 	UPROPERTY(EditAnywhere)
     float LMultiplier;
+
+
+    UPROPERTY(EditAnywhere)
+    FString RightJointName;
+    UPROPERTY(EditAnywhere)
+    FString LeftJointName;
+
+    UPROPERTY(EditAnywhere)
+    FString RightFingerTipName;
+    UPROPERTY(EditAnywhere)
+    FString LeftFingerTipName;
+
+    UPROPERTY(EditAnywhere)
+    URJoint* RightFinger ;
+    UPROPERTY(EditAnywhere)
+    URJoint* LeftFinger ;
+
+    UPROPERTY(EditAnywhere)
+    URJoint* RightFingerTip;
+    UPROPERTY(EditAnywhere)
+    URJoint* LeftFingerTip;
+
+
 protected:
 
     UPROPERTY()

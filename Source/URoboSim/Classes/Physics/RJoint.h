@@ -22,6 +22,9 @@ public:
 	// Sets default values for this component's properties
 	URJoint();
 
+        bool bActuate;
+        bool bBreakEnabled;
+
 	class URLink* Parent();
 	class URLink* Child();
 

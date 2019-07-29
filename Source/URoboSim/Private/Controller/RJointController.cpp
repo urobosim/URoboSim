@@ -231,6 +231,19 @@ void URJointController::Init(ARModel* InModel)
   else
     {
       Model = InModel;
+      for(auto & Link: Model->Links)
+        {
+          Link.Value->GetCollision()->SetEnableGravity(false);
+        }
+      Model->Links[BaseLink]->GetCollision()->SetEnableGravity(false);
+      for(auto & IgnoredJoint: IgnoreList)
+        {
+          if(Model->Joints.Contains(IgnoredJoint))
+            {
+              Model->Joints[IgnoredJoint]->bActuate = false;
+            }
+
+        }
       // Status = 1;
     }
 }

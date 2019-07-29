@@ -85,6 +85,7 @@ protected:
 	UPROPERTY()
 	URStaticMeshComponent* Child;
 
+        bool bBreakEnabled;
 };
 
 UCLASS()
