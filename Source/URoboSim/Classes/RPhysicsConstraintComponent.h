@@ -29,6 +29,9 @@ public:
 	float Lower;
 	// virtual void Init(USDFJoint* InJoint, UActorComponent* Parent, UActorComponent* Child){};
 	virtual void ConnectToComponents(){};
+	virtual void EnableMotor(bool InEnable){};
+        virtual void SetTargetPosition(float InTargetPos){};
+        virtual float GetConstraintPosition(){return 0;};
 	virtual void SetAxis(USDFJoint* InJoint){};
 	virtual void SetPosition(USDFJoint* InJoint){};
 	virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
@@ -161,6 +164,9 @@ public:
 	virtual void SetAxis(USDFJoint* InJoint);
 	virtual void RotateConstraintToRefAxis(FVector InRefAxis, bool bUseParentModelFrame);
 
+        virtual void SetTargetPosition(float InTargetPos);
+	virtual void EnableMotor(bool InEnable);
+        virtual float GetConstraintPosition() override;
     virtual float GetJointPosition() override;
     virtual float GetJointVelocity() override;
     virtual float GetJointPositionInUUnits() override;
@@ -200,5 +206,8 @@ class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraint
 public:
 	virtual void SetAxis(USDFJoint* InJoint);
 	virtual float CalculateRotationOffset(USDFJoint* InJoint);
+        virtual void SetTargetPosition(float InTargetPos);
+
+        float RotationOffset;
 
 };

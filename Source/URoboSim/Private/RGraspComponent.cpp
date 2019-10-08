@@ -13,6 +13,7 @@ URGraspComponent::URGraspComponent()
 }
 
 void URGraspComponent::Init(URStaticMeshComponent* InGripper)
+// void URGraspComponent::Init()
 {
   Gripper = InGripper;
 
@@ -25,23 +26,23 @@ void URGraspComponent::BeginPlay()
 {
   Super::BeginPlay();
 
-  ARModel* Owner = Cast<ARModel>(GetOuter());
-  if(Owner)
-    {
-      URLink* GripperP = *Owner->Links.Find(GripperName);
-      if(GripperP)
-        {
-          Init(GripperP->GetCollision());
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Gripper not found"));
-        }
-    }
-  else
-    {
-      UE_LOG(LogTemp, Error, TEXT("Not attached to RModel"));
-    }
+  // ARModel* Owner = Cast<ARModel>(GetOuter());
+  // if(Owner)
+  //   {
+  //     URLink* GripperP = *Owner->Links.Find(GripperName);
+  //     if(GripperP)
+  //       {
+  //         Init(GripperP->GetCollision());
+  //       }
+  //     else
+  //       {
+  //         UE_LOG(LogTemp, Error, TEXT("Gripper not found"));
+  //       }
+  //   }
+  // else
+  //   {
+  //     UE_LOG(LogTemp, Error, TEXT("Not attached to RModel"));
+  //   }
 
 }
 
@@ -49,11 +50,11 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
                                                        class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
 
+  UE_LOG(LogTemp, Error, TEXT("Gripper %s Overlap with Object: %s at %s"), *GetName(), *OtherActor->GetName(), *SweepResult.Location.ToString());
   if (ARModel* SMA = Cast<ARModel>(OtherActor))
     {
       return;
     }
-  UE_LOG(LogTemp, Error, TEXT("Objectname: %s"), *OtherActor->GetName());
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
       ObjectsInReach.Emplace(OtherSMA);

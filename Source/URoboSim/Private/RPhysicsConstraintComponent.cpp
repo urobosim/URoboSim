@@ -92,39 +92,39 @@ FVector ROSAngularVelocityToU(FVector InAngularVelocity)
 
 void URContinuousConstraintComponent::UpdateJointVelocity()
 {
-	if(Child && Parent)
-	{
-		float ChildMass = Child->GetMass();
+  if(Child && Parent)
+    {
+      float ChildMass = Child->GetMass();
 
-		// FRotator ParentRotation = Parent->GetComponentRotation();
-		// FVector TargetJointAngularVelocityWorld = ParentRotation.Quaternion().RotateVector(FMath::DegreesToRadians(TargetVelocity)*RefAxis);
+      // FRotator ParentRotation = Parent->GetComponentRotation();
+      // FVector TargetJointAngularVelocityWorld = ParentRotation.Quaternion().RotateVector(FMath::DegreesToRadians(TargetVelocity)*RefAxis);
 
-		FRotator JointRotation = GetComponentRotation();
-		FVector TargetJointAngularVelocity = TargetVelocity * RefAxis;
-		TargetJointAngularVelocity = ROSAngularVelocityToU(TargetJointAngularVelocity);
+      FRotator JointRotation = GetComponentRotation();
+      FVector TargetJointAngularVelocity = TargetVelocity * RefAxis;
+      TargetJointAngularVelocity = ROSAngularVelocityToU(TargetJointAngularVelocity);
 
-		FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
+      FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
 
-		FVector COM = Child->GetBodyInstance()->GetCOMPosition();
-		FVector DistanceJointCOM = COM - GetComponentLocation();
+      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
+      FVector DistanceJointCOM = COM - GetComponentLocation();
 
-		FVector COMTargetVelocity = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
-		COMTargetVelocity += Parent->GetPhysicsLinearVelocityAtPoint(COM);
+      FVector COMTargetVelocity = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
+      COMTargetVelocity += Parent->GetPhysicsLinearVelocityAtPoint(COM);
 
-		FVector CurrentParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
+      FVector CurrentParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
 
-		Child->NextTickLinearVelocity = COMTargetVelocity;
-		Child->NextTickAngularVelocity = CurrentParentAngularVelocity + TargetJointAngularVelocityWorld;
+      Child->NextTickLinearVelocity = COMTargetVelocity;
+      Child->NextTickAngularVelocity = CurrentParentAngularVelocity + TargetJointAngularVelocityWorld;
 
-		Child->SetPhysicsLinearVelocity(COMTargetVelocity);
-		Child->SetPhysicsAngularVelocityInRadians(CurrentParentAngularVelocity + TargetJointAngularVelocityWorld);
+      Child->SetPhysicsLinearVelocity(COMTargetVelocity);
+      Child->SetPhysicsAngularVelocityInRadians(CurrentParentAngularVelocity + TargetJointAngularVelocityWorld);
 
-		if(Child->IsGravityEnabled())
-		{
-			Child->AddForce(ChildMass * FVector(0.f,0.f,980.f));
-		}
-		// Child->UpdateVelocity();
-	}
+      if(Child->IsGravityEnabled())
+        {
+          Child->AddForce(ChildMass * FVector(0.f,0.f,980.f));
+        }
+      // Child->UpdateVelocity();
+    }
 }
 
 
@@ -247,28 +247,49 @@ void URContinuousConstraintComponent::RotateConstraintToRefAxis(FVector InRefAxi
 	}
 }
 
+void URContinuousConstraintComponent::SetTargetPosition(float InTargetPos)
+{
+  ConstraintInstance.SetAngularOrientationTarget(FQuat(RefAxis, InTargetPos));
+}
+
+void URRevoluteConstraintComponent::SetTargetPosition(float InTargetPos)
+{
+  UE_LOG(LogTemp, Warning, TEXT("SetJointTarget for %s: %f %f"), *GetName(), InTargetPos, RotationOffset);
+  // ConstraintInstance.SetAngularOrientationTarget(FQuat(RefAxis, InTargetPos-RotationOffset));
+  ConstraintInstance.SetAngularOrientationTarget(FQuat(RefAxis, InTargetPos-FMath::DegreesToRadians(15)));
+}
+
+void URContinuousConstraintComponent::EnableMotor(bool InEnable)
+{
+  SetOrientationDriveTwistAndSwing(InEnable, InEnable);
+}
+
 void URContinuousConstraintComponent::SetAxis(USDFJoint* InJoint)
 {
-	Super::SetAxis(InJoint);
+  Super::SetAxis(InJoint);
 
-	FQuat ParentOrientation = Parent->GetComponentQuat();
-	FQuat ChildOrientation = Child->GetComponentQuat();
-	QInitial = ParentOrientation.Inverse() * ChildOrientation;
+  FQuat ParentOrientation = Parent->GetComponentQuat();
+  FQuat ChildOrientation = Child->GetComponentQuat();
+  QInitial = ParentOrientation.Inverse() * ChildOrientation;
 
-	RotateConstraintToRefAxis(InJoint->Axis->Xyz, InJoint->Axis->bUseParentModelFrame);
+  RotateConstraintToRefAxis(InJoint->Axis->Xyz, InJoint->Axis->bUseParentModelFrame);
 
 
-    if (RefAxis[0]== 1)
+  SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
+  SetAngularDriveParams(190000.0f, 100.0f, 900000.0f);
+
+
+  if (RefAxis[0]== 1)
     {
-        ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
+      ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
     }
-    else if (RefAxis[1]== 1)
+  else if (RefAxis[1]== 1)
     {
-        ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 0);
+      ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
-    else if (RefAxis[2]==1)
+  else if (RefAxis[2]==1)
     {
-        ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 0);
+      ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
 }
 
@@ -276,51 +297,51 @@ void URContinuousConstraintComponent::SetAxis(USDFJoint* InJoint)
 
 void URRevoluteConstraintComponent::SetAxis(USDFJoint* InJoint)
 {
-	//TODO rotate joint 180° if  xyz is negative?
-	Super::SetAxis(InJoint);
+  //TODO rotate joint 180° if  xyz is negative?
+  Super::SetAxis(InJoint);
 
-    Limit  =  0.5*FMath::Abs(InJoint->Axis->Upper - InJoint->Axis->Lower) ;
-    EAngularConstraintMotion AngularConstraintMotion = EAngularConstraintMotion::ACM_Limited;
+  Limit  =  0.5*FMath::Abs(InJoint->Axis->Upper - InJoint->Axis->Lower) ;
+  EAngularConstraintMotion AngularConstraintMotion = EAngularConstraintMotion::ACM_Limited;
 
-	//Because the limit is symetrical the Rotation center has to be offseted so that upper and lower limit corespond to the sdf values
-	float RotationOffset = CalculateRotationOffset(InJoint);
+  //Because the limit is symetrical the Rotation center has to be offseted so that upper and lower limit corespond to the sdf values
+  CalculateRotationOffset(InJoint);
 
-	// RefAxis = RefAxis;
-    if (RefAxis[0] == 1)
+  // RefAxis = RefAxis;
+  if (RefAxis[0] == 1)
     {
-        ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, Limit);
-		ConstraintInstance.AngularRotationOffset.Roll =  RotationOffset;
+      ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, Limit);
+      ConstraintInstance.AngularRotationOffset.Roll =  RotationOffset;
     }
-    else if (RefAxis[1] == 1)
+  else if (RefAxis[1] == 1)
     {
-        ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, Limit);
-		ConstraintInstance.AngularRotationOffset.Pitch = RotationOffset;
+      ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, Limit);
+      ConstraintInstance.AngularRotationOffset.Pitch = RotationOffset;
     }
-    // else if (InJoint->Axis->Xyz[2] == 1)
-    // {
-    //     ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, Limit);
-	// 	ConstraintInstance.AngularRotationOffset.Yaw =  RotationOffset;
-    // }
-	else
-	{
-		// FVector ZAxis = GetComponentQuat().GetAxisZ();
-		// FQuat BetweenQuat = FQuat::FindBetweenVectors(RefAxis, ZAxis);
-		// AddLocalRotation(BetweenQuat);
-		// RefAxis = FVector(0.0f, 0.0f, 1.0f);
-        ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, Limit);
-		ConstraintInstance.AngularRotationOffset.Yaw =  RotationOffset;
-	}
+  // else if (InJoint->Axis->Xyz[2] == 1)
+  // {
+  //     ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, Limit);
+  // 	ConstraintInstance.AngularRotationOffset.Yaw =  RotationOffset;
+  // }
+  else
+    {
+      // FVector ZAxis = GetComponentQuat().GetAxisZ();
+      // FQuat BetweenQuat = FQuat::FindBetweenVectors(RefAxis, ZAxis);
+      // AddLocalRotation(BetweenQuat);
+      // RefAxis = FVector(0.0f, 0.0f, 1.0f);
+      ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, Limit);
+      ConstraintInstance.AngularRotationOffset.Yaw =  RotationOffset;
+    }
 }
 
 
 float URRevoluteConstraintComponent::CalculateRotationOffset(USDFJoint* InJoint)
 {
-	float RotationOffset = 0.5 * (InJoint->Axis->Upper + InJoint->Axis->Lower);
-    if (InJoint->Axis->Xyz[0] == 1 || InJoint->Axis->Xyz[0] == -1)
-	{
-		RotationOffset *= -1;
-	}
-	return RotationOffset;
+  RotationOffset = 0.5 * (InJoint->Axis->Upper + InJoint->Axis->Lower);
+  if (InJoint->Axis->Xyz[0] == 1 || InJoint->Axis->Xyz[0] == -1)
+    {
+      RotationOffset *= -1;
+    }
+  return RotationOffset;
 }
 
 void URFixedConstraintComponent::ConnectToComponents()
@@ -383,6 +404,23 @@ float URPrismaticConstraintComponent::GetJointVelocityInUUnits()
 {
 	//TODO make  this a function in Conversions
 	return GetJointVelocity();
+}
+
+float URContinuousConstraintComponent::GetConstraintPosition()
+{
+  if (RefAxis[0]== 1)
+    {
+      return ConstraintInstance.GetCurrentTwist();
+    }
+  else if (RefAxis[1]== 1)
+    {
+      return ConstraintInstance.GetCurrentSwing2();
+    }
+  else if (RefAxis[2]==1)
+    {
+      return ConstraintInstance.GetCurrentSwing1();
+    }
+  return 0.;
 }
 
 float URContinuousConstraintComponent::GetJointPosition()

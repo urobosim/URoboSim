@@ -31,6 +31,11 @@ void URJoint::UpdateEncoder()
   Child_->UpdateEncoder();
 }
 
+void URJoint::EnableMotor(bool InEnable)
+{
+  Constraint->EnableMotor(InEnable);
+}
+
 void URJoint::UpdateVelocity()
 {
   if(bActuate)

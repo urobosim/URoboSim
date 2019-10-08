@@ -16,6 +16,7 @@ public:
 	URGraspComponent();
 
 	virtual void Init(URStaticMeshComponent* InGripper);
+	// virtual void Init();
 
 	virtual void BeginPlay() override;
 
@@ -33,15 +34,15 @@ protected:
 
 
 	// Object maximum length (cm)
-	UPROPERTY(EditAnywhere, Category = "MC")
+	UPROPERTY()
 	float ObjectMaxLength;
 
 	// Object maximum mass (kg)
-	UPROPERTY(EditAnywhere, Category = "MC")
+	UPROPERTY()
 	float ObjectMaxMass;
 
 	// Flag if the object should be welded to the hand
-	UPROPERTY(EditAnywhere, Category = "MC")
+	UPROPERTY()
 	bool bWeldFixation;
 
 	UPROPERTY()

@@ -37,6 +37,7 @@ public:
 	virtual void SetJointVelocityInUUnits(float Velocity);
 	virtual void SetJointEffort(float Effort);
 	virtual void SetJointEffortFromROS(float Effort);
+        virtual void EnableMotor(bool InEnable);
 
     static void Load(ARModel* OutModel, USDFJoint* InJoint);
 
@@ -49,7 +50,7 @@ protected:
 	// virtual void BeginPlay() override;
 
     static bool CreateConstraintComponent(URJoint* OutOwner, USDFJoint* InJoint);
-	static void InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint);
+        static void InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint);
 	static void SetConstraintPosition(URJoint* OutJoint, USDFJoint* InJoint);
 	// static void SetupConstraint(ARModel* OutModel, URJoint* OutOwner, USDFJoint* InJoint);
 

@@ -30,6 +30,31 @@ public:
 };
 
 USTRUCT()
+struct FGraspComponentSetting
+{
+  GENERATED_BODY()
+  public:
+
+  UPROPERTY(EditAnywhere)
+  FString GripperName;
+
+  UPROPERTY(EditAnywhere)
+  FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
+
+  // Object maximum length (cm)
+  UPROPERTY(EditAnywhere)
+  float ObjectMaxLength;
+
+  // Object maximum mass (kg)
+  UPROPERTY(EditAnywhere)
+  float ObjectMaxMass;
+
+  // Flag if the object should be welded to the hand
+  UPROPERTY(EditAnywhere)
+  bool bWeldFixation;
+};
+
+USTRUCT()
 struct FGraspResult
 {
     GENERATED_BODY()
@@ -252,6 +277,9 @@ public:
 	UPROPERTY()
 	URGraspComponent* GraspComponent;
 
+        UPROPERTY(EditAnywhere)
+          FGraspComponentSetting GraspCompSetting;
+
 	UPROPERTY()
 	float Position;
 
@@ -264,13 +292,22 @@ public:
 	UPROPERTY()
 	bool bStalled;
 
+	UPROPERTY(EditAnywhere)
+	float Stiffness;
+
+	UPROPERTY(EditAnywhere)
+	float MaxForce;
+
+	UPROPERTY(EditAnywhere)
+	float Dampening;
+
     UPROPERTY()
     FGraspResult Result;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
     float RMultiplier;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
     float LMultiplier;
 
 
@@ -281,17 +318,20 @@ public:
 
     UPROPERTY(EditAnywhere)
     FString RightFingerTipName;
+
     UPROPERTY(EditAnywhere)
     FString LeftFingerTipName;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY()
     URJoint* RightFinger ;
-    UPROPERTY(EditAnywhere)
+
+    UPROPERTY()
     URJoint* LeftFinger ;
 
-    UPROPERTY(EditAnywhere)
+    UPROPERTY()
     URJoint* RightFingerTip;
-    UPROPERTY(EditAnywhere)
+
+    UPROPERTY()
     URJoint* LeftFingerTip;
 
 
@@ -306,14 +346,12 @@ protected:
 	UPROPERTY()
 	ARModel* Model;
 
-	UPROPERTY(EditAnywhere)
-	FString GraspComponentName;
+        UPROPERTY(EditAnywhere)
+          FString GraspComponentName;
 
-	UPROPERTY(EditAnywhere)
-	FString GripperName;
+	// UPROPERTY(EditAnywhere)
+	// FString GripperName;
 
-	UPROPERTY(EditAnywhere)
-	FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)

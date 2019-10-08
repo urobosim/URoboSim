@@ -121,20 +121,20 @@ void URLink::SetVirtualCollision(URLink* OutLink, USDFLink* InLink)
     UStaticMesh* Collision = RStaticMeshUtils::CreateStaticMesh(LinkComponent, VirtualCollision);
     if(Collision)
     {
-        //Create the collision vor the visual mesh. Necessary to enable physics.
-        CreateCollisionForMesh(Collision, VirtualCollision->Geometry->Type);
-        LinkComponent->SetStaticMesh(Collision);
-        /*  */
-        /* if(OutLink->Collisions.Num()==0) */
-        /* { */
-		/* 	UE_LOG(LogTemp, Error, TEXT("before AttachToComponent")); */
-		LinkComponent->SetSimulatePhysics(true);
-		LinkComponent->AttachToComponent(OutLink->Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-		/* 	UE_LOG(LogTemp, Error, TEXT("after AttachToComponent")); */
-		/* } */
-		LinkComponent->bVisible = false;
-		OutLink->Collisions.Add(LinkComponent);
-	}
+      //Create the collision vor the visual mesh. Necessary to enable physics.
+      CreateCollisionForMesh(Collision, VirtualCollision->Geometry->Type);
+      LinkComponent->SetStaticMesh(Collision);
+      /*  */
+      /* if(OutLink->Collisions.Num()==0) */
+      /* { */
+      /* 	UE_LOG(LogTemp, Error, TEXT("before AttachToComponent")); */
+      LinkComponent->SetSimulatePhysics(true);
+      LinkComponent->AttachToComponent(OutLink->Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+      /* 	UE_LOG(LogTemp, Error, TEXT("after AttachToComponent")); */
+      /* } */
+      LinkComponent->bVisible = false;
+      OutLink->Collisions.Add(LinkComponent);
+    }
 }
 
 void URLink::SetVisuals(URLink* OutLink, TArray<USDFVisual*> InVisuals)

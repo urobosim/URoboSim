@@ -71,8 +71,8 @@ void URGripperController::SetupCollisionEvent()
   UE_LOG(LogTemp, Error, TEXT("HitEvent Registerd"));
   RightFingerTip->Child()->GetCollision()->SetNotifyRigidBodyCollision(true);
   LeftFingerTip->Child()->GetCollision()->SetNotifyRigidBodyCollision(true);
-  RightFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
-  LeftFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
+  // RightFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
+  // LeftFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
 }
 
 void URGripperController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
@@ -114,50 +114,23 @@ void URGripperController::UpdateGripper()
 
 void URGripperController::CheckGripperActionResult(float InError, float InThreshold = 0.5)
 {
-    // if(bMoved)
-    // {
-    //     if(FMath::Abs(InError) < InThreshold)
-    //     {
-    //         if(bSuccessGrasp)
-    //         {
-    //             Result.FillValues(Position, MaxEffort, true, false);
-    //         }
-    //         else
-    //         {
-    //             Result.FillValues(Position, MaxEffort, false, true);
-    //         }
-    //         GoalStatusList.Last().Status = 3;
-    //         OldPosition = Position;
-    //         bActive = false;
-    //         bPublishResult = true;
-    //     }
-    // }
-    // else
-    // {
-    //     Result.FillValues(Position, MaxEffort, false, true);
-    //     GoalStatusList.Last().Status = 3;
-    //     OldPosition = Position;
-    //     bActive = false;
-    //     bPublishResult = true;
-    // }
-        if(FMath::Abs(InError) < InThreshold)
-        {
-          Result.FillValues(Position, MaxEffort, false, true);
-          GoalStatusList.Last().Status = 3;
-          bActive = false;
-          bPublishResult = true;
-        }
+  if(FMath::Abs(InError) < InThreshold)
+    {
+      Result.FillValues(Position, MaxEffort, false, true);
+      GoalStatusList.Last().Status = 3;
+      bActive = false;
+      bPublishResult = true;
+    }
 
-        if(ActionDuration > 2)
-          {
-            ActionDuration = 0.0;
-            GoalStatusList.Last().Status = 3;
-            bActive = false;
-            bPublishResult = true;
-            bStalled = true;
-            Result.FillValues(Position, MaxEffort, bStalled, false);
-          }
-
+  if(ActionDuration > 2)
+    {
+      ActionDuration = 0.0;
+      GoalStatusList.Last().Status = 3;
+      bActive = false;
+      bPublishResult = true;
+      bStalled = true;
+      Result.FillValues(Position, MaxEffort, bStalled, false);
+    }
 }
 
 void URGripperController::Tick(float InDeltaTime)
@@ -174,50 +147,78 @@ void URGripperController::Tick(float InDeltaTime)
         return;
       }
 
+    RightFinger->bActuate = false;
+    LeftFinger->bActuate = false;
+
+
     GripperPosition = FMath::Abs((RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size() -3 );
     Error = Position-GripperPosition ;
-    // if(FMath::Abs(Error) > 0.5)
-    if(bActive || bStalled)
-      {
-        ActionDuration += InDeltaTime;
-        RightFinger->bActuate = false;
-        LeftFinger->bActuate = false;
-
-        float Force = 1.0;
-        if(bStalled)
-          {
-            Force = MaxEffort * 100;
-            UE_LOG(LogTemp, Error, TEXT("MaxEffort %f"), MaxEffort);
-          }
-
-        FVector DirectionTipToTip = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation());
-        if(Error < 0)
-          {
-            RightFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
-            LeftFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
-          }
-        else
-          {
-            RightFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
-            LeftFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
-          }
-        RightFinger->MaxJointVel = 0.2;
-        RightFinger->DesiredJointPose = RightFinger->GetEncoderValue();
-        LeftFinger->MaxJointVel = 0.2;
-        LeftFinger->DesiredJointPose = LeftFinger->GetEncoderValue();
-      }
-    else
-      {
-        RightFinger->bActuate = true;
-        LeftFinger->bActuate = true;
-      }
-
     if(bActive)
     {
-      GoalStatusList.Last().Status = 1;
-      UE_LOG(LogTemp, Error, TEXT("Error %f Position %f GripperPosition %f"), Error, Position, GripperPosition);
+      bStalled = false;
       CheckGripperActionResult(Error, 0.5);
+      if(bActive)
+        {
+          GoalStatusList.Last().Status = 1;
+          ActionDuration += InDeltaTime;
+          RightFinger->EnableMotor(false);
+          LeftFinger->EnableMotor(false);
+
+
+          float Force = 1.0;
+          // if(bStalled)
+          //   {
+          //     Force = MaxEffort * 100;
+          //     UE_LOG(LogTemp, Error, TEXT("MaxEffort %f"), MaxEffort);
+          //   }
+
+          FVector DirectionTipToTip = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation());
+          if(Error < 0)
+            {
+              RightFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
+              LeftFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
+            }
+          else
+            {
+              RightFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
+              LeftFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
+            }
+          // RightFinger->MaxJointVel = 0.2;
+          // RightFinger->DesiredJointPose = RightFinger->GetEncoderValue();
+          // LeftFinger->MaxJointVel = 0.2;
+          // LeftFinger->DesiredJointPose = LeftFinger->GetEncoderValue();
+          // RightFinger->Constraint->SetTargetPosition(RightFinger->Constraint->GetConstraintPosition());
+          // LeftFinger->Constraint->SetTargetPosition(LeftFinger->Constraint->GetConstraintPosition());
+          RightFinger->Constraint->SetTargetPosition(RightFinger->GetJointPosition());
+          LeftFinger->Constraint->SetTargetPosition(LeftFinger->GetJointPosition());
+        }
+      else if (bStalled)
+        {
+          RightFinger->Constraint->SetTargetPosition(RightFinger->GetJointPosition());
+          LeftFinger->Constraint->SetTargetPosition(LeftFinger->GetJointPosition());
+          // RightFinger->Constraint->SetTargetPosition(0.);
+          // LeftFinger->Constraint->SetTargetPosition(0.);
+          RightFinger->EnableMotor(true);
+          LeftFinger->EnableMotor(true);
+          Grasp();
+        }
+      else
+        {
+          // RightFinger->bActuate = true;
+          // LeftFinger->bActuate = true;
+          RightFinger->EnableMotor(true);
+          LeftFinger->EnableMotor(true);
+          Release();
+        }
     }
+
+
+    // if(bActive)
+    // {
+    //   GoalStatusList.Last().Status = 1;
+    //   UE_LOG(LogTemp, Error, TEXT("Error %f Position %f GripperPosition %f"), Error, Position, GripperPosition);
+    //   CheckGripperActionResult(Error, 0.5);
+    // }
 
 }
 
@@ -476,6 +477,7 @@ void URBaseController::Turn(float InVelocity, float InDeltaTime)
 URGripperController::URGripperController()
 {
     OldPosition = 0.0;
+    // GraspComponent = CreateDefaultSubobject<URGraspComponent>(FName(*(GetName() + TEXT("_GraspComp"))));
 }
 
 bool URGripperController::Grasp()
@@ -622,26 +624,64 @@ void URGripperController::Init(ARModel* InModel)
             {
               if(GraspComp->GetName().Equals(GraspComponentName))
                 {
+                  // UE_LOG(LogTemp, Error, TEXT("Grasp Comp found %s"), *GraspComp->GetName());
                   GraspComponent = GraspComp;
-                  URLink* ReferenceLink = Model->Links[GraspComponent->GripperName];
+                  URLink* ReferenceLink = Model->Links[GraspCompSetting.GripperName];
                   GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-                  GraspComponent->AddRelativeLocation(ToolCenterPoint);
+                  GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
+                  GraspComponent->Init(ReferenceLink->GetCollision());
                 }
             }
-          RightJointName = GripperName + TEXT("_r_finger_joint");
-          LeftJointName = GripperName + TEXT("_l_finger_joint");
 
-          RightFingerTipName = GripperName + TEXT("_r_finger_tip_joint");
-          LeftFingerTipName = GripperName + TEXT("_l_finger_tip_joint");
+          // FString GraspCompName = GetName() + TEXT("_Grasp_Comp");
+
+
+          //USE CREATEDEFAULTSUBOBJECT IN CONSTRUCTOR OF THE CONTROLLER
+
+
+          // GraspComponent = NewObject<URGraspComponent>(Model);
+          // GraspComponent->RegisterComponent();
+          // GraspComponent->SetSimulatePhysics(false);
+          // URLink* ReferenceLink = Model->Links[GraspCompSetting.GripperName];
+          // GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          // GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
+          // GraspComponent->Init(ReferenceLink->GetCollision());
+          // GraspComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          // UE_LOG(LogTemp, Error, TEXT("RefLokation %s"), *ReferenceLink->GetCollision()->GetComponentLocation().ToString());
+          // UE_LOG(LogTemp, Error, TEXT("GraspPosition %s"), *GraspComponent->GetComponentLocation().ToString());
+          // GraspComponent->SetSimulatePhysics(true);
+
+
+
+          // RightJointName = GraspCompSetting.GripperName + TEXT("_r_finger_joint");
+          // LeftJointName = GraspCompSetting.GripperName + TEXT("_l_finger_joint");
+
+          // RightFingerTipName = GraspCompSetting.GripperName + TEXT("_r_finger_tip_joint");
+          // LeftFingerTipName = GraspCompSetting.GripperName + TEXT("_l_finger_tip_joint");
           RightFinger = Model->Joints.FindRef(RightJointName);
           LeftFinger = Model->Joints.FindRef(LeftJointName);
 
           RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
           LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
-          SetupCollisionEvent();
+          // SetupCollisionEvent();
           RightFinger->bActuate = false;
           LeftFinger->bActuate = false;
           bStalled = false;
+          RightFinger->DesiredJointPose = RightFinger->GetEncoderValue();
+          LeftFinger->DesiredJointPose = LeftFinger->GetEncoderValue();
+
+          //next four lines can be deleted four new robots
+          RightFinger->Constraint->SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
+          LeftFinger->Constraint->SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
+          // RightFinger->Constraint->SetTargetPosition(RightFinger->Constraint->GetConstraintPosition()*0.9);
+          // LeftFinger->Constraint->SetTargetPosition(LeftFinger->Constraint->GetConstraintPosition()*0.9);
+          RightFinger->Constraint->SetTargetPosition(0);
+          LeftFinger->Constraint->SetTargetPosition(0);
+          RightFinger->Constraint->SetAngularDriveParams(Stiffness, Dampening, MaxForce);
+          LeftFinger->Constraint->SetAngularDriveParams(Stiffness, Dampening, MaxForce);
+
+          RightFinger->EnableMotor(true);
+          LeftFinger->EnableMotor(true);
 	}
 }
 
