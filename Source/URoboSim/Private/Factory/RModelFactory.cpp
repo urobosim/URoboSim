@@ -1,4 +1,5 @@
-#include "RModelFactory.h"
+#include "Factory/RModelFactory.h"
+#include "Factory/RModelBuilder.h"
 #include "Physics/RModel.h"
 
 URModelFactory::URModelFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -42,8 +43,12 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 				UE_LOG(LogTemp, Error, TEXT("Create Model %s"), *SpawnInfo.Name.ToString());
 
 				// Creates RRobot Actor.
+
+                                URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
 				NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo);
-				NewRobot->Load(Model);
+                                ModelBuilder->Load(Model, NewRobot);
+
+				// NewRobot->Load(Model);
 				// URModelFactory::CreateModels(NewRobot, SDFAsset);
 			}
 		}
@@ -66,5 +71,3 @@ void URModelFactory::CreateModels(ARModel* OutModel, USDFDataAsset* SDFData)
 {
 		// OutModel->Load(Model);
 }
-
-

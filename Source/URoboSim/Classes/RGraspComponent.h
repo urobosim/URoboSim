@@ -5,6 +5,7 @@
 #include "RStaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -15,7 +16,7 @@ class UROBOSIM_API URGraspComponent : public USphereComponent
 public:
 	URGraspComponent();
 
-	virtual void Init(URStaticMeshComponent* InGripper);
+	virtual void Init(URStaticMeshComponent* InGripper, TArray<URStaticMeshComponent*> InFixationPoints);
 	// virtual void Init();
 
 	virtual void BeginPlay() override;
@@ -48,6 +49,11 @@ protected:
 	UPROPERTY()
 	URStaticMeshComponent* Gripper;
 
+	UPROPERTY()
+          TArray<UPhysicsConstraintComponent*> ConstComps;
+
+	UPROPERTY()
+          TArray<URStaticMeshComponent*> FixationPoints;
 
 	// Function called when an item enters the fixation overlap area
 	UFUNCTION()

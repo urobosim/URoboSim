@@ -277,6 +277,7 @@ public:
 	UPROPERTY()
 	URGraspComponent* GraspComponent;
 
+
         UPROPERTY(EditAnywhere)
           FGraspComponentSetting GraspCompSetting;
 

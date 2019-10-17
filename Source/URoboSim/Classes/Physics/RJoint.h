@@ -22,11 +22,33 @@ public:
 	// Sets default values for this component's properties
 	URJoint();
 
-        bool bActuate;
-        bool bBreakEnabled;
+        // UPROPERTY()
+        //   FJointInformation JointInformation;
 
-	class URLink* Parent();
-	class URLink* Child();
+        UPROPERTY()
+          bool bBreakEnabled;
+
+        UPROPERTY()
+          bool bActuate;
+
+        UPROPERTY()
+          bool bUseParentModelFrame;
+
+        virtual void SetParentChild(URLink* Parent, URLink* Child);
+
+        UPROPERTY()
+          FString ParentName;
+
+        UPROPERTY()
+          FString ChildName;
+
+        UPROPERTY()
+          class URLink* Parent;
+        // FString ChildName;
+
+        UPROPERTY()
+          class URLink* Child;
+    // FString ParentName;
 
 	virtual float GetJointPosition();
 	virtual float GetJointPositionInUUnits();
@@ -50,34 +72,30 @@ protected:
 	// virtual void BeginPlay() override;
 
     static bool CreateConstraintComponent(URJoint* OutOwner, USDFJoint* InJoint);
-        static void InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint);
-	static void SetConstraintPosition(URJoint* OutJoint, USDFJoint* InJoint);
-	// static void SetupConstraint(ARModel* OutModel, URJoint* OutOwner, USDFJoint* InJoint);
+    static void InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint);
+    static void SetConstraintPosition(URJoint* OutJoint, USDFJoint* InJoint);
+    // static void SetupConstraint(ARModel* OutModel, URJoint* OutOwner, USDFJoint* InJoint);
 
 
-	UPROPERTY()
-	class URLink* Parent_;
-	// FString ChildName;
-
-	UPROPERTY()
-	class URLink* Child_;
-	// FString ParentName;
 
 
 public:
-	// Called every frame
-	// virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+    // Called every frame
+    // virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void UpdateVelocity();
-	// virtual void UpdateJointStates();
-	virtual void UpdateEncoder();
+    virtual void UpdateVelocity();
+    // virtual void UpdateJointStates();
+    virtual void UpdateEncoder();
 
-	UPROPERTY(EditAnywhere)
-	FTransform Pose;
-
-    UPROPERTY()
-    float DesiredJointPose = 0;
+    UPROPERTY(EditAnywhere)
+      FTransform Pose;
 
     UPROPERTY()
-    float MaxJointVel = -1;
+      float DesiredJointPose = 0;
+
+    UPROPERTY()
+      float MaxJointVel = -1;
+
+    UPROPERTY()
+      float AccumulatatedJointMass = 0;
 };

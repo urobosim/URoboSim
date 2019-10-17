@@ -104,8 +104,6 @@ GENERATED_BODY()
 protected:
 virtual void SetOwner(UObject* InOwner);
 
-// UPROPERTY()
-// URHeadTrajectoryController* Owner;
 };
 
 UCLASS()
@@ -274,7 +272,7 @@ class UROBOSIM_API UROdomPublisher : public URPublisher
     GENERATED_BODY()
 public:
     virtual void Publish();
-
+    UROdomPublisher();
 
 	UPROPERTY(EditAnywhere)
 	FTransform FrameTransform;
@@ -302,8 +300,8 @@ class UROBOSIM_API URJointTrajectoryFeedbackPublisher : public URPublisher
     GENERATED_BODY()
 
 public:
-
     virtual void Publish();
+    URJointTrajectoryFeedbackPublisher();
 protected:
 	virtual void SetMessageType();
 	virtual void SetOwner(UObject* InOwner);
@@ -344,6 +342,7 @@ class UROBOSIM_API URFollowTrajectoryActionResultPublisher : public URPublisher
 
 public:
 
+
     virtual void Publish();
 protected:
 	virtual void SetMessageType();
@@ -359,9 +358,10 @@ class UROBOSIM_API URJointTrajectoryControllerStatePublisher : public URJointTra
 {
     GENERATED_BODY()
 public:
+      URJointTrajectoryControllerStatePublisher();
     virtual void Publish();
 protected:
-	virtual void SetMessageType();
+    virtual void SetMessageType();
 };
 
 UCLASS()
@@ -371,6 +371,7 @@ class UROBOSIM_API UR2DLidarPublisher : public URPublisher
 
 public:
 
+    UR2DLidarPublisher();
     virtual void Publish();
 
   UPROPERTY(EditAnywhere)

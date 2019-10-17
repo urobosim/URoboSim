@@ -69,10 +69,10 @@ void URBaseController::Turn(float InVelocity)
 void URGripperController::SetupCollisionEvent()
 {
   UE_LOG(LogTemp, Error, TEXT("HitEvent Registerd"));
-  RightFingerTip->Child()->GetCollision()->SetNotifyRigidBodyCollision(true);
-  LeftFingerTip->Child()->GetCollision()->SetNotifyRigidBodyCollision(true);
-  // RightFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
-  // LeftFingerTip->Child()->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
+  RightFingerTip->Child->GetCollision()->SetNotifyRigidBodyCollision(true);
+  LeftFingerTip->Child->GetCollision()->SetNotifyRigidBodyCollision(true);
+  // RightFingerTip->Child->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
+  // LeftFingerTip->Child->GetCollision()->OnComponentHit.AddDynamic(this, &URGripperController::OnCollision);
 }
 
 void URGripperController::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit)
@@ -175,13 +175,13 @@ void URGripperController::Tick(float InDeltaTime)
           FVector DirectionTipToTip = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation());
           if(Error < 0)
             {
-              RightFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
-              LeftFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
+              RightFingerTip->Child->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
+              LeftFingerTip->Child->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
             }
           else
             {
-              RightFingerTip->Child()->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
-              LeftFingerTip->Child()->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
+              RightFingerTip->Child->GetCollision()->AddForce(Force*DirectionTipToTip.GetSafeNormal());
+              LeftFingerTip->Child->GetCollision()->AddForce(-Force*DirectionTipToTip.GetSafeNormal());
             }
           // RightFinger->MaxJointVel = 0.2;
           // RightFinger->DesiredJointPose = RightFinger->GetEncoderValue();
@@ -196,16 +196,12 @@ void URGripperController::Tick(float InDeltaTime)
         {
           RightFinger->Constraint->SetTargetPosition(RightFinger->GetJointPosition());
           LeftFinger->Constraint->SetTargetPosition(LeftFinger->GetJointPosition());
-          // RightFinger->Constraint->SetTargetPosition(0.);
-          // LeftFinger->Constraint->SetTargetPosition(0.);
           RightFinger->EnableMotor(true);
           LeftFinger->EnableMotor(true);
           Grasp();
         }
       else
         {
-          // RightFinger->bActuate = true;
-          // LeftFinger->bActuate = true;
           RightFinger->EnableMotor(true);
           LeftFinger->EnableMotor(true);
           Release();
@@ -478,6 +474,8 @@ URGripperController::URGripperController()
 {
     OldPosition = 0.0;
     // GraspComponent = CreateDefaultSubobject<URGraspComponent>(FName(*(GetName() + TEXT("_GraspComp"))));
+
+
 }
 
 bool URGripperController::Grasp()
@@ -620,6 +618,13 @@ void URGripperController::Init(ARModel* InModel)
           Model = InModel;
           TArray<URGraspComponent* > TempGraspComponents;
           Model->GetComponents<URGraspComponent>(TempGraspComponents);
+
+          RightFinger = Model->Joints.FindRef(RightJointName);
+          LeftFinger = Model->Joints.FindRef(LeftJointName);
+
+          RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
+          LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
+
           for(auto& GraspComp : TempGraspComponents)
             {
               if(GraspComp->GetName().Equals(GraspComponentName))
@@ -629,7 +634,10 @@ void URGripperController::Init(ARModel* InModel)
                   URLink* ReferenceLink = Model->Links[GraspCompSetting.GripperName];
                   GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
                   GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-                  GraspComponent->Init(ReferenceLink->GetCollision());
+                  TArray<URStaticMeshComponent*> TempFixationPoints;
+                  TempFixationPoints.Add(RightFinger->Child->GetCollision());
+                  TempFixationPoints.Add(LeftFinger->Child->GetCollision());
+                  GraspComponent->Init(ReferenceLink->GetCollision(), TempFixationPoints);
                 }
             }
 
@@ -658,11 +666,6 @@ void URGripperController::Init(ARModel* InModel)
 
           // RightFingerTipName = GraspCompSetting.GripperName + TEXT("_r_finger_tip_joint");
           // LeftFingerTipName = GraspCompSetting.GripperName + TEXT("_l_finger_tip_joint");
-          RightFinger = Model->Joints.FindRef(RightJointName);
-          LeftFinger = Model->Joints.FindRef(LeftJointName);
-
-          RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
-          LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
           // SetupCollisionEvent();
           RightFinger->bActuate = false;
           LeftFinger->bActuate = false;

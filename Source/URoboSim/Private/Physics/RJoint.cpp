@@ -12,11 +12,6 @@ URJoint::URJoint()
 {
   bBreakEnabled = false;
   bActuate = true;
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	// PrimaryComponentTick.bCanEverTick = true;
-
-  // Encoder.Test();
 }
 
 
@@ -28,7 +23,7 @@ float URJoint::GetEncoderValue()
 void URJoint::UpdateEncoder()
 {
   Constraint->UpdateEncoderValue(GetJointPosition());
-  Child_->UpdateEncoder();
+  Child->UpdateEncoder();
 }
 
 void URJoint::EnableMotor(bool InEnable)
@@ -43,7 +38,7 @@ void URJoint::UpdateVelocity()
     Constraint->UpdateJointVelocity();
   }
 
-  Child_->UpdateVelocity();
+  Child->UpdateVelocity();
 }
 
 // void URJoint::UpdateJointStates()
@@ -54,49 +49,49 @@ void URJoint::UpdateVelocity()
 
 void URJoint::Load(ARModel* OutModel, USDFJoint* InJoint)
 {
-	UActorComponent* ParentMesh = nullptr;
-	UActorComponent* ChildMesh = nullptr;
-	URLink* ParentLink;
-	URLink* ChildLink;
+  UActorComponent* ParentMesh = nullptr;
+  UActorComponent* ChildMesh = nullptr;
+  URLink* ParentLink;
+  URLink* ChildLink;
 
-	for(auto& Component : OutModel->Links)
-	{
-		if(Component.Key.Equals(InJoint->Parent))
-		{
-			ParentMesh = Component.Value->GetCollision();
-			ParentLink = Component.Value;
-		}
-		if(Component.Key.Equals(InJoint->Child))
-		{
-			ChildMesh = Component.Value->GetCollision();
-			ChildLink = Component.Value;
-		}
-	}
+  for(auto& Component : OutModel->Links)
+    {
+      if(Component.Key.Equals(InJoint->Parent))
+        {
+          ParentMesh = Component.Value->GetCollision();
+          ParentLink = Component.Value;
+        }
+      if(Component.Key.Equals(InJoint->Child))
+        {
+          ChildMesh = Component.Value->GetCollision();
+          ChildLink = Component.Value;
+        }
+    }
 
-	if(ParentMesh && ChildMesh)
-	{
-		URJoint* Joint = NewObject<URJoint>(OutModel, FName((InJoint->Name).GetCharArray().GetData()));
-		if(CreateConstraintComponent(Joint, InJoint))
-		{
-			ChildLink->ParentFrame = ParentLink->GetName();
-			Joint->Child_ = ChildLink;
-			Joint->Parent_ = ParentLink;
-			Joint->Pose = InJoint->Pose;
-			InitConstraintComponent(Joint,InJoint);
-			ParentLink->AddJoint(Joint);
-			OutModel->AddJoint(Joint);
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("Parent and/or Child not found for Link: %s"), *InJoint->Name);
-	}
+  if(ParentMesh && ChildMesh)
+    {
+      URJoint* Joint = NewObject<URJoint>(OutModel, FName((InJoint->Name).GetCharArray().GetData()));
+      if(CreateConstraintComponent(Joint, InJoint))
+        {
+          ChildLink->ParentFrame = ParentLink->GetName();
+          Joint->Child = ChildLink;
+          Joint->Parent = ParentLink;
+          Joint->Pose = InJoint->Pose;
+          InitConstraintComponent(Joint,InJoint);
+          ParentLink->AddJoint(Joint);
+          OutModel->AddJoint(Joint);
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Parent and/or Child not found for Link: %s"), *InJoint->Name);
+    }
 }
 
 void URJoint::InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint)
 {
 
-	OutJoint->Constraint->SetParentChild(Cast<URStaticMeshComponent>(OutJoint->Parent_->GetCollision()), Cast<URStaticMeshComponent>(OutJoint->Child_->GetCollision()));
+	OutJoint->Constraint->SetParentChild(Cast<URStaticMeshComponent>(OutJoint->Parent->GetCollision()), Cast<URStaticMeshComponent>(OutJoint->Child->GetCollision()));
 	// OutJoint->Constraint->SetPosition(InJoint);
 	SetConstraintPosition(OutJoint, InJoint);
 	OutJoint->Constraint->SetAxis(InJoint);
@@ -107,35 +102,35 @@ void URJoint::InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint)
 
 void URJoint::SetConstraintPosition(URJoint* OutJoint, USDFJoint* InJoint)
 {
-	URStaticMeshComponent* Child = Cast<URStaticMeshComponent>(OutJoint->Child_->GetCollision());
-	URStaticMeshComponent* Parent = Cast<URStaticMeshComponent>(OutJoint->Parent_->GetCollision());
-	URConstraintComponent* Constraint = OutJoint->Constraint;
-	FQuat ChildRotation = Child->GetComponentQuat();
-	FQuat ParentRotation = Parent->GetComponentQuat();
+  URStaticMeshComponent* Child = Cast<URStaticMeshComponent>(OutJoint->Child->GetCollision());
+  URStaticMeshComponent* Parent = Cast<URStaticMeshComponent>(OutJoint->Parent->GetCollision());
+  URConstraintComponent* Constraint = OutJoint->Constraint;
+  FQuat ChildRotation = Child->GetComponentQuat();
+  FQuat ParentRotation = Parent->GetComponentQuat();
 
-	if(InJoint->Axis->bUseParentModelFrame)
-	{
-		FVector ModelLocation = Cast<ARModel>(OutJoint->GetOuter())->GetActorLocation();
-		FQuat ModelRotation = Cast<ARModel>(OutJoint->GetOuter())->GetActorQuat();
+  if(InJoint->Axis->bUseParentModelFrame)
+    {
+      FVector ModelLocation = Cast<ARModel>(OutJoint->GetOuter())->GetActorLocation();
+      FQuat ModelRotation = Cast<ARModel>(OutJoint->GetOuter())->GetActorQuat();
 
-		//TODO test order of multiplication
-		FVector LocationOffset = ModelRotation.RotateVector(InJoint->Pose.GetLocation());
-		Constraint->SetWorldLocation(Child->GetComponentLocation() + LocationOffset);
+      //TODO test order of multiplication
+      FVector LocationOffset = ModelRotation.RotateVector(InJoint->Pose.GetLocation());
+      Constraint->SetWorldLocation(Child->GetComponentLocation() + LocationOffset);
 
-		//TODO test order of multiplication
-		FQuat RotationOffset = ChildRotation * InJoint->Pose.GetRotation();
-		Constraint->SetWorldRotation(RotationOffset);
+      //TODO test order of multiplication
+      FQuat RotationOffset = ChildRotation * InJoint->Pose.GetRotation();
+      Constraint->SetWorldRotation(RotationOffset);
 
-		Constraint->AttachToComponent(Child, FAttachmentTransformRules::KeepWorldTransform);
-	}
-	else
-	{
-		//TODO Implement and check this case
-		UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame"));
+      Constraint->AttachToComponent(Child, FAttachmentTransformRules::KeepWorldTransform);
+    }
+  else
+    {
+      //TODO Implement and check this case
+      UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame"));
 
-		Constraint->SetPosition(InJoint);
-		Constraint->AttachToComponent(Child, FAttachmentTransformRules::KeepRelativeTransform);
-	}
+      Constraint->SetPosition(InJoint);
+      Constraint->AttachToComponent(Child, FAttachmentTransformRules::KeepRelativeTransform);
+    }
 
 }
 
@@ -174,15 +169,23 @@ bool URJoint::CreateConstraintComponent(URJoint* OutOwner, USDFJoint* InJoint)
 	}
 }
 
-URLink* URJoint::Child()
+void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
 {
-	return Child_;
+  Child = InChild;
+  Parent = InParent;
+
+  Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
 
-URLink* URJoint::Parent()
-{
-	return Parent_;
-}
+// URLink* URJoint::Child()
+// {
+// 	return Child_;
+// }
+
+// URLink* URJoint::Parent()
+// {
+// 	return Parent_;
+// }
 
 float URJoint::GetJointPosition()
 {
@@ -225,3 +228,7 @@ void URJoint::SetJointEffortFromROS(float Effort)
 
 	Constraint->SetJointEffort(Effort);
 }
+
+      // Constraint->AttachToComponent(Child->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+      // Constraint->AddRelativeLocation(Pose.GetLocation());
+      // Constraint->AddRelativeRotation(Pose.GetRotation());

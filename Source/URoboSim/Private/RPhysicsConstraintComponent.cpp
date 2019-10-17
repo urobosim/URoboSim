@@ -196,15 +196,15 @@ void URContinuousConstraintComponent::BeginPlay()
 
 void URPrismaticConstraintComponent::BeginPlay()
 {
-    JointAccuracy = 0.01;
-	Super::BeginPlay();
+  JointAccuracy = 0.01;
+  Super::BeginPlay();
 
-	if(GetOuter()->GetName().Equals("torso_lift_joint"))
-	{
-		SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
-	}
+  if(GetOuter()->GetName().Equals("torso_lift_joint"))
+    {
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
+    }
 
-	SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
 }
 
 void URContinuousConstraintComponent::RotateConstraintToRefAxis(FVector InRefAxis, bool bUseParentModelFrame)
@@ -354,6 +354,19 @@ void URFixedConstraintComponent::ConnectToComponents()
 
 }
 
+void URPrismaticConstraintComponent::ConnectToComponents()
+{
+  Super::ConnectToComponents();
+  if(Parent && Child)
+    {
+      ParentChildDistance = Child->GetComponentLocation() - Parent->GetComponentLocation();
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Parent not found in prismatic"));
+    }
+
+}
 void URFixedConstraintComponent::SetPosition(USDFJoint* InJoint)
 {
 	// SetWorldLocation(Cast<UPrimitiveComponent>(Child)->GetComponentLocation());

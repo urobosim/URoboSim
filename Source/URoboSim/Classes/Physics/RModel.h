@@ -18,49 +18,58 @@ class USDFLink;
 class URJoint;
 // class URLink;
 
+USTRUCT()
+struct FModelInformation
+{
+  GENERATED_BODY()
+  public:
+
+};
 
 UCLASS()
 class UROBOSIM_API ARModel : public AActor
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
-public:
-	// Sets default values for this actor's properties
-	ARModel();
+    public:
+    // Sets default values for this actor's properties
+    ARModel();
 
-	// Destructor
-	~ARModel();
+  // Destructor
+  ~ARModel();
 
-	UPROPERTY(EditAnywhere)
-	TMap<FString, URJoint*> Joints;
+  UPROPERTY(EditAnywhere)
+    TMap<FString, URJoint*> Joints;
 
-	UPROPERTY(EditAnywhere)
-	TMap<FString, URLink*> Links;
+  UPROPERTY(EditAnywhere)
+    TMap<FString, URLink*> Links;
 
-	UPROPERTY(VisibleAnywhere)
-	TMap<FString, UActorComponent*> Plugins;
+  UPROPERTY()
+  URLink* BaseLink;
 
-	virtual FJointState GetJointState();
+  UPROPERTY(VisibleAnywhere)
+    TMap<FString, UActorComponent*> Plugins;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+  virtual FJointState GetJointState();
+
+ protected:
+  // Called when the game starts or when spawned
+  virtual void BeginPlay() override;
 
 
-	void LoadLinks(TArray<USDFLink*> InLinks);
-	void LoadJoints(TArray<USDFJoint*> InJoints);
+  void LoadLinks(TArray<USDFLink*> InLinks);
+  void LoadJoints(TArray<USDFJoint*> InJoints);
 
-	UPROPERTY()
-	TArray<URGraspComponent*> Grippers;
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+  UPROPERTY()
+    TArray<URGraspComponent*> Grippers;
+ public:
+  // Called every frame
+  virtual void Tick(float DeltaTime) override;
 
-	void AddJoint(URJoint* Joint);
-	void AddLink(URLink* Link);
-	// Load model
+  void AddJoint(URJoint* Joint);
+  void AddLink(URLink* Link);
+  // Load model
 
-	void Load(USDFModel* InModel);
+  void Load(USDFModel* InModel);
 
 };
-

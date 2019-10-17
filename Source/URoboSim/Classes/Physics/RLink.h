@@ -12,6 +12,7 @@
 class ARModel;
 class USDFLink;
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URLink : public UObject
 {
@@ -37,17 +38,19 @@ protected:
     static void SetSimulateGravity(URLink* OutLink, bool InUseGravity);
     static bool CreateCollisionForMesh(UStaticMesh* OutLink, ESDFGeometryType Type);
 
-	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Visuals;
-	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Collisions;
 
 	UPROPERTY()
 	TArray<class URJoint*> Joints;
 
+public:
+
 	UPROPERTY()
 	ARModel* Model;
-public:
+
+	UPROPERTY(EditAnywhere)
+	TArray<class URStaticMeshComponent*> Visuals;
+	UPROPERTY(EditAnywhere)
+	TArray<class URStaticMeshComponent*> Collisions;
 
 	virtual void SetPose(FTransform InPose);
 	virtual void SetPose(FVector InLocation, FQuat InRotation);
@@ -75,4 +78,13 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FTransform Pose;
+};
+
+USTRUCT()
+struct FLinkInformation
+{
+  GENERATED_BODY()
+  public:
+
+  TArray<URLink*> Childs;
 };
