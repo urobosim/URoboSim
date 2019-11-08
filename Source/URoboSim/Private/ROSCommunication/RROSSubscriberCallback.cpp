@@ -73,7 +73,8 @@ void FROSWholeBodyControllerCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 			JointController->Trajectory.Add(TempPoints) ;
 			// JointController->Error.Add(TempError) ;
 		}
-		JointController->bFollowTrajectory = true;
+		// JointController->bFollowTrajectory = true;
+                JointController->FollowTrajectory();
 		UE_LOG(LogTemp, Error, TEXT("Call Callback for TrajectoryGoal"));
 	}
 	else

@@ -13,38 +13,37 @@ void URActionServer::Init(TSharedPtr<FROSBridgeHandler> InHandler, UObject* InOw
 
 void URActionServer::Init(FString InHostIp, uint32 InPort, UObject* InOwner, FString InActionName )
 {
-	Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(InHostIp, InPort));
-	Handler->Connect();
-	Owner = InOwner;
-	if(!InActionName.Equals(""))
-	{
-		ActionName = InActionName;
-	}
-	Init();
-
+  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(InHostIp, InPort));
+  Handler->Connect();
+  Owner = InOwner;
+  if(!InActionName.Equals(""))
+    {
+      ActionName = InActionName;
+    }
+  Init();
 }
 
 void URActionServer::Tick()
 {
-	if(Handler.IsValid())
-	{
-		Handler->Process();
-	}
+  if(Handler.IsValid())
+    {
+      Handler->Process();
+    }
 
-	if(FeedbackPublisher)
-	{
-		FeedbackPublisher->Publish();
-	}
+  if(FeedbackPublisher)
+    {
+      FeedbackPublisher->Publish();
+    }
 
-	if(ResultPublisher)
-	{
-		ResultPublisher->Publish();
-	}
+  if(ResultPublisher)
+    {
+      ResultPublisher->Publish();
+    }
 
-	if(StatusPublisher)
-	{
-		StatusPublisher->Publish();
-	}
+  if(StatusPublisher)
+    {
+      StatusPublisher->Publish();
+    }
 }
 
 void URActionServer::Init()

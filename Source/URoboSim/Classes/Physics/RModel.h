@@ -5,7 +5,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Components/SceneComponent.h"
 #include "RUtilityClasses.h"
 #include "RGraspComponent.h"
 #include "Physics/RLink.h"
@@ -57,9 +56,6 @@ class UROBOSIM_API ARModel : public AActor
   virtual void BeginPlay() override;
 
 
-  void LoadLinks(TArray<USDFLink*> InLinks);
-  void LoadJoints(TArray<USDFJoint*> InJoints);
-
   UPROPERTY()
     TArray<URGraspComponent*> Grippers;
  public:
@@ -69,7 +65,5 @@ class UROBOSIM_API ARModel : public AActor
   void AddJoint(URJoint* Joint);
   void AddLink(URLink* Link);
   // Load model
-
-  void Load(USDFModel* InModel);
 
 };

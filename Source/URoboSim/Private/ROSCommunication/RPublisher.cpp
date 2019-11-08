@@ -428,7 +428,8 @@ void URJointTrajectoryControllerStatePublisher::Publish()
 
 void URJointTrajectoryFeedbackPublisher::Publish()
 {
-  if(Owner->bFollowTrajectory)
+  // if(Owner->bFollowTrajectory)
+  if(Owner->GetState() == UJointControllerState::FollowJointTrajectory)
     {
       TSharedPtr<control_msgs::FollowJointTrajectoryActionFeedback> Feedback =
         MakeShareable(new control_msgs::FollowJointTrajectoryActionFeedback());

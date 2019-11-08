@@ -362,13 +362,19 @@ URStaticMeshComponent* URLink::GetCollision()
 	}
 }
 
-FString URLink::GetParentFrame(FString InDefaultFrame)
+// FString URLink::GetParentFrame(FString InDefaultFrame)
+// {
+// 	// if(ParentFrame.IsEmpty())
+// 	// {
+// 	// 	return InDefaultFrame;
+// 	// }
+// 	// return ParentFrame;
+//   return TEXT("");
+// }
+
+TArray<class URJoint*> URLink::GetJoints()
 {
-	if(ParentFrame.IsEmpty())
-	{
-		return InDefaultFrame;
-	}
-	return ParentFrame;
+  return Joints;
 }
 
 float URLink::GetNumCollisions()

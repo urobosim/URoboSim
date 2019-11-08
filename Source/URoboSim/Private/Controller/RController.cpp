@@ -27,9 +27,6 @@ URBaseController::URBaseController()
 }
 
 
-URHeadTrajectoryController::URHeadTrajectoryController()
-{
-}
 
 URControllerComponent::URControllerComponent()
 {
@@ -224,146 +221,8 @@ void URBaseController::Tick(float InDeltaTime)
 	MoveLinearTick(InDeltaTime);
 }
 
-void URHeadTrajectoryController::Tick(float InDeltaTime)
-{
-  CancelAction();
-  if(bActive)
-    {
-      GoalStatusList.Last().Status = 1;
-      CheckPointHeadState();
-    }
-}
-
-FVector URHeadTrajectoryController::CalculateNewViewDirection()
-{
-  //TODO make it a request to tf
-  FVector Direction;
-  if(Model)
-    {
-      FTransform ReferenceLinkTransform ;
-      if(FrameId.Equals(TEXT("map")))
-        {
-
-        }
-      else
-        {
-          URLink* ReferenceLink = Model->Links.FindRef(FrameId);
-          if(!ReferenceLink)
-            {
-              UE_LOG(LogTemp, Error, TEXT("ReferenceLink %s not found"), *FrameId);
-              return FVector();
-            }
-          ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
-        }
-
-      TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
-      URStaticMeshComponent* PointingLink = nullptr;
-      for(auto & Component : ActorComponents)
-        {
-          if(Component->GetName().Contains(PointingFrame))
-            {
-              PointingLink = Component;
-            }
-        }
-      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
-      if(!PointingLink)
-        {
-          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
-          return FVector();
-        }
-
-      // Add offset to get the right position in pr2 high_def_frame
-      FVector PointInWorldCoord = ReferenceLinkTransform.GetRotation().RotateVector(Point) +  ReferenceLinkTransform.GetLocation();
-
-      // Direction = PointInWorldCoord - PointingLink->GetCollision()->GetComponentTransform().GetLocation();
-      Direction = PointInWorldCoord - (PointingLink->GetComponentQuat().RotateVector(FVector(7.0, 11.0, 12.0)) + PointingLink->GetComponentTransform().GetLocation());
-
-    }
-  return Direction;
-}
-
-void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
-{
-  //TODO use max vel from msg
-  //TODO Currently only work for objects infront
-  if(Model)
-    {
-      TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
-      URStaticMeshComponent* PointingLink = nullptr;
-      for(auto & Component : ActorComponents)
-        {
-          if(Component->GetName().Contains(PointingFrame))
-            {
-              PointingLink = Component;
-            }
-        }
-      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
-      if(!PointingLink)
-        {
-          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
-          return;
-        }
-      FQuat ReferenceQuat = PointingLink->GetComponentQuat();
-      // FQuat ReferenceQuat = PointingLink->GetCollision()->GetComponentQuat();
-      FVector2D AzEl = FMath::GetAzimuthAndElevation(InNewDirection.GetSafeNormal(), ReferenceQuat.GetAxisX(), ReferenceQuat.GetAxisY(), ReferenceQuat.GetAxisZ());
 
 
-      // UE_LOG(LogTemp, Error, TEXT("HeadTrajController: %f %f"), FMath::RadiansToDegrees(AzEl.X), FMath::RadiansToDegrees(AzEl.Y));
-
-      URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-      URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
-
-      float Az = AzimuthJoint->GetJointPosition();
-      float El = ElevationJoint->GetJointPosition();
-
-      // UE_LOG(LogTemp, Error, TEXT("Elevation: %s"), *(NewDirectionElevation).Euler().ToString());
-      // UE_LOG(LogTemp, Error, TEXT("azimuth: %s"), *(NewDirectionAzimuth).Euler().ToString());
-      // UE_LOG(LogTemp, Error, TEXT("%f %f"), AzimuthVel, ElevationVel);
-      AzimuthJoint->DesiredJointPose = Az - AzEl.X;
-      AzimuthJoint->MaxJointVel = 0.17;
-      // AzimuthJoint->SetJointVelocity(AzimuthVel);
-      ElevationJoint->DesiredJointPose = El - AzEl.Y;
-      ElevationJoint->MaxJointVel = 0.17;
-      // ElevationJoint->SetJointVelocity(ElevationVel);
-
-    }
-}
-
-void URPR2HeadTrajectoryController::CheckPointHeadState()
-{
-    if(Model)
-    {
-        URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-        URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
-
-        float Az = AzimuthJoint->GetJointPosition();
-        float El = ElevationJoint->GetJointPosition();
-
-        float DiffAz = AzimuthJoint->DesiredJointPose - Az;
-        float DiffEl = ElevationJoint->DesiredJointPose - El;
-
-        if(FMath::Abs(DiffAz) < 0.02 && FMath::Abs(DiffEl) < 0.02 )
-            // if(AzEl.Y == 0.0 && AzEl.X == 0.0 )
-        {
-            GoalStatusList.Last().Status = 3;
-            bPublishResult = true;
-            bActive = false;
-        }
-    }
-}
-
-void URPR2HeadTrajectoryController::UpdateHeadDirection()
-{
-    if(PointingFrame.Equals("high_def_frame"))
-    {
-        PointingFrame = TEXT("head_tilt_link");
-    }
-
-    FVector NewDirection = CalculateNewViewDirection();
-    MoveToNewPosition(NewDirection);
-}
 
 void URBaseController::TurnTick(float InDeltaTime)
 {
@@ -551,60 +410,51 @@ void URCameraController::Tick(float InDeltaTime)
 
 void URCameraController::Init(ARModel* InModel)
 {
-	if(!InModel)
-	{
-		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-		return;
-	}
-	Model = InModel;
-	TArray<AActor*> FoundActors;
-	TArray<URStaticMeshComponent*> ActorComponents;
-        // URLink* ReferenceLink;
-        URStaticMeshComponent* ReferenceLink;
-        Model->GetComponents(ActorComponents);
+  if(!InModel)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+      return;
+    }
+  Model = InModel;
+  TArray<AActor*> FoundActors;
+  TArray<URStaticMeshComponent*> ActorComponents;
+  // URLink* ReferenceLink;
+  URStaticMeshComponent* ReferenceLink;
+  Model->GetComponents(ActorComponents);
 
-        for(auto & Component : ActorComponents)
-          {
-            UE_LOG(LogTemp, Error, TEXT("%s"), *Component->GetName());
-            if(Component->GetName().Equals(CameraRef))
-              {
-                ReferenceLink = Component;
-              }
-          }
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
-
-	for(auto& Camera : FoundActors)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Camera name %s"), *Camera->GetName());
-		if(Camera->GetName().Equals(CameraName))
-		{
-
-			// URLink* ReferenceLink = Model->Links[CameraRef];
-			// Camera->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			Camera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-                        Camera->AddActorLocalOffset(PoseOffset.GetLocation());
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Camera not found"));
-		}
-	}
-
-}
-
-void URHeadTrajectoryController::Init(ARModel* InModel)
-{
-	bActive = false;
-	if(!InModel)
-	{
-		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-	}
-	else
-	{
-          Model = InModel;
+  for(auto & Component : ActorComponents)
+    {
+      if(Component->GetName().Equals(CameraRef))
+        {
+          ReferenceLink = Component;
         }
+    }
+  if(!ReferenceLink)
+    {
+      UE_LOG(LogTemp, Error, TEXT("CameraRef not found"));
+      return;
+    }
+
+  UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
+
+  for(auto& Camera : FoundActors)
+    {
+      if(Camera->GetName().Equals(CameraName))
+        {
+
+          // URLink* ReferenceLink = Model->Links[CameraRef];
+          // Camera->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          Camera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          Camera->AddActorLocalOffset(PoseOffset.GetLocation());
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Camera not found"));
+        }
+    }
+
 }
+
 
 void URGripperController::Init(ARModel* InModel)
 {
@@ -802,4 +652,162 @@ void URControllerComponent::Release(FString InGripperIndex)
 	{
 		Cast<URGripperController>(Controller.ControllerList[InGripperIndex])->Release();
 	}
+}
+
+URHeadTrajectoryController::URHeadTrajectoryController()
+{
+}
+
+void URHeadTrajectoryController::Init(ARModel* InModel)
+{
+	bActive = false;
+	if(!InModel)
+	{
+		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+	}
+	else
+	{
+          Model = InModel;
+        }
+}
+
+void URHeadTrajectoryController::Tick(float InDeltaTime)
+{
+  CancelAction();
+  if(bActive)
+    {
+      GoalStatusList.Last().Status = 1;
+      CheckPointHeadState();
+    }
+}
+
+FVector URHeadTrajectoryController::CalculateNewViewDirection()
+{
+  //TODO make it a request to tf
+  FVector Direction;
+  if(Model)
+    {
+      FTransform ReferenceLinkTransform ;
+      if(FrameId.Equals(TEXT("map")))
+        {
+
+        }
+      else
+        {
+          URLink* ReferenceLink = Model->Links.FindRef(FrameId);
+          if(!ReferenceLink)
+            {
+              UE_LOG(LogTemp, Error, TEXT("ReferenceLink %s not found"), *FrameId);
+              return FVector();
+            }
+          ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+        }
+
+      TArray<URStaticMeshComponent*> ActorComponents;
+      Model->GetComponents(ActorComponents);
+      URStaticMeshComponent* PointingLink = nullptr;
+      for(auto & Component : ActorComponents)
+        {
+          if(Component->GetName().Contains(PointingFrame))
+            {
+              PointingLink = Component;
+            }
+        }
+      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
+      if(!PointingLink)
+        {
+          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
+          return FVector();
+        }
+
+      // Add offset to get the right position in pr2 high_def_frame
+      FVector PointInWorldCoord = ReferenceLinkTransform.GetRotation().RotateVector(Point) +  ReferenceLinkTransform.GetLocation();
+
+      // Direction = PointInWorldCoord - PointingLink->GetCollision()->GetComponentTransform().GetLocation();
+      Direction = PointInWorldCoord - (PointingLink->GetComponentQuat().RotateVector(FVector(7.0, 11.0, 12.0)) + PointingLink->GetComponentTransform().GetLocation());
+
+    }
+  return Direction;
+}
+
+void URPR2HeadTrajectoryController::UpdateHeadDirection()
+{
+    if(PointingFrame.Equals("high_def_frame"))
+    {
+        PointingFrame = TEXT("head_tilt_link");
+    }
+
+    FVector NewDirection = CalculateNewViewDirection();
+    MoveToNewPosition(NewDirection);
+}
+
+void URPR2HeadTrajectoryController::CheckPointHeadState()
+{
+    if(Model)
+    {
+        URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
+        URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
+
+        float Az = AzimuthJoint->GetJointPosition();
+        float El = ElevationJoint->GetJointPosition();
+
+        float DiffAz = AzimuthJoint->DesiredJointPose - Az;
+        float DiffEl = ElevationJoint->DesiredJointPose - El;
+
+        if(FMath::Abs(DiffAz) < 0.02 && FMath::Abs(DiffEl) < 0.02 )
+            // if(AzEl.Y == 0.0 && AzEl.X == 0.0 )
+        {
+            GoalStatusList.Last().Status = 3;
+            bPublishResult = true;
+            bActive = false;
+        }
+    }
+}
+
+void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
+{
+  //TODO use max vel from msg
+  //TODO Currently only work for objects infront
+  if(Model)
+    {
+      TArray<URStaticMeshComponent*> ActorComponents;
+      Model->GetComponents(ActorComponents);
+      URStaticMeshComponent* PointingLink = nullptr;
+      for(auto & Component : ActorComponents)
+        {
+          if(Component->GetName().Contains(PointingFrame))
+            {
+              PointingLink = Component;
+            }
+        }
+      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
+      if(!PointingLink)
+        {
+          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
+          return;
+        }
+      FQuat ReferenceQuat = PointingLink->GetComponentQuat();
+      // FQuat ReferenceQuat = PointingLink->GetCollision()->GetComponentQuat();
+      FVector2D AzEl = FMath::GetAzimuthAndElevation(InNewDirection.GetSafeNormal(), ReferenceQuat.GetAxisX(), ReferenceQuat.GetAxisY(), ReferenceQuat.GetAxisZ());
+
+
+      // UE_LOG(LogTemp, Error, TEXT("HeadTrajController: %f %f"), FMath::RadiansToDegrees(AzEl.X), FMath::RadiansToDegrees(AzEl.Y));
+
+      URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
+      URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
+
+      float Az = AzimuthJoint->GetJointPosition();
+      float El = ElevationJoint->GetJointPosition();
+
+      // UE_LOG(LogTemp, Error, TEXT("Elevation: %s"), *(NewDirectionElevation).Euler().ToString());
+      // UE_LOG(LogTemp, Error, TEXT("azimuth: %s"), *(NewDirectionAzimuth).Euler().ToString());
+      // UE_LOG(LogTemp, Error, TEXT("%f %f"), AzimuthVel, ElevationVel);
+      AzimuthJoint->DesiredJointPose = Az - AzEl.X;
+      AzimuthJoint->MaxJointVel = 0.17;
+      // AzimuthJoint->SetJointVelocity(AzimuthVel);
+      ElevationJoint->DesiredJointPose = El - AzEl.Y;
+      ElevationJoint->MaxJointVel = 0.17;
+      // ElevationJoint->SetJointVelocity(ElevationVel);
+
+    }
 }

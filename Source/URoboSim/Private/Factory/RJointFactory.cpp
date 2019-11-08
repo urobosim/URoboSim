@@ -143,10 +143,10 @@ void URJointBuilder::RotateConstraintToRefAxis()
 float URJointBuilder::CalculateRotationOffset()
 {
   Joint->Constraint->RotationOffset = 0.5 * (JointDescription->Axis->Upper + JointDescription->Axis->Lower);
-  if (JointDescription->Axis->Xyz[0] == 1 || JointDescription->Axis->Xyz[0] == -1)
-    {
-      Joint->Constraint->RotationOffset *= -1;
-    }
+  // if (JointDescription->Axis->Xyz[0] == 1 || JointDescription->Axis->Xyz[0] == -1)
+  //   {
+  //     Joint->Constraint->RotationOffset *= -1;
+  //   }
   return Joint->Constraint->RotationOffset;
 }
 
@@ -154,9 +154,6 @@ void URContiniousJointBuilder::SetAxis()
 {
   Super::SetAxis();
 
-  // FQuat ParentOrientation = Joint->Parent()->GetCollision()->GetComponentQuat();
-  // FQuat ChildOrientation = Joint->Child()->GetCollision()->GetComponentQuat();
-  // Joint->Constraint->QInitial = ParentOrientation.Inverse() * ChildOrientation;
 
   RotateConstraintToRefAxis();
 

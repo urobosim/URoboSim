@@ -1,5 +1,5 @@
-#include "RStaticMeshEditUtils.h"
 #include "Factory/RLinkFactory.h"
+#include "RStaticMeshEditUtils.h"
 
 URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription)
 {
@@ -127,7 +127,7 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
       else
         {
           LinkComponent->WeldTo(Link->Visuals[0]);
-          UE_LOG(LogTemp, Warning, TEXT("Attachment succesfull Weld to first visual:%s."), *LinkComponent->GetName() );
+          // UE_LOG(LogTemp, Warning, TEXT("Attachment succesfull Weld to first visual:%s."), *LinkComponent->GetName() );
         }
       Link->Visuals.Add(LinkComponent);
     }
@@ -180,6 +180,10 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
         }
       LinkComponent->bVisible = false;
       Link->Collisions.Add(LinkComponent);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Collision Mesh not valid"));
     }
 }
 

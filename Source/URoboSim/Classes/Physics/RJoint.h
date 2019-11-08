@@ -71,9 +71,6 @@ protected:
 	// Called when the game starts
 	// virtual void BeginPlay() override;
 
-    static bool CreateConstraintComponent(URJoint* OutOwner, USDFJoint* InJoint);
-    static void InitConstraintComponent(URJoint* OutJoint, USDFJoint* InJoint);
-    static void SetConstraintPosition(URJoint* OutJoint, USDFJoint* InJoint);
     // static void SetupConstraint(ARModel* OutModel, URJoint* OutOwner, USDFJoint* InJoint);
 
 

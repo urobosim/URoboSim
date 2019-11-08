@@ -55,16 +55,16 @@ public:
 	virtual void SetPose(FTransform InPose);
 	virtual void SetPose(FVector InLocation, FQuat InRotation);
 
-	UPROPERTY()
-	FString ChildFrame;
+	// UPROPERTY()
+	// FString ChildFrame;
 
-	UPROPERTY()
-	FString ParentFrame;
+	// UPROPERTY()
+	// FString ParentFrame;
 
 	URStaticMeshComponent* GetVisual();
 	URStaticMeshComponent* GetCollision();
-
-	virtual FString GetParentFrame(FString InDefaultFrame);
+        TArray<class URJoint*> GetJoints();
+	// virtual FString GetParentFrame(FString InDefaultFrame);
 
 	float GetNumCollisions();
 	// Load link from sdf data
@@ -78,6 +78,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FTransform Pose;
+
+        UPROPERTY()
+        bool bAttachedToParent = false;
 };
 
 USTRUCT()

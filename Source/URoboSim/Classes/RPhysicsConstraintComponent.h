@@ -63,7 +63,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void EnableMotor(bool InEnable){};
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
-  virtual void SetAxis(USDFJoint* InJoint){};
   virtual void SetPosition(USDFJoint* InJoint){};
   virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
 
@@ -102,7 +101,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     UREncoder* Encoder;
 
-  UPROPERTY()
+  UPROPERTY(VisibleAnywhere)
     FVector RefAxis;
 
   UPROPERTY()
@@ -135,7 +134,6 @@ class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
 public:
 	// virtual void Init(USDFJoint* InJoint, UActorComponent* Parent, UActorComponent* Child);
 	virtual void ConnectToComponents();
-	virtual void SetAxis(USDFJoint* InJoint);
 	virtual void SetPosition(USDFJoint *InJoint);
 
 };
@@ -143,43 +141,44 @@ public:
 UCLASS()
 class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComponent
 {
-    GENERATED_BODY()
-public:
+  GENERATED_BODY()
+    public:
 
-      URPrismaticConstraintComponent(){
-      Encoder = CreateDefaultSubobject<URLinearEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
-      PrimaryComponentTick.bCanEverTick = true;
-      PrimaryComponentTick.TickGroup = TG_PrePhysics;
-      P = 1;
-      I = 1;
-    };
-
-
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual void SetPosition(USDFJoint* InJoint);
-	virtual void BeginPlay() override;
-
-    virtual float GetJointPosition() override;
-    virtual float GetJointVelocity() override;
-
-    virtual float GetJointPositionInUUnits() override;
-    virtual float GetJointVelocityInUUnits() override;
-
-    virtual void SetJointPosition(float Angle);
-    virtual void SetJointVelocity(float Velocity);
-    virtual void SetJointVelocityInUUnits(float Velocity);
-    virtual void SetJointEffort(float Effort);
-    virtual void SetJointEffortFromROS(float InEffort);
+    URPrismaticConstraintComponent(){
+    Encoder = CreateDefaultSubobject<URLinearEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
+    PrimaryComponentTick.bCanEverTick = true;
+    PrimaryComponentTick.TickGroup = TG_PrePhysics;
+    P = 1;
+    I = 1;
+  };
 
 
+  virtual void SetPosition(USDFJoint* InJoint);
+  virtual void BeginPlay() override;
 
-protected:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void UpdateJointVelocity();
-	virtual void ConnectToComponents() override;
-private:
-	UPROPERTY()
-	FVector ParentChildDistance;
+  virtual float GetJointPosition() override;
+  virtual float GetJointVelocity() override;
+
+  virtual float GetJointPositionInUUnits() override;
+  virtual float GetJointVelocityInUUnits() override;
+
+  virtual void SetJointPosition(float Angle);
+  virtual void SetJointVelocity(float Velocity);
+  virtual void SetJointVelocityInUUnits(float Velocity);
+  virtual void SetJointEffort(float Effort);
+  virtual void SetJointEffortFromROS(float InEffort);
+  virtual void EnableMotor(bool InEnable);
+  virtual void SetTargetPosition(float InTargetPos);
+
+
+
+ protected:
+  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+  virtual void UpdateJointVelocity();
+  virtual void ConnectToComponents() override;
+ private:
+  UPROPERTY()
+    FVector ParentChildDistance;
 
 };
 
@@ -197,8 +196,6 @@ public:
       I = 1;
       // D = 0.01;
     };
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual void RotateConstraintToRefAxis(FVector InRefAxis, bool bUseParentModelFrame);
 
         virtual void SetTargetPosition(float InTargetPos);
 	virtual void EnableMotor(bool InEnable);
@@ -238,8 +235,6 @@ class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraint
 {
     GENERATED_BODY()
 public:
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual float CalculateRotationOffset(USDFJoint* InJoint);
         virtual void SetTargetPosition(float InTargetPos);
 
 

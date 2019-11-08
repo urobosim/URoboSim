@@ -9,6 +9,7 @@
 // #include "Runtime/Engine/Classes/Engine/Brush.h"
 // #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "SDF/SDFDataAsset.h"
+#include "CustomMeshComponent.h"
 
 // #include "Editor.h"
 #include "Editor/EditorEngine.h"
@@ -21,6 +22,12 @@
 #include "Runtime/CoreUObject/Public/UObject/UObjectGlobals.h"
 #include "FileHelpers.h"
 // #include "RStaticMeshEditUtils.generated.h"
+
+#include "MeshDescription.h"
+#include "KismetProceduralMeshLibrary.h"
+#include "ProceduralMeshComponent.h"
+#include "AssetRegistryModule.h"
+
 
 class AActor;
 
@@ -72,6 +79,10 @@ protected:
 
     static UCylinderBuilder* CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters);
 
+    static UProceduralMeshComponent* CreateCubePM(UObject* InOwner, TArray<float> InParameter);
+    static UProceduralMeshComponent* CreateCylinderPM(UObject* InOwner, TArray<float> InParameter, float Section = 8);
+    static void GenerateCylinder(TArray<FVector>& InVertices, TArray<int32>& InTriangles,TArray<FVector2D>& InUVs, TArray<FVector> InNormals, TArray<FProcMeshTangent> InTangets, float Height, float InWidth, int32 InCrossSectionCount, bool bCapEnds = false, bool bDoubleSided = false, bool bInSmoothNormals = true);
+
 };
 
 template <typename T>
@@ -108,171 +119,306 @@ UStaticMesh* RStaticMeshUtils::CreateThroughBrushOrLoadMesh(UStaticMeshComponent
     return StaticMesh;
 };
 
+// template <typename T>
+// UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(UStaticMeshComponent* InOwner, T* InVisual)
+// {
+//   UStaticMesh* StaticMesh = nullptr;
+
+//   FString PackageName = "";
+//   FString Reason = "";
+//   // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
+//   if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
+//     {
+//       UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
+//       return nullptr;
+//     }
+
+//   FString MeshReference = TEXT("StaticMesh\'") + PackageName + "." + FPackageName::GetShortName(PackageName)+ "\'";
+//   // StaticMesh = LoadObject<UStaticMesh>(NULL, *MeshReference, NULL, LOAD_None, NULL);
+//   StaticMesh = LoadObject<UStaticMesh>(InOwner, *MeshReference, NULL, LOAD_None, NULL);
+//   if(!StaticMesh)
+//     {
+//       // UE_LOG(LogTemp, Error, TEXT("Mesh will be created: %s"), *InVisual->Name);
+//       UWorld *World = GEditor->GetEditorWorldContext().World();
+//       if ((World != nullptr) && (World->GetDefaultBrush() != nullptr))
+//         {
+//           ULevel* CurrentLevel = World->GetCurrentLevel();
+//           ABrush* DefBrush = World->GetDefaultBrush();
+//           UE_LOG(LogTemp, Error, TEXT("DefBrush: %s "), *DefBrush->GetName());
+//           TArray<float> Parameters = GetGeometryParameter(InVisual->Geometry);
+//           CreateBrushBuilder(DefBrush, InVisual->Geometry->Type, Parameters);
+//           if (CurrentLevel != nullptr && !FLevelUtils::IsLevelLocked(CurrentLevel)
+//               && DefBrush->BrushBuilder)
+//             {
+//               World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
+//               // World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
+//               World->GetDefaultBrush()->BrushBuilder->Build(World, DefBrush);
+//               DefBrush->SetNeedRebuild(CurrentLevel);
+//               GEditor->RebuildAlteredBSP();
+//               bool bIsAdditive = true;
+//               const TCHAR* Command = bIsAdditive ? TEXT("BRUSH ADD SELECTNEWBRUSH") : TEXT("BRUSH SUBTRACT SELECTNEWBRUSH");
+//               GEditor->Exec(World, Command);
+//               USelection* SelectedActor = GEditor->GetSelectedActors();
+//               if(Cast<ABrush>(SelectedActor->GetSelectedObject(0)))
+//                 {
+//                   int32 BrushIndexForReattachment = 0;
+//                   TArray<AActor* > BrushList ;
+//                   BrushList.Add(Cast<AActor>(SelectedActor->GetSelectedObject(0)));
+//                   for(auto& Brush : BrushList)
+//                     {
+//                       UE_LOG(LogTemp, Error, TEXT("BrushName: %s %s"), *Brush->GetName(), *PackageName);
+//                     }
+//                   // GEditor->DoConvertActors(BrushList, AStaticMeshActor::StaticClass(), TSet<FString>(), false, PackageName);
+//                 }
+
+//             }
+
+//         }
+//     }
+//   else
+//     {
+//       // CleanUp(InVisual->Name);
+//     }
+//   // Early out if actor deletion is currently forbidden
+//   if (GEditor->ShouldAbortActorDeletion())
+//     {
+//       return nullptr;
+//     }
+
+//   return StaticMesh;
+// }
+
 template <typename T>
 UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(UStaticMeshComponent* InOwner, T* InVisual)
 {
 
-    UStaticMesh* StaticMesh = nullptr;
+  UStaticMesh* StaticMesh = nullptr;
+  FString PackageName = "";
+  FString Reason = "";
+  // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
+  if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/Meshes/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
+    {
+      UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
+      return nullptr;
+    }
+  StaticMesh = LoadObject<UStaticMesh>(InOwner, *PackageName, NULL, LOAD_None, NULL);
+  if(StaticMesh)
+    {
+      return StaticMesh;
+    }
 
-	FString PackageName = "";
-	FString Reason = "";
-        // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
-	if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
-	{
-		UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
-		return nullptr;
-	}
+  UProceduralMeshComponent* ProcMeshComp = nullptr;
 
-	FString MeshReference = TEXT("StaticMesh\'") + PackageName + "." + FPackageName::GetShortName(PackageName)+ "\'";
-	StaticMesh = LoadObject<UStaticMesh>(NULL, *MeshReference, NULL, LOAD_None, NULL);
-	if(!StaticMesh)
-	{
-		UWorld *World = GEditor->GetEditorWorldContext().World();
-		if ((World != nullptr) && (World->GetDefaultBrush() != nullptr))
-		{
-			ULevel* CurrentLevel = World->GetCurrentLevel();
-			ABrush* DefBrush = World->GetDefaultBrush();
-			TArray<float> Parameters = GetGeometryParameter(InVisual->Geometry);
-			CreateBrushBuilder(DefBrush, InVisual->Geometry->Type, Parameters);
-			if (CurrentLevel != nullptr && !FLevelUtils::IsLevelLocked(CurrentLevel)
-					&& DefBrush->BrushBuilder)
-			{
-				World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
-				World->GetDefaultBrush()->BrushBuilder->Build(World, DefBrush);
-				DefBrush->SetNeedRebuild(CurrentLevel);
-				GEditor->RebuildAlteredBSP();
-				bool bIsAdditive = true;
-				const TCHAR* Command = bIsAdditive ? TEXT("BRUSH ADD SELECTNEWBRUSH") : TEXT("BRUSH SUBTRACT SELECTNEWBRUSH");
-				GEditor->Exec(World, Command);
-				USelection* SelectedActor = GEditor->GetSelectedActors();
-				if(Cast<ABrush>(SelectedActor->GetSelectedObject(0)))
-				{
-					int32 BrushIndexForReattachment = 0;
-					TArray<AActor* > BrushList ;
-					BrushList.Add(Cast<AActor>(SelectedActor->GetSelectedObject(0)));
-					GEditor->DoConvertActors(BrushList, AStaticMeshActor::StaticClass(), TSet<FString>(), false, PackageName);
-				}
+  switch(InVisual->Geometry->Type)
+    {
+        case ESDFGeometryType::None :
+            UE_LOG(LogTemp, Error, TEXT("GeometryTyp Not Implemented"));
+            break;
+        case ESDFGeometryType::Mesh :
+            UE_LOG(LogTemp, Error, TEXT("Mesh Not Implemented"));
+            break;
+        case ESDFGeometryType::Box :
+          ProcMeshComp = CreateCubePM(InOwner, GetGeometryParameter(InVisual->Geometry));
+            break;
+        case ESDFGeometryType::Cylinder :
+          ProcMeshComp = CreateCylinderPM(InOwner, GetGeometryParameter(InVisual->Geometry));
+            break;
+        case ESDFGeometryType::Sphere :
+            UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet."));
+            break;
+        default :
+            UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet."));
+            break;
+    }
+  // FVector BoxRadius(1, 1, 1);
+  // TArray<FVector> Vertices;
+  // TArray<int32> Triangles;
+  // TArray<FVector> Normals;
+  // TArray<FVector2D> UVs;
+  // TArray<FProcMeshTangent> Tangent;
+  // TArray<FLinearColor> Colors;
+  // UKismetProceduralMeshLibrary::GenerateBoxMesh(BoxRadius, Vertices, Triangles, Normals, UVs, Tangent);
+  // for(int i = 0; i < Vertices.Num(); i++)
+  //   {
+  //     Colors.Add(FLinearColor::Green);
+  //   }
+  // ProcMeshComp->CreateMeshSection_LinearColor(0, Vertices, Triangles, Normals, UVs, Colors, Tangent, false);
+  // UMaterial* Material = NewObject<UMaterial>(ProcMeshComp);
+  // ProcMeshComp->SetMaterial(0, Material);
 
-			}
 
-		}
-	}
-	else
-	{
-		CleanUp(InVisual->Name);
-	}
-	// Early out if actor deletion is currently forbidden
-	if (GEditor->ShouldAbortActorDeletion())
-	{
-		return nullptr;
-	}
 
-	return StaticMesh;
+
+  FString Name;
+  FName MeshName(*FPackageName::GetLongPackageAssetName(PackageName));
+  // UStaticMesh* StaticMesh = NewObject<UStaticMesh>(InOwner, MeshName, RF_Public | RF_Standalone);
+  if (ProcMeshComp != nullptr)
+    {
+      // Get the full name of where we want to create the physics asset.
+
+      FMeshDescription MeshDescription;
+      UStaticMesh::RegisterMeshAttributes(MeshDescription);
+      FStaticMeshDescriptionAttributeGetter AttributeGetter(&MeshDescription);
+      TPolygonGroupAttributesRef<FName> PolygonGroupNames = AttributeGetter.GetPolygonGroupImportedMaterialSlotNames();
+      TVertexAttributesRef<FVector> VertexPositions = AttributeGetter.GetPositions();
+      TVertexInstanceAttributesRef<FVector> Tangents = AttributeGetter.GetTangents();
+      TVertexInstanceAttributesRef<float> BinormalSigns = AttributeGetter.GetBinormalSigns();
+      TVertexInstanceAttributesRef<FVector> Normals = AttributeGetter.GetNormals();
+      TVertexInstanceAttributesRef<FVector4> Colors = AttributeGetter.GetColors();
+      TVertexInstanceAttributesRef<FVector2D> UVs = AttributeGetter.GetUVs();
+      TEdgeAttributesRef<bool> EdgeHardnesses = AttributeGetter.GetEdgeHardnesses();
+      TEdgeAttributesRef<float> EdgeCreaseSharpnesses = AttributeGetter.GetEdgeCreaseSharpnesses();
+
+      // Materials to apply to new mesh
+      const int32 NumSections = ProcMeshComp->GetNumSections();
+      int32 VertexCount = 0;
+      int32 VertexInstanceCount = 0;
+      int32 PolygonCount = 0;
+      TMap<UMaterialInterface*, FPolygonGroupID> UniqueMaterials;
+      UniqueMaterials.Reserve(NumSections);
+      TArray<FPolygonGroupID> MaterialRemap;
+      MaterialRemap.Reserve(NumSections);
+      //Get all the info we need to create the MeshDescription
+      for (int32 SectionIdx = 0; SectionIdx < NumSections; SectionIdx++)
+        {
+          FProcMeshSection* ProcSection = ProcMeshComp->GetProcMeshSection(SectionIdx);
+          VertexCount += ProcSection->ProcVertexBuffer.Num();
+          VertexInstanceCount += ProcSection->ProcIndexBuffer.Num();
+          PolygonCount += ProcSection->ProcIndexBuffer.Num() / 3;
+          UMaterialInterface*Material = ProcMeshComp->GetMaterial(SectionIdx);
+          if (!UniqueMaterials.Contains(Material))
+            {
+              FPolygonGroupID NewPolygonGroup = MeshDescription.CreatePolygonGroup();
+              UniqueMaterials.Add(Material, NewPolygonGroup);
+              PolygonGroupNames[NewPolygonGroup] = Material->GetFName();
+            }
+          FPolygonGroupID* PolygonGroupID = UniqueMaterials.Find(Material);
+          check(PolygonGroupID != nullptr);
+          MaterialRemap.Add(*PolygonGroupID);
+        }
+      MeshDescription.ReserveNewVertices(VertexCount);
+      MeshDescription.ReserveNewVertexInstances(VertexInstanceCount);
+      MeshDescription.ReserveNewPolygons(PolygonCount);
+      MeshDescription.ReserveNewEdges(PolygonCount * 2);
+      UVs.SetNumIndices(4);
+      //Add Vertex and VertexInstance and polygon for each section
+      for (int32 SectionIdx = 0; SectionIdx < NumSections; SectionIdx++)
+        {
+          FProcMeshSection* ProcSection = ProcMeshComp->GetProcMeshSection(SectionIdx);
+          FPolygonGroupID PolygonGroupID = MaterialRemap[SectionIdx];
+          //Create the vertex
+          int32 NumVertex = ProcSection->ProcVertexBuffer.Num();
+          TMap<int32, FVertexID> VertexIndexToVertexID;
+          VertexIndexToVertexID.Reserve(NumVertex);
+          for (int32 VertexIndex = 0; VertexIndex < NumVertex; ++VertexIndex)
+            {
+              FProcMeshVertex& Vert = ProcSection->ProcVertexBuffer[VertexIndex];
+              const FVertexID VertexID = MeshDescription.CreateVertex();
+              VertexPositions[VertexID] = Vert.Position;
+              VertexIndexToVertexID.Add(VertexIndex, VertexID);
+            }
+          //Create the VertexInstance
+          int32 NumIndices = ProcSection->ProcIndexBuffer.Num();
+          int32 NumTri = NumIndices / 3;
+          TMap<int32, FVertexInstanceID> IndiceIndexToVertexInstanceID;
+          IndiceIndexToVertexInstanceID.Reserve(NumVertex);
+          for (int32 IndiceIndex = 0; IndiceIndex < NumIndices; IndiceIndex++)
+            {
+              const int32 VertexIndex = ProcSection->ProcIndexBuffer[IndiceIndex];
+              const FVertexID VertexID = VertexIndexToVertexID[VertexIndex];
+              const FVertexInstanceID VertexInstanceID = MeshDescription.CreateVertexInstance(VertexID);
+              IndiceIndexToVertexInstanceID.Add(IndiceIndex, VertexInstanceID);
+
+              FProcMeshVertex& ProcVertex = ProcSection->ProcVertexBuffer[VertexIndex];
+
+              Tangents[VertexInstanceID] = ProcVertex.Tangent.TangentX;
+              Normals[VertexInstanceID] = ProcVertex.Normal;
+              BinormalSigns[VertexInstanceID] = ProcVertex.Tangent.bFlipTangentY ? -1.f : 1.f;
+
+              Colors[VertexInstanceID] = FLinearColor(ProcVertex.Color);
+
+              UVs.Set(VertexInstanceID, 0, ProcVertex.UV0);
+              UVs.Set(VertexInstanceID, 1, ProcVertex.UV1);
+              UVs.Set(VertexInstanceID, 2, ProcVertex.UV2);
+              UVs.Set(VertexInstanceID, 3, ProcVertex.UV3);
+            }
+
+          //Create the polygons for this section
+          for (int32 TriIdx = 0; TriIdx < NumTri; TriIdx++)
+            {
+              FVertexID VertexIndexes[3];
+              TArray<FVertexInstanceID> VertexInstanceIDs;
+              VertexInstanceIDs.SetNum(3);
+
+              for (int32 CornerIndex = 0; CornerIndex < 3; ++CornerIndex)
+                {
+                  const int32 IndiceIndex = (TriIdx * 3) + CornerIndex;
+                  const int32 VertexIndex = ProcSection->ProcIndexBuffer[IndiceIndex];
+                  VertexIndexes[CornerIndex] = VertexIndexToVertexID[VertexIndex];
+                  VertexInstanceIDs[CornerIndex] = IndiceIndexToVertexInstanceID[IndiceIndex];
+                }
+
+              // Insert a polygon into the mesh
+              const FPolygonID NewPolygonID = MeshDescription.CreatePolygon(PolygonGroupID, VertexInstanceIDs);
+              //Triangulate the polygon
+              FMeshPolygon& Polygon = MeshDescription.GetPolygon(NewPolygonID);
+              MeshDescription.ComputePolygonTriangulation(NewPolygonID, Polygon.Triangles);
+            }
+        }
+
+      // If we got some valid data.
+      if (MeshDescription.Polygons().Num() > 0)
+        {
+          // Then find/create it.
+          UPackage* Package = CreatePackage(NULL, *PackageName);
+          check(Package);
+
+          // Create StaticMesh object
+          StaticMesh = NewObject<UStaticMesh>(Package, MeshName, RF_Public | RF_Standalone);
+          StaticMesh->InitResources();
+
+          StaticMesh->LightingGuid = FGuid::NewGuid();
+
+          // Add source to new StaticMesh
+          FStaticMeshSourceModel& SrcModel = StaticMesh->AddSourceModel();
+          SrcModel.BuildSettings.bRecomputeNormals = false;
+          SrcModel.BuildSettings.bRecomputeTangents = false;
+          SrcModel.BuildSettings.bRemoveDegenerates = false;
+          SrcModel.BuildSettings.bUseHighPrecisionTangentBasis = false;
+          SrcModel.BuildSettings.bUseFullPrecisionUVs = false;
+          SrcModel.BuildSettings.bGenerateLightmapUVs = true;
+          SrcModel.BuildSettings.SrcLightmapIndex = 0;
+          SrcModel.BuildSettings.DstLightmapIndex = 1;
+          FMeshDescription* OriginalMeshDescription = StaticMesh->GetMeshDescription(0);
+          if (OriginalMeshDescription == nullptr)
+            {
+              OriginalMeshDescription = StaticMesh->CreateMeshDescription(0);
+            }
+          *OriginalMeshDescription = MeshDescription;
+          StaticMesh->CommitMeshDescription(0);
+
+          // Copy materials to new mesh
+          for (auto Kvp : UniqueMaterials)
+            {
+              UMaterialInterface* Material = Kvp.Key;
+              StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+            }
+
+          //Set the Imported version before calling the build
+          StaticMesh->ImportVersion = EImportStaticMeshVersion::LastVersion;
+
+          // Build mesh from source
+          StaticMesh->Build(false);
+          StaticMesh->PostEditChange();
+
+          // Notify asset registry of new asset
+          FAssetRegistryModule::AssetCreated(StaticMesh);
+        }
+
+    }
+  return StaticMesh;
 }
 
-// template <typename T>
-// UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(UStaticMeshComponent* InOwner, T* InVisual)
-// {
-//
-//     UStaticMesh* StaticMesh = nullptr;
-//
-// 	FString PackageName = "";
-// 	FString Reason = "";
-// 	if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
-// 	{
-// 		UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
-// 		return nullptr;
-// 	}
-//
-// 	if(!FPackageName::DoesPackageExist(PackageName))
-// 	{
-// 		UWorld *World = GEditor->GetEditorWorldContext().World();
-// 		if ((World != nullptr) && (World->GetDefaultBrush() != nullptr))
-// 		{
-// 			UE_LOG(LogTemp, Warning, TEXT("1"));
-// 			ULevel* CurrentLevel = World->GetCurrentLevel();
-// 			ABrush* DefBrush = World->GetDefaultBrush();
-// 			TArray<float> Parameters = GetGeometryParameter(InVisual->Geometry);
-// 			CreateBrushBuilder(DefBrush, InVisual->Geometry->Type, Parameters);
-//
-// 			if (CurrentLevel != nullptr && !FLevelUtils::IsLevelLocked(CurrentLevel)
-// 					&& DefBrush->BrushBuilder)
-// 			{
-// 				UE_LOG(LogTemp, Warning, TEXT("2"));
-// 				World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
-// 				World->GetDefaultBrush()->BrushBuilder->Build(World, DefBrush);
-// 				DefBrush->SetNeedRebuild(CurrentLevel);
-// 				GEditor->RebuildAlteredBSP();
-// 				bool bIsAdditive = true;
-// 				const TCHAR* Command = bIsAdditive ? TEXT("BRUSH ADD SELECTNEWBRUSH") : TEXT("BRUSH SUBTRACT SELECTNEWBRUSH");
-// 				GEditor->Exec(World, Command);
-// 				UE_LOG(LogTemp, Warning, TEXT("3"));
-// 				if( !GIsTransacting )
-// 				{
-// 					int32 ActorCount = GEditor->GetSelectedActorCount();
-// 					USelection* SelectedActor = GEditor->GetSelectedActors();
-// 					for(int32 ActIdx =0; ActIdx < ActorCount; ActIdx++)
-// 					{
-// 						UE_LOG(LogTemp, Warning, TEXT("4"));
-// 						if(ABrush* Brush = Cast<ABrush>(SelectedActor->GetSelectedObject(ActIdx)))
-// 						{
-// 							UE_LOG(LogTemp, Warning, TEXT("5"));
-// 							if (!FActorEditorUtils::IsABuilderBrush(Brush))
-// 							{
-// 								UE_LOG(LogTemp, Warning, TEXT("save %s"), *InVisual->Name);
-// 								TArray< TWeakObjectPtr<ABrush> > SelectedBrushes;
-// 								SelectedBrushes.Add(Brush);
-// 								TArray<AActor*> ValidSelectedBrushes;
-// 								CopyFromWeakArray(ValidSelectedBrushes, SelectedBrushes);
-//
-// 								GEditor->DoConvertActors(ValidSelectedBrushes, AStaticMeshActor::StaticClass(), TSet<FString>(), true, PackageName);
-// 								UEditorLoadingAndSavingUtils::SaveDirtyPackages(false, true);
-// 								UE_LOG(LogTemp, Warning, TEXT("save finished"));
-// // StaticMesh'/Game/fr_caster_r_wheel_link_geom_StaticMesh.fr_caster_r_wheel_link_geom_StaticMesh'
-// 							}
-// 							else
-// 							{
-// 								UE_LOG(LogTemp, Error, TEXT("Brush is a  BuilderBrush."));
-// 							}
-// 						}
-// 						else
-// 						{
-// 							UE_LOG(LogTemp, Error, TEXT("Selected Actor no Brush"));
-// 						}
-// 					}
-// 				}
-// 				else
-// 				{
-// 					UE_LOG(LogTemp, Error, TEXT("Editor is Transacting"));
-// 				}
-// 			}
-// 			else
-// 			{
-// 				UE_LOG(LogTemp, Error, TEXT("No Level or LevelLocked or no BrushBuilder."));
-// 			}
-// 		}
-// 		else
-// 		{
-// 			UE_LOG(LogTemp, Error, TEXT("No world or DefaultBrushBuilder"));
-// 		}
-// 	}
-// 	else
-// 	{
-//
-// 		UE_LOG(LogTemp, Warning, TEXT("before CleanUp"));
-// 		CleanUp(InVisual->Name);
-// 		UE_LOG(LogTemp, Warning, TEXT("after CleanUp"));
-// 	}
-//
-// 	FString MeshReference = TEXT("StaticMesh\'") + PackageName + "." + FPackageName::GetShortName(PackageName)+ "\'";
-// 	StaticMesh = LoadObject<UStaticMesh>(NULL, *MeshReference, NULL, LOAD_None, NULL);
-// 	if(!StaticMesh)
-// 	{
-// 		UE_LOG(LogTemp, Error, TEXT("Package %s not Found"), *PackageName);
-// 	}
-// 	UE_LOG(LogTemp, Warning, TEXT("return mesh"));
-//     return StaticMesh;
-// };
 
 template <typename T>
 UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(USDFLink* InOwner, T* InVisual)
