@@ -5,18 +5,26 @@ Unreal engine based robot simulator.
 Version using `SDF` for loading robots.
 See `gzsdf` for converting `URDF` to `SDF`.
 
-**Dependencies**
+**Plugin Dependencies**
 
 *  [UUtils](https://github.com/urobosim/UUtils)
 *  [UROSWorldControl](https://github.com/urobosim/UROSWorldControl)
 *  [UROSBridge](https://github.com/urobosim/UROSBridge)
 *  [URoboVision](https://github.com/urobosim/URoboVision)
 
+
+
 **Installation**
 
 *  place the URobosim into the plugin folder of your project
-*  place all dependencies into the plugin folder of your project
+*  place all plugin dependencies into the plugin folder of your project
 *  add URoboSim as dependency to the *.Build.cs
+
+**ROS requirements**
+
+*  install ROS (tested on kinetic)
+*  install [rosbridge_suite](https://wiki.ros.org/rosbridge_suite)
+*  add [urobosim_msgs](https://github.com/urobosim/urobosim_msgs) to your workspace
 
 **Creating the robot model**
 
