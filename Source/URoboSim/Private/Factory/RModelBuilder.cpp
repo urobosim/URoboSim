@@ -73,12 +73,12 @@ void URModelBuilder::BuildKinematicTree()
       if(!Parent)
         {
           UE_LOG(LogTemp, Error, TEXT("Parent %s not found"), *Joint.Value->ParentName);
-          break;
+          continue;
         }
       if(!Child)
         {
           UE_LOG(LogTemp, Error, TEXT("Child %s not found"), *Joint.Value->ChildName);
-          break;
+          continue;
         }
 
       Joint.Value->SetParentChild(Parent, Child);
@@ -89,8 +89,10 @@ void URModelBuilder::BuildKinematicTree()
 
       if(!Joint.Value->Child->bAttachedToParent)
         {
-          Joint.Value->Child->GetCollision()->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-          Joint.Value->Child->bAttachedToParent = true;
+          Child->GetCollision()->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+          // Child->GetCollision()->RegisterComponent();
+          // Child->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
+          Child->bAttachedToParent = true;
           // if(Joint.Value->Child->GetName().Equals(TEXT("fr_caster_l_wheel_link")))
           //   {
           //   }
@@ -98,8 +100,10 @@ void URModelBuilder::BuildKinematicTree()
         }
       else
         {
-          Joint.Value->Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-          Joint.Value->Parent->bAttachedToParent = true;
+          Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+          // Parent->GetCollision()->RegisterComponent();
+          // Parent->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
+          Parent->bAttachedToParent = true;
         }
       Parent->AddJoint(Joint.Value);
     }
@@ -109,8 +113,8 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 {
   if(InJoint->bUseParentModelFrame)
     {
-      // InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
       InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+      InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
       InJoint->Constraint->SetWorldLocation(InJoint->Child->GetCollision()->GetComponentLocation());
       InJoint->Constraint->AddRelativeLocation(InJoint->Pose.GetLocation());
       InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());

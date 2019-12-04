@@ -198,6 +198,7 @@ void URJointTrajectoryFeedbackPublisher::SetOwner(UObject* InOwner)
   Owner = Cast<URJointController>(ControllerComp->Controller.ControllerList["JointController"]);
   ConfigClient = NewObject<URJointStateConfigurationClient>(this);
   ConfigClient->JointParamTopic = JointParamTopic;
+  // ConfigClient->URROSClient::Init(ControllerComp, Handler);
   ConfigClient->URROSClient::Init(InOwner, &Owner->TrajectoryStatus.JointNames, Handler);
 }
 

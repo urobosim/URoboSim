@@ -110,8 +110,14 @@ private:
 	// Get mesh absolute path
 	FString GetMeshAbsolutePath(const FString& Uri);
 
+        FName GenerateMeshName(ESDFType InType, FString InName);
+        FString GeneratePackageName(FName MeshName);
+        bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
+        USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+
 	// Import .fbx meshes from data asset
 	UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
+	UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
 
 	// From <pose>z y z r p y</pose> to FTransform
 	FTransform PoseContentToFTransform(const FString& InPoseData);
@@ -140,4 +146,6 @@ private:
 
 	// Fbx factory
 	UFbxFactory* FbxFactory;
+
+        FAssetRegistryModule AssetRegistryModule;
 };

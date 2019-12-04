@@ -22,7 +22,8 @@ URLinkBuilder* URLinkFactory::CreateBuilder(USDFLink* InLinkDescription)
     }
   else
     {
-      return NewObject<URVirtualLinkBuilder>(this);
+      return nullptr;
+      // return NewObject<URVirtualLinkBuilder>(this);
     }
 }
 
@@ -99,6 +100,7 @@ void URLinkBuilder::SetVisuals()
 void URLinkBuilder::SetVisual(USDFVisual* InVisual)
 {
   URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
+  LinkComponent->RegisterComponent();
 
   FVector LocationOffset = LinkPose.GetRotation().RotateVector(InVisual->Pose.GetLocation());
   LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation());
@@ -108,18 +110,16 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
   LinkComponent->SetWorldRotation(RotationOffset);
 
   //Static Mesh creation
-  UStaticMesh* Visual = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InVisual);
+  // UStaticMesh* Visual = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InVisual);
+  UStaticMesh* Visual = InVisual->Geometry->Mesh;
   if(Visual)
     {
-      //Create the collision vor the visual mesh. Necessary to enable physics.
-      CreateCollisionForMesh(Visual, InVisual->Geometry->Type);
       LinkComponent->SetStaticMesh(Visual);
 
       if(Link->Visuals.Num()==0)
         {
           if(Link->Collisions.Num()!=0)
             {
-              // LinkComponent->WeldTo(Link->Collisions[0]);
               LinkComponent->GetBodyInstance()->bAutoWeld=false;
               LinkComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
             }
@@ -127,7 +127,6 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
       else
         {
           LinkComponent->WeldTo(Link->Visuals[0]);
-          // UE_LOG(LogTemp, Warning, TEXT("Attachment succesfull Weld to first visual:%s."), *LinkComponent->GetName() );
         }
       Link->Visuals.Add(LinkComponent);
     }
@@ -144,6 +143,7 @@ void URLinkBuilder::SetCollisions()
 void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 {
   URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InCollision->Name).GetCharArray().GetData()));
+  LinkComponent->RegisterComponent();
   if(Model->GetRootComponent() == nullptr)
     {
       Model->SetRootComponent(LinkComponent);
@@ -161,11 +161,12 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   LinkComponent->SetWorldRotation(RotationOffset);
 
   //Static Mesh creation
-  UStaticMesh* Collision = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InCollision);
+  UStaticMesh* Collision = InCollision->Geometry->Mesh;
+  // UStaticMesh* Collision = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InCollision);
   if(Collision)
     {
       //Create the collision vor the visual mesh. Necessary to enable physics.
-      CreateCollisionForMesh(Collision, InCollision->Geometry->Type);
+      // CreateCollisionForMesh(Collision, InCollision->Geometry->Type);
       LinkComponent->SetStaticMesh(Collision);
 
       if(Link->Collisions.Num()==0)
@@ -215,7 +216,14 @@ void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
     {
       Collision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
       Collision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-      Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+      if(Link->Visuals.Num() == 0)
+        {
+          Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+        }
+      else
+        {
+          Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+        }
       if(!InSelfColide)
         {
           Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
@@ -238,55 +246,4 @@ void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
     {
       Visual->SetEnableGravity(false);
     }
-}
-
-void URVirtualLinkBuilder::SetCollisions()
-{
-  URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((Link->GetName()).GetCharArray().GetData()));
-  if(Model->GetRootComponent() == nullptr)
-    {
-      Model->SetRootComponent(LinkComponent);
-    }
-
-  LinkComponent->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-  LinkComponent->BodyInstance.PositionSolverIterationCount = 20;
-  LinkComponent->BodyInstance.VelocitySolverIterationCount = 8;
-
-  LinkComponent->SetWorldLocation(LinkPose.GetLocation());
-
-  //Rotations are added by multiplying the Quaternions
-  // FQuat RotationOffset = Link->Pose.GetRotation() * InLink->Pose.GetRotation();
-  FQuat RotationOffset = LinkPose.GetRotation();
-  LinkComponent->SetWorldRotation(RotationOffset);
-
-  USDFCollision* VirtualCollision = NewObject<USDFCollision>(Link);
-  VirtualCollision->Name = Link->GetName();
-  VirtualCollision->Name = VirtualCollision->Name.Append("_geom");
-  VirtualCollision->Pose = FTransform();
-  VirtualCollision->Geometry = NewObject<USDFGeometry>(Link);
-  VirtualCollision->Geometry->Type = ESDFGeometryType::Box;
-  VirtualCollision->Geometry->Size = FVector(0.5f, 0.5f, 0.5f);
-
-  //Static Mesh creation
-  UStaticMesh* Collision = RStaticMeshUtils::CreateStaticMesh(LinkComponent, VirtualCollision);
-  if(Collision)
-    {
-      //Create the collision vor the visual mesh. Necessary to enable physics.
-      CreateCollisionForMesh(Collision, VirtualCollision->Geometry->Type);
-      LinkComponent->SetStaticMesh(Collision);
-      /*  */
-      /* if(Link->Collisions.Num()==0) */
-      /* { */
-      /* 	UE_LOG(LogTemp, Error, TEXT("before AttachToComponent")); */
-      LinkComponent->SetSimulatePhysics(true);
-      LinkComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-      /* 	UE_LOG(LogTemp, Error, TEXT("after AttachToComponent")); */
-      /* } */
-      LinkComponent->bVisible = false;
-      Link->Collisions.Add(LinkComponent);
-    }
-}
-
-void URVirtualLinkBuilder::SetVisuals()
-{
 }

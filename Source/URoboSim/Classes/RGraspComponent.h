@@ -5,6 +5,7 @@
 #include "RStaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/StaticMeshActor.h"
+#include "Components/BoxComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
 
@@ -16,7 +17,7 @@ class UROBOSIM_API URGraspComponent : public USphereComponent
 public:
 	URGraspComponent();
 
-	virtual void Init(URStaticMeshComponent* InGripper, TArray<URStaticMeshComponent*> InFixationPoints);
+	virtual void Init(URStaticMeshComponent* InGripper);
 	// virtual void Init();
 
 	virtual void BeginPlay() override;
@@ -27,33 +28,20 @@ public:
 	// Detach fixation
 	virtual void TryToDetach();
 
-	UPROPERTY(EditAnywhere, Category = "MC")
+	UPROPERTY()
 	FString GripperName;
+
 	// Fixated object
 	AStaticMeshActor* FixatedObject;
+
 protected:
 
-
-	// Object maximum length (cm)
-	UPROPERTY()
-	float ObjectMaxLength;
-
-	// Object maximum mass (kg)
-	UPROPERTY()
-	float ObjectMaxMass;
-
-	// Flag if the object should be welded to the hand
-	UPROPERTY()
-	bool bWeldFixation;
 
 	UPROPERTY()
 	URStaticMeshComponent* Gripper;
 
-	UPROPERTY()
-          TArray<UPhysicsConstraintComponent*> ConstComps;
-
-	UPROPERTY()
-          TArray<URStaticMeshComponent*> FixationPoints;
+        UPROPERTY()
+          UPhysicsConstraintComponent* Constraint;
 
 	// Function called when an item enters the fixation overlap area
 	UFUNCTION()
@@ -71,8 +59,4 @@ protected:
 
 	// Fixate object to hand
 	virtual void FixateObject(AStaticMeshActor* InSMA);
-
-
-	// Check if the static mesh actor can be grasped
-	virtual bool CanBeGrasped(AStaticMeshActor* InActor);
 };

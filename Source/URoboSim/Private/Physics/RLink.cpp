@@ -390,21 +390,14 @@ float URLink::GetNumCollisions()
 //     }
 // }
 
-void URLink::UpdateVelocity()
+void URLink::UpdateVelocity(float InDeltaTime)
 {
   for(URJoint* Joint : Joints)
     {
-      Joint->UpdateVelocity();
+      Joint->UpdateVelocity(InDeltaTime);
     }
 }
 
-void URLink::UpdateEncoder()
-{
-  for(URJoint* Joint : Joints)
-    {
-      Joint->UpdateEncoder();
-    }
-}
 
 void URLink::SetNextVelocities()
 {

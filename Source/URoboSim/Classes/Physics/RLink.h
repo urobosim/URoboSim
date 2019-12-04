@@ -71,8 +71,7 @@ public:
 	static void Load(ARModel* OutModel, USDFLink* InLink);
 	void AddJoint(class URJoint* InJoint);
 
-	virtual void UpdateVelocity();
-	virtual void UpdateEncoder();
+	virtual void UpdateVelocity(float InDeltaTime);
 	// virtual void UpdateJointStates();
 	virtual void SetNextVelocities();
 

@@ -11,7 +11,7 @@
 URJoint::URJoint()
 {
   bBreakEnabled = false;
-  bActuate = true;
+  bActuate = false;
 }
 
 
@@ -23,7 +23,7 @@ float URJoint::GetEncoderValue()
 void URJoint::UpdateEncoder()
 {
   Constraint->UpdateEncoderValue(GetJointPosition());
-  Child->UpdateEncoder();
+  // Child->UpdateEncoder();
 }
 
 void URJoint::EnableMotor(bool InEnable)
@@ -31,21 +31,15 @@ void URJoint::EnableMotor(bool InEnable)
   Constraint->EnableMotor(InEnable);
 }
 
-void URJoint::UpdateVelocity()
+void URJoint::UpdateVelocity(float InDeltaTime)
 {
   if(bActuate)
   {
-    Constraint->UpdateJointVelocity();
+    Constraint->UpdateJointVelocity(InDeltaTime);
   }
 
-  Child->UpdateVelocity();
+  Child->UpdateVelocity(InDeltaTime);
 }
-
-// void URJoint::UpdateJointStates()
-// {
-// 	Constraint->UpdateJointVelocity();
-// 	Child_->UpdateJointStates();
-// }
 
 void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
 {
@@ -54,16 +48,6 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
 
   Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
-
-// URLink* URJoint::Child()
-// {
-// 	return Child_;
-// }
-
-// URLink* URJoint::Parent()
-// {
-// 	return Parent_;
-// }
 
 float URJoint::GetJointPosition()
 {
@@ -82,9 +66,9 @@ float URJoint::GetJointVelocity()
 	return Constraint->GetJointVelocity();
 }
 
-void URJoint::SetJointPosition(float Angle)
+void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
-	Constraint->SetJointPosition(Angle);
+	Constraint->SetJointPosition(Angle, OutSweepHitResult);
 }
 void URJoint::SetJointVelocity(float Velocity)
 {

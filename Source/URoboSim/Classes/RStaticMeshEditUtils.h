@@ -69,6 +69,8 @@ public:
     static void GenerateKDop(UStaticMesh* OutMesh, ECollisionType InCollisionType);
     static void GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirections, uint32 InNumInDirections);
     static TArray<float> GetGeometryParameter(USDFGeometry* InGeometry);
+
+    static UStaticMesh* CreateStaticMesh(UPackage* InPackage, FString InPackageName, ESDFGeometryType InShape, TArray<float> InParameters);
 protected:
 
     static void CreateBrushBuilder(ABrush* OutBrush, ESDFGeometryType InGeometryTyp, TArray<float> InParameters);

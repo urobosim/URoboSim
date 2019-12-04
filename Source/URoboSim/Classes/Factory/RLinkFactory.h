@@ -47,16 +47,16 @@ protected:
 
 };
 
-UCLASS()
-class UROBOSIM_API URVirtualLinkBuilder : public URLinkBuilder
-{
-  GENERATED_BODY()
+// UCLASS()
+// class UROBOSIM_API URVirtualLinkBuilder : public URLinkBuilder
+// {
+//   GENERATED_BODY()
 
- protected:
+//  protected:
 
-  virtual void SetCollisions() override;
-  virtual void SetVisuals() override;
-};
+//   virtual void SetCollisions() override;
+//   virtual void SetVisuals() override;
+// };
 
 UCLASS()
 class UROBOSIM_API URLinkFactory : public UObject

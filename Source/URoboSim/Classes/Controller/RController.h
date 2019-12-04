@@ -30,50 +30,6 @@ public:
 };
 
 USTRUCT()
-struct FGraspComponentSetting
-{
-  GENERATED_BODY()
-  public:
-
-  UPROPERTY(EditAnywhere)
-  FString GripperName;
-
-  UPROPERTY(EditAnywhere)
-  FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
-
-  // Object maximum length (cm)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxLength;
-
-  // Object maximum mass (kg)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxMass;
-
-  // Flag if the object should be welded to the hand
-  UPROPERTY(EditAnywhere)
-  bool bWeldFixation;
-};
-
-USTRUCT()
-struct FGraspResult
-{
-    GENERATED_BODY()
-public:
-    float Position;
-    float Effort;
-    bool bStalled;
-    bool bReachedGoal;
-
-    void FillValues(float InPosition, float InEffort, bool InbStalled, bool InbReachedGoal)
-    {
-        Position = InPosition;
-        Effort = InEffort;
-        bStalled = InbStalled;
-        bReachedGoal = InbReachedGoal;
-    };
-};
-
-USTRUCT()
 struct FJointInfo
 {
     GENERATED_BODY()
@@ -146,6 +102,7 @@ public:
 	virtual void Tick(float InDeltaTime){};
 	virtual void Init(ARModel* Model){};
 	virtual void CancelAction();
+
 
 	UPROPERTY()
 	bool bActive;
@@ -254,157 +211,6 @@ protected:
 	// UPROPERTY(EditAnywhere)
 	// FString NamePerceivedObject;
 };
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URGripperController : public URController
-{
-    GENERATED_BODY()
-public:
-	URGripperController();
-
-	virtual void Init(ARModel* InModel) override;
-	virtual bool Grasp();
-	virtual void Release();
-	virtual void UpdateGripper();
-	virtual void SetupCollisionEvent();
-        UFUNCTION()
-        virtual void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-
-	virtual void CheckGripperActionResult(float InError, float InThreshold);
-	virtual void Tick(float InDeltaTime);
-
-	UPROPERTY()
-	URGraspComponent* GraspComponent;
-
-
-        UPROPERTY(EditAnywhere)
-          FGraspComponentSetting GraspCompSetting;
-
-	UPROPERTY()
-	float Position;
-
-	UPROPERTY()
-	float OldPosition;
-
-	UPROPERTY()
-	float MaxEffort;
-
-	UPROPERTY()
-	bool bStalled;
-
-	UPROPERTY(EditAnywhere)
-	float Stiffness;
-
-	UPROPERTY(EditAnywhere)
-	float MaxForce;
-
-	UPROPERTY(EditAnywhere)
-	float Dampening;
-
-    UPROPERTY()
-    FGraspResult Result;
-
-	UPROPERTY()
-    float RMultiplier;
-
-	UPROPERTY()
-    float LMultiplier;
-
-
-    UPROPERTY(EditAnywhere)
-    FString RightJointName;
-    UPROPERTY(EditAnywhere)
-    FString LeftJointName;
-
-    UPROPERTY(EditAnywhere)
-    FString RightFingerTipName;
-
-    UPROPERTY(EditAnywhere)
-    FString LeftFingerTipName;
-
-    UPROPERTY()
-    URJoint* RightFinger ;
-
-    UPROPERTY()
-    URJoint* LeftFinger ;
-
-    UPROPERTY()
-    URJoint* RightFingerTip;
-
-    UPROPERTY()
-    URJoint* LeftFingerTip;
-
-
-protected:
-
-    UPROPERTY()
-    bool bSuccessGrasp = false;
-
-    UPROPERTY()
-    bool bMoved = false;
-
-	UPROPERTY()
-	ARModel* Model;
-
-        UPROPERTY(EditAnywhere)
-          FString GraspComponentName;
-
-	// UPROPERTY(EditAnywhere)
-	// FString GripperName;
-
-};
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URHeadTrajectoryController : public URController
-{
-    GENERATED_BODY()
-public:
-	URHeadTrajectoryController();
-
-	virtual void Init(ARModel* InModel) override;
-	virtual void Tick(float InDeltaTime);
-
-	UPROPERTY()
-	float AngleError;
-
-	UPROPERTY()
-	FString FrameId;
-
-	UPROPERTY()
-	FVector Point;
-
-	UPROPERTY()
-	FString PointingFrame;
-
-	UPROPERTY()
-	FVector Axis;
-
-	UPROPERTY()
-	ARModel* Model;
-
-    virtual void UpdateHeadDirection(){};
-protected:
-
-	virtual FVector CalculateNewViewDirection();
-	virtual void MoveToNewPosition(FVector InNewDirection){};
-    virtual void CheckPointHeadState(){};
-
-};
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URPR2HeadTrajectoryController : public URHeadTrajectoryController
-{
-    GENERATED_BODY()
-public:
-    virtual void UpdateHeadDirection();
-protected:
-	virtual void MoveToNewPosition(FVector InNewDirection) override;
-    virtual void CheckPointHeadState();
-
-};
-
-
 
 USTRUCT(Blueprintable)
 struct FRControllerContainer

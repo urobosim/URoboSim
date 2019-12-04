@@ -54,7 +54,7 @@ public:
 	virtual float GetJointPositionInUUnits();
 	virtual float GetJointVelocity();
 
-	virtual void SetJointPosition(float Angle);
+	virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
 	virtual void SetJointVelocity(float Velocity);
 	virtual void SetJointVelocityInUUnits(float Velocity);
 	virtual void SetJointEffort(float Effort);
@@ -80,15 +80,15 @@ public:
     // Called every frame
     // virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-    virtual void UpdateVelocity();
+    virtual void UpdateVelocity(float InDeltaTime);
     // virtual void UpdateJointStates();
     virtual void UpdateEncoder();
 
     UPROPERTY(EditAnywhere)
       FTransform Pose;
 
-    UPROPERTY()
-      float DesiredJointPose = 0;
+    // UPROPERTY()
+    //   float DesiredJointPose = 0;
 
     UPROPERTY()
       float MaxJointVel = -1;

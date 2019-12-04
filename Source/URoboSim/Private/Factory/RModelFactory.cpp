@@ -50,6 +50,16 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
               // NewRobot->Load(Model);
               // URModelFactory::CreateModels(NewRobot, SDFAsset);
+              if ( NewRobot )
+                {
+                  PostSpawnActor(Asset, NewRobot);
+
+                  // Only do this if the actor wasn't already given a name
+                  if (Name == NAME_None && Asset)
+                    {
+                      FActorLabelUtilities::SetActorLabelUnique(NewRobot, Model->Name);
+                    }
+                }
             }
         }
       return NewRobot;
@@ -69,5 +79,5 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
 void URModelFactory::CreateModels(ARModel* OutModel, USDFDataAsset* SDFData)
 {
-		// OutModel->Load(Model);
+  // OutModel->Load(Model);
 }

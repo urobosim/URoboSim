@@ -8,6 +8,8 @@
 #include "Physics/RLink.h"
 #include "ROSCommunication/RROSClient.h"
 #include "Controller/RJointController.h"
+#include "Controller/RGripperController.h"
+#include "Controller/RHeadController.h"
 #include "Controller/RController.h"
 #include "Sensor/R2DLidar.h"
 #include "Conversions.h"

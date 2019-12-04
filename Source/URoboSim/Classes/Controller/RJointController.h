@@ -3,6 +3,7 @@
 #include "Controller/RController.h"
 #include "RJointController.generated.h"
 
+
 UENUM()
 enum class UJointControllerState : uint8
 {
@@ -37,7 +38,7 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY()
     TArray<FTrajectoryPoints> Trajectory;
 
-  UPROPERTY()
+  UPROPERTY(EditAnywhere)
     TMap<FString,float> DesiredJointState;
 
   UPROPERTY()
@@ -49,6 +50,8 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY(EditAnywhere)
     TArray<FString> IgnoreList;
 
+  UPROPERTY(EditAnywhere)
+    float MaxJointAngularVel;
 
   // UPROPERTY()
   //   TMap<FString, FJointInfo> JointStateList;
@@ -65,8 +68,8 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY(EditAnywhere)
     UJointControllerMode Mode;
 
-  virtual void MoveJoints();
-  virtual void MoveJointsDynamic();
+  virtual void MoveJoints(float InDeltaTime);
+  virtual void MoveJointsDynamic(float InDeltaTime);
   virtual void MoveJointsKinematic();
 
 // #if WITH_EDITOR
