@@ -44,17 +44,9 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY()
     TArray<bool> bTrajectoryPointsReached;
 
-  // UPROPERTY()
-  //   bool bFollowTrajectory = false;
-
-  UPROPERTY(EditAnywhere)
-    TArray<FString> IgnoreList;
 
   UPROPERTY(EditAnywhere)
     float MaxJointAngularVel;
-
-  // UPROPERTY()
-  //   TMap<FString, FJointInfo> JointStateList;
 
   UPROPERTY()
     FTrajectoryStatus TrajectoryStatus;
@@ -71,34 +63,6 @@ class UROBOSIM_API URJointController : public URController
   virtual void MoveJoints(float InDeltaTime);
   virtual void MoveJointsDynamic(float InDeltaTime);
   virtual void MoveJointsKinematic();
-
-// #if WITH_EDITOR
-//   void PostEditChangeProperty(struct FPropertyChangedEvent& PropertyChangedEvent)
-//   {
-//     FName PropertyName = (PropertyChangedEvent.Property != NULL) ? PropertyChangedEvent.Property->GetFName() : NAME_None;
-
-//     if (PropertyName == GET_MEMBER_NAME_CHECKED(URJointController, Mode))
-//       {
-//         if(Model)
-//           {
-//             for(auto& Link : Model->Links)
-//               {
-//                     bool bEnablePhysics;
-//                     if(Mode == UJointControllerMode::Kinematic)
-//                       {
-//                         bEnablePhysics = false;
-//                       }
-//                     else
-//                       {
-//                         bEnablePhysics = true;
-//                       }
-//                     Link.Value->GetCollision()->SetSimulatePhysics(bEnablePhysics);
-//               }
-//           }
-//       }
-//     Super::PostEditChangeProperty(PropertyChangedEvent);
-//   };
-// #endif
 
   UPROPERTY()
     ARModel* Model;

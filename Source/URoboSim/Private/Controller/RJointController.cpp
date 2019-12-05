@@ -4,24 +4,6 @@
 URJointController::URJointController()
 {
   BaseLink = TEXT("base_footprint");
-  IgnoreList.Add(TEXT("l_gripper_l_finger_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_motor_slider_joint"));
-  IgnoreList.Add(TEXT("l_gripper_motor_screw_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_finger_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_finger_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_motor_slider_joint"));
-  IgnoreList.Add(TEXT("r_gripper_motor_screw_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_finger_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_joint"));
-  IgnoreList.Add(TEXT("r_gripper_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_parallel_root_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_parallel_root_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_parallel_root_joint"));
-  IgnoreList.Add(TEXT("l_gripper_l_parallel_root_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_l_parallel_tip_joint"));
   State = UJointControllerState::Normal;
   Mode = UJointControllerMode::Dynamic;
 }
@@ -60,8 +42,6 @@ bool URJointController::CheckTrajectoryStatus()
 {
   bool bFinalTrajectoryPointReached = false;
 
-  // TrajectoryPointIndex++;
-
   if(TrajectoryPointIndex == Trajectory.Num()-1)
     {
       State = UJointControllerState::Normal;
@@ -82,17 +62,13 @@ bool URJointController::CheckTrajectoryStatus()
           URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
           if(Joint)
             {
-              // float CurrentJointPos = Joint->GetJointPosition();
               float CurrentJointPos = Joint->GetEncoderValue();
               float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
-              // DesiredPos = Joint->Constraint->CheckPositionRange(DesiredPos);
               float Diff = DesiredPos - CurrentJointPos;
-              // Diff = Joint->Constraint->CheckPositionRange(Diff);
 
               if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
                 {
                   bAllPointsReady = false;
-                  // UE_LOG(LogTemp, Error, TEXT("JointName %s Diff %f"), *TrajectoryStatus.JointNames[i], Diff);
                 }
               TrajectoryStatus.Position[i] = CurrentJointPos;
               TrajectoryStatus.Desired[i] = Trajectory[TrajectoryPointIndex].Points[i];
@@ -125,33 +101,30 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
   FString Velocity = "";
   for(auto & Joint: Model->Joints)
     {
-      // if(!IgnoreList.Contains(Joint.Key))
-        // {
-          if(DesiredJointState.Contains(Joint.Key))
+      if(DesiredJointState.Contains(Joint.Key))
+        {
+          Joint.Value->bActuate = true;
+          float DesiredPos = 0.0f;
+          DesiredPos = DesiredJointState[Joint.Key];
+
+          float CurrentJointPos = Joint.Value->GetEncoderValue();
+          float Diff = DesiredPos - CurrentJointPos;
+          Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
+
+          float Vel = Diff / InDeltaTime;
+          if(!Joint.Key.Equals("torso_lift_joint"))
             {
-              Joint.Value->bActuate = true;
-              float DesiredPos = 0.0f;
-              DesiredPos = DesiredJointState[Joint.Key];
-
-              float CurrentJointPos = Joint.Value->GetEncoderValue();
-              float Diff = DesiredPos - CurrentJointPos;
-              Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
-
-              float Vel = Diff / InDeltaTime;
-              if(!Joint.Key.Equals("torso_lift_joint"))
-                {
-                  Joint.Value->MaxJointVel = MaxJointAngularVel;
-                }
-              if(Joint.Value->MaxJointVel > 0)
-                {
-                  if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
-                    {
-                      Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
-                    }
-                }
-              Joint.Value->SetJointVelocity(Vel);
+              Joint.Value->MaxJointVel = MaxJointAngularVel;
             }
-        // }
+          if(Joint.Value->MaxJointVel > 0)
+            {
+              if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
+                {
+                  Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
+                }
+            }
+          Joint.Value->SetJointVelocity(Vel);
+        }
     }
 }
 
@@ -243,10 +216,6 @@ void URJointController::Init(ARModel* InModel)
         {
           Link.Value->GetCollision()->SetEnableGravity(false);
         }
-
-      // ConfigClient = NewObject<URJointStateConfigurationClient>(this);
-      // ConfigClient->JointParamTopic = JointParamTopic;
-      // ConfigClient->URROSClient::Init(InOwner, &Owner->TrajectoryStatus.JointNames, Handler);
     }
 }
 

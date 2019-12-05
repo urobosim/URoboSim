@@ -1,12 +1,10 @@
 
 #include "RStaticMeshEditUtils.h"
 
-// #include "GameFramework/Actor.h"
 // necessary for Collision creation
 #include "Private/ConvexDecompTool.h"
 // necessary for Collision creation KDOP
 #include "Editor/UnrealEd/Private/GeomFitUtils.h"
-//if commented incomplete type bodySetup
 #include "Runtime/Engine/Classes/PhysicsEngine/BodySetup.h"
 #include "EngineAnalytics.h"
 #include "RenderingThread.h"
@@ -17,25 +15,6 @@
 #ifndef USE_ASYNC_DECOMP
 #define USE_ASYNC_DECOMP 0
 #endif
-
-// UStaticMesh* RStaticMeshUtils::CreateStaticMesh(AActor* InOwner,
-//                                                 ESDFGeometryType InGeometryTyp,
-//                                                 TArray<float> InParameters)
-// {
-//     bool bIsAdditive = true;
-//     UStaticMesh* StaticMesh = nullptr;
-//     UWorld *World = GEditor->GetEditorWorldContext().World();
-//     ABrush* DefBrush = World->GetDefaultBrush();
-//     CreateBrushBuilder(DefBrush, InGeometryTyp, InParameters);
-//     if(DefBrush->BrushBuilder)
-//     {
-//         DefBrush->BrushBuilder->Build(World, DefBrush);
-//         DefBrush->SetNeedRebuild(DefBrush->GetLevel());
-//         GEditor->RebuildAlteredBSP();
-//         StaticMesh = CreateStaticMeshFromBrush(InOwner, TEXT("Test"),World->GetDefaultBrush(), World->GetDefaultBrush()->Brush);
-//     }
-//     return StaticMesh;
-// }
 
 
 UStaticMesh* RStaticMeshUtils::LoadMesh(UStaticMeshComponent* InOwner, UStaticMesh* Mesh)
@@ -90,9 +69,7 @@ UTetrahedronBuilder* RStaticMeshUtils::CreateSphereBuilder(ABrush* OutBrush, TAr
     UTetrahedronBuilder* SphereBuilder = NewObject<UTetrahedronBuilder>(OutBrush,"SphereBuilder");
 	if(InParameters[0] < 0.1)
 	{
-		//ClampMin 0.000001
 		SphereBuilder->Radius = 0.1;
-		//ClampMax 5 ClampMin 1
 		SphereBuilder->SphereExtrapolation = 1;
 	}
 	else
@@ -147,7 +124,6 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 			}
 		}
 
-		// ClearSelectedPrims();
 		FlushRenderingCommands();
 
 		// Get the BodySetup we are going to put the collision into
@@ -173,19 +149,12 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 			UE_LOG(LogTemp, Error, TEXT("To few Verts or CollidingIndices!"));
 		}
 
-		// // Enable collision, if not already
-		// if( !Viewport->GetViewportClient().IsShowSimpleCollisionChecked() )
-		// {
-		//	 Viewport->GetViewportClient().ToggleShowSimpleCollision();
-		// }
 
 		// refresh collision change back to staticmesh components
 		RefreshCollisionChange(*OutMesh);
 
 		OutMesh->MarkPackageDirty();
 		OutMesh->bCustomizedCollision = true;	//mark the static mesh for collision customization
-		// // Update screen.
-		// Viewport->RefreshViewport();
 	}
 	else
 	{
@@ -442,105 +411,6 @@ void RStaticMeshUtils::GenerateCylinder(TArray<FVector>& InVertices, TArray<int3
       InTangets.Add(FProcMeshTangent(SurfaceTangent, false));
       InTangets.Add(FProcMeshTangent(SurfaceTangent, false));
 
-      // -------------------------------------------------------
-  //     // If double sided, create extra polygons but face the normals the other way.
-  //     if (bInDoubleSided)
-  //       {
-  //         VertIndex1 = VertexIndex++;
-  //         VertIndex2 = VertexIndex++;
-  //         VertIndex3 = VertexIndex++;
-  //         VertIndex4 = VertexIndex++;
-
-  //         InVertices[VertIndex1].Position = p0;
-  //         InVertices[VertIndex2].Position = p1;
-  //         InVertices[VertIndex3].Position = p2;
-  //         InVertices[VertIndex4].Position = p3;
-
-  //         // Reverse the poly order to face them the other way
-  //         InTriangles[TriangleIndex++] = VertIndex4;
-  //         InTriangles[TriangleIndex++] = VertIndex1;
-  //         InTriangles[TriangleIndex++] = VertIndex3;
-
-  //         InTriangles[TriangleIndex++] = VertIndex3;
-  //         InTriangles[TriangleIndex++] = VertIndex1;
-  //         InTriangles[TriangleIndex++] = VertIndex2;
-
-  //         // UVs  (Unreal 1,1 is top left)
-  //         InVertices[VertIndex1].UV0 = FVector2D(1.0f - (VMapPerQuad * QuadIndex), 1.0f);
-  //         InVertices[VertIndex2].UV0 = FVector2D(1.0f - (VMapPerQuad * (QuadIndex + 1)), 1.0f);
-  //         InVertices[VertIndex3].UV0 = FVector2D(1.0f - (VMapPerQuad * (QuadIndex + 1)), 0.0f);
-  //         InVertices[VertIndex4].UV0 = FVector2D(1.0f - (VMapPerQuad * QuadIndex), 0.0f);
-
-  //         // Just simple (unsmoothed) normal for these
-  //         InVertices[VertIndex1].Normal = InVertices[VertIndex2].Normal = InVertices[VertIndex3].Normal = InVertices[VertIndex4].Normal = FPackedNormal(NormalCurrent);
-
-  //         // Tangents (perpendicular to the surface)
-  //         FVector SurfaceTangentDbl = p0 - p1;
-  //         SurfaceTangentDbl = SurfaceTangentDbl.GetSafeNormal();
-  //         InVertices[VertIndex1].Tangent = InVertices[VertIndex2].Tangent = InVertices[VertIndex3].Tangent = InVertices[VertIndex4].Tangent = FPackedNormal(SurfaceTangentDbl);
-  //       }
-
-      // -------------------------------------------------------
-      // Caps are closed here by triangles that start at 0, then use the points along the circle for the other two corners.
-      // A better looking method uses a vertex in the center of the circle, but uses two more polygons.  We will demonstrate that in a different sample.
-  //     if (QuadIndex != 0 && QuadIndex != InCrossSectionCount - 1 && bInCapEnds)
-  //       {
-  //         // Bottom cap
-  //         FVector capVertex0 = FVector(FMath::Cos(0) * InWidth, FMath::Sin(0) * InWidth, 0.f);
-  //         FVector capVertex1 = FVector(FMath::Cos(Angle) * InWidth, FMath::Sin(Angle) * InWidth, 0.f);
-  //         FVector capVertex2 = FVector(FMath::Cos(NextAngle) * InWidth, FMath::Sin(NextAngle) * InWidth, 0.f);
-
-  //         VertIndex1 = VertexIndex++;
-  //         VertIndex2 = VertexIndex++;
-  //         VertIndex3 = VertexIndex++;
-  //         InVertices[VertIndex1].Position = capVertex0;
-  //         InVertices[VertIndex2].Position = capVertex1;
-  //         InVertices[VertIndex3].Position = capVertex2;
-
-  //         InTriangles[TriangleIndex++] = VertIndex1;
-  //         InTriangles[TriangleIndex++] = VertIndex2;
-  //         InTriangles[TriangleIndex++] = VertIndex3;
-
-  //         InVertices[VertIndex1].UV0 = FVector2D(0.5f - (FMath::Cos(0) / 2.0f), 0.5f - (FMath::Sin(0) / 2.0f));
-  //         InVertices[VertIndex2].UV0 = FVector2D(0.5f - (FMath::Cos(-Angle) / 2.0f), 0.5f - (FMath::Sin(-Angle) / 2.0f));
-  //         InVertices[VertIndex3].UV0 = FVector2D(0.5f - (FMath::Cos(-NextAngle) / 2.0f), 0.5f - (FMath::Sin(-NextAngle) / 2.0f));
-
-  //         FVector CapNormalCurrent = FVector::CrossProduct(InVertices[VertIndex1].Position - InVertices[VertIndex3].Position, InVertices[VertIndex2].Position - InVertices[VertIndex3].Position).GetSafeNormal();
-  //         InVertices[VertIndex1].Normal = InVertices[VertIndex2].Normal = InVertices[VertIndex3].Normal = FPackedNormal(CapNormalCurrent);
-
-  //         // Tangents (perpendicular to the surface)
-  //         FVector SurfaceTangentCap = p0 - p1;
-  //         SurfaceTangentCap = SurfaceTangentCap.GetSafeNormal();
-  //         InVertices[VertIndex1].Tangent = InVertices[VertIndex2].Tangent = InVertices[VertIndex3].Tangent = FPackedNormal(SurfaceTangentCap);
-
-  //         // Top cap
-  //         capVertex0 = capVertex0 + Offset;
-  //         capVertex1 = capVertex1 + Offset;
-  //         capVertex2 = capVertex2 + Offset;
-
-  //         VertIndex1 = VertexIndex++;
-  //         VertIndex2 = VertexIndex++;
-  //         VertIndex3 = VertexIndex++;
-  //         InVertices[VertIndex1].Position = capVertex0;
-  //         InVertices[VertIndex2].Position = capVertex1;
-  //         InVertices[VertIndex3].Position = capVertex2;
-
-  //         InTriangles[TriangleIndex++] = VertIndex3;
-  //         InTriangles[TriangleIndex++] = VertIndex2;
-  //         InTriangles[TriangleIndex++] = VertIndex1;
-
-  //         InVertices[VertIndex1].UV0 = FVector2D(0.5f - (FMath::Cos(0) / 2.0f), 0.5f - (FMath::Sin(0) / 2.0f));
-  //         InVertices[VertIndex2].UV0 = FVector2D(0.5f - (FMath::Cos(Angle) / 2.0f), 0.5f - (FMath::Sin(Angle) / 2.0f));
-  //         InVertices[VertIndex3].UV0 = FVector2D(0.5f - (FMath::Cos(NextAngle) / 2.0f), 0.5f - (FMath::Sin(NextAngle) / 2.0f));
-
-  //         CapNormalCurrent = FVector::CrossProduct(InVertices[VertIndex1].Position - InVertices[VertIndex3].Position, InVertices[VertIndex2].Position - InVertices[VertIndex3].Position).GetSafeNormal();
-  //         InVertices[VertIndex1].Normal = InVertices[VertIndex2].Normal = InVertices[VertIndex3].Normal = FPackedNormal(CapNormalCurrent);
-
-  //         // Tangents (perpendicular to the surface)
-  //         SurfaceTangentCap = p0 - p1;
-  //         SurfaceTangentCap = SurfaceTangentCap.GetSafeNormal();
-  //         InVertices[VertIndex1].Tangent = InVertices[VertIndex2].Tangent = InVertices[VertIndex3].Tangent = FPackedNormal(SurfaceTangentCap);
-  //       }
     }
 }
 
@@ -549,18 +419,6 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
 
   UStaticMesh* StaticMesh = nullptr;
   FString PackageName = InPackageName;
-  // // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
-  // if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/Meshes/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
-  //   {
-  //     UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
-  //     return nullptr;
-  //   }
-  // StaticMesh = LoadObject<UStaticMesh>(InOwner, *PackageName, NULL, LOAD_None, NULL);
-  // if(StaticMesh)
-  //   {
-  //     return StaticMesh;
-  //   }
-
   UProceduralMeshComponent* ProcMeshComp = nullptr;
 
   TArray<float> TempParameters;
@@ -594,8 +452,6 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
   FName MeshName(*FPackageName::GetLongPackageAssetName(PackageName));
   if (ProcMeshComp != nullptr)
     {
-      // Get the full name of where we want to create the physics asset.
-
       FMeshDescription MeshDescription;
       UStaticMesh::RegisterMeshAttributes(MeshDescription);
       FStaticMeshDescriptionAttributeGetter AttributeGetter(&MeshDescription);
@@ -709,8 +565,6 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
       // If we got some valid data.
       if (MeshDescription.Polygons().Num() > 0)
         {
-          // Then find/create it.
-          // UPackage* Package = CreatePackage(NULL, *PackageName);
           UPackage* Package = InPackage;
           check(Package);
 
@@ -760,4 +614,3 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
   return StaticMesh;
 }
 #undef LOCTEXT_NAMESPACE
-// #undef USE_ASYNC_DECOMP

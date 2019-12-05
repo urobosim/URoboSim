@@ -231,10 +231,6 @@ public:
 	URControllerComponent();
 	~URControllerComponent();
 
-	virtual void ExcecuteCommands(TArray<FString> InCommands);
-	virtual void ExcecuteCommands();
-	virtual void ExcecuteCommand(FString InCommand);
-
 	virtual URController* ControllerList(FString ControllerName);
 
 	virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
@@ -247,9 +243,6 @@ public:
 	TQueue<FString, EQueueMode::Mpsc> CommandQuerry;
 protected:
 	virtual void BeginPlay() override;
-
-	void Grasp(FString InGripperIndex);
-	void Release(FString InGripperIndex);
 
 	UPROPERTY()
 	ARModel* Model;
