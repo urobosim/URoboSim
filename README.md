@@ -28,6 +28,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
 
 **Creating the robot model**
 
+*  Create CollisionChannel Robot in new Projects
 *  import the sdf file (enable: Combine Meshes)
 *  drag and dorp the sdf file into the map (while dragging wait for the mesh creation to be finished before dropping the model)
 
@@ -39,7 +40,9 @@ See `gzsdf` for converting `URDF` to `SDF`.
     *  Base Name: Name of the Base
 *  JointController:
     *  Base Link: same as BaseController Base Name
-    *  IgnoreList: Joints that are not controlled
+    *  DesiredJointState: TMap of the desired joint angles, can be set manually
+       or by adding a RJointControllerConfigurationClient to the
+       ROSCommunication Component 
 *  CameraController:
     *  CameraRef: Name of the Reference Link
     *  Camera Name: Name of the Camera (Placed in the world)

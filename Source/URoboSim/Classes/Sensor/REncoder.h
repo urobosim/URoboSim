@@ -43,7 +43,6 @@ class UROBOSIM_API URLinearEncoder : public UREncoder
 {
   GENERATED_BODY()
 
-
 };
 
 UCLASS(ClassGroup=(RobotSensor), meta=(BlueprintSpawnableComponent))

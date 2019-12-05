@@ -30,25 +30,6 @@ public:
 };
 
 USTRUCT()
-struct FGraspResult
-{
-    GENERATED_BODY()
-public:
-    float Position;
-    float Effort;
-    bool bStalled;
-    bool bReachedGoal;
-
-    void FillValues(float InPosition, float InEffort, bool InbStalled, bool InbReachedGoal)
-    {
-        Position = InPosition;
-        Effort = InEffort;
-        bStalled = InbStalled;
-        bReachedGoal = InbReachedGoal;
-    };
-};
-
-USTRUCT()
 struct FJointInfo
 {
     GENERATED_BODY()
@@ -121,6 +102,7 @@ public:
 	virtual void Tick(float InDeltaTime){};
 	virtual void Init(ARModel* Model){};
 	virtual void CancelAction();
+
 
 	UPROPERTY()
 	bool bActive;
@@ -230,143 +212,6 @@ protected:
 	// FString NamePerceivedObject;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URGripperController : public URController
-{
-    GENERATED_BODY()
-public:
-	URGripperController();
-
-	virtual void Init(ARModel* InModel) override;
-	virtual bool Grasp();
-	virtual void Release();
-	virtual void UpdateGripper();
-	virtual void SetupCollisionEvent();
-        UFUNCTION()
-        virtual void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
-
-
-	virtual void CheckGripperActionResult(float InError, float InThreshold);
-	virtual void Tick(float InDeltaTime);
-
-	UPROPERTY()
-	URGraspComponent* GraspComponent;
-
-	UPROPERTY()
-	float Position;
-
-	UPROPERTY()
-	float OldPosition;
-
-	UPROPERTY()
-	float MaxEffort;
-
-	UPROPERTY()
-	bool bStalled;
-
-    UPROPERTY()
-    FGraspResult Result;
-
-	UPROPERTY(EditAnywhere)
-    float RMultiplier;
-
-	UPROPERTY(EditAnywhere)
-    float LMultiplier;
-
-
-    UPROPERTY(EditAnywhere)
-    FString RightJointName;
-    UPROPERTY(EditAnywhere)
-    FString LeftJointName;
-
-    UPROPERTY(EditAnywhere)
-    FString RightFingerTipName;
-    UPROPERTY(EditAnywhere)
-    FString LeftFingerTipName;
-
-    UPROPERTY(EditAnywhere)
-    URJoint* RightFinger ;
-    UPROPERTY(EditAnywhere)
-    URJoint* LeftFinger ;
-
-    UPROPERTY(EditAnywhere)
-    URJoint* RightFingerTip;
-    UPROPERTY(EditAnywhere)
-    URJoint* LeftFingerTip;
-
-
-protected:
-
-    UPROPERTY()
-    bool bSuccessGrasp = false;
-
-    UPROPERTY()
-    bool bMoved = false;
-
-	UPROPERTY()
-	ARModel* Model;
-
-	UPROPERTY(EditAnywhere)
-	FString GraspComponentName;
-
-	UPROPERTY(EditAnywhere)
-	FString GripperName;
-
-	UPROPERTY(EditAnywhere)
-	FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
-};
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URHeadTrajectoryController : public URController
-{
-    GENERATED_BODY()
-public:
-	URHeadTrajectoryController();
-
-	virtual void Init(ARModel* InModel) override;
-	virtual void Tick(float InDeltaTime);
-
-	UPROPERTY()
-	float AngleError;
-
-	UPROPERTY()
-	FString FrameId;
-
-	UPROPERTY()
-	FVector Point;
-
-	UPROPERTY()
-	FString PointingFrame;
-
-	UPROPERTY()
-	FVector Axis;
-
-	UPROPERTY()
-	ARModel* Model;
-
-    virtual void UpdateHeadDirection(){};
-protected:
-
-	virtual FVector CalculateNewViewDirection();
-	virtual void MoveToNewPosition(FVector InNewDirection){};
-    virtual void CheckPointHeadState(){};
-
-};
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URPR2HeadTrajectoryController : public URHeadTrajectoryController
-{
-    GENERATED_BODY()
-public:
-    virtual void UpdateHeadDirection();
-protected:
-	virtual void MoveToNewPosition(FVector InNewDirection) override;
-    virtual void CheckPointHeadState();
-
-};
-
-
-
 USTRUCT(Blueprintable)
 struct FRControllerContainer
 {
@@ -386,10 +231,6 @@ public:
 	URControllerComponent();
 	~URControllerComponent();
 
-	virtual void ExcecuteCommands(TArray<FString> InCommands);
-	virtual void ExcecuteCommands();
-	virtual void ExcecuteCommand(FString InCommand);
-
 	virtual URController* ControllerList(FString ControllerName);
 
 	virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
@@ -402,9 +243,6 @@ public:
 	TQueue<FString, EQueueMode::Mpsc> CommandQuerry;
 protected:
 	virtual void BeginPlay() override;
-
-	void Grasp(FString InGripperIndex);
-	void Release(FString InGripperIndex);
 
 	UPROPERTY()
 	ARModel* Model;

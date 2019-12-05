@@ -90,7 +90,8 @@ void URActionCancelSubscriber::CreateSubscriber()
 
 void URVelocityCommandSubscriber::SetMessageType()
 {
-	MessageType = TEXT("geometry_msgs/Twist");
+  MessageType = TEXT("geometry_msgs/Twist");
+  Topic = TEXT("/base_controller/command");
 }
 
 void URVelocityCommandSubscriber::CreateSubscriber()
