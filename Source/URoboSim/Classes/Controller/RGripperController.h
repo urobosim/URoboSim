@@ -20,14 +20,6 @@ struct FGraspComponentSetting
   UPROPERTY(EditAnywhere)
   FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
 
-  // Object maximum length (cm)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxLength;
-
-  // Object maximum mass (kg)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxMass;
-
 };
 
 USTRUCT()

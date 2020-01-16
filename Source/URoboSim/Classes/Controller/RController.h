@@ -11,6 +11,9 @@
 #include "Containers/Queue.h"
 #include "RController.generated.h"
 
+
+
+
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UPerceivedObject : public UObject
 {
@@ -27,6 +30,18 @@ public:
 
     UPROPERTY(BlueprintReadWrite,  EditAnywhere, export, noclear)
     FTransform PoseWorld;
+};
+
+USTRUCT()
+struct FTFInfo
+{
+    GENERATED_BODY()
+public:
+    FString ParentFrame;
+  FTransform Pose;
+  // FString ChildFrame;
+  // FORCEINLINE FTransform() : ParentFrame(""), Pose(FTransform()){};
+  // FORCEINLINE explicit FTFInfo() : ParentFrame(InParentFrame), Pose(InPose){};
 };
 
 USTRUCT()
@@ -142,7 +157,16 @@ public:
 	virtual void Turn(float InVelocity, float InDeltaTime);
 	virtual void Turn(float InVelocity);
 
+        virtual void SetLocation(FVector InPosition);
+        virtual void SetRotation(FRotator InRotator);
+        virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
+        virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
+        virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
+
 	virtual void Tick(float InDeltaTime) override;
+
+	UPROPERTY(EditAnywhere)
+	FString BaseName;
 protected:
 
 	virtual void TurnTick(float InDeltaTime);
@@ -151,8 +175,6 @@ protected:
 	UPROPERTY()
 	ARModel* Model;
 
-	UPROPERTY(EditAnywhere)
-	FString BaseName;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsKinematic;
@@ -201,15 +223,35 @@ protected:
 
 	UPROPERTY(EditAnywhere)
 	FTransform PoseOffset;
+};
 
-	// UPROPERTY(EditAnywhere)
-	// FTransform PosePerceivedObject;
+UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URTFController : public URController
+{
+    GENERATED_BODY()
+public:
+	virtual void Init(ARModel* InModel) override;
+        virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
+        virtual TMap<FString, FTFInfo> GetTFList();
 
-	// UPROPERTY(EditAnywhere)
-	// FString TypePerceivedObject;
+        virtual bool UpdateFramePoses();
+        virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
 
-	// UPROPERTY(EditAnywhere)
-	// FString NamePerceivedObject;
+	virtual void Tick(float InDeltaTime) override;
+
+protected:
+
+	UPROPERTY()
+	ARModel* Model;
+
+        UPROPERTY(EditAnywhere)
+          float UpdateRate;
+
+        UPROPERTY()
+          float Time;
+
+	UPROPERTY()
+          TMap<FString, FTFInfo> TFList;
 };
 
 USTRUCT(Blueprintable)
@@ -240,10 +282,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	FRControllerContainer Controller;
 
-	TQueue<FString, EQueueMode::Mpsc> CommandQuerry;
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
 	ARModel* Model;
+
 };

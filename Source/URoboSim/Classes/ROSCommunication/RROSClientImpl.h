@@ -25,3 +25,13 @@ public:
 private:
   TMap<FString, float>* JointNames;
 };
+
+class FROSJointLimitControllerConfigurationClient final : public FROSBridgeSrvClient
+{
+public:
+  FROSJointLimitControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType);
+
+	void Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
+private:
+  TMap<FString, float>* JointNames;
+};

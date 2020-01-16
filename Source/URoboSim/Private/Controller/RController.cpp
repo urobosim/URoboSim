@@ -108,8 +108,9 @@ void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
 
       for(auto& Link : Model->Links)
         {
-          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-          Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+          // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+          // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+          AddRelativeLocation(Link.Value, DistanceTraveld);
         }
     }
 }
@@ -120,8 +121,9 @@ void URBaseController::MoveLinearToWorld(FVector InVelocity, float InDeltaTime)
 
   for(auto& Link : Model->Links)
     {
-      FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-      Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+      // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+      // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+      AddRelativeLocation(Link.Value, DistanceTraveld);
     }
 }
 
@@ -132,25 +134,63 @@ void URBaseController::Turn(float InVelocity, float InDeltaTime)
   if(InVelocity != 0.f)
     {
       FRotator TestRotation = FRotator(0.0f, InVelocity *InDeltaTime, 0.0f);
-
-      URLink* Base = Model->Links[BaseName];
-      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-      FVector BasePosition = Base->GetCollision()->GetComponentLocation();
-
       for(auto& Link : Model->Links)
         {
-          FRotator Orientation = Link.Value->GetCollision()->GetComponentRotation();
-          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-
-          FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
-          Link.Value->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
-
-          FVector LinkBaseOffset = Position - BasePosition;
-          FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
-
-          Link.Value->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
+          AddRelativeRotation(Link.Value, TestRotation);
         }
     }
+}
+
+void URBaseController::AddRelativeLocation(URLink* InLink, FVector InPosition)
+{
+  FVector Position = InLink->GetCollision()->GetComponentLocation();
+  InLink->GetCollision()->SetWorldLocation(InPosition + Position, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
+{
+  URLink* Base = Model->Links[BaseName];
+  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  FRotator Orientation = InLink->GetCollision()->GetComponentRotation();
+  FVector Position = InLink->GetCollision()->GetComponentLocation();
+
+  FQuat NewRot = InRotator.Quaternion() * Orientation.Quaternion() ;
+  InLink->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
+
+  FVector LinkBaseOffset = Position - BasePosition;
+  FVector NewPosition = InRotator.RotateVector(LinkBaseOffset) + BasePosition;
+
+  InLink->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void URBaseController::SetLocation(FVector InPosition)
+{
+  URLink* Base = Model->Links[BaseName];
+  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  FVector DistanceTraveld = InPosition - BasePosition;
+
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeLocation(Link.Value, DistanceTraveld);
+    }
+}
+void URBaseController::SetRotation(FRotator InRotation)
+{
+  URLink* Base = Model->Links[BaseName];
+  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FRotator NewRotation = InRotation - BaseOrientation;
+
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeRotation(Link.Value, NewRotation);
+    }
+}
+
+void URBaseController::SetLocationAndRotation(FVector InPosition, FRotator InRotation)
+{
+  SetLocation(InPosition);
+  SetRotation(InRotation);
 }
 
 void URCameraController::PerceiveObject()
@@ -298,4 +338,70 @@ URController* URControllerComponent::ControllerList(FString ControllerName)
       return Controller.ControllerList[ControllerName];
     }
   return nullptr;
+}
+
+void URTFController::Init(ARModel* InModel)
+{
+  if(!InModel)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+    }
+  else
+    {
+      Model = InModel;
+      Time = 0.0f;
+      for(auto& Link : Model->Links)
+        {
+          Link.Value->GetCollision()->SetSimulatePhysics(false);
+        }
+    }
+}
+
+void URTFController::AddTF(FString InFrameName, FTFInfo InTFInfo)
+{
+  FTFInfo& Info = TFList.FindOrAdd(InFrameName);
+  Info = InTFInfo;
+}
+
+TMap<FString, FTFInfo> URTFController::GetTFList()
+{
+  return TFList;
+}
+
+bool URTFController::UpdateFramePoses()
+{
+  if(Time > 1./UpdateRate)
+    {
+      Time = 0;
+      for(auto & TF : TFList)
+        {
+          FString ChildName = TF.Key;
+          FString ParentName = TF.Value.ParentFrame;
+          if(Model->Links.Contains(ChildName) && Model->Links.Contains(ParentName))
+            {
+              SetLinkPose(Model->Links[ChildName], Model->Links[ParentName], TF.Value.Pose);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("Model does not contain Frame %s or ParentFrame %s"), *TF.Key, *TF.Value.ParentFrame);
+            }
+        }
+    }
+
+  return false;
+}
+
+void URTFController::SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose)
+{
+  FTransform ParentTransform = InParentLink->GetCollision()->GetComponentTransform();
+  FVector NewLocation = ParentTransform.GetLocation() + ParentTransform.GetRotation().RotateVector(InPose.GetLocation());
+  FQuat NewRotation = ParentTransform.GetRotation() * InPose.GetRotation();
+
+  FTransform NewTransform = FTransform(NewRotation, NewLocation, FVector(1.0f, 1.0f, 1.0f));
+  InChildLink->GetCollision()->SetWorldTransform(NewTransform, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void URTFController::Tick(float InDeltaTime)
+{
+  Time += InDeltaTime;
 }

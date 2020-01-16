@@ -67,11 +67,16 @@ class UROBOSIM_API URJointControllerConfigurationClient : public URROSClient
   GENERATED_BODY()
 
 public:
+    URJointControllerConfigurationClient();
+
    UPROPERTY()
      URControllerComponent* ControllerComp;
 
    UPROPERTY(EditAnywhere)
      FString JointParamTopic;
+
+   UPROPERTY(EditAnywhere)
+     FString LimitParamTopic;
 
    virtual void CallService();
 
@@ -79,7 +84,11 @@ public:
     virtual void CreateClient();
 
 private:
-    TSharedPtr<FROSJointControllerConfigurationClient> ServiceClient;
-    TSharedPtr<rosapi::GetParam::Request> Request;
-    TSharedPtr<rosapi::GetParam::Response> Response;
+    TSharedPtr<FROSJointControllerConfigurationClient> JointServiceClient;
+    TSharedPtr<FROSJointLimitControllerConfigurationClient> JointLimitServiceClient;
+    TSharedPtr<rosapi::GetParam::Request> JointRequest;
+    TSharedPtr<rosapi::GetParam::Response> JointResponse;
+
+    TSharedPtr<rosapi::GetParam::Request> LimitRequest;
+    TSharedPtr<rosapi::GetParam::Response> LimitResponse;
 };
