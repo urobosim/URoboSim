@@ -640,7 +640,6 @@ void URPerceiveObjectActionResultPublisher::Publish()
 {
   if(Owner->bPublishResult)
     {
-      UE_LOG(LogTemp, Error, TEXT("Publish Result"));
       TSharedPtr<urobosim_msgs::PerceiveObjectActionResult> ActionResult =
         MakeShareable(new urobosim_msgs::PerceiveObjectActionResult());
 

@@ -197,22 +197,33 @@ void URCameraController::PerceiveObject()
 {
   if(bActive)
     {
-      UE_LOG(LogTemp, Warning, TEXT("PerceiveObject is a dummy function"));
       GoalStatusList.Last().Status = 1;
-
-
       bool bObjectFound = false;
-      for(auto & Object : PerceivedObjects)
+      TArray<AActor*> PerceivedActors;
+      UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(*TypeToPerceive), PerceivedActors);
+
+      if(PerceivedActors.Num()>0)
         {
-          if(Object->Type.Equals(TypeToPerceive, ESearchCase::IgnoreCase))
-            {
-              PerceivedObject = Object;
-              bObjectFound = true;
-            }
+          bObjectFound = true;
+          PerceivedObject = NewObject<UPerceivedObject>(this);
+          PerceivedObject->PoseWorld.SetLocation(PerceivedActors[0]->GetActorLocation());
+          PerceivedObject->PoseWorld.SetRotation(PerceivedActors[0]->GetActorQuat());
+          PerceivedObject->Name = PerceivedActors[0]->GetName();
         }
+
+
+      // for(auto & Object : PerceivedObjects)
+      //   {
+      //     if(Object->Type.Equals(TypeToPerceive, ESearchCase::IgnoreCase))
+      //       {
+      //         PerceivedObject = Object;
+      //         bObjectFound = true;
+      //       }
+      //   }
 
       if(bObjectFound)
         {
+
           URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
           FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
 
