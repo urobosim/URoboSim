@@ -38,6 +38,7 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
       ObjectsInReach.Emplace(OtherSMA);
+      UE_LOG(LogTemp, Warning, TEXT("InReach %s"), *OtherSMA->GetName());
     }
 }
 
@@ -103,6 +104,7 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
       FixatedObject = InSMA;
     }
 
+  UE_LOG(LogTemp, Warning, TEXT("Fixate %s"), *SMC->GetName());
   Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
 
   // Clear objects in reach array

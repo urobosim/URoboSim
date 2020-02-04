@@ -226,6 +226,9 @@ void URCameraController::PerceiveObject()
 
           URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
           FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+          FVector Location = ReferenceLinkTransform.GetLocation();
+          Location.Z = 0.0f;
+          ReferenceLinkTransform.SetLocation(Location);
 
           FVector Temp = PerceivedObject->PoseWorld.GetLocation() - ReferenceLinkTransform.GetLocation();
           FVector Pose = ReferenceLinkTransform.GetRotation().Inverse().RotateVector(Temp) ;

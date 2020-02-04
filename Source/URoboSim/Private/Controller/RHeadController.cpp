@@ -35,6 +35,7 @@ void URHeadTrajectoryController::Tick(float InDeltaTime)
   if(bActive)
     {
       GoalStatusList.Last().Status = 1;
+      UpdateHeadDirection();
       CheckPointHeadState();
     }
 }
@@ -152,8 +153,8 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
       float& DesAz = JointController->DesiredJointState.FindOrAdd("head_pan_joint");
       DesAz = Az - AzEl.X;
       float& DesEl = JointController->DesiredJointState.FindOrAdd("head_tilt_joint");
-      DesEl = Az - AzEl.Y;
-      AzimuthJoint->MaxJointVel = 0.27;
-      ElevationJoint->MaxJointVel = 0.27;
+      DesEl = El - AzEl.Y;
+      AzimuthJoint->MaxJointVel = 0.007;
+      ElevationJoint->MaxJointVel = 0.007;
     }
 }
