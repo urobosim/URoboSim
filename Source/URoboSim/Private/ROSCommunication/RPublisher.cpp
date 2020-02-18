@@ -475,7 +475,10 @@ void UROdomPublisher::Publish()
 
   //TODO get the correct pos of base footprint
   FVector BasePose =Owner->GetActorLocation();
-  BasePose.Z = 0.;
+  if(bProjectToGround)
+    {
+      BasePose.Z = 0.;
+    }
 
   geometry_msgs::Transform BaseTransfMsg(
                                          geometry_msgs::Vector3(FConversions::UToROS(BasePose - FrameTransform.GetLocation())),

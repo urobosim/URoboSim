@@ -287,6 +287,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FString BaseFrameId = "base_footprint";
+
+        UPROPERTY(EditAnywhere)
+          bool bProjectToGround = true;
 protected:
 	virtual void SetMessageType();
 	virtual void SetOwner(UObject* InOwner);
