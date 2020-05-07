@@ -4,54 +4,36 @@
 URJointController::URJointController()
 {
   BaseLink = TEXT("base_footprint");
-  IgnoreList.Add(TEXT("l_gripper_l_finger_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_motor_slider_joint"));
-  IgnoreList.Add(TEXT("l_gripper_motor_screw_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_finger_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_finger_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_motor_slider_joint"));
-  IgnoreList.Add(TEXT("r_gripper_motor_screw_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_finger_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_joint"));
-  IgnoreList.Add(TEXT("r_gripper_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_parallel_root_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_parallel_root_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_parallel_root_joint"));
-  IgnoreList.Add(TEXT("l_gripper_l_parallel_root_joint"));
-  IgnoreList.Add(TEXT("r_gripper_r_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("r_gripper_l_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_r_parallel_tip_joint"));
-  IgnoreList.Add(TEXT("l_gripper_l_parallel_tip_joint"));
+  State = UJointControllerState::Normal;
+  Mode = UJointControllerMode::Dynamic;
 }
 
 void URJointController::SetJointNames(TArray<FString> InNames)
 {
-	TrajectoryStatus.JointNames = InNames;
-	int JointNum = InNames.Num();
-	TrajectoryStatus.Error.Empty();
-	TrajectoryStatus.Error.AddDefaulted(JointNum);
-	TrajectoryStatus.Desired.Empty();
-	TrajectoryStatus.Desired.AddDefaulted(JointNum);
-	TrajectoryStatus.Position.Empty();
-	TrajectoryStatus.Position.AddDefaulted(JointNum);
-	bTrajectoryPointsReached.Empty();
-	bTrajectoryPointsReached.AddDefaulted(JointNum);
-	ActionDuration = 0.0;
-	TrajectoryPointIndex = 0;
+  TrajectoryStatus.JointNames = InNames;
+  int JointNum = InNames.Num();
+  TrajectoryStatus.Error.Empty();
+  TrajectoryStatus.Error.AddDefaulted(JointNum);
+  TrajectoryStatus.Desired.Empty();
+  TrajectoryStatus.Desired.AddDefaulted(JointNum);
+  TrajectoryStatus.Position.Empty();
+  TrajectoryStatus.Position.AddDefaulted(JointNum);
+  bTrajectoryPointsReached.Empty();
+  bTrajectoryPointsReached.AddDefaulted(JointNum);
+  ActionDuration = 0.0;
+  TrajectoryPointIndex = 0;
 }
 
 void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 {
-    for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
+  if(State == UJointControllerState::FollowJointTrajectory)
     {
-        URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
-        if(Joint)
+      for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
-            Joint->DesiredJointPose = Trajectory[TrajectoryPointIndex].Points[i];
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("%s of Trajectory not contained in RobotModel"), *TrajectoryStatus.JointNames[i]);
+          FString JointName = TrajectoryStatus.JointNames[i];
+          float& JointState = DesiredJointState.FindOrAdd(JointName);
+
+          JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
     }
 }
@@ -60,22 +42,12 @@ bool URJointController::CheckTrajectoryStatus()
 {
   bool bFinalTrajectoryPointReached = false;
 
-  // TrajectoryPointIndex++;
-
   if(TrajectoryPointIndex == Trajectory.Num()-1)
     {
-      bFollowTrajectory = false;
+      State = UJointControllerState::Normal;
       bPublishResult = true;
 
       GoalStatusList.Last().Status = 3;
-
-      // FString FinalPos;
-      // for(auto& pos : TrajectoryStatus.Position)
-      //   {
-      //     FinalPos.Append(FString::SanitizeFloat(pos));
-      //     FinalPos.Append(" ");
-      //   }
-      // UE_LOG(LogTemp, Error, TEXT("Final pos: %s"), *FinalPos);
 
       Trajectory.Empty();
       TrajectoryPointIndex = 0;
@@ -90,21 +62,14 @@ bool URJointController::CheckTrajectoryStatus()
           URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
           if(Joint)
             {
-              // float CurrentJointPos = Joint->GetJointPosition();
               float CurrentJointPos = Joint->GetEncoderValue();
               float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
-              // DesiredPos = Joint->Constraint->CheckPositionRange(DesiredPos);
               float Diff = DesiredPos - CurrentJointPos;
-              // Diff = Joint->Constraint->CheckPositionRange(Diff);
 
               if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
                 {
                   bAllPointsReady = false;
-                  UE_LOG(LogTemp, Error, TEXT("JointName %s Diff %f"), *TrajectoryStatus.JointNames[i], Diff);
                 }
-
-
-
               TrajectoryStatus.Position[i] = CurrentJointPos;
               TrajectoryStatus.Desired[i] = Trajectory[TrajectoryPointIndex].Points[i];
               TrajectoryStatus.Error[i] = Diff;
@@ -114,40 +79,16 @@ bool URJointController::CheckTrajectoryStatus()
               UE_LOG(LogTemp, Error, TEXT("%s of Trajectory not contained in RobotModel"), *TrajectoryStatus.JointNames[i]);
             }
         }
-      // FString Name = "";
-      // for(auto& pos : TrajectoryStatus.JointNames)
-      //   {
-      //     Name.Append(pos);
-      //     Name.Append(" ");
-      //   }
-
-      // FString Position = "";
-      // for(auto& pos : TrajectoryStatus.Position)
-      //   {
-      //     Position.Append(FString::SanitizeFloat(pos));
-      //     Position.Append(" ");
-      //   }
-      // UE_LOG(LogTemp, Position, TEXT("Position: %s"), *Position);
-
-      // FString Desired = "";
-      // for(auto& desired : TrajectoryStatus.Desired)
-      //   {
-      //     Desired.Append(FString::SanitizeFloat(desired));
-      //     Desired.Append(" ");
-      //   }
-      // UE_LOG(LogTemp, Error, TEXT("Desired: %s"), *Desired);
       FString Error = "";
       for(auto& error : TrajectoryStatus.Error)
         {
           Error.Append(FString::SanitizeFloat(error));
           Error.Append(" ");
         }
-      // UE_LOG(LogTemp, Error, TEXT("Error: %s"), *Error);
 
       if(bAllPointsReady)
         {
           TrajectoryPointIndex++;
-          // UE_LOG(LogTemp, Error, TEXT("TrajIndex: %d/ %d"), TrajectoryPointIndex, Trajectory.Num());
         }
 
       GoalStatusList.Last().Status = 1;
@@ -160,17 +101,23 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
   FString Velocity = "";
   for(auto & Joint: Model->Joints)
     {
-      if(!IgnoreList.Contains(Joint.Key))
+      if(DesiredJointState.Contains(Joint.Key))
         {
-          // float CurrentJointPos = Joint.Value->GetJointPosition();
-          float CurrentJointPos = Joint.Value->GetEncoderValue();
-          float DesiredPos = Joint.Value->DesiredJointPose;
-          // DesiredPos = Joint.Value->Constraint->CheckPositionRange(DesiredPos);
-          float Diff = DesiredPos - CurrentJointPos;
+          Joint.Value->bActuate = true;
+          float DesiredPos = 0.0f;
+          DesiredPos = DesiredJointState[Joint.Key];
 
-          // Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
+
+
+          float CurrentJointPos = Joint.Value->GetEncoderValue();
+          float Diff = DesiredPos - CurrentJointPos;
+          Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
           float Vel = Diff / InDeltaTime;
+          if(!Joint.Key.Equals("torso_lift_joint"))
+            {
+              Joint.Value->MaxJointVel = MaxJointAngularVel;
+            }
           if(Joint.Value->MaxJointVel > 0)
             {
               if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
@@ -178,65 +125,167 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
                   Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
                 }
             }
-      // Velocity.Append(FString::SanitizeFloat(Vel));
-      // Velocity.Append(" ");
-
           Joint.Value->SetJointVelocity(Vel);
         }
     }
-  // UE_LOG(LogTemp, Error, TEXT("Vel: %s"), *Velocity);
 }
 
+void URJointController::SetDesiredJointState(FString JointName, float InJointState)
+{
+  URJoint* Joint = Model->Joints[JointName];
+  if(Joint)
+    {
+      float& JointValue = DesiredJointState.FindOrAdd(JointName);
+      // UE_LOG(LogTemp, Warning, TEXT("JointName %s Upper %f Lower %f"), *JointName, Joint->Constraint->Upper, Joint->Constraint->Lower);
+      if(InJointState > FMath::DegreesToRadians(Joint->Constraint->Upper))
+        {
+          UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Upper));
+          JointValue =  FMath::DegreesToRadians(Joint->Constraint->Upper);
+        }
+      else if(InJointState < FMath::DegreesToRadians(Joint->Constraint->Lower))
+        {
+          UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Lower));
+          JointValue =  FMath::DegreesToRadians(Joint->Constraint->Lower);
+        }
+      else
+        {
+          JointValue = InJointState;
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Setting DesiredJointState failed. Joint %s not contained in Model"), *JointName);
+    }
+}
 
 void URJointController::Tick(float InDeltaTime)
 {
-
   if(!Model)
     {
       UE_LOG(LogTemp, Error, TEXT("Model not initialized"));
       return;
     }
 
-  if(Model->Links.Contains(BaseLink))
+  for(auto& Joint : Model->Joints)
     {
-      Model->Links[BaseLink]->UpdateEncoder();
+      Joint.Value->UpdateEncoder();
     }
 
-  if(bFollowTrajectory)
+  switch(State)
     {
+    case UJointControllerState::FollowJointTrajectory:
       if(!CheckTrajectoryStatus())
         {
           UpdateDesiredJointAngle(InDeltaTime);
         }
+      CallculateJointVelocities(InDeltaTime);
+      MoveJoints(InDeltaTime);
+      break;
+
+    case UJointControllerState::Normal:
+      CallculateJointVelocities(InDeltaTime);
+      MoveJoints(InDeltaTime);
+
+      break;
+
+    case UJointControllerState::Off:
+
+      break;
     }
+}
 
-  CallculateJointVelocities(InDeltaTime);
+void URJointController::MoveJoints(float InDeltaTime)
+{
+  switch(Mode)
+    {
+    case UJointControllerMode::Kinematic:
+      MoveJointsKinematic();
+      break;
 
+    case UJointControllerMode::Dynamic:
+      MoveJointsDynamic(InDeltaTime);
+      break;
+    }
+}
+
+void URJointController::MoveJointsDynamic(float InDeltaTime)
+{
   if(Model->Links.Contains(BaseLink))
     {
-      Model->Links[BaseLink]->UpdateVelocity();
-      // Model->Links[BaseLink]->UpdateJointStates();
+      Model->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+    }
+}
+
+void URJointController::MoveJointsKinematic()
+{
+
+  FHitResult * HitResult = nullptr;
+  for(auto& Joint : Model->Joints)
+    {
+      if(DesiredJointState.Contains(Joint.Key))
+        {
+          Joint.Value->SetJointPosition(DesiredJointState[Joint.Key], HitResult);
+        }
     }
 }
 
 void URJointController::Init(ARModel* InModel)
 {
-  bFollowTrajectory = false;
+  State = UJointControllerState::Normal;
   bPublishResult = false;
   if(!InModel)
     {
-      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-      // Status = 4;
+      UE_LOG(LogTemp, Error, TEXT("JointController not attached to ARModel"));
     }
   else
     {
       Model = InModel;
-      // Status = 1;
+      SwitchMode(Mode, true);
+      for(auto & Link: Model->Links)
+        {
+          Link.Value->GetCollision()->SetEnableGravity(false);
+        }
+    }
+}
+
+void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
+{
+  if(Mode == InMode && !IsInit)
+    {
+      return;
+    }
+
+  Mode = InMode;
+  if(!Model)
+    {
+      return;
+    }
+
+  bool bEnablePhysics;
+  switch(Mode)
+    {
+    case UJointControllerMode::Kinematic:
+      bEnablePhysics = false;
+      break;
+
+    case UJointControllerMode::Dynamic:
+      bEnablePhysics = true;
+      break;
+    }
+
+  for(auto& Joint : Model->Joints)
+    {
+      Joint.Value->Child->GetCollision()->SetSimulatePhysics(bEnablePhysics);
     }
 }
 
 void URJointController::FollowTrajectory()
 {
-	TrajectoryPointIndex = 0;
-	bFollowTrajectory = true;
+  TrajectoryPointIndex = 0;
+  State = UJointControllerState::FollowJointTrajectory;
+}
+
+UJointControllerState URJointController::GetState()
+{
+  return State;
 }

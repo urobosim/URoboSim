@@ -28,7 +28,7 @@ public class URoboSim : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"Core",
+				"Core"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -41,11 +41,13 @@ public class URoboSim : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                                "UnrealEd",
-                                "XmlParser",
+                "UnrealEd",
+                "XmlParser",
 				"UConversions",
 				"URoboVision",
-				"UROSBridge"
+				"UROSBridge",
+                "CustomMeshComponent",
+                "ProceduralMeshComponent"
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

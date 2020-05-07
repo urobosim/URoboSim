@@ -12,6 +12,7 @@
 class ARModel;
 class USDFLink;
 
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URLink : public UObject
 {
@@ -37,42 +38,55 @@ protected:
     static void SetSimulateGravity(URLink* OutLink, bool InUseGravity);
     static bool CreateCollisionForMesh(UStaticMesh* OutLink, ESDFGeometryType Type);
 
+
+	UPROPERTY()
+	TArray<class URJoint*> Joints;
+
+public:
+
+	UPROPERTY()
+	ARModel* Model;
+
 	UPROPERTY(EditAnywhere)
 	TArray<class URStaticMeshComponent*> Visuals;
 	UPROPERTY(EditAnywhere)
 	TArray<class URStaticMeshComponent*> Collisions;
 
-	UPROPERTY()
-	TArray<class URJoint*> Joints;
-
-	UPROPERTY()
-	ARModel* Model;
-public:
-
 	virtual void SetPose(FTransform InPose);
 	virtual void SetPose(FVector InLocation, FQuat InRotation);
 
-	UPROPERTY()
-	FString ChildFrame;
+	// UPROPERTY()
+	// FString ChildFrame;
 
-	UPROPERTY()
-	FString ParentFrame;
+	// UPROPERTY()
+	// FString ParentFrame;
 
 	URStaticMeshComponent* GetVisual();
 	URStaticMeshComponent* GetCollision();
-
-	virtual FString GetParentFrame(FString InDefaultFrame);
+        TArray<class URJoint*> GetJoints();
+	// virtual FString GetParentFrame(FString InDefaultFrame);
 
 	float GetNumCollisions();
 	// Load link from sdf data
 	static void Load(ARModel* OutModel, USDFLink* InLink);
 	void AddJoint(class URJoint* InJoint);
 
-	virtual void UpdateVelocity();
-	virtual void UpdateEncoder();
+	virtual void UpdateVelocity(float InDeltaTime);
 	// virtual void UpdateJointStates();
 	virtual void SetNextVelocities();
 
 	UPROPERTY(EditAnywhere)
 	FTransform Pose;
+
+        UPROPERTY()
+        bool bAttachedToParent = false;
+};
+
+USTRUCT()
+struct FLinkInformation
+{
+  GENERATED_BODY()
+  public:
+
+  TArray<URLink*> Childs;
 };

@@ -1,39 +1,72 @@
 #include "ROSCommunication/RROSClient.h"
 #include "TimerManager.h"
 
-
-void URROSClient::Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InName)
+void URROSClient::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
 {
 	ROSHandler = InHandler;
-	// Name = InName;
-	Init(InModel);
+	Init(InOwner);
 }
 
-void URROSClient::Init(UObject* InModel, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler)
+void URROSClient::Init(UObject* InOwner, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler)
 {
 	ROSHandler = InHandler;
-	Init(InModel, OutArray);
+	Init(InOwner, OutArray);
 }
 
 void URJointStateConfigurationClient::Init(UObject* InModel, TArray<FString>* OutArray)
+// void URJointStateConfigurationClient::Init(UObject* InControllerComp)
 {
-	ARModel* Model = Cast<ARModel>(InModel);
+  ARModel* Model = Cast<ARModel>(InModel);
 
-	ServiceClient = MakeShareable<FROSJointStateConfigurationClient>(new FROSJointStateConfigurationClient(OutArray,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
-	FTimerHandle MyTimerHandle;
-	Model->GetWorldTimerManager().SetTimer(MyTimerHandle, this, &URJointStateConfigurationClient::CallService, 1.0f, false);
-	// UE_LOG(LogTemp, Error, TEXT("befor call"));
-	// CallService();
-	// UE_LOG(LogTemp, Error, TEXT("after call"));
+
+  Request = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
+  // Create an empty response instance
+  Response = MakeShareable(new rosapi::GetParam::Response());
+  ServiceClient = MakeShareable<FROSJointStateConfigurationClient>(new FROSJointStateConfigurationClient(OutArray,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+  FTimerHandle MyTimerHandle;
+  Model->GetWorldTimerManager().SetTimer(MyTimerHandle, this, &URJointStateConfigurationClient::CallService, 1.0f, false);
 }
 
 void URJointStateConfigurationClient::CallService()
 {
-	// Create a request instance with request parameters
-	Request = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
-	// Create an empty response instance
-	Response = MakeShareable(new rosapi::GetParam::Response());
 
-	ROSHandler->CallService(ServiceClient, Request, Response);
+  ROSHandler->CallService(ServiceClient, Request, Response);
 
+}
+
+URJointControllerConfigurationClient::URJointControllerConfigurationClient()
+{
+  JointParamTopic = TEXT("/whole_body_controller/joints");
+  LimitParamTopic = TEXT("/robot_description");
+}
+
+void URJointControllerConfigurationClient::Init(UObject* InControllerComp)
+{
+  // ARModel* Model = Cast<ARModel>(InModel);
+  ControllerComp = Cast<URControllerComponent>(InControllerComp);
+  CreateClient();
+  // ServiceClient = MakeShareable<FROSJointStateConfigurationClient>(new FROSJointStateConfigurationClient(OutArray,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+}
+
+void URJointControllerConfigurationClient::CreateClient()
+{
+  URJointController* JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
+  TMap<FString,float>* JointNames = &JointController->DesiredJointState;
+  JointRequest = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
+  JointResponse = MakeShareable(new rosapi::GetParam::Response());
+  JointServiceClient = MakeShareable<FROSJointControllerConfigurationClient>(new FROSJointControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+
+  LimitRequest = MakeShareable(new rosapi::GetParam::Request(LimitParamTopic, ""));
+  LimitResponse = MakeShareable(new rosapi::GetParam::Response());
+  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+
+
+  FTimerHandle MyTimerHandle;
+  ControllerComp->GetOwner()->GetWorldTimerManager().SetTimer(MyTimerHandle, this, &URJointControllerConfigurationClient::CallService, 1.0f, false);
+}
+
+void URJointControllerConfigurationClient::CallService()
+{
+  ROSHandler->CallService(JointServiceClient, JointRequest, JointResponse);
+  ROSHandler->CallService(JointLimitServiceClient, LimitRequest, LimitResponse);
 }
