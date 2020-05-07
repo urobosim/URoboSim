@@ -63,34 +63,41 @@ void URGripperController::Tick(float InDeltaTime)
     if(bActive)
     {
       bStalled = false;
-      CheckGripperActionResult(Error, 0.5);
+      CheckGripperActionResult(Error, 0.4);
+      UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
       if(bActive)
         {
           GoalStatusList.Last().Status = 1;
           ActionDuration += InDeltaTime;
 
+          JointValue = (LeftFinger->GetEncoderValue() + RightFinger->GetEncoderValue()) / 2.0;
           if(Error < 0)
             {
-              float& RightJointValue = JointController->DesiredJointState.FindOrAdd(RightJointName);
-              RightJointValue = RightFinger->GetEncoderValue() - 0.02;
-              float& LeftJointValue = JointController->DesiredJointState.FindOrAdd(LeftJointName);
-              LeftJointValue = LeftFinger->GetEncoderValue() - 0.02;
+              JointController->SetDesiredJointState(RightJointName, JointValue - 0.02);
+              JointController->SetDesiredJointState(LeftJointName, JointValue  - 0.02);
             }
           else
             {
-              float& RightJointValue = JointController->DesiredJointState.FindOrAdd(RightJointName);
-              RightJointValue = RightFinger->GetEncoderValue() + 0.02;
-              float& LeftJointValue = JointController->DesiredJointState.FindOrAdd(LeftJointName);
-              LeftJointValue = LeftFinger->GetEncoderValue() + 0.02;
+              JointController->SetDesiredJointState(RightJointName, JointValue + 0.02);
+              JointController->SetDesiredJointState(LeftJointName, JointValue + 0.02);
             }
         }
       else if (bStalled)
         {
+
+
+          UE_LOG(LogTemp, Error, TEXT("Grasp"));
           Grasp();
+
+          OldPosition = GripperPosition;
         }
       else
         {
+          UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
+          // OldPosition = GripperPosition;
+          UE_LOG(LogTemp, Error, TEXT("Release"));
           Release();
+          OldPosition = GripperPosition;
         }
     }
 }
@@ -186,5 +193,6 @@ void URGripperController::Init(ARModel* InModel)
       RightJointValue = RightFinger->GetEncoderValue();
       float& LeftJointValue = JointController->DesiredJointState.FindOrAdd(LeftJointName);
       LeftJointValue = LeftFinger->GetEncoderValue();
+      JointValue = (RightJointValue + LeftJointValue) / 2.0;
     }
 }

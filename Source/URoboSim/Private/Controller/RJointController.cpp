@@ -107,6 +107,8 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           float DesiredPos = 0.0f;
           DesiredPos = DesiredJointState[Joint.Key];
 
+
+
           float CurrentJointPos = Joint.Value->GetEncoderValue();
           float Diff = DesiredPos - CurrentJointPos;
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
@@ -128,6 +130,33 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
     }
 }
 
+void URJointController::SetDesiredJointState(FString JointName, float InJointState)
+{
+  URJoint* Joint = Model->Joints[JointName];
+  if(Joint)
+    {
+      float& JointValue = DesiredJointState.FindOrAdd(JointName);
+      // UE_LOG(LogTemp, Warning, TEXT("JointName %s Upper %f Lower %f"), *JointName, Joint->Constraint->Upper, Joint->Constraint->Lower);
+      if(InJointState > FMath::DegreesToRadians(Joint->Constraint->Upper))
+        {
+          UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Upper));
+          JointValue =  FMath::DegreesToRadians(Joint->Constraint->Upper);
+        }
+      else if(InJointState < FMath::DegreesToRadians(Joint->Constraint->Lower))
+        {
+          UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Lower));
+          JointValue =  FMath::DegreesToRadians(Joint->Constraint->Lower);
+        }
+      else
+        {
+          JointValue = InJointState;
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Setting DesiredJointState failed. Joint %s not contained in Model"), *JointName);
+    }
+}
 
 void URJointController::Tick(float InDeltaTime)
 {

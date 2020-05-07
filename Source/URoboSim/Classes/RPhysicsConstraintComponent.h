@@ -42,8 +42,8 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   GENERATED_BODY()
     public:
 
-    UPROPERTY()
-    FJointInformation JointInformation;
+    // UPROPERTY()
+    // FJointInformation JointInformation;
 
   UPROPERTY()
     FQuat QInitial;

@@ -32,7 +32,12 @@ public:
 	FString GripperName;
 
 	// Fixated object
+
+	UPROPERTY()
 	AStaticMeshActor* FixatedObject;
+
+	UPROPERTY()
+        bool bObjectGrasped;
 
 protected:
 
@@ -59,4 +64,7 @@ protected:
 
 	// Fixate object to hand
 	virtual void FixateObject(AStaticMeshActor* InSMA);
+
+        UPROPERTY()
+          bool bGraspObjectGravity;
 };

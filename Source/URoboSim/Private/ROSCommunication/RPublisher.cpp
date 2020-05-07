@@ -355,7 +355,7 @@ void URFollowTrajectoryActionResultPublisher::Publish()
   /* UE_LOG(LogTemp, Error, TEXT("bPublishResult pub: %s"), Owner->bPublishResult ? TEXT("True") : TEXT("False")); */
   if(Owner->bPublishResult)
     {
-      UE_LOG(LogTemp, Error, TEXT("Publish Result"));
+      UE_LOG(LogTemp, Error, TEXT("Publish Result FollowJointTrajectory"));
       TSharedPtr<control_msgs::FollowJointTrajectoryActionResult> ActionResult =
         MakeShareable(new control_msgs::FollowJointTrajectoryActionResult());
 
@@ -512,7 +512,7 @@ void URPR2HeadActionResultPublisher::Publish()
 {
   if(Owner->bPublishResult)
     {
-      UE_LOG(LogTemp, Error, TEXT("Publish Result"));
+      UE_LOG(LogTemp, Error, TEXT("Publish Result HeadAction"));
       TSharedPtr<pr2_controllers_msgs::PR2PointHeadActionResult> ActionResult =
         MakeShareable(new pr2_controllers_msgs::PR2PointHeadActionResult());
 
@@ -583,7 +583,7 @@ void URPR2GripperCommandActionResultPublisher::Publish()
 
       Seq++ ;
       Owner->bPublishResult = false;
-      UE_LOG(LogTemp, Error, TEXT("Publish Result"));
+      UE_LOG(LogTemp, Error, TEXT("Publish Result Gripper Action"));
     }
 }
 

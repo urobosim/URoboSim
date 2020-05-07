@@ -57,6 +57,7 @@ URJoint* URJointBuilder::NewJoint()
   if(Joint->Constraint)
     {
       SetAxis();
+      SetJointLimit();
     }
   else
     {

@@ -31,7 +31,7 @@ void URHeadTrajectoryController::Init(ARModel* InModel)
 
 void URHeadTrajectoryController::Tick(float InDeltaTime)
 {
-  CancelAction();
+  // CancelAction();
   if(bActive)
     {
       GoalStatusList.Last().Status = 1;

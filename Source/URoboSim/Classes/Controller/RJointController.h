@@ -56,6 +56,9 @@ class UROBOSIM_API URJointController : public URController
   virtual void SwitchMode(UJointControllerMode InMode, bool IsInit = false);
 
   UJointControllerState GetState();
+
+  virtual void SetDesiredJointState(FString JointName, float InJointState);
+
  protected:
   UPROPERTY(EditAnywhere)
     UJointControllerMode Mode;

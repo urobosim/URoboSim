@@ -70,6 +70,9 @@ class UROBOSIM_API URGripperController : public URController
     float Position;
 
   UPROPERTY()
+    float OldPosition;
+
+  UPROPERTY()
     float MaxEffort;
 
   UPROPERTY()
@@ -124,4 +127,6 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY(EditAnywhere)
     FString GraspComponentName;
 
+  UPROPERTY()
+    float JointValue;
 };

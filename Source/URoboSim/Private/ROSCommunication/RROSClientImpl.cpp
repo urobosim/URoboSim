@@ -46,7 +46,7 @@ void FROSJointControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv:
 	JointString.ParseIntoArray(StringArray,TEXT(","),true);
 	for(auto& st : StringArray)
 	{
-		st = st.Trim().TrimQuotes();
+          st = st.Trim().TrimQuotes();
           float& JointState = JointNames->FindOrAdd(st);
           JointState = 0.f;
 	}

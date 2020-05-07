@@ -180,7 +180,10 @@ void URBaseController::SetRotation(FRotator InRotation)
   URLink* Base = Model->Links[BaseName];
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
   FRotator NewRotation = InRotation - BaseOrientation;
+  NewRotation.Pitch = 0;
+  NewRotation.Roll = 0;
 
+  UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
   for(auto& Link : Model->Links)
     {
       AddRelativeRotation(Link.Value, NewRotation);
@@ -263,7 +266,7 @@ void URCameraController::Init(ARModel* InModel)
   Model = InModel;
   TArray<AActor*> FoundActors;
   TArray<URStaticMeshComponent*> ActorComponents;
-  URStaticMeshComponent* ReferenceLink;
+  URStaticMeshComponent* ReferenceLink = nullptr;
   Model->GetComponents(ActorComponents);
 
   for(auto & Component : ActorComponents)
@@ -287,12 +290,10 @@ void URCameraController::Init(ARModel* InModel)
         {
           Camera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
           Camera->AddActorLocalOffset(PoseOffset.GetLocation());
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Camera not found"));
+          return;
         }
     }
+  UE_LOG(LogTemp, Error, TEXT("Camera %s not found"), *CameraName);
 
 }
 

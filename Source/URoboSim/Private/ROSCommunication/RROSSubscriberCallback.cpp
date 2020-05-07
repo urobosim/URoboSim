@@ -283,7 +283,15 @@ void FROSGripperCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Ms
 
       AsyncTask(ENamedThreads::GameThread, [this, Id, Command]()
                 {
-                  Controller->Position = Command->GetGoal().GetCommand().GetPosition() * 100.0;
+                  float Pos = Command->GetGoal().GetCommand().GetPosition() * 100.0;
+                  if(Pos > 8.5)
+                  {
+                    UE_LOG(LogTemp, Warning, TEXT("%s: DesiredPosition should not exceed 8.5"), *Controller->GetName());
+                    Pos = 8.5;
+                  }
+
+                  Controller->Position = Pos;
+
                   Controller->MaxEffort = Command->GetGoal().GetCommand().GetMaxEffort();
                   UE_LOG(LogTemp, Log, TEXT("Recieved GripperCommand Id: %s Goal: %f"), *Id.GetId(), Controller->Position);
                   Controller->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
