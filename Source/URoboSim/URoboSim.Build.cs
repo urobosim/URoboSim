@@ -41,13 +41,14 @@ public class URoboSim : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "UnrealEd",
-                "XmlParser",
+                                "UnrealEd",
+                                "XmlParser",
 				"UConversions",
 				"URoboVision",
 				"UROSBridge",
-                "CustomMeshComponent",
-                "ProceduralMeshComponent"
+				"UIAISimUtils",
+                                "CustomMeshComponent",
+                                "ProceduralMeshComponent"
 				// ... add private dependencies that you statically link with here ...
 			}
 			);
