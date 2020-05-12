@@ -25,6 +25,10 @@
 			"Name": "UUtils",
 			"Enabled": true
 		},
+                {
+                        "Name": "UIAISimUtils",
+                        "Enabled": true
+                },
 		{
 			"Name": "URoboVision",
 			"Enabled": true

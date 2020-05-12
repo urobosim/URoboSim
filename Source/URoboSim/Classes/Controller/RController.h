@@ -8,6 +8,7 @@
 #include "Physics/RJoint.h"
 /* #include "ROSCommunication/RRosComunication.h" */
 #include "RGBDCamera.h"
+#include "ROSUtilities.h"
 #include "Containers/Queue.h"
 #include "RController.generated.h"
 
@@ -87,26 +88,6 @@ public:
 	TArray<double> Error;
 };
 
-USTRUCT()
-struct FGoalStatusInfo
-{
-    GENERATED_BODY()
-public:
-	FGoalStatusInfo(){};
-
-	FGoalStatusInfo(FString InId, uint32 InSecs, uint32 InNSecs, uint8 InStatus = 0, FString InText = ""): Id(InId),
-		   Secs(InSecs),
-		   NSecs(InNSecs),
-		   Status(InStatus),
-		   Text(InText){};
-
-	FString Id;
-	uint32 Secs;
-	uint32 NSecs;
-	uint8 Status;
-	FString Text;
-
-};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URController : public UObject
