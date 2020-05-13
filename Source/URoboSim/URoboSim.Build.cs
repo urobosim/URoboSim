@@ -46,7 +46,6 @@ public class URoboSim : ModuleRules
 				"UConversions",
 				"URoboVision",
 				"UROSBridge",
-				"UIAISimUtils",
                                 "CustomMeshComponent",
                                 "ProceduralMeshComponent"
 				// ... add private dependencies that you statically link with here ...
