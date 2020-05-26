@@ -43,7 +43,7 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
   FVector LidarBodyLoc = GetComponentLocation();
   FRotator LidarBodyRot = GetComponentRotation();
 
-  for(int i = 0; i<SCSResolution; i++)
+  for(int i = 0; i < (int) SCSResolution; i++)
     {
       float Angle = i * FMath::RadiansToDegrees(AngularIncrement);
       FRotator ResultRot = UKismetMathLibrary::ComposeRotators(

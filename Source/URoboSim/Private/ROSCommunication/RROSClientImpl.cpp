@@ -22,7 +22,7 @@ void FROSJointStateConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvR
 	JointString.ParseIntoArray(StringArray,TEXT(","),true);
 	for(auto& st : StringArray)
 	{
-		st = st.Trim().TrimQuotes();
+		st = st.TrimStartAndEnd().TrimQuotes();
 	}
 	JointNames->Empty();
 	JointNames->Append(StringArray);
@@ -46,7 +46,7 @@ void FROSJointControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv:
 	JointString.ParseIntoArray(StringArray,TEXT(","),true);
 	for(auto& st : StringArray)
 	{
-          st = st.Trim().TrimQuotes();
+          st = st.TrimStartAndEnd().TrimQuotes();
           float& JointState = JointNames->FindOrAdd(st);
           JointState = 0.f;
 	}
@@ -81,7 +81,7 @@ void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridg
         {
           if (Node->GetTag().Equals(TEXT("joint")))
             {
-              const FString Name = Node->GetAttribute(TEXT("name"));
+              const FString MyName = Node->GetAttribute(TEXT("name"));
               for (const auto& ChildNode : Node->GetChildrenNodes())
                 {
                   if (ChildNode->GetTag().Equals(TEXT("safety_controller")))
@@ -89,15 +89,15 @@ void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridg
                       float SoftLowerLimit = FCString::Atof(*ChildNode->GetAttribute("soft_lower_limit"));
                       float SoftUpperLimit = FCString::Atof(*ChildNode->GetAttribute("soft_upper_limit"));
 
-                      UE_LOG(LogTemp, Warning, TEXT("%s: Lower %s Upper: %s"), *Name, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
+                      UE_LOG(LogTemp, Warning, TEXT("%s: Lower %s Upper: %s"), *MyName, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
                       if(0.0f < SoftLowerLimit)
                         {
-                          float& JointState = JointNames->FindOrAdd(Name);
+                          float& JointState = JointNames->FindOrAdd(MyName);
                           JointState = SoftLowerLimit;
                         }
                       else if(0.0f > SoftUpperLimit)
                         {
-                          float& JointState = JointNames->FindOrAdd(Name);
+                          float& JointState = JointNames->FindOrAdd(MyName);
                           JointState = SoftUpperLimit;
                         }
 

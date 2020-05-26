@@ -284,12 +284,12 @@ void URCameraController::Init(ARModel* InModel)
 
   UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
 
-  for(auto& Camera : FoundActors)
+  for(auto& MyCamera : FoundActors)
     {
-      if(Camera->GetName().Equals(CameraName))
+      if(MyCamera->GetName().Equals(CameraName))
         {
-          Camera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-          Camera->AddActorLocalOffset(PoseOffset.GetLocation());
+		  MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
           return;
         }
     }

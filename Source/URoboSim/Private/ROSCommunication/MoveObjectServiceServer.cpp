@@ -20,7 +20,7 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FROSMoveObjectServer::Callback(TSharedPtr
 		StaticCastSharedPtr<FROSMoveObjectSrv::Request>(Request);
 
 
-        FString Name = MoveRequest->GetName();
+        FString MyName = MoveRequest->GetName();
         FVector Location = MoveRequest->GetPose().GetPosition().GetVector();
         FQuat Quat = MoveRequest->GetPose().GetOrientation().GetQuat();
         bool ServiceSuccess = true;
@@ -38,7 +38,7 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FROSMoveObjectServer::Callback(TSharedPtr
               while(ActorItr)
                 {
                   UE_LOG(LogTemp, Error, TEXT("Name %s"), *ActorItr->GetName());
-                  if(ActorItr->GetName().Equals(Name))
+                  if(ActorItr->GetName().Equals(MyName))
                     {
                       ActorItr->SetActorLocationAndRotation(Location, Quat);
                     }

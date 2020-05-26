@@ -271,6 +271,9 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
     case UJointControllerMode::Dynamic:
       bEnablePhysics = true;
       break;
+
+	default:
+		bEnablePhysics = true;
     }
 
   for(auto& Joint : Model->Joints)

@@ -20,18 +20,26 @@
 		  "LoadingPhase": "Default"
 		}
 		],
-	"Plugins": [
-		{
-			"Name": "UUtils",
-			"Enabled": true
-		},
-		{
-			"Name": "URoboVision",
-			"Enabled": true
-		},
-		{
-			"Name": "UROSBridge",
-			"Enabled": true
-		}
-	]
+  "Plugins": [
+    {
+      "Name": "UUtils",
+      "Enabled": true
+    },
+    {
+      "Name": "URoboVision",
+      "Enabled": true
+    },
+    {
+      "Name": "ProceduralMeshComponent",
+      "Enabled": true
+    },
+    {
+      "Name": "CustomMeshComponent",
+      "Enabled": true
+    },
+    {
+      "Name": "UROSBridge",
+      "Enabled": true
+    }
+  ]
 }
