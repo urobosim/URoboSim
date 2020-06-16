@@ -1,7 +1,8 @@
-// Copyright 2018, Institute for Artificial Intelligence - University of Bremen
+// Copyright 201    8, Institute for Artificial Intelligence - University of Bremen
 // Author: Andrei Haidu (http://haidu.eu)
 
 using UnrealBuildTool;
+using System.IO;
 
 public class URoboSim : ModuleRules
 {
@@ -9,28 +10,18 @@ public class URoboSim : ModuleRules
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicIncludePaths.AddRange(
-			new string[] {
-				"URoboSim/Public"
-				// ... add public include paths required here ...
-			}
-			);
+        PublicIncludePaths.Add(Path.Combine(ModuleDirectory, "Public"));
+        PrivateIncludePaths.Add(Path.Combine(ModuleDirectory, "Private"));
 
-
-		PrivateIncludePaths.AddRange(
-			new string[] {
-				"URoboSim/Private",
-				// ... add other private include paths required here ...
-			}
-			);
-
-
-		PublicDependencyModuleNames.AddRange(
+        PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"Core"
 				// ... add other public dependencies that you statically link with here ...
-			}
+                ,"MeshDescription",
+                "RenderCore",
+                "Json",
+            }
 			);
 
 
@@ -41,13 +32,13 @@ public class URoboSim : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                                "UnrealEd",
-                                "XmlParser",
+                "UnrealEd",
+                "XmlParser",
 				"UConversions",
 				"URoboVision",
 				"UROSBridge",
-                                "CustomMeshComponent",
-                                "ProceduralMeshComponent"
+                "CustomMeshComponent",
+                "ProceduralMeshComponent",
 				// ... add private dependencies that you statically link with here ...
 			}
 			);

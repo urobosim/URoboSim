@@ -11,12 +11,12 @@
 #include "RStaticMeshEditUtils.h"
 
 // Default constructor
-FSDFParser::FSDFParser() : XmlFile(nullptr), bSDFLoaded(false)
+FSDFParser::FSDFParser() : XmlFile(nullptr), bSDFLoaded(false), AssetRegistryModule(FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry")))
 {
 }
 
 // Constructor with load from path
-FSDFParser::FSDFParser(const FString& InFilename) : XmlFile(nullptr), bSDFLoaded(false)
+FSDFParser::FSDFParser(const FString& InFilename) : XmlFile(nullptr), bSDFLoaded(false), AssetRegistryModule(FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry")))
 {
   LoadSDF(InFilename);
 }
@@ -30,7 +30,7 @@ FSDFParser::~FSDFParser()
 // Load sdf from file
 bool FSDFParser::LoadSDF(const FString& InFilename)
 {
-  AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+  AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry"));
   // Make sure parser is clean
   Clear();
 

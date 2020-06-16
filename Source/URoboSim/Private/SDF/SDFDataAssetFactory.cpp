@@ -47,7 +47,8 @@ UObject* USDFDataAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 	Flags |= RF_Transactional;
 
 	// Called when new assets are being (re-)imported
-	FEditorDelegates::OnAssetPreImport.Broadcast(this, InClass, InParent, InName, Parms);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPreImport(this, InClass, InParent, InName, Parms);
+	//FEditorDelegates::OnAssetPreImport.Broadcast(this, InClass, InParent, InName, Parms);
 
 	// Parse the .sdf buffer data into the data asset
 	FSDFParser Parser(Filename);
@@ -56,7 +57,8 @@ UObject* USDFDataAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 	USDFDataAsset* NewDataAsset = Parser.ParseToNewDataAsset(InParent, InName, Flags);
 
 	// Called when new assets have been (re-)imported
-	FEditorDelegates::OnAssetPostImport.Broadcast(this, NewDataAsset);
+	GEditor->GetEditorSubsystem<UImportSubsystem>()->BroadcastAssetPostImport(this, NewDataAsset);
+	//FEditorDelegates::OnAssetPostImport.Broadcast(this, NewDataAsset);
 	return NewDataAsset;
 }
 /* End UFactory overrides */

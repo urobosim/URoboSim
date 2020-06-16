@@ -147,5 +147,5 @@ private:
 	// Fbx factory
 	UFbxFactory* FbxFactory;
 
-        FAssetRegistryModule AssetRegistryModule;
+    FAssetRegistryModule& AssetRegistryModule;
 };
