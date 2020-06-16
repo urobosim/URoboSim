@@ -45,7 +45,7 @@ protected:
 	UPROPERTY()
 	URStaticMeshComponent* Gripper;
 
-        UPROPERTY()
+        UPROPERTY(EditAnywhere)
           UPhysicsConstraintComponent* Constraint;
 
 	// Function called when an item enters the fixation overlap area

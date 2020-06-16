@@ -7,7 +7,8 @@ URGraspComponent::URGraspComponent()
   InitSphereRadius(10.f);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
-  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Constraint"));
+  FString ConstraintName = TEXT("Constraint_") + GetName();
+  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName));
   Constraint->SetupAttachment(this);
   Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
   Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
