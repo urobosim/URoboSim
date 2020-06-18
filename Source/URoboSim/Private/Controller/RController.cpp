@@ -89,6 +89,7 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
       URLink* Base = Model->Links[BaseName];
       FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
       FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
+      UE_LOG(LogTemp, Log, TEXT("LinearVelocity %s, DistanceTraveld %s"), *LinearVelocity.ToString(), *DistanceTraveld.ToString());
 
       for(auto& Link : Model->Links)
         {
