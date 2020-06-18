@@ -9,5 +9,5 @@ void URoboSimWCM::SetupServiceServers()
   UE_LOG(LogTemp, Error, TEXT("Setup Service"));
   // Add Service Servers
   UWorld* World = GetWorld();
-  ServicesToPublish.Add(MakeShareable<FROSResetLevelServer>(new FROSResetLevelServer(Namespace, TEXT("reset_level"), World, this)));
+  ServicesToPublish.Add(MakeShareable<FROSResetLevelServer>(new FROSResetLevelServer(Namespace, TEXT("reset_level"), this)));
 }
