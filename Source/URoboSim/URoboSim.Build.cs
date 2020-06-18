@@ -32,7 +32,6 @@ public class URoboSim : ModuleRules
 				"Engine",
 				"Slate",
 				"SlateCore",
-                "UnrealEd",
                 "XmlParser",
 				"UConversions",
 				"URoboVision",

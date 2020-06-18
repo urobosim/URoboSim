@@ -3,17 +3,17 @@
 
 #include "CoreMinimal.h"
 // #include "BrushBuilder.h"
-#include "Editor/UnrealEd/Classes/Builders/CubeBuilder.h"
-#include "Editor/UnrealEd/Classes/Builders/TetrahedronBuilder.h"
-#include "Editor/UnrealEd/Classes/Builders/CylinderBuilder.h"
+// #include "Editor/UnrealEd/Classes/Builders/CubeBuilder.h"
+// #include "Editor/UnrealEd/Classes/Builders/TetrahedronBuilder.h"
+// #include "Editor/UnrealEd/Classes/Builders/CylinderBuilder.h"
 // #include "Runtime/Engine/Classes/Engine/Brush.h"
 // #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
 #include "SDF/SDFDataAsset.h"
 #include "CustomMeshComponent.h"
 
 // #include "Editor.h"
-#include "Editor/EditorEngine.h"
-#include "EditorModeManager.h"
+// #include "Editor/EditorEngine.h"
+// #include "EditorModeManager.h"
 #include "ActorEditorUtils.h"
 #include "EngineUtils.h"
 #include "LevelUtils.h"
@@ -73,13 +73,13 @@ public:
     static UStaticMesh* CreateStaticMesh(UPackage* InPackage, FString InPackageName, ESDFGeometryType InShape, TArray<float> InParameters);
 protected:
 
-    static void CreateBrushBuilder(ABrush* OutBrush, ESDFGeometryType InGeometryTyp, TArray<float> InParameters);
+    // static void CreateBrushBuilder(ABrush* OutBrush, ESDFGeometryType InGeometryTyp, TArray<float> InParameters);
 
-    static UCubeBuilder* CreateCubeBuilder(ABrush* OutBrush, TArray<float> InParameters);
+    // static UCubeBuilder* CreateCubeBuilder(ABrush* OutBrush, TArray<float> InParameters);
 
-    static UTetrahedronBuilder* CreateSphereBuilder(ABrush* OutBrush, TArray<float> InParameters);
+    // static UTetrahedronBuilder* CreateSphereBuilder(ABrush* OutBrush, TArray<float> InParameters);
 
-    static UCylinderBuilder* CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters);
+    // static UCylinderBuilder* CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters);
 
     static UProceduralMeshComponent* CreateCubePM(UObject* InOwner, TArray<float> InParameter);
     static UProceduralMeshComponent* CreateCylinderPM(UObject* InOwner, TArray<float> InParameter, float Section = 8);

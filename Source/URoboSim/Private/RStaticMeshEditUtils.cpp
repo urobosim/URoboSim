@@ -24,73 +24,73 @@ UStaticMesh* RStaticMeshUtils::LoadMesh(UStaticMeshComponent* InOwner, UStaticMe
     return StaticMesh;
 }
 
-void RStaticMeshUtils::CreateBrushBuilder(ABrush* OutBrush,
-                                          ESDFGeometryType InGeometryTyp,
-                                          TArray<float> InParameters)
-{
-    switch(InGeometryTyp)
-    {
-        case ESDFGeometryType::None :
-            UE_LOG(LogTemp, Error, TEXT("GeometryTyp Not Implemented"));
-            break;
-        case ESDFGeometryType::Mesh :
-            UE_LOG(LogTemp, Error, TEXT("Mesh Not Implemented"));
-            break;
-        case ESDFGeometryType::Box :
-            OutBrush->BrushBuilder = CreateCubeBuilder(OutBrush, InParameters);
-            break;
-        case ESDFGeometryType::Cylinder :
-            OutBrush->BrushBuilder = CreateCylinderBuilder(OutBrush, InParameters);
-            break;
-        case ESDFGeometryType::Sphere :
-            OutBrush->BrushBuilder = CreateSphereBuilder(OutBrush, InParameters);
-            break;
-        default :
-            UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet."));
-            break;
-    }
-}
+// void RStaticMeshUtils::CreateBrushBuilder(ABrush* OutBrush,
+//                                           ESDFGeometryType InGeometryTyp,
+//                                           TArray<float> InParameters)
+// {
+//     switch(InGeometryTyp)
+//     {
+//         case ESDFGeometryType::None :
+//             UE_LOG(LogTemp, Error, TEXT("GeometryTyp Not Implemented"));
+//             break;
+//         case ESDFGeometryType::Mesh :
+//             UE_LOG(LogTemp, Error, TEXT("Mesh Not Implemented"));
+//             break;
+//         case ESDFGeometryType::Box :
+//             OutBrush->BrushBuilder = CreateCubeBuilder(OutBrush, InParameters);
+//             break;
+//         case ESDFGeometryType::Cylinder :
+//             OutBrush->BrushBuilder = CreateCylinderBuilder(OutBrush, InParameters);
+//             break;
+//         case ESDFGeometryType::Sphere :
+//             OutBrush->BrushBuilder = CreateSphereBuilder(OutBrush, InParameters);
+//             break;
+//         default :
+//             UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet."));
+//             break;
+//     }
+// }
 
-UCubeBuilder* RStaticMeshUtils::CreateCubeBuilder(ABrush* OutBrush,
-                                                  TArray<float> InParameters)
-{
-    UCubeBuilder* CubeBuilder = NewObject<UCubeBuilder>(OutBrush,"CubeBuilder");
-    //ClampMin 0.000001
-    CubeBuilder->X = InParameters[0];
-    //ClampMin 0.000001
-    CubeBuilder->Y = InParameters[1];
-    //ClampMin 0.000001
-    CubeBuilder->Z = InParameters[2];
-    return CubeBuilder;
-}
+// UCubeBuilder* RStaticMeshUtils::CreateCubeBuilder(ABrush* OutBrush,
+//                                                   TArray<float> InParameters)
+// {
+//     UCubeBuilder* CubeBuilder = NewObject<UCubeBuilder>(OutBrush,"CubeBuilder");
+//     //ClampMin 0.000001
+//     CubeBuilder->X = InParameters[0];
+//     //ClampMin 0.000001
+//     CubeBuilder->Y = InParameters[1];
+//     //ClampMin 0.000001
+//     CubeBuilder->Z = InParameters[2];
+//     return CubeBuilder;
+// }
 
-UTetrahedronBuilder* RStaticMeshUtils::CreateSphereBuilder(ABrush* OutBrush, TArray<float> InParameters)
-{
-    UTetrahedronBuilder* SphereBuilder = NewObject<UTetrahedronBuilder>(OutBrush,"SphereBuilder");
-	if(InParameters[0] < 0.1)
-	{
-		SphereBuilder->Radius = 0.1;
-		SphereBuilder->SphereExtrapolation = 1;
-	}
-	else
-	{
-		SphereBuilder->Radius = InParameters[0];
-		SphereBuilder->SphereExtrapolation = 4;
-	}
-    return SphereBuilder;
-}
+// UTetrahedronBuilder* RStaticMeshUtils::CreateSphereBuilder(ABrush* OutBrush, TArray<float> InParameters)
+// {
+//     UTetrahedronBuilder* SphereBuilder = NewObject<UTetrahedronBuilder>(OutBrush,"SphereBuilder");
+// 	if(InParameters[0] < 0.1)
+// 	{
+// 		SphereBuilder->Radius = 0.1;
+// 		SphereBuilder->SphereExtrapolation = 1;
+// 	}
+// 	else
+// 	{
+// 		SphereBuilder->Radius = InParameters[0];
+// 		SphereBuilder->SphereExtrapolation = 4;
+// 	}
+//     return SphereBuilder;
+// }
 
-UCylinderBuilder* RStaticMeshUtils::CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters)
-{
-    UCylinderBuilder* CylinderBuilder = NewObject<UCylinderBuilder>(OutBrush,"CylinderBuilder");
-    CylinderBuilder->OuterRadius = InParameters[0];
-    CylinderBuilder->Z = InParameters[1];
-    CylinderBuilder->Sides = 8;
-    CylinderBuilder->InnerRadius = 0;
-    CylinderBuilder->Hollow = 0;
-    CylinderBuilder->AlignToSide = 1;
-    return CylinderBuilder;
-}
+// UCylinderBuilder* RStaticMeshUtils::CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters)
+// {
+//     UCylinderBuilder* CylinderBuilder = NewObject<UCylinderBuilder>(OutBrush,"CylinderBuilder");
+//     CylinderBuilder->OuterRadius = InParameters[0];
+//     CylinderBuilder->Z = InParameters[1];
+//     CylinderBuilder->Sides = 8;
+//     CylinderBuilder->InnerRadius = 0;
+//     CylinderBuilder->Hollow = 0;
+//     CylinderBuilder->AlignToSide = 1;
+//     return CylinderBuilder;
+// }
 
 void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHullCount, int32 InMaxHullVerts, uint32 InHullPrecision)
 {
