@@ -17,24 +17,6 @@
 
 class URControllerComponent;
 
-// USTRUCT()
-// struct FROSTopic
-// {
-// 	GENERATED_BODY()
-
-// 	UPROPERTY(EditAnywhere)
-// 	FString Topic;
-
-// 	UPROPERTY(EditAnywhere)
-// 	FString Type;
-
-// 	int32 ID;
-
-// 	FROSTopic(FString InTopic = "", FString InType = "") : Topic(InTopic), Type(InType){};
-
-// };
-
-
 USTRUCT(Blueprintable)
 struct FRROSComunicationContainer
 {
