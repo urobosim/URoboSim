@@ -14,7 +14,7 @@
 // #include "Editor.h"
 // #include "Editor/EditorEngine.h"
 // #include "EditorModeManager.h"
-#include "ActorEditorUtils.h"
+// #include "ActorEditorUtils.h"
 #include "EngineUtils.h"
 #include "LevelUtils.h"
 #include "Runtime/Engine/Classes/Engine/StaticMeshActor.h"
@@ -73,14 +73,6 @@ public:
     static UStaticMesh* CreateStaticMesh(UPackage* InPackage, FString InPackageName, ESDFGeometryType InShape, TArray<float> InParameters);
 protected:
 
-    // static void CreateBrushBuilder(ABrush* OutBrush, ESDFGeometryType InGeometryTyp, TArray<float> InParameters);
-
-    // static UCubeBuilder* CreateCubeBuilder(ABrush* OutBrush, TArray<float> InParameters);
-
-    // static UTetrahedronBuilder* CreateSphereBuilder(ABrush* OutBrush, TArray<float> InParameters);
-
-    // static UCylinderBuilder* CreateCylinderBuilder(ABrush* OutBrush, TArray<float> InParameters);
-
     static UProceduralMeshComponent* CreateCubePM(UObject* InOwner, TArray<float> InParameter);
     static UProceduralMeshComponent* CreateCylinderPM(UObject* InOwner, TArray<float> InParameter, float Section = 8);
     static void GenerateCylinder(TArray<FVector>& InVertices, TArray<int32>& InTriangles,TArray<FVector2D>& InUVs, TArray<FVector> InNormals, TArray<FProcMeshTangent> InTangets, float Height, float InWidth, int32 InCrossSectionCount, bool bCapEnds = false, bool bDoubleSided = false, bool bInSmoothNormals = true);
@@ -120,75 +112,6 @@ UStaticMesh* RStaticMeshUtils::CreateThroughBrushOrLoadMesh(UStaticMeshComponent
     }
     return StaticMesh;
 };
-
-// template <typename T>
-// UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(UStaticMeshComponent* InOwner, T* InVisual)
-// {
-//   UStaticMesh* StaticMesh = nullptr;
-
-//   FString PackageName = "";
-//   FString Reason = "";
-//   // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
-//   if(!FPackageName::TryConvertFilenameToLongPackageName("/Game/" + InVisual->Name + "_StaticMesh", PackageName, &Reason))
-//     {
-//       UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
-//       return nullptr;
-//     }
-
-//   FString MeshReference = TEXT("StaticMesh\'") + PackageName + "." + FPackageName::GetShortName(PackageName)+ "\'";
-//   // StaticMesh = LoadObject<UStaticMesh>(NULL, *MeshReference, NULL, LOAD_None, NULL);
-//   StaticMesh = LoadObject<UStaticMesh>(InOwner, *MeshReference, NULL, LOAD_None, NULL);
-//   if(!StaticMesh)
-//     {
-//       // UE_LOG(LogTemp, Error, TEXT("Mesh will be created: %s"), *InVisual->Name);
-//       UWorld *World = GEditor->GetEditorWorldContext().World();
-//       if ((World != nullptr) && (World->GetDefaultBrush() != nullptr))
-//         {
-//           ULevel* CurrentLevel = World->GetCurrentLevel();
-//           ABrush* DefBrush = World->GetDefaultBrush();
-//           UE_LOG(LogTemp, Error, TEXT("DefBrush: %s "), *DefBrush->GetName());
-//           TArray<float> Parameters = GetGeometryParameter(InVisual->Geometry);
-//           CreateBrushBuilder(DefBrush, InVisual->Geometry->Type, Parameters);
-//           if (CurrentLevel != nullptr && !FLevelUtils::IsLevelLocked(CurrentLevel)
-//               && DefBrush->BrushBuilder)
-//             {
-//               World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
-//               // World->GetDefaultBrush()->BrushBuilder = DuplicateObject<UBrushBuilder>(DefBrush->BrushBuilder, World->GetDefaultBrush()->GetOuter());
-//               World->GetDefaultBrush()->BrushBuilder->Build(World, DefBrush);
-//               DefBrush->SetNeedRebuild(CurrentLevel);
-//               GEditor->RebuildAlteredBSP();
-//               bool bIsAdditive = true;
-//               const TCHAR* Command = bIsAdditive ? TEXT("BRUSH ADD SELECTNEWBRUSH") : TEXT("BRUSH SUBTRACT SELECTNEWBRUSH");
-//               GEditor->Exec(World, Command);
-//               USelection* SelectedActor = GEditor->GetSelectedActors();
-//               if(Cast<ABrush>(SelectedActor->GetSelectedObject(0)))
-//                 {
-//                   int32 BrushIndexForReattachment = 0;
-//                   TArray<AActor* > BrushList ;
-//                   BrushList.Add(Cast<AActor>(SelectedActor->GetSelectedObject(0)));
-//                   for(auto& Brush : BrushList)
-//                     {
-//                       UE_LOG(LogTemp, Error, TEXT("BrushName: %s %s"), *Brush->GetName(), *PackageName);
-//                     }
-//                   // GEditor->DoConvertActors(BrushList, AStaticMeshActor::StaticClass(), TSet<FString>(), false, PackageName);
-//                 }
-
-//             }
-
-//         }
-//     }
-//   else
-//     {
-//       // CleanUp(InVisual->Name);
-//     }
-//   // Early out if actor deletion is currently forbidden
-//   if (GEditor->ShouldAbortActorDeletion())
-//     {
-//       return nullptr;
-//     }
-
-//   return StaticMesh;
-// }
 
 template <typename T>
 UStaticMesh* RStaticMeshUtils::CreateStaticMeshThroughBrush(UStaticMeshComponent* InOwner, T* InVisual)

@@ -52,13 +52,13 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
               // URModelFactory::CreateModels(NewRobot, SDFAsset);
               if ( NewRobot )
                 {
-                  PostSpawnActor(Asset, NewRobot);
 
                   // Only do this if the actor wasn't already given a name
-                  if (Name == NAME_None && Asset)
-                    {
-                      FActorLabelUtilities::SetActorLabelUnique(NewRobot, Model->Name);
-                    }
+                  // if (Name == NAME_None && Asset)
+                  //   {
+                  FActorLabelUtilities::SetActorLabelUnique(NewRobot, Model->Name);
+                  PostSpawnActor(Asset, NewRobot);
+                  //   }
                 }
             }
         }

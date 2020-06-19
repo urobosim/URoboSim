@@ -2,7 +2,8 @@
 
 #include "ROSCommunication/ResetLevelServer.h"
 #include "Conversions.h"
-#include "EngineUtils.h"
+#include "GameFramework/GameMode.h"
+// #include "EngineUtils.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 
 TSharedPtr<FROSBridgeSrv::SrvRequest> FROSResetLevelServer::FromJson(TSharedPtr<FJsonObject> JsonObject) const

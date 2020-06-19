@@ -8,6 +8,7 @@
 #include "RStaticMeshComponent.h"
 #include "SDF/SDFJoint.h"
 #include "Sensor/REncoder.h"
+#include "Physics/RLink.h"
 #include "RPhysicsConstraintComponent.generated.h"
 
 USTRUCT()

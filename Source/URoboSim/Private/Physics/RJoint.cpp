@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #include "Physics/RJoint.h"
 #include "Physics/RLink.h"
@@ -23,7 +23,6 @@ float URJoint::GetEncoderValue()
 void URJoint::UpdateEncoder()
 {
   Constraint->UpdateEncoderValue(GetJointPosition());
-  // Child->UpdateEncoder();
 }
 
 void URJoint::EnableMotor(bool InEnable)

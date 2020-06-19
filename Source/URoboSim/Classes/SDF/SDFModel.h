@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -10,7 +10,7 @@
 #include "SDFModel.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFModel : public UObject
@@ -31,5 +31,5 @@ public:
 	TArray<USDFLink*> Links;
 
 	UPROPERTY(EditAnywhere, Category = "Model")
-	TArray<USDFJoint*> Joints;	
+	TArray<USDFJoint*> Joints;
 };

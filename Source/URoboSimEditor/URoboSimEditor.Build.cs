@@ -4,9 +4,9 @@
 using UnrealBuildTool;
 using System.IO;
 
-public class URoboSim : ModuleRules
+public class URoboSimEditor : ModuleRules
 {
-	public URoboSim(ReadOnlyTargetRules Target) : base(Target)
+	public URoboSimEditor(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -29,16 +29,16 @@ public class URoboSim : ModuleRules
 			{
 				"CoreUObject",
 				"Engine",
-				"UConversions",
-				"URoboVision",
-				"UROSBridge",
+				"Slate",
+				"SlateCore",
                                 "XmlParser",
+				"UConversions",
+                                "CustomMeshComponent",
+                                "ProceduralMeshComponent",
+                                "URoboSim",
+                                "UnrealEd",
 			}
 			);
-
-
-
-
 
 		DynamicallyLoadedModuleNames.AddRange(
 			new string[]

@@ -43,20 +43,7 @@ protected:
   virtual void SetInertial(USDFLinkInertial* InInertial);
   virtual void SetCollisionProfile(bool InSelfColide);
   virtual void SetSimulateGravity(bool InUseGravity);
-  virtual bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
-
 };
-
-// UCLASS()
-// class UROBOSIM_API URVirtualLinkBuilder : public URLinkBuilder
-// {
-//   GENERATED_BODY()
-
-//  protected:
-
-//   virtual void SetCollisions() override;
-//   virtual void SetVisuals() override;
-// };
 
 UCLASS()
 class UROBOSIM_API URLinkFactory : public UObject

@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #include "SDF/SDFJointAxis.h"
 #include "SDF/SDFJoint.h"
@@ -46,4 +46,3 @@ void USDFJointAxis::SetUpperLimitFromSDF(float UpperLimit)
 	}
 
 }
-

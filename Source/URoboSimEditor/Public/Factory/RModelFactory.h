@@ -2,8 +2,9 @@
 
 #pragma once
 
-#include "UnrealEd.h"
+// #include "UnrealEd.h"
 #include "SDF/SDFDataAsset.h"
+#include "ActorFactories/ActorFactory.h"
 #include "RModelFactory.generated.h"
 
 class ARModel;
@@ -15,14 +16,12 @@ class ARModel;
  * Own ActorFactory which creates a robot from SDFData Asset.
  */
 UCLASS()
-class UROBOSIM_API URModelFactory : public UActorFactory
+class UROBOSIMEDITOR_API URModelFactory : public UActorFactory
 {
     GENERATED_BODY()
 
 private:
     URModelFactory(const FObjectInitializer& ObjectInitializer);
-
-#if WITH_EDITOR
 
     /**
      * Checks if AssetData is intended for the factory.
@@ -39,5 +38,4 @@ private:
     virtual void CreateModels(ARModel* OutModel, USDFDataAsset* InSDFData);
 
 
-#endif
 };

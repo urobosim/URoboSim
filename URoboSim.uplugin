@@ -5,8 +5,8 @@
 	"FriendlyName": "URoboSim",
 	"Description": "",
 	"Category": "RobCoG",
-	"CreatedBy": "Andrei Haidu",
-	"CreatedByURL": "http://haidu.eu",
+	"CreatedBy": "Michael Neumann",
+	"CreatedByURL": "",
 	"DocsURL": "https://github.com/robcog-iai/URoboSim",
 	"MarketplaceURL": "",
 	"SupportURL": "http://robcog.org/",
@@ -16,7 +16,12 @@
 	"Modules": [
 		{
 		  "Name": "URoboSim",
-		  "Type": "Developer",
+		  "Type": "Runtime",
+		  "LoadingPhase": "Default"
+		},
+                {
+		  "Name": "URoboSimEditor",
+		  "Type": "Editor",
 		  "LoadingPhase": "Default"
 		}
 		],

@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -11,13 +11,13 @@
 #include "SDFLink.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFLink : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Constructor
 	USDFLink();
@@ -41,5 +41,5 @@ public:
 	TArray<USDFCollision*> Collisions;
 
 	UPROPERTY(EditAnywhere, Category = "Link")
-	TArray<USDFVisual*> Visuals;		
+	TArray<USDFVisual*> Visuals;
 };

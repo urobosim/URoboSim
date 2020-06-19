@@ -1,13 +1,12 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
-#include "SDF/SDFParser.h"
+#include "SDFParser.h"
 #include "SDF/SDFDataAsset.h"
 #include "Conversions.h"
 #include "Paths.h"
 #include "XmlFile.h"
 #include "Factories/FbxFactory.h"
-#include "AssetRegistryModule.h"
 #include "RStaticMeshEditUtils.h"
 
 // Default constructor

@@ -1,17 +1,14 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "SDF/SDFDataAsset.h"
 #include "RPhysicsConstraintComponent.h"
 #include "RJoint.generated.h"
 
-// Forward declarations
 class ARModel;
-class USDFJoint;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URJoint : public UObject
@@ -19,11 +16,7 @@ class UROBOSIM_API URJoint : public UObject
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this component's properties
 	URJoint();
-
-        // UPROPERTY()
-        //   FJointInformation JointInformation;
 
         UPROPERTY()
           bool bBreakEnabled;
@@ -44,11 +37,9 @@ public:
 
         UPROPERTY()
           class URLink* Parent;
-        // FString ChildName;
 
         UPROPERTY()
           class URLink* Child;
-    // FString ParentName;
 
 	virtual float GetJointPosition();
 	virtual float GetJointPositionInUUnits();
@@ -61,34 +52,18 @@ public:
 	virtual void SetJointEffortFromROS(float Effort);
         virtual void EnableMotor(bool InEnable);
 
-    static void Load(ARModel* OutModel, USDFJoint* InJoint);
-
     UPROPERTY(EditAnywhere)
     URConstraintComponent* Constraint;
 
     virtual float GetEncoderValue();
-protected:
-	// Called when the game starts
-	// virtual void BeginPlay() override;
-
-    // static void SetupConstraint(ARModel* OutModel, URJoint* OutOwner, USDFJoint* InJoint);
-
-
-
 
 public:
-    // Called every frame
-    // virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
     virtual void UpdateVelocity(float InDeltaTime);
-    // virtual void UpdateJointStates();
     virtual void UpdateEncoder();
 
     UPROPERTY(EditAnywhere)
       FTransform Pose;
-
-    // UPROPERTY()
-    //   float DesiredJointPose = 0;
 
     UPROPERTY()
       float MaxJointVel = -1;

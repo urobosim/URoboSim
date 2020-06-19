@@ -6,7 +6,7 @@
 #include "CoreMinimal.h"
 #include "ModuleManager.h"
 
-class FURoboSimModule : public IModuleInterface
+class FURoboSimEditorModule : public IModuleInterface
 {
 public:
 

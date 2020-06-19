@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -9,13 +9,13 @@
 #include "SDFCollision.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFCollision : public UObject
 {
 	GENERATED_BODY()
-	
+
 public:
 	// Constructor
 	USDFCollision();
@@ -27,5 +27,5 @@ public:
 	FTransform Pose;
 
 	UPROPERTY(EditAnywhere, Category = "Collision|Geometry")
-	USDFGeometry* Geometry;	
+	USDFGeometry* Geometry;
 };

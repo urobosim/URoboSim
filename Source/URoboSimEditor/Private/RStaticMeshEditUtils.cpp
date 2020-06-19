@@ -4,12 +4,14 @@
 // necessary for Collision creation
 #include "Private/ConvexDecompTool.h"
 // necessary for Collision creation KDOP
-#include "Editor/UnrealEd/Private/GeomFitUtils.h"
+
 #include "Runtime/Engine/Classes/PhysicsEngine/BodySetup.h"
 #include "EngineAnalytics.h"
 #include "RenderingThread.h"
 #include "Runtime/Analytics/Analytics/Public/Interfaces/IAnalyticsProvider.h"
 
+#include "Editor/UnrealEd/Private/GeomFitUtils.h"
+#include "Editor/EditorEngine.h"
 
 #define LOCTEXT_NAMESPACE "StaticMeshEditor"
 #ifndef USE_ASYNC_DECOMP
@@ -164,6 +166,7 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 
 void RStaticMeshUtils::GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirections, uint32 InNumInDirections)
 {
+
     TArray<FVector>	DirArray;
     for(uint32 DirectionIndex = 0;DirectionIndex < InNumInDirections;DirectionIndex++)
     {

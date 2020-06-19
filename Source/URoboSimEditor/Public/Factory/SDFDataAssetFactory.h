@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -12,7 +12,7 @@
 class USDFDataAsset;
 
 /**
- * 
+ *
  */
 UCLASS()
 class UROBOSIM_API USDFDataAssetFactory : public UFactory/*, public FReimportHandler*/
@@ -30,5 +30,5 @@ private:
 
 	// Create a new object by importing it from a file name
 	virtual UObject* FactoryCreateFile(UClass* InClass, UObject* InParent, FName InName, EObjectFlags Flags, const FString & Filename, const TCHAR* Parms, FFeedbackContext* Warn, bool& bOutOperationCanceled) override;
-	//////// End UFactory Interface 
+	//////// End UFactory Interface
 };

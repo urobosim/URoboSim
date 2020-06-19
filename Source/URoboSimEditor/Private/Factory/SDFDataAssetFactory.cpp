@@ -1,9 +1,9 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
-#include "SDF/SDFDataAssetFactory.h"
+#include "Factory/SDFDataAssetFactory.h"
 #include "SDF/SDFDataAsset.h"
-#include "SDF/SDFParser.h"
+#include "SDFParser.h"
 #include "Editor.h" // FEditorDelegates
 
 // Constructor
