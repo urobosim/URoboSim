@@ -2,7 +2,6 @@
 // Author: Michael Neumann
 
 #include "SDFParser.h"
-#include "SDF/SDFDataAsset.h"
 #include "Conversions.h"
 #include "Paths.h"
 #include "XmlFile.h"

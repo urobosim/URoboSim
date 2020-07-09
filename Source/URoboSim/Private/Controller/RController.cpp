@@ -191,6 +191,12 @@ void URBaseController::SetRotation(FRotator InRotation)
     }
 }
 
+void URBaseController::SetTransform(FTransform InTransform)
+{
+  SetLocation(InTransform.GetLocation());
+  SetRotation(InTransform.GetRotation().Rotator());
+}
+
 void URBaseController::SetLocationAndRotation(FVector InPosition, FRotator InRotation)
 {
   SetLocation(InPosition);
