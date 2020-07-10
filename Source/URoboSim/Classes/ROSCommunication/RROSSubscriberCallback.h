@@ -8,31 +8,6 @@
 #include "ROSBridgeSubscriber.h"
 #include "Controller/RController.h"
 #include "Controller/RJointController.h"
-// #include "Physics/RModel.h"
-// #include "Physics/RJoint.h"
-
-// class URJointController;
-// class URController;
-// class URBaseController;
-// class URHeadTrajectoryController;
-
-/**
- *
- */
-// class UROBOSIM_API FROSSubscriberCallback : public FROSBridgeSubscriber
-// {
-// public:
-// 	FROSSubscriberCallback(const FString& InTopic, const FString& InType, ARModel* InModel);
-//
-// 	~FROSSubscriberCallback() override;
-//
-// 	TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
-//
-// 	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
-//
-// 	ARModel* Model;
-// private:
-// };
 
 class UROBOSIM_API FROSWholeBodyControllerCallback : public FROSBridgeSubscriber
 {
@@ -149,4 +124,43 @@ public:
 	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
 
 	URGripperController* Controller;
+};
+
+class UROBOSIM_API FROSJointStateReplaySubscriberCallback : public FROSBridgeSubscriber
+{
+public:
+	FROSJointStateReplaySubscriberCallback(const FString& InTopic, const FString& InType, UObject* InController);
+
+	TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
+
+	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
+
+	URJointController* JointController;
+private:
+};
+
+class UROBOSIM_API FROSOdomReplaySubscriberCallback : public FROSBridgeSubscriber
+{
+public:
+	FROSOdomReplaySubscriberCallback(const FString& InTopic, const FString& InType, UObject* InController);
+
+	TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
+
+	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
+
+	URBaseController* BaseController;
+private:
+};
+
+class UROBOSIM_API FROSTFReplaySubscriberCallback : public FROSBridgeSubscriber
+{
+public:
+	FROSTFReplaySubscriberCallback(const FString& InTopic, const FString& InType, UObject* InController);
+
+	TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
+
+	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
+
+	URTFController* TFController;
+private:
 };

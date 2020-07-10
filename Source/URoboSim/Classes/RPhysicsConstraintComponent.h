@@ -8,196 +8,200 @@
 #include "RStaticMeshComponent.h"
 #include "SDF/SDFJoint.h"
 #include "Sensor/REncoder.h"
-/* #include "PIDController3D.h" */
+#include "Physics/RLink.h"
 #include "RPhysicsConstraintComponent.generated.h"
+
+USTRUCT()
+struct FJointInformation
+{
+  GENERATED_BODY()
+  public:
+
+
+  UPROPERTY()
+  URLink* Parent;
+
+  UPROPERTY()
+  URLink* Child;
+
+  UPROPERTY()
+  FVector RefAxis;
+
+  UPROPERTY()
+  float Upper;
+
+  UPROPERTY()
+  float Lower;
+
+  UPROPERTY()
+  FQuat QInitial;
+};
 
 UCLASS()
 class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
 {
-    GENERATED_BODY()
-public:
+  GENERATED_BODY()
+    public:
+
+    // UPROPERTY()
+    // FJointInformation JointInformation;
+
+  UPROPERTY()
+    FQuat QInitial;
+
+  UPROPERTY()
+    float Upper;
+
+  UPROPERTY()
+    float Lower;
+
+  virtual void ConnectToComponents(){};
+  virtual void EnableMotor(bool InEnable){};
+  virtual void SetTargetPosition(float InTargetPos){};
+  virtual float GetConstraintPosition(){return 0;};
+  virtual void SetPosition(USDFJoint* InJoint){};
+  virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
 
 
-	typedef void (URConstraintComponent::*UpdateStateFunctionPtr)();
+  virtual float GetJointPosition(){return 0.;};
+  virtual float GetJointVelocity(){return 0.;};
 
-	UpdateStateFunctionPtr UpdateFunctionPtr;
+  virtual float GetJointPositionInUUnits(){return 0.;};
+  virtual float GetJointVelocityInUUnits(){return 0.;};
 
-	UPROPERTY()
-	float Upper;
+  virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult){};
+  virtual void SetJointVelocity(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
+  virtual void SetJointVelocityInUUnits(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
+  virtual void SetJointEffort(float Effort){};
+  virtual void SetJointEffortFromROS(float InEffort){};
 
-	UPROPERTY()
-	float Lower;
-	// virtual void Init(USDFJoint* InJoint, UActorComponent* Parent, UActorComponent* Child){};
-	virtual void ConnectToComponents(){};
-	virtual void SetAxis(USDFJoint* InJoint){};
-	virtual void SetPosition(USDFJoint* InJoint){};
-	virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
+  virtual void UpdateJointVelocity(float InDeltaT = 0){};
+  virtual void UpdateEncoderValue(float InValue);
+  virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
 
-
-    virtual float GetJointPosition(){return 0.;};
-    virtual float GetJointVelocity(){return 0.;};
-
-    virtual float GetJointPositionInUUnits(){return 0.;};
-    virtual float GetJointVelocityInUUnits(){return 0.;};
-
-    virtual void SetJointPosition(float Angle){};
-    virtual void SetJointVelocity(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
-    virtual void SetJointVelocityInUUnits(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
-    virtual void SetJointEffort(float Effort){};
-    virtual void SetJointEffortFromROS(float InEffort){};
-
-	virtual void UpdateJointVelocity(){};
-	virtual void UpdateEncoderValue(float InValue);
-	virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
-
-	UPROPERTY(EditAnywhere)
-	float P;
-
-	UPROPERTY(EditAnywhere)
-	float I;
-
-	UPROPERTY(EditAnywhere)
-	float D;
-
-    UPROPERTY()
+  UPROPERTY()
     float JointAccuracy;
 
-    UPROPERTY()
+  UPROPERTY()
     float Limit;
 
-    UPROPERTY()
+  UPROPERTY()
     UREncoder* Encoder;
 
-protected:
+  UPROPERTY(VisibleAnywhere)
+    FVector RefAxis;
 
-	UPROPERTY()
-	FVector RefAxis;
+  UPROPERTY()
+    float RotationOffset;
 
-	// UPROPERTY()
-	// FPIDController3D PID;
+  UPROPERTY()
+    FVector Offset;
+ protected:
 
-	UPROPERTY()
-	float TargetVelocity;
+  UPROPERTY()
+    float TargetVelocity;
 
-	UPROPERTY()
-	URStaticMeshComponent* Parent;
+  UPROPERTY()
+    URStaticMeshComponent* Parent;
 
-	UPROPERTY()
-	URStaticMeshComponent* Child;
+  UPROPERTY()
+    URStaticMeshComponent* Child;
 
 };
 
 UCLASS()
 class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
 {
-    GENERATED_BODY()
-public:
-	// virtual void Init(USDFJoint* InJoint, UActorComponent* Parent, UActorComponent* Child);
-	virtual void ConnectToComponents();
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual void SetPosition(USDFJoint *InJoint);
+  GENERATED_BODY()
+    public:
+    virtual void ConnectToComponents();
+  virtual void SetPosition(USDFJoint *InJoint);
 
 };
 
 UCLASS()
 class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComponent
 {
-    GENERATED_BODY()
-public:
+  GENERATED_BODY()
+    public:
 
-      URPrismaticConstraintComponent(){
-      Encoder = CreateDefaultSubobject<URLinearEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
-      PrimaryComponentTick.bCanEverTick = true;
-      PrimaryComponentTick.TickGroup = TG_PrePhysics;
-      P = 1;
-      I = 1;
-    };
+    URPrismaticConstraintComponent(){
+    Encoder = CreateDefaultSubobject<URLinearEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
+  };
 
 
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual void SetPosition(USDFJoint* InJoint);
-	virtual void BeginPlay() override;
+  virtual void SetPosition(USDFJoint* InJoint);
+  virtual void BeginPlay() override;
 
-    virtual float GetJointPosition() override;
-    virtual float GetJointVelocity() override;
+  virtual float GetJointPosition() override;
+  virtual float GetJointVelocity() override;
 
-    virtual float GetJointPositionInUUnits() override;
-    virtual float GetJointVelocityInUUnits() override;
+  virtual float GetJointPositionInUUnits() override;
+  virtual float GetJointVelocityInUUnits() override;
 
-    virtual void SetJointPosition(float Angle);
-    virtual void SetJointVelocity(float Velocity);
-    virtual void SetJointVelocityInUUnits(float Velocity);
-    virtual void SetJointEffort(float Effort);
-    virtual void SetJointEffortFromROS(float InEffort);
+  virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
+  virtual void SetJointVelocity(float Velocity);
+  virtual void SetJointVelocityInUUnits(float Velocity);
+  virtual void SetJointEffort(float Effort);
+  virtual void SetJointEffortFromROS(float InEffort);
+  virtual void EnableMotor(bool InEnable);
+  virtual void SetTargetPosition(float InTargetPos);
 
 
 
-protected:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void UpdateJointVelocity();
-private:
-	UPROPERTY()
-	FVector ParentChildDistance;
+ protected:
+  virtual void UpdateJointVelocity(float InDeltaT = 0);
+  virtual void ConnectToComponents() override;
+ private:
+  UPROPERTY()
+    FVector ParentChildDistance;
 
-	UPROPERTY()
-	FVector Offset;
 };
 
 
 UCLASS()
 class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintComponent
 {
-    GENERATED_BODY()
-public:
-      URContinuousConstraintComponent(){
-      Encoder = CreateDefaultSubobject<URAngularEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
-      PrimaryComponentTick.bCanEverTick = true;
-      PrimaryComponentTick.TickGroup = TG_PrePhysics;
-      P = 1;
-      I = 1;
-      // D = 0.01;
-    };
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual void RotateConstraintToRefAxis(FVector InRefAxis, bool bUseParentModelFrame);
+  GENERATED_BODY()
+    public:
+    URContinuousConstraintComponent(){
+    Encoder = CreateDefaultSubobject<URAngularEncoder>(FName(*(GetName() + TEXT("_Encoder"))));
+  };
 
-    virtual float GetJointPosition() override;
-    virtual float GetJointVelocity() override;
-    virtual float GetJointPositionInUUnits() override;
-    virtual float GetJointVelocityInUUnits() override;
+  virtual void SetTargetPosition(float InTargetPos);
+  virtual void EnableMotor(bool InEnable);
+  virtual float GetConstraintPosition() override;
+  virtual float GetJointPosition() override;
+  virtual float GetJointVelocity() override;
+  virtual float GetJointPositionInUUnits() override;
+  virtual float GetJointVelocityInUUnits() override;
 
-	virtual float CheckPositionRange(float InTargetJointPos);
+  virtual float CheckPositionRange(float InTargetJointPos);
 
-    virtual void SetJointPosition(float Angle);
-    virtual void SetJointVelocity(float Velocity);
-    virtual void SetJointVelocityInUUnits(float Velocity);
-    virtual void SetJointEffort(float Effort);
-    virtual void SetJointEffortFromROS(float InEffort);
+  virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
+  virtual void SetJointVelocity(float Velocity);
+  virtual void SetJointVelocityInUUnits(float Velocity);
+  virtual void SetJointEffort(float Effort);
+  virtual void SetJointEffortFromROS(float InEffort);
 
-	virtual void BeginPlay() override;
+  virtual void BeginPlay() override;
 
 
-	virtual void UpdateJointVelocity();
-protected:
-
-	UPROPERTY()
-	FQuat QInitial;
-
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+  virtual void UpdateJointVelocity(float InDeltaT = 0);
 };
 
 UCLASS()
 class UROBOSIM_API URScrewConstraintComponent : public URContinuousConstraintComponent
 {
-    GENERATED_BODY()
-};
+  GENERATED_BODY()
+    };
 
 UCLASS()
 class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraintComponent
 {
-    GENERATED_BODY()
-public:
-	virtual void SetAxis(USDFJoint* InJoint);
-	virtual float CalculateRotationOffset(USDFJoint* InJoint);
+  GENERATED_BODY()
+    public:
+    virtual void SetTargetPosition(float InTargetPos);
+
 
 };

@@ -8,6 +8,8 @@
 #include "Physics/RLink.h"
 #include "ROSCommunication/RROSClient.h"
 #include "Controller/RJointController.h"
+#include "Controller/RGripperController.h"
+#include "Controller/RHeadController.h"
 #include "Controller/RController.h"
 #include "Sensor/R2DLidar.h"
 #include "Conversions.h"
@@ -104,8 +106,6 @@ GENERATED_BODY()
 protected:
 virtual void SetOwner(UObject* InOwner);
 
-// UPROPERTY()
-// URHeadTrajectoryController* Owner;
 };
 
 UCLASS()
@@ -274,7 +274,7 @@ class UROBOSIM_API UROdomPublisher : public URPublisher
     GENERATED_BODY()
 public:
     virtual void Publish();
-
+    UROdomPublisher();
 
 	UPROPERTY(EditAnywhere)
 	FTransform FrameTransform;
@@ -287,6 +287,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FString BaseFrameId = "base_footprint";
+
+        UPROPERTY(EditAnywhere)
+          bool bProjectToGround = true;
 protected:
 	virtual void SetMessageType();
 	virtual void SetOwner(UObject* InOwner);
@@ -302,8 +305,8 @@ class UROBOSIM_API URJointTrajectoryFeedbackPublisher : public URPublisher
     GENERATED_BODY()
 
 public:
-
     virtual void Publish();
+    URJointTrajectoryFeedbackPublisher();
 protected:
 	virtual void SetMessageType();
 	virtual void SetOwner(UObject* InOwner);
@@ -344,6 +347,7 @@ class UROBOSIM_API URFollowTrajectoryActionResultPublisher : public URPublisher
 
 public:
 
+
     virtual void Publish();
 protected:
 	virtual void SetMessageType();
@@ -359,9 +363,10 @@ class UROBOSIM_API URJointTrajectoryControllerStatePublisher : public URJointTra
 {
     GENERATED_BODY()
 public:
+      URJointTrajectoryControllerStatePublisher();
     virtual void Publish();
 protected:
-	virtual void SetMessageType();
+    virtual void SetMessageType();
 };
 
 UCLASS()
@@ -371,6 +376,7 @@ class UROBOSIM_API UR2DLidarPublisher : public URPublisher
 
 public:
 
+    UR2DLidarPublisher();
     virtual void Publish();
 
   UPROPERTY(EditAnywhere)

@@ -8,30 +8,10 @@ void URSubscriber::Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandle
 	Model = Cast<ARModel>(InModel);
 	ControllerComponent = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
 
-	// Model = Cast<ARModel>(InControllerComponent->GetOuter());
-	// ControllerComponent = Cast<URControllerComponent>(InControllerComponent);
-
 	Init(InRosTopic);
 	InHandler->AddSubscriber(Subscriber);
 
 }
-
-// URSubscriber* URSubscriber::Init(FString Type, UObject* Owner, FString RosTopic)
-// {
-// 	URSubscriber* SubscriberTemp = nullptr;
-// 	SubscriberTemp = URSubscriberFactory::CreateInstance(Type, Owner);
-// 	SubscriberTemp->Model = Cast<ARModel>(Owner->GetOuter());
-// 	if (SubscriberTemp->Model)
-// 	{
-// 		UE_LOG(LogTemp, Warning, TEXT("Model Found"));
-// 	}
-// 	else
-// 	{
-// 		UE_LOG(LogTemp, Warning, TEXT("Model not found"));
-// 	}
-// 	SubscriberTemp->Init(RosTopic);
-// 	return SubscriberTemp;
-// }
 
 void URSubscriber::Init(FString RosTopic)
 {
@@ -90,7 +70,8 @@ void URActionCancelSubscriber::CreateSubscriber()
 
 void URVelocityCommandSubscriber::SetMessageType()
 {
-	MessageType = TEXT("geometry_msgs/Twist");
+  MessageType = TEXT("geometry_msgs/Twist");
+  Topic = TEXT("/base_controller/command");
 }
 
 void URVelocityCommandSubscriber::CreateSubscriber()
@@ -148,4 +129,37 @@ void URPerceiveObjectActionGoalSubscriber::CreateSubscriber()
 	{
 		UE_LOG(LogTemp, Log, TEXT("Subscriber connected to RosBridge"));
 	}
+}
+
+void URJointStateReplaySubscriber::SetMessageType()
+{
+	MessageType = TEXT("sensor_msgs/JointState");
+}
+
+void URJointStateReplaySubscriber::CreateSubscriber()
+{
+	Subscriber = MakeShareable<FROSJointStateReplaySubscriberCallback>(
+			new FROSJointStateReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
+}
+
+void UROdometrieReplaySubscriber::SetMessageType()
+{
+	MessageType = TEXT("tf2_msgs/TFMessage");
+}
+
+void UROdometrieReplaySubscriber::CreateSubscriber()
+{
+	Subscriber = MakeShareable<FROSOdomReplaySubscriberCallback>(
+			new FROSOdomReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
+}
+
+void URTFSubscriber::SetMessageType()
+{
+	MessageType = TEXT("tf2_msgs/TFMessage");
+}
+
+void URTFSubscriber::CreateSubscriber()
+{
+  Subscriber = MakeShareable<FROSTFReplaySubscriberCallback>(
+                                                             new FROSTFReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
 }

@@ -1,53 +1,13 @@
 
 #include "ROSCommunication/RROSClientImpl.h"
 #include "ROSCommunication/RRosComunication.h"
-#include "ROSCommunication/RPublisher.h"
+// #include "ROSCommunication/RPublisher.h"
 #include "ROSCommunication/RROSClient.h"
-#include "Controller/RController.h"
-#include "ROSCommunication/RRosCommunicationComponent.h"
+// #include "Controller/RController.h"
+// #include "ROSCommunication/RRosCommunicationComponent.h"
 #include "Physics/RModel.h"
+#include "XmlFile.h"
 
-
-
-/* void FROSRobotRegistrationClient::Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) */
-/* { */
-/* 	TSharedPtr<unreal_controller_manager::RegisterRobot::Response> Response = */
-/* 		StaticCastSharedPtr<unreal_controller_manager::RegisterRobot::Response>(InResponse); */
-/*  */
-/* 	Client->bIsRegisterd = Response->GetSuccess(); */
-/* } */
-
-/* FROSUpdateWorldClient::FROSUpdateWorldClient(UObject* InModel, const FString& InName, const FString& InType): */
-/* 	FROSBridgeSrvClient(InName, InType) */
-/* { */
-/* 	ControllerComponent = Cast<URControllerComponent>(Cast<ARModel>(InModel)->FindComponentByClass(URControllerComponent::StaticClass())); */
-/* 	BaseController= Cast<URBaseController>(ControllerComponent->ControllerList("BaseController")); */
-/* } */
-/*  */
-/* void FROSUpdateWorldClient::Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) */
-/* { */
-/*  */
-/* 	TSharedPtr<unreal_controller_manager::UpdateWorld::Response> Response = */
-/* 		StaticCastSharedPtr<unreal_controller_manager::UpdateWorld::Response>(InResponse); */
-/*  */
-/* 	if(ControllerComponent) */
-/* 	{ */
-/* 		ControllerComponent->SetJointVelocities(Response->GetJointNames(), Response->GetJointVelocities()); */
-/* 		BaseController->Turn(Response->GetBaseControllCommand().GetAngular().GetZ()); */
-/* 		BaseController->MoveLinear(Response->GetBaseControllCommand().GetLinear().GetVector()); */
-/*  */
-/* 		// ControllerComponent->ExcecuteCommands(Response->GetCommands()); */
-/* 		TArray<FString> ResponseCommands = Response->GetCommands(); */
-/* 		for(auto& Command : ResponseCommands) */
-/* 		{ */
-/* 			ControllerComponent->CommandQuerry.Enqueue(Command); */
-/* 		} */
-/* 	} */
-/* 	else */
-/* 	{ */
-/* 		UE_LOG(LogTemp, Error, TEXT("Model is not of type ARModel")); */
-/* 	} */
-/* } */
 
 void FROSJointStateConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse)
 {
@@ -60,13 +20,10 @@ void FROSJointStateConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvR
 	JointString.RemoveFromStart(TEXT("["));
 	JointString.RemoveFromEnd(TEXT("]"));
 	JointString.ParseIntoArray(StringArray,TEXT(","),true);
-	UE_LOG(LogTemp, Error, TEXT("JointNames Callback"));
 	for(auto& st : StringArray)
 	{
-		st = st.Trim().TrimQuotes();
-		// UE_LOG(LogTemp, Log, TEXT("%"), *st);
+		st = st.TrimStartAndEnd().TrimQuotes();
 	}
-	// JSPublisher->ListJointName = StringArray;
 	JointNames->Empty();
 	JointNames->Append(StringArray);
 }
@@ -74,22 +31,102 @@ void FROSJointStateConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvR
 FROSJointStateConfigurationClient::FROSJointStateConfigurationClient(TArray<FString>* OutJointNames, const FString& InName, const FString& InType):
 	FROSBridgeSrvClient(InName, InType)
 {
-	//TODO make jspublisher variable
-
 	JointNames = OutJointNames;
+}
+
+void FROSJointControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse)
+{
+	TSharedPtr<rosapi::GetParam::Response> Response =
+		StaticCastSharedPtr<rosapi::GetParam::Response>(InResponse);
+
+	FString JointString = Response->GetValue();
+	TArray<FString> StringArray;
+	JointString.RemoveFromStart(TEXT("["));
+	JointString.RemoveFromEnd(TEXT("]"));
+	JointString.ParseIntoArray(StringArray,TEXT(","),true);
+	for(auto& st : StringArray)
+	{
+          st = st.TrimStartAndEnd().TrimQuotes();
+          float& JointState = JointNames->FindOrAdd(st);
+          JointState = 0.f;
+	}
+}
+
+FROSJointControllerConfigurationClient::FROSJointControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType):
+	FROSBridgeSrvClient(InName, InType)
+{
+	JointNames = OutJointNames;
+}
+
+void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse)
+{
+  TSharedPtr<rosapi::GetParam::Response> Response =
+    StaticCastSharedPtr<rosapi::GetParam::Response>(InResponse);
 
 
-	// URROSCommunicationComponent* ComComp = Cast<URROSCommunicationComponent>(Cast<ARModel>(InOwner)->FindComponentByClass(URROSCommunicationComponent::StaticClass()));
-	/* if(ComComp) */
-	/* { */
-	/* 	JSPublisher = Cast<URJointStatePublisher>(ComComp->RosComunication.PublisherList["JointState"]); */
-	/* 	if(!JSPublisher) */
-	/* 	{ */
-	/* 		UE_LOG(LogTemp, Error, TEXT("JSPublisher not found")); */
-	/* 	} */
-	/* } */
-	/* else */
-	/* { */
-	/* 	UE_LOG(LogTemp, Error, TEXT("No Comunication Component found")); */
-	/* } */
+  TArray<TCHAR> Chars;
+  Chars.Add('\n');
+  Chars.Add('\"');
+  FString JointString = Response->GetValue();
+  JointString = JointString.ReplaceEscapedCharWithChar(&Chars);
+
+  JointString.RemoveFromStart(TEXT("\""));
+  JointString.RemoveFromEnd(TEXT("\""));
+
+  FXmlFile XmlFile(JointString,  EConstructMethod::ConstructFromBuffer);
+
+  if(XmlFile.IsValid())
+    {
+      for(auto & Node : XmlFile.GetRootNode()->GetChildrenNodes())
+        {
+          if (Node->GetTag().Equals(TEXT("joint")))
+            {
+              const FString MyName = Node->GetAttribute(TEXT("name"));
+              for (const auto& ChildNode : Node->GetChildrenNodes())
+                {
+                  if (ChildNode->GetTag().Equals(TEXT("safety_controller")))
+                    {
+                      float SoftLowerLimit = FCString::Atof(*ChildNode->GetAttribute("soft_lower_limit"));
+                      float SoftUpperLimit = FCString::Atof(*ChildNode->GetAttribute("soft_upper_limit"));
+
+                      UE_LOG(LogTemp, Warning, TEXT("%s: Lower %s Upper: %s"), *MyName, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
+                      if(0.0f < SoftLowerLimit)
+                        {
+                          float& JointState = JointNames->FindOrAdd(MyName);
+                          JointState = SoftLowerLimit;
+                        }
+                      else if(0.0f > SoftUpperLimit)
+                        {
+                          float& JointState = JointNames->FindOrAdd(MyName);
+                          JointState = SoftUpperLimit;
+                        }
+
+                      // for(auto& Attributs : ChildNode->GetAttributes())
+                      //   {
+                      //     UE_LOG(LogTemp, Error, TEXT("safety %s"), *Attributs.GetTag());
+                      //   }
+                    }
+                }
+            }
+        }
+    }
+
+  // UE_LOG(LogTemp, Warning, TEXT("rootnode: %s"), *JointString);
+  // UE_LOG(LogTemp, Warning, TEXT("rootnode: %s"), *JointString);
+  // TArray<FString> StringArray;
+  // JointString.RemoveFromStart(TEXT("["));
+  // JointString.RemoveFromEnd(TEXT("]"));
+  // JointString.ParseIntoArray(StringArray,TEXT(","),true);
+  // for(auto& st : StringArray)
+  // {
+  // 	st = st.Trim().TrimQuotes();
+  //   float& JointState = JointNames->FindOrAdd(st);
+  //   JointState = 0.f;
+  // }
+}
+
+FROSJointLimitControllerConfigurationClient::FROSJointLimitControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType):
+	FROSBridgeSrvClient(InName, InType)
+{
+	JointNames = OutJointNames;
 }

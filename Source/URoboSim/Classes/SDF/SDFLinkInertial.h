@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -8,7 +8,7 @@
 #include "SDFLinkInertial.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFLinkInertial : public UObject
@@ -18,7 +18,7 @@ class UROBOSIM_API USDFLinkInertial : public UObject
 public:
 	UPROPERTY(EditAnywhere, Category = "Link|Inertial")
 	float Mass;
-		
+
 	UPROPERTY(EditAnywhere, Category = "Link|Inertial")
-	FTransform Pose;	
+	FTransform Pose;
 };

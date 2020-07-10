@@ -26,11 +26,6 @@ URBaseController::URBaseController()
 	BaseName = TEXT("base_footprint");
 }
 
-
-URHeadTrajectoryController::URHeadTrajectoryController()
-{
-}
-
 URControllerComponent::URControllerComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -44,140 +39,16 @@ URControllerComponent::URControllerComponent()
 
 URControllerComponent::~URControllerComponent()
 {
-	UE_LOG(LogTemp, Error, TEXT("destroy component"));
-	// if(Model)
-	// {
-	// 	Model->Plugins.FindAndRemoveChecked(TEXT("ControllerComponent"));
-	// }
 }
-
-/* URROSControllerComponent::URROSControllerComponent() */
-/* { */
-/* 	// RosComunication.ControllerComponent = this; */
-/* } */
 
 void URBaseController::MoveLinear(FVector InVelocity)
 {
-	LinearVelocity = InVelocity;
+  LinearVelocity = InVelocity;
 }
 
 void URBaseController::Turn(float InVelocity)
 {
-	AngularVelocity = -InVelocity;
-}
-
-void URGripperController::UpdateGripper()
-{
-    if(OldPosition > Position)
-    {
-      if(GraspComponent->FixatedObject)
-        {
-          Position = 2.0;
-          bMoved = false;
-          bSuccessGrasp = true;
-        }
-      else
-        {
-          bMoved = true;
-          bSuccessGrasp = Grasp();
-          if(bSuccessGrasp)
-            {
-              Position = 2.0;
-            }
-        }
-    }
-    else if(OldPosition < Position)
-    {
-        bMoved = true;
-        Release();
-    }
-    else
-    {
-        bMoved = false;
-    }
-    bActive = true;
-}
-
-void URGripperController::CheckGripperActionResult(float InError, float InThreshold = 0.5)
-{
-    if(bMoved)
-    {
-        if(FMath::Abs(InError) < InThreshold)
-        {
-            if(bSuccessGrasp)
-            {
-                Result.FillValues(Position, MaxEffort, true, false);
-            }
-            else
-            {
-                Result.FillValues(Position, MaxEffort, false, true);
-            }
-            GoalStatusList.Last().Status = 3;
-            OldPosition = Position;
-            bActive = false;
-            bPublishResult = true;
-        }
-    }
-    else
-    {
-        Result.FillValues(Position, MaxEffort, false, true);
-        GoalStatusList.Last().Status = 3;
-        OldPosition = Position;
-        bActive = false;
-        bPublishResult = true;
-    }
-}
-
-void URGripperController::Tick(float InDeltaTime)
-{
-    float GripperPosition = 0.;
-    float Error = 0;
-
-    FString RightJointName = GripperName + TEXT("_r_finger_joint");
-    FString LeftJointName = GripperName + TEXT("_l_finger_joint");
-
-    FString RightFingerTipName = GripperName + TEXT("_r_finger_tip_joint");
-    FString LeftFingerTipName = GripperName + TEXT("_l_finger_tip_joint");
-
-    URJoint* RightFinger = Model->Joints.FindRef(RightJointName);
-    URJoint* LeftFinger = Model->Joints.FindRef(LeftJointName);
-
-    URJoint* RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
-    URJoint* LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
-
-    if(!RightFinger)
-      {
-        return;
-      }
-
-    if(!LeftFinger)
-      {
-        return;
-      }
-
-    if(bActive)
-    {
-      GripperPosition = FMath::Abs((RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size() -3 );
-      GoalStatusList.Last().Status = 1;
-      Error = Position-GripperPosition ;
-      // UE_LOG(LogTemp, Error, TEXT("Error %f Position %f GripperPosition %f"), Error, Position, GripperPosition);
-      CheckGripperActionResult(Error, 0.5);
-    }
-
-    if(bActive)
-    {
-      float DistanceFingerToTipRight = (RightFingerTip->Constraint->GetComponentLocation() - RightFinger->Constraint->GetComponentLocation()).Size();
-      float Angle = FMath::Asin(Position / 2.0  / DistanceFingerToTipRight) ;
-      if(FMath::Abs(Angle) > FMath::DegreesToRadians(RightFinger->Constraint->Limit * 1.9))
-        {
-          Angle = FMath::DegreesToRadians(RightFinger->Constraint->Limit * 1.9);
-        }
-      RightFinger->MaxJointVel = 0.2;
-      RightFinger->DesiredJointPose = RMultiplier * Angle;
-      LeftFinger->MaxJointVel = 0.2;
-      LeftFinger->DesiredJointPose = LMultiplier * Angle;
-
-    }
+  AngularVelocity = -InVelocity;
 }
 
 void URBaseController::Tick(float InDeltaTime)
@@ -186,410 +57,246 @@ void URBaseController::Tick(float InDeltaTime)
 	MoveLinearTick(InDeltaTime);
 }
 
-void URHeadTrajectoryController::Tick(float InDeltaTime)
-{
-  CancelAction();
-  if(bActive)
-    {
-      GoalStatusList.Last().Status = 1;
-      CheckPointHeadState();
-    }
-}
-
-FVector URHeadTrajectoryController::CalculateNewViewDirection()
-{
-  //TODO make it a request to tf
-  FVector Direction;
-  if(Model)
-    {
-      FTransform ReferenceLinkTransform ;
-      if(FrameId.Equals(TEXT("map")))
-        {
-
-        }
-      else
-        {
-          URLink* ReferenceLink = Model->Links.FindRef(FrameId);
-          if(!ReferenceLink)
-            {
-              UE_LOG(LogTemp, Error, TEXT("ReferenceLink %s not found"), *FrameId);
-              return FVector();
-            }
-          ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
-        }
-
-      TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
-      URStaticMeshComponent* PointingLink = nullptr;
-      for(auto & Component : ActorComponents)
-        {
-          if(Component->GetName().Contains(PointingFrame))
-            {
-              PointingLink = Component;
-            }
-        }
-      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
-      if(!PointingLink)
-        {
-          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
-          return FVector();
-        }
-
-      // Add offset to get the right position in pr2 high_def_frame
-      FVector PointInWorldCoord = ReferenceLinkTransform.GetRotation().RotateVector(Point) +  ReferenceLinkTransform.GetLocation();
-
-      // Direction = PointInWorldCoord - PointingLink->GetCollision()->GetComponentTransform().GetLocation();
-      Direction = PointInWorldCoord - (PointingLink->GetComponentQuat().RotateVector(FVector(7.0, 11.0, 12.0)) + PointingLink->GetComponentTransform().GetLocation());
-
-    }
-  return Direction;
-}
-
-void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
-{
-  //TODO use max vel from msg
-  //TODO Currently only work for objects infront
-  if(Model)
-    {
-      TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
-      URStaticMeshComponent* PointingLink = nullptr;
-      for(auto & Component : ActorComponents)
-        {
-          if(Component->GetName().Contains(PointingFrame))
-            {
-              PointingLink = Component;
-            }
-        }
-      // URLink* PointingLink = Model->Links.FindRef(PointingFrame);
-      if(!PointingLink)
-        {
-          UE_LOG(LogTemp, Error, TEXT("PointingLink %s not found"), *PointingFrame);
-          return;
-        }
-      FQuat ReferenceQuat = PointingLink->GetComponentQuat();
-      // FQuat ReferenceQuat = PointingLink->GetCollision()->GetComponentQuat();
-      FVector2D AzEl = FMath::GetAzimuthAndElevation(InNewDirection.GetSafeNormal(), ReferenceQuat.GetAxisX(), ReferenceQuat.GetAxisY(), ReferenceQuat.GetAxisZ());
-
-
-      // UE_LOG(LogTemp, Error, TEXT("HeadTrajController: %f %f"), FMath::RadiansToDegrees(AzEl.X), FMath::RadiansToDegrees(AzEl.Y));
-
-      URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-      URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
-
-      float Az = AzimuthJoint->GetJointPosition();
-      float El = ElevationJoint->GetJointPosition();
-
-      // UE_LOG(LogTemp, Error, TEXT("Elevation: %s"), *(NewDirectionElevation).Euler().ToString());
-      // UE_LOG(LogTemp, Error, TEXT("azimuth: %s"), *(NewDirectionAzimuth).Euler().ToString());
-      // UE_LOG(LogTemp, Error, TEXT("%f %f"), AzimuthVel, ElevationVel);
-      AzimuthJoint->DesiredJointPose = Az - AzEl.X;
-      AzimuthJoint->MaxJointVel = 0.17;
-      // AzimuthJoint->SetJointVelocity(AzimuthVel);
-      ElevationJoint->DesiredJointPose = El - AzEl.Y;
-      ElevationJoint->MaxJointVel = 0.17;
-      // ElevationJoint->SetJointVelocity(ElevationVel);
-
-    }
-}
-
-void URPR2HeadTrajectoryController::CheckPointHeadState()
-{
-    if(Model)
-    {
-        URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-        URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
-
-        float Az = AzimuthJoint->GetJointPosition();
-        float El = ElevationJoint->GetJointPosition();
-
-        float DiffAz = AzimuthJoint->DesiredJointPose - Az;
-        float DiffEl = ElevationJoint->DesiredJointPose - El;
-
-        if(FMath::Abs(DiffAz) < 0.02 && FMath::Abs(DiffEl) < 0.02 )
-            // if(AzEl.Y == 0.0 && AzEl.X == 0.0 )
-        {
-            GoalStatusList.Last().Status = 3;
-            bPublishResult = true;
-            bActive = false;
-        }
-    }
-}
-
-void URPR2HeadTrajectoryController::UpdateHeadDirection()
-{
-    if(PointingFrame.Equals("high_def_frame"))
-    {
-        PointingFrame = TEXT("head_tilt_link");
-    }
-
-    FVector NewDirection = CalculateNewViewDirection();
-    MoveToNewPosition(NewDirection);
-}
-
 void URBaseController::TurnTick(float InDeltaTime)
 {
-	if(AngularVelocity != 0.f)
-	{
-		FRotator TestRotation = FRotator(0.0f, AngularVelocity *InDeltaTime, 0.0f);
-		// for(auto& Link : Model->Links)
-		// {
-		// 	Link.Value->GetCollision()->SetSimulatePhysics(false);
-		// }
-        //
-		URLink* Base = Model->Links[BaseName];
-		FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-		FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  if(AngularVelocity != 0.f)
+    {
+      FRotator TestRotation = FRotator(0.0f, AngularVelocity *InDeltaTime, 0.0f);
+      URLink* Base = Model->Links[BaseName];
+      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FVector BasePosition = Base->GetCollision()->GetComponentLocation();
 
 
-		for(auto& Link : Model->Links)
-		{
-			FRotator Orientation = Link.Value->GetCollision()->GetComponentRotation();
-			FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+      for(auto& Link : Model->Links)
+        {
+          FRotator Orientation = Link.Value->GetCollision()->GetComponentRotation();
+          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
 
-			FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
-			// Link.Value->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::None);
+          FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
 
-			FVector LinkBaseOffset = Position - BasePosition;
-			FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
+          FVector LinkBaseOffset = Position - BasePosition;
+          FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
 
-			// Link.Value->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::None);
-			Link.Value->GetCollision()->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
-			// UE_LOG(LogTemp, Warning, TEXT("%s: %f"), *Link.Value->GetName(), realtimeSeconds);
-		}
-		AngularVelocity = 0.0f;
-	}
+          Link.Value->GetCollision()->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
+        }
+    }
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
 {
-	if(LinearVelocity.Size() != 0.f)
-	{
-		URLink* Base = Model->Links[BaseName];
-		FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-		FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
+  if(LinearVelocity.Size() != 0.f)
+    {
+      URLink* Base = Model->Links[BaseName];
+      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
+      UE_LOG(LogTemp, Log, TEXT("LinearVelocity %s, DistanceTraveld %s"), *LinearVelocity.ToString(), *DistanceTraveld.ToString());
 
-		for(auto& Link : Model->Links)
-		{
-			FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-			Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
-		}
-	}
+      for(auto& Link : Model->Links)
+        {
+          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+          Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+        }
+    }
 }
 
 void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
 {
-	if(InVelocity.Size() != 0.f)
-	{
-		URLink* Base = Model->Links[BaseName];
-		FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-		FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(InVelocity*InDeltaTime);
+  if(InVelocity.Size() != 0.f)
+    {
+      URLink* Base = Model->Links[BaseName];
+      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(InVelocity*InDeltaTime);
 
-		for(auto& Link : Model->Links)
-		{
-			FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-			Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
-		}
-	}
+      for(auto& Link : Model->Links)
+        {
+          // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+          // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+          AddRelativeLocation(Link.Value, DistanceTraveld);
+        }
+    }
 }
 
 void URBaseController::MoveLinearToWorld(FVector InVelocity, float InDeltaTime)
 {
-	FVector DistanceTraveld = InVelocity*InDeltaTime;
+  FVector DistanceTraveld = InVelocity*InDeltaTime;
 
-	for(auto& Link : Model->Links)
-	{
-		FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-		Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
-	}
+  for(auto& Link : Model->Links)
+    {
+      // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+      // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+      AddRelativeLocation(Link.Value, DistanceTraveld);
+    }
 }
 
 
 
 void URBaseController::Turn(float InVelocity, float InDeltaTime)
 {
-	if(InVelocity != 0.f)
-	{
-		FRotator TestRotation = FRotator(0.0f, InVelocity *InDeltaTime, 0.0f);
-
-		URLink* Base = Model->Links[BaseName];
-		FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-		FVector BasePosition = Base->GetCollision()->GetComponentLocation();
-
-		for(auto& Link : Model->Links)
-		{
-			FRotator Orientation = Link.Value->GetCollision()->GetComponentRotation();
-			FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-
-			FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
-			Link.Value->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
-
-			FVector LinkBaseOffset = Position - BasePosition;
-			FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
-
-			Link.Value->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
-		}
-	}
+  if(InVelocity != 0.f)
+    {
+      FRotator TestRotation = FRotator(0.0f, InVelocity *InDeltaTime, 0.0f);
+      for(auto& Link : Model->Links)
+        {
+          AddRelativeRotation(Link.Value, TestRotation);
+        }
+    }
 }
 
-URGripperController::URGripperController()
+void URBaseController::AddRelativeLocation(URLink* InLink, FVector InPosition)
 {
-    OldPosition = 0.0;
+  FVector Position = InLink->GetCollision()->GetComponentLocation();
+  InLink->GetCollision()->SetWorldLocation(InPosition + Position, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
-bool URGripperController::Grasp()
+void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
 {
-	if(GraspComponent)
-	{
-          return GraspComponent->TryToFixate();
-	}
-    return false;
+  URLink* Base = Model->Links[BaseName];
+  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  FRotator Orientation = InLink->GetCollision()->GetComponentRotation();
+  FVector Position = InLink->GetCollision()->GetComponentLocation();
+
+  FQuat NewRot = InRotator.Quaternion() * Orientation.Quaternion() ;
+  InLink->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
+
+  FVector LinkBaseOffset = Position - BasePosition;
+  FVector NewPosition = InRotator.RotateVector(LinkBaseOffset) + BasePosition;
+
+  InLink->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
-void URGripperController::Release()
+void URBaseController::SetLocation(FVector InPosition)
 {
-	if(GraspComponent)
-	{
-		GraspComponent->TryToDetach();
-	}
+  URLink* Base = Model->Links[BaseName];
+  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  FVector DistanceTraveld = InPosition - BasePosition;
+
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeLocation(Link.Value, DistanceTraveld);
+    }
+}
+void URBaseController::SetRotation(FRotator InRotation)
+{
+  URLink* Base = Model->Links[BaseName];
+  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FRotator NewRotation = InRotation - BaseOrientation;
+  NewRotation.Pitch = 0;
+  NewRotation.Roll = 0;
+
+  UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeRotation(Link.Value, NewRotation);
+    }
+}
+
+void URBaseController::SetLocationAndRotation(FVector InPosition, FRotator InRotation)
+{
+  SetLocation(InPosition);
+  SetRotation(InRotation);
 }
 
 void URCameraController::PerceiveObject()
 {
-    if(bActive)
+  if(bActive)
     {
-        UE_LOG(LogTemp, Warning, TEXT("PerceiveObject is a dummy function"));
-        GoalStatusList.Last().Status = 1;
+      GoalStatusList.Last().Status = 1;
+      bool bObjectFound = false;
+      TArray<AActor*> PerceivedActors;
+      UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(*TypeToPerceive), PerceivedActors);
+
+      if(PerceivedActors.Num()>0)
+        {
+          bObjectFound = true;
+          PerceivedObject = NewObject<UPerceivedObject>(this);
+          PerceivedObject->PoseWorld.SetLocation(PerceivedActors[0]->GetActorLocation());
+          PerceivedObject->PoseWorld.SetRotation(PerceivedActors[0]->GetActorQuat());
+          PerceivedObject->Name = PerceivedActors[0]->GetName();
+        }
 
 
-        bool bObjectFound = false;
-        for(auto & Object : PerceivedObjects)
-          {
-            if(Object->Type.Equals(TypeToPerceive, ESearchCase::IgnoreCase))
-              {
-                PerceivedObject = Object;
-                bObjectFound = true;
-              }
-          }
+      // for(auto & Object : PerceivedObjects)
+      //   {
+      //     if(Object->Type.Equals(TypeToPerceive, ESearchCase::IgnoreCase))
+      //       {
+      //         PerceivedObject = Object;
+      //         bObjectFound = true;
+      //       }
+      //   }
 
-        if(bObjectFound)
-          {
-            URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
-            FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+      if(bObjectFound)
+        {
 
-            FVector Temp = PerceivedObject->PoseWorld.GetLocation() - ReferenceLinkTransform.GetLocation();
-            FVector Pose = ReferenceLinkTransform.GetRotation().Inverse().RotateVector(Temp) ;
+          URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
+          FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+          FVector Location = ReferenceLinkTransform.GetLocation();
+          Location.Z = 0.0f;
+          ReferenceLinkTransform.SetLocation(Location);
 
-            PerceivedObject->Pose.SetLocation(Pose);
-            FQuat TempRotator = PerceivedObject->PoseWorld.GetRotation() * ReferenceLinkTransform.GetRotation().Inverse() ;
-            PerceivedObject->Pose.SetRotation(TempRotator);
+          FVector Temp = PerceivedObject->PoseWorld.GetLocation() - ReferenceLinkTransform.GetLocation();
+          FVector Pose = ReferenceLinkTransform.GetRotation().Inverse().RotateVector(Temp) ;
 
-            GoalStatusList.Last().Status = 3;
-            bActive = false;
-            bPublishResult = true;
-            // UE_LOG(LogTemp, Warning, TEXT("Base: %s, :World %s"), *Pose.ToString(), *TempRotator.ToString());
-          }
-        else
-          {
-            UE_LOG(LogTemp, Error, TEXT("No Object of Type %s found"), *TypeToPerceive);
-          }
+          PerceivedObject->Pose.SetLocation(Pose);
+          FQuat TempRotator = PerceivedObject->PoseWorld.GetRotation() * ReferenceLinkTransform.GetRotation().Inverse() ;
+          PerceivedObject->Pose.SetRotation(TempRotator);
 
-        // PerceivedObject.Name = NamePerceivedObject;
-        // PerceivedObject.Type = TypePerceivedObject;
-
-        // FVector Temp = PosePerceivedObject.GetLocation() - ReferenceLinkTransform.GetLocation();
-
+          GoalStatusList.Last().Status = 3;
+          bActive = false;
+          bPublishResult = true;
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("No Object of Type %s found"), *TypeToPerceive);
+        }
     }
 
 }
 
 void URCameraController::Tick(float InDeltaTime)
 {
-    // PerceiveObject();
 }
 
 void URCameraController::Init(ARModel* InModel)
 {
-	if(!InModel)
-	{
-		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-		return;
-	}
-	Model = InModel;
-	TArray<AActor*> FoundActors;
-	TArray<URStaticMeshComponent*> ActorComponents;
-        // URLink* ReferenceLink;
-        URStaticMeshComponent* ReferenceLink;
-        Model->GetComponents(ActorComponents);
+  if(!InModel)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+      return;
+    }
+  Model = InModel;
+  TArray<AActor*> FoundActors;
+  TArray<URStaticMeshComponent*> ActorComponents;
+  URStaticMeshComponent* ReferenceLink = nullptr;
+  Model->GetComponents(ActorComponents);
 
-        for(auto & Component : ActorComponents)
-          {
-            UE_LOG(LogTemp, Error, TEXT("%s"), *Component->GetName());
-            if(Component->GetName().Equals(CameraRef))
-              {
-                ReferenceLink = Component;
-              }
-          }
+  for(auto & Component : ActorComponents)
+    {
+      if(Component->GetName().Equals(CameraRef))
+        {
+          ReferenceLink = Component;
+        }
+    }
+  if(!ReferenceLink)
+    {
+      UE_LOG(LogTemp, Error, TEXT("CameraRef not found"));
+      return;
+    }
 
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
+  UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
 
-	for(auto& Camera : FoundActors)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Camera name %s"), *Camera->GetName());
-		if(Camera->GetName().Equals(CameraName))
-		{
-
-			// URLink* ReferenceLink = Model->Links[CameraRef];
-			// Camera->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			Camera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-                        Camera->AddActorLocalOffset(PoseOffset.GetLocation());
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Camera not found"));
-		}
-	}
+  for(auto& MyCamera : FoundActors)
+    {
+      if(MyCamera->GetName().Equals(CameraName))
+        {
+		  MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+          MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
+          return;
+        }
+    }
+  UE_LOG(LogTemp, Error, TEXT("Camera %s not found"), *CameraName);
 
 }
-
-void URHeadTrajectoryController::Init(ARModel* InModel)
-{
-	bActive = false;
-	if(!InModel)
-	{
-		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-	}
-	else
-	{
-		Model = InModel;
-	}
-}
-
-void URGripperController::Init(ARModel* InModel)
-{
-	if(!InModel)
-	{
-		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-	}
-	else
-	{
-
-		Model = InModel;
-		TArray<URGraspComponent* > TempGraspComponents;
-		Model->GetComponents<URGraspComponent>(TempGraspComponents);
-		for(auto& GraspComp : TempGraspComponents)
-		{
-			if(GraspComp->GetName().Equals(GraspComponentName))
-			{
-				GraspComponent = GraspComp;
-				URLink* ReferenceLink = Model->Links[GraspComponent->GripperName];
-				GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-				GraspComponent->AddRelativeLocation(ToolCenterPoint);
-			}
-		}
-	}
-}
-
 
 void URBaseController::Init(ARModel* InModel)
 {
@@ -607,101 +314,110 @@ void URBaseController::Init(ARModel* InModel)
 
 void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-	float realtimeSeconds = FPlatformTime::Seconds();
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	for(auto& C : Controller.ControllerList)
-	{
-		C.Value->Tick(DeltaTime);
-	}
-
-	ExcecuteCommands();
+  float realtimeSeconds = FPlatformTime::Seconds();
+  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+  for(auto& C : Controller.ControllerList)
+    {
+      C.Value->Tick(DeltaTime);
+    }
 }
 
 void URControllerComponent::BeginPlay()
 {
-	Super::BeginPlay();
+  Super::BeginPlay();
 
-	// Model = Cast<ARModel>(GetOwner());
-	if(!Model)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
-	}
-	else
-	{
-          Model->Joints["torso_lift_joint"]->DesiredJointPose = 0.10;
-          Model->Joints["torso_lift_joint"]->MaxJointVel = 2.0;
-          // Model->Joints["torso_lift_joint"]->Encoder->Test();
-		for(auto& C : Controller.ControllerList)
-		{
-			C.Value->Init(Model);
-		}
-	}
+  if(!Model)
+    {
+      UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
+    }
+  else
+    {
+      for(auto& C : Controller.ControllerList)
+        {
+          C.Value->Init(Model);
+        }
+    }
 }
 
 void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
 {
-	for(int i = 0; i < InJointNames.Num();i++)
-	{
-		Model->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
-	}
-}
-
-void URControllerComponent::ExcecuteCommands()
-{
-	FString Command;
-	while(!CommandQuerry.IsEmpty())
-	{
-		CommandQuerry.Dequeue(Command);
-		ExcecuteCommand(Command);
-	}
-}
-
-void URControllerComponent::ExcecuteCommands(TArray<FString> InCommands)
-{
-	for(auto& Command : InCommands)
-	{
-		ExcecuteCommand(Command);
-	}
-
-}
-
-void URControllerComponent::ExcecuteCommand(FString InCommand)
-{
-	//TODO maybe like Exec function from Editor
-	//TODO use GripperIndex
-	if(InCommand.Equals("GRASP"))
-	{
-		Grasp("GripperController");
-	}
-	else if(InCommand.Equals("RELEASE"))
-	{
-		Release("GripperController");
-	}
-
+  for(int i = 0; i < InJointNames.Num();i++)
+    {
+      Model->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
+    }
 }
 
 URController* URControllerComponent::ControllerList(FString ControllerName)
 {
-	if(Controller.ControllerList.Contains(ControllerName))
-	{
-		return Controller.ControllerList[ControllerName];
-	}
-	return nullptr;
+  if(Controller.ControllerList.Contains(ControllerName))
+    {
+      return Controller.ControllerList[ControllerName];
+    }
+  return nullptr;
 }
 
-void URControllerComponent::Grasp(FString InGripperIndex)
+void URTFController::Init(ARModel* InModel)
 {
-	if(Controller.ControllerList.Contains(InGripperIndex))
-	{
-		Cast<URGripperController>(Controller.ControllerList[InGripperIndex])->Grasp();
-	}
-
+  if(!InModel)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+    }
+  else
+    {
+      Model = InModel;
+      Time = 0.0f;
+      for(auto& Link : Model->Links)
+        {
+          Link.Value->GetCollision()->SetSimulatePhysics(false);
+        }
+    }
 }
 
-void URControllerComponent::Release(FString InGripperIndex)
+void URTFController::AddTF(FString InFrameName, FTFInfo InTFInfo)
 {
-	if(Controller.ControllerList.Contains(InGripperIndex) )
-	{
-		Cast<URGripperController>(Controller.ControllerList[InGripperIndex])->Release();
-	}
+  FTFInfo& Info = TFList.FindOrAdd(InFrameName);
+  Info = InTFInfo;
+}
+
+TMap<FString, FTFInfo> URTFController::GetTFList()
+{
+  return TFList;
+}
+
+bool URTFController::UpdateFramePoses()
+{
+  if(Time > 1./UpdateRate)
+    {
+      Time = 0;
+      for(auto & TF : TFList)
+        {
+          FString ChildName = TF.Key;
+          FString ParentName = TF.Value.ParentFrame;
+          if(Model->Links.Contains(ChildName) && Model->Links.Contains(ParentName))
+            {
+              SetLinkPose(Model->Links[ChildName], Model->Links[ParentName], TF.Value.Pose);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("Model does not contain Frame %s or ParentFrame %s"), *TF.Key, *TF.Value.ParentFrame);
+            }
+        }
+    }
+
+  return false;
+}
+
+void URTFController::SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose)
+{
+  FTransform ParentTransform = InParentLink->GetCollision()->GetComponentTransform();
+  FVector NewLocation = ParentTransform.GetLocation() + ParentTransform.GetRotation().RotateVector(InPose.GetLocation());
+  FQuat NewRotation = ParentTransform.GetRotation() * InPose.GetRotation();
+
+  FTransform NewTransform = FTransform(NewRotation, NewLocation, FVector(1.0f, 1.0f, 1.0f));
+  InChildLink->GetCollision()->SetWorldTransform(NewTransform, false, nullptr, ETeleportType::TeleportPhysics);
+}
+
+void URTFController::Tick(float InDeltaTime)
+{
+  Time += InDeltaTime;
 }

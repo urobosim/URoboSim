@@ -33,7 +33,7 @@ public:
 
     TSharedPtr<FROSBridgeSubscriber> Subscriber;
 
-    UPROPERTY()
+    UPROPERTY(EditAnywhere)
     FString ControllerName;
 protected:
     virtual void Init(FString RosTopic);
@@ -116,6 +116,39 @@ public:
 
 UCLASS()
 class UROBOSIM_API URPerceiveObjectActionGoalSubscriber: public URSubscriber
+{
+    GENERATED_BODY()
+public:
+
+	virtual void SetMessageType();
+	virtual void CreateSubscriber();
+
+};
+
+UCLASS()
+class UROBOSIM_API URJointStateReplaySubscriber: public URSubscriber
+{
+    GENERATED_BODY()
+public:
+
+	virtual void SetMessageType();
+	virtual void CreateSubscriber();
+
+};
+
+UCLASS()
+class UROBOSIM_API UROdometrieReplaySubscriber: public URSubscriber
+{
+    GENERATED_BODY()
+public:
+
+	virtual void SetMessageType();
+	virtual void CreateSubscriber();
+
+};
+
+UCLASS()
+class UROBOSIM_API URTFSubscriber: public URSubscriber
 {
     GENERATED_BODY()
 public:

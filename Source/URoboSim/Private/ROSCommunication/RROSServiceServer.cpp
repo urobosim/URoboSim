@@ -30,7 +30,7 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FROSSimulationCommandsServer::Callback(TS
 	FString Command = Request->GetCommand();
 
 
-	Owner->CommandQuerry.Enqueue(Command);
+	// Owner->CommandQuerry.Enqueue(Command);
 
 	return MakeShareable<FROSBridgeSrv::SrvResponse>
 		(new u_robo_sim_communication::SimulationCommands::Response(true));

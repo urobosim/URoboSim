@@ -1,11 +1,12 @@
 #include "ROSCommunication/RROSSubscriberCallback.h"
-// #include "sensor_msgs/JointState.h"
+#include "sensor_msgs/JointState.h"
 #include "Conversions.h"
 #include "control_msgs/FollowJointTrajectoryActionGoal.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionGoal.h"
 #include "pr2_controllers_msgs/PR2PointHeadActionGoal.h"
 #include "urobosim_msgs/PerceiveObjectActionGoal.h"
 #include "geometry_msgs/Twist.h"
+#include "tf2_msgs/TFMessage.h"
 
 FROSWholeBodyControllerCallback::FROSWholeBodyControllerCallback(
 	const FString& InTopic, const FString& InType, UObject* InController) :
@@ -61,7 +62,6 @@ void FROSWholeBodyControllerCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 		JointController->SetJointNames(Names);
 
 		actionlib_msgs::GoalID Id = TrajectoryMsg->GetGoalId();
-        UE_LOG(LogTemp, Log, TEXT("Recieved TrajectoryCommand Id: %s"), *Id.GetId());
 		JointController->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
 		for(auto& JointPoint : TrajectoryMsg->GetGoal().GetTrajectory().GetPoints())
 		{
@@ -73,7 +73,8 @@ void FROSWholeBodyControllerCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 			JointController->Trajectory.Add(TempPoints) ;
 			// JointController->Error.Add(TempError) ;
 		}
-		JointController->bFollowTrajectory = true;
+		// JointController->bFollowTrajectory = true;
+                JointController->FollowTrajectory();
 		UE_LOG(LogTemp, Error, TEXT("Call Callback for TrajectoryGoal"));
 	}
 	else
@@ -282,7 +283,15 @@ void FROSGripperCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Ms
 
       AsyncTask(ENamedThreads::GameThread, [this, Id, Command]()
                 {
-                  Controller->Position = Command->GetGoal().GetCommand().GetPosition() * 100.0;
+                  float Pos = Command->GetGoal().GetCommand().GetPosition() * 100.0;
+                  if(Pos > 8.5)
+                  {
+                    UE_LOG(LogTemp, Warning, TEXT("%s: DesiredPosition should not exceed 8.5"), *Controller->GetName());
+                    Pos = 8.5;
+                  }
+
+                  Controller->Position = Pos;
+
                   Controller->MaxEffort = Command->GetGoal().GetCommand().GetMaxEffort();
                   UE_LOG(LogTemp, Log, TEXT("Recieved GripperCommand Id: %s Goal: %f"), *Id.GetId(), Controller->Position);
                   Controller->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
@@ -332,4 +341,135 @@ void FROSPerceiveObjectGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg
         );
 
 	}
+}
+
+FROSJointStateReplaySubscriberCallback::FROSJointStateReplaySubscriberCallback(
+                                                                               const FString& InTopic, const FString& InType, UObject* InController) :
+  FROSBridgeSubscriber(InTopic, InType)
+{
+  JointController = Cast<URJointController>(InController);
+}
+
+TSharedPtr<FROSBridgeMsg> FROSJointStateReplaySubscriberCallback::ParseMessage
+(TSharedPtr<FJsonObject> JsonObject) const
+{
+  TSharedPtr<sensor_msgs::JointState> JointStateMessage =
+        MakeShareable<sensor_msgs::JointState>(new sensor_msgs::JointState());
+
+  JointStateMessage->FromJson(JsonObject);
+
+  return StaticCastSharedPtr<FROSBridgeMsg>(JointStateMessage);
+}
+
+void FROSJointStateReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
+{
+  if(JointController)
+    {
+      TSharedPtr<sensor_msgs::JointState> JointState = StaticCastSharedPtr<sensor_msgs::JointState>(Msg);
+
+      TArray<FString> Names = JointState->GetName();
+      TArray<double>  Positions = JointState->GetPosition();
+      for(int i = 0; i < Names.Num(); i++)
+        {
+          float& DesiredJointPosition = JointController->DesiredJointState.FindOrAdd(Names[i]);
+          DesiredJointPosition = Positions[i];
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("JonintController not found"));
+    }
+}
+
+FROSOdomReplaySubscriberCallback::FROSOdomReplaySubscriberCallback(
+                                                                   const FString& InTopic, const FString& InType, UObject* InController) :
+  FROSBridgeSubscriber(InTopic, InType)
+{
+  BaseController = Cast<URBaseController>(InController);
+}
+
+TSharedPtr<FROSBridgeMsg> FROSOdomReplaySubscriberCallback::ParseMessage
+(TSharedPtr<FJsonObject> JsonObject) const
+{
+  // MessageType = TEXT("tf2_msgs/TFMessage");
+  TSharedPtr<tf2_msgs::TFMessage> JointStateMessage =
+        MakeShareable<tf2_msgs::TFMessage>(new tf2_msgs::TFMessage());
+
+  JointStateMessage->FromJson(JsonObject);
+
+  return StaticCastSharedPtr<FROSBridgeMsg>(JointStateMessage);
+}
+
+void FROSOdomReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
+{
+  if(BaseController)
+    {
+      TSharedPtr<tf2_msgs::TFMessage> TFMessage = StaticCastSharedPtr<tf2_msgs::TFMessage>(Msg);
+      for(auto & TF : TFMessage->GetTransforms())
+      // for(int i = 0; i < TFMessage.Num(); i++)
+        {
+          FString FrameName = TF.GetChildFrameId();
+          if(FrameName.Equals(BaseController->BaseName))
+            {
+              FString ParentFrame = TF.GetHeader().GetFrameId();
+              if(!ParentFrame.Equals("map"))
+                {
+                  UE_LOG(LogTemp, Error, TEXT("Frame not in map coordinates"));
+                  return;
+                }
+
+              BaseController->SetLocationAndRotation(FConversions::ROSToU(TF.GetTransform().GetTranslation().GetVector()),
+                                                     FConversions::ROSToU(TF.GetTransform().GetRotation().GetQuat()).Rotator());
+            }
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("BaseController not found"));
+    }
+}
+
+FROSTFReplaySubscriberCallback::FROSTFReplaySubscriberCallback(
+                                                                   const FString& InTopic, const FString& InType, UObject* InController) :
+  FROSBridgeSubscriber(InTopic, InType)
+{
+  TFController = Cast<URTFController>(InController);
+}
+
+TSharedPtr<FROSBridgeMsg> FROSTFReplaySubscriberCallback::ParseMessage
+(TSharedPtr<FJsonObject> JsonObject) const
+{
+  TSharedPtr<tf2_msgs::TFMessage> JointStateMessage =
+        MakeShareable<tf2_msgs::TFMessage>(new tf2_msgs::TFMessage());
+
+  JointStateMessage->FromJson(JsonObject);
+
+  return StaticCastSharedPtr<FROSBridgeMsg>(JointStateMessage);
+}
+
+void FROSTFReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
+{
+  if(TFController)
+    {
+      TSharedPtr<tf2_msgs::TFMessage> TFMessage = StaticCastSharedPtr<tf2_msgs::TFMessage>(Msg);
+      for(auto & TF : TFMessage->GetTransforms())
+        {
+          FString ChildFrame = TF.GetChildFrameId();
+          FString ParentFrame = TF.GetHeader().GetFrameId();
+          FTransform Pose = FTransform(FConversions::ROSToU(TF.GetTransform().GetRotation().GetQuat()),
+                                       FConversions::ROSToU(TF.GetTransform().GetTranslation().GetVector()),
+                                       FVector(1.0f, 1.0f, 1.0f));
+          FTFInfo TFInfo ;
+          TFInfo.ParentFrame = ParentFrame;
+          TFInfo.Pose = Pose;
+
+          TFController->AddTF(ChildFrame, TFInfo);
+
+        }
+      TFController->UpdateFramePoses();
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("BaseController not found"));
+    }
 }
