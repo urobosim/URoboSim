@@ -25,8 +25,8 @@ void URDonbotOdomPublisher::SetOwner(UObject* InOwner)
 void URDonbotOdomPublisher::Publish()
 {
 
-  FVector BasePose =Owner->GetActorLocation();
-  FRotator BaseRotation =Owner->GetActorRotation();
+  FVector BasePose =FConversions::UToROS(Owner->GetActorLocation());
+  FRotator BaseRotation =FConversions::UToROS(Owner->GetActorRotation());
 
   TSharedPtr<sensor_msgs::JointState> JointState =
     MakeShareable(new sensor_msgs::JointState());
