@@ -3,7 +3,7 @@
 
 URDonbotOdomPublisher::URDonbotOdomPublisher()
 {
-  Topic = TEXT("/joint_state");
+  Topic = TEXT("/joint_states");
 }
 
 void URDonbotOdomPublisher::SetMessageType()
@@ -26,7 +26,8 @@ void URDonbotOdomPublisher::Publish()
 {
 
   FVector BasePose =FConversions::UToROS(Owner->GetActorLocation());
-  FRotator BaseRotation =FConversions::UToROS(Owner->GetActorRotation());
+  FQuat BaseQuaternion =FConversions::UToROS(Owner->GetActorRotation().Quaternion());
+  FRotator BaseRotation = BaseQuaternion.Rotator();
 
   TSharedPtr<sensor_msgs::JointState> JointState =
     MakeShareable(new sensor_msgs::JointState());
