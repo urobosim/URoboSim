@@ -28,11 +28,33 @@ void URDonbotOdomPublisher::SetOwner(UObject* InOwner)
   this->JointVelocityStates.Add(0);
 }
 
+static void CalculateOdomVelocity(TArray<double>& JointPositionStates, TArray<double>& JointVelocityStates)
+{
+  static TArray<double> JointPositionStatesOld = JointPositionStates;
+  static TArray<double> JointVelocityStatesOld = JointVelocityStates;
+   
+  FROSTime frosTime;
+  static FROSTime frosTimeOld = frosTime.Now();
+  double deltaSecs = (double)(frosTime.NSecs - frosTimeOld.NSecs)/1000000000;
+  double deltaSecsDelay = 0.001; //Set time delay to avoid noise and division by zeros
+
+  double c_phi = cos(JointPositionStates[2]);
+  double s_phi = sin(JointPositionStates[2]);
+  double v_x = (JointPositionStates[0] - JointPositionStatesOld[0] + deltaSecsDelay * JointVelocityStatesOld[0])/(deltaSecs + deltaSecsDelay);
+  double v_y = (JointPositionStates[1] - JointPositionStatesOld[1] + deltaSecsDelay * JointVelocityStatesOld[1])/(deltaSecs + deltaSecsDelay);
+  
+  JointVelocityStates[0] = v_x * c_phi + v_y * s_phi;
+  JointVelocityStates[1] = -v_x * s_phi + v_y * c_phi;
+  JointVelocityStates[2] = (JointPositionStates[2] - JointPositionStatesOld[2] + deltaSecsDelay * JointVelocityStatesOld[2])/(deltaSecs + deltaSecsDelay);
+
+  //Update variables for next step
+  JointPositionStatesOld = JointPositionStates;
+  JointVelocityStatesOld = JointVelocityStates;
+  frosTimeOld = frosTime.Now();
+}
+
 void URDonbotOdomPublisher::Publish()
 {
-  static TArray<double> JointPositionStatesOld = this->JointPositionStates;
-  static TArray<double> JointVelocityStatesOld = this->JointVelocityStates;
-
   FVector BasePose =FConversions::UToROS(this->Owner->GetActorLocation());
   FQuat BaseQuaternion =FConversions::UToROS(this->Owner->GetActorRotation().Quaternion());
   FRotator BaseRotation = BaseQuaternion.Rotator();
@@ -42,18 +64,12 @@ void URDonbotOdomPublisher::Publish()
 
   this->JointPositionStates[0]=BasePose.X;
   this->JointPositionStates[1]=BasePose.Y;
-  this->JointPositionStates[2]=BaseRotation.Yaw;
+  static double deg2rad = acos(0.0)/90;
+  this->JointPositionStates[2]=deg2rad*BaseRotation.Yaw;
   
-  FROSTime frosTime;
-  static FROSTime frosTimeOld;
-  float deltaSecs = (float)(frosTime.NSecs - frosTimeOld.NSecs)/1000000000;
-  float deltaSecsDelay = 0.01;
+  CalculateOdomVelocity(this->JointPositionStates, this->JointVelocityStates);
 
-  this->JointVelocityStates[0]=(this->JointPositionStates[0] - JointPositionStatesOld[0] + deltaSecsDelay * JointVelocityStatesOld[0])/(deltaSecs + deltaSecsDelay);
-  this->JointVelocityStates[1]=(this->JointPositionStates[1] - JointPositionStatesOld[1] + deltaSecsDelay * JointVelocityStatesOld[1])/(deltaSecs + deltaSecsDelay);
-  this->JointVelocityStates[2]=(this->JointPositionStates[2] - JointPositionStatesOld[2] + deltaSecsDelay * JointVelocityStatesOld[2])/(deltaSecs + deltaSecsDelay);
-
-  JointState->SetHeader(std_msgs::Header(Seq, frosTime, TEXT("0")));
+  JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), TEXT("0")));
   JointState->SetName(FrameNames);
   JointState->SetPosition(this->JointPositionStates);
   JointState->SetVelocity(this->JointVelocityStates);
@@ -62,8 +78,4 @@ void URDonbotOdomPublisher::Publish()
 
   Handler->PublishMsg(Topic, JointState);
   Handler->Process();
-
-  JointPositionStatesOld = this->JointPositionStates;
-  JointVelocityStatesOld = this->JointVelocityStates;
-  frosTimeOld = frosTime.Now();
 }
