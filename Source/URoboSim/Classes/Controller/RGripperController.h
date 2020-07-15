@@ -59,7 +59,6 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY()
     URGraspComponent* GraspComponent;
 
-
   UPROPERTY(EditAnywhere)
     FGraspComponentSetting GraspCompSetting;
 
