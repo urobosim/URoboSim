@@ -33,17 +33,21 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString BaseFrameId = "base_footprint";
 
-        UPROPERTY(EditAnywhere)
-          bool bProjectToGround = true;
+	UPROPERTY(EditAnywhere)
+	bool bProjectToGround = true;
+	
 protected:
 	virtual void SetMessageType();
 	virtual void SetOwner(UObject* InOwner);
 
-        UPROPERTY()
-        TArray<FString> FrameNames;
+	UPROPERTY()
+	TArray<FString> FrameNames;
 
-        UPROPERTY()
-        TArray<double> JointStates;
+	UPROPERTY()
+	TArray<double> JointPositionStates;
+
+	UPROPERTY()
+	TArray<double> JointVelocityStates;
 
 	UPROPERTY()
 	ARModel* Owner;
