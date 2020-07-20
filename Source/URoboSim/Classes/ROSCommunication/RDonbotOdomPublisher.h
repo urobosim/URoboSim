@@ -5,6 +5,7 @@
 #include "ROSBridgePublisher.h"
 #include "Physics/RModel.h"
 #include "Conversions.h"
+#include "Controller/RController.h"
 #include "RDonbotOdomPublisher.generated.h"
 
 UCLASS()
@@ -44,11 +45,5 @@ protected:
 	TArray<FString> FrameNames;
 
 	UPROPERTY()
-	TArray<double> JointPositionStates;
-
-	UPROPERTY()
-	TArray<double> JointVelocityStates;
-
-	UPROPERTY()
-	ARModel* Owner;
+	URBaseController* Owner;
 };

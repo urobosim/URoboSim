@@ -6,13 +6,12 @@
 #include "RGraspComponent.h"
 #include "ConstructorHelpers.h"
 #include "Physics/RJoint.h"
-/* #include "ROSCommunication/RRosComunication.h" */
+//#include "ROSCommunication/RRosComunication.h"
 #include "RGBDCamera.h"
 #include "ROSUtilities.h"
 #include "Containers/Queue.h"
+#include "Conversions.h"
 #include "RController.generated.h"
-
-
 
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -138,14 +137,17 @@ public:
 	virtual void Turn(float InVelocity, float InDeltaTime);
 	virtual void Turn(float InVelocity);
 
-        virtual void SetLocation(FVector InPosition);
-        virtual void SetRotation(FRotator InRotator);
-        virtual void SetTransform(FTransform InTransform);
-        virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
-        virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
-        virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
+	virtual void SetLocation(FVector InPosition);
+	virtual void SetRotation(FRotator InRotator);
+	virtual void SetTransform(FTransform InTransform);
+	virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
+	virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
+	virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
 
 	virtual void Tick(float InDeltaTime) override;
+
+	virtual TArray<double> GetOdomPositionStates();
+	virtual TArray<double> GetOdomVelocityStates();
 
 	UPROPERTY(EditAnywhere)
 	FString BaseName;
@@ -153,10 +155,10 @@ protected:
 
 	virtual void TurnTick(float InDeltaTime);
 	virtual void MoveLinearTick(float InDeltaTime);
+	virtual void CalculateOdomStates(float InDeltaTime);
 
 	UPROPERTY()
 	ARModel* Model;
-
 
 	UPROPERTY(EditAnywhere)
 	bool bIsKinematic;
@@ -166,6 +168,12 @@ protected:
 
 	UPROPERTY()
 	FVector LinearVelocity;
+
+	UPROPERTY()
+	TArray<double> OdomPositionStates;
+
+	UPROPERTY()
+	TArray<double> OdomVelocityStates;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -181,8 +189,8 @@ public:
 
 	virtual void Tick(float InDeltaTime) override;
 
-        UPROPERTY(BlueprintReadWrite, Instanced  ,EditAnywhere, export, noclear)
-          TArray<UPerceivedObject*> PerceivedObjects;
+	UPROPERTY(BlueprintReadWrite, Instanced  ,EditAnywhere, export, noclear)
+	TArray<UPerceivedObject*> PerceivedObjects;
 
     UPROPERTY()
     FString TypeToPerceive;
@@ -191,7 +199,7 @@ public:
 	ARGBDCamera* Camera;
 
 	UPROPERTY()
-        UPerceivedObject* PerceivedObject;
+	UPerceivedObject* PerceivedObject;
 protected:
 
 	UPROPERTY()
@@ -213,11 +221,11 @@ class UROBOSIM_API URTFController : public URController
     GENERATED_BODY()
 public:
 	virtual void Init(ARModel* InModel) override;
-        virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
-        virtual TMap<FString, FTFInfo> GetTFList();
+	virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
+	virtual TMap<FString, FTFInfo> GetTFList();
 
-        virtual bool UpdateFramePoses();
-        virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
+	virtual bool UpdateFramePoses();
+	virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
 
 	virtual void Tick(float InDeltaTime) override;
 
@@ -226,14 +234,14 @@ protected:
 	UPROPERTY()
 	ARModel* Model;
 
-        UPROPERTY(EditAnywhere)
-          float UpdateRate;
-
-        UPROPERTY()
-          float Time;
+	UPROPERTY(EditAnywhere)
+	float UpdateRate;
 
 	UPROPERTY()
-          TMap<FString, FTFInfo> TFList;
+	float Time;
+
+	UPROPERTY()
+	TMap<FString, FTFInfo> TFList;
 };
 
 USTRUCT(Blueprintable)
