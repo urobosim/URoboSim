@@ -117,7 +117,7 @@ void URPrismaticConstraintComponent::BeginPlay()
       SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
     }
 
-  //SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
 }
 
 
