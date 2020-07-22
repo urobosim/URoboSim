@@ -111,13 +111,9 @@ void URPrismaticConstraintComponent::BeginPlay()
 {
   JointAccuracy = 0.01;
   Super::BeginPlay();
-
-  if(GetOuter()->GetName().Equals("torso_lift_joint"))
-    {
-      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
-    }
-
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
+  FVector FramePos = ParentChildDistance + Offset;
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
 }
 
 
