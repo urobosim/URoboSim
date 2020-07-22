@@ -115,7 +115,7 @@ void URBaseController::CalculateOdomStates(float InDeltaTime)
   FVector BasePose =FConversions::UToROS(Model->GetActorLocation());
   FQuat BaseQuaternion =FConversions::UToROS(Model->GetActorRotation().Quaternion());
   FRotator BaseRotation = BaseQuaternion.Rotator();
-  
+
   OdomPositionStates[0]=BasePose.X;
   OdomPositionStates[1]=BasePose.Y;
   OdomPositionStates[2]=FMath::DegreesToRadians(BaseRotation.Yaw);
@@ -124,7 +124,7 @@ void URBaseController::CalculateOdomStates(float InDeltaTime)
   double s_phi = sin(OdomPositionStates[2]);
   double v_x = (OdomPositionStates[0] - OdomPositionStatesOld[0])/InDeltaTime;
   double v_y = (OdomPositionStates[1] - OdomPositionStatesOld[1])/InDeltaTime;
-  
+
   OdomVelocityStates[0] = v_x * c_phi + v_y * s_phi;
   OdomVelocityStates[1] = -v_x * s_phi + v_y * c_phi;
   OdomVelocityStates[2] = (OdomPositionStates[2] - OdomPositionStatesOld[2])/InDeltaTime;
@@ -338,6 +338,7 @@ void URCameraController::Init(ARModel* InModel)
         {
 		  MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
           MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
+          MyCamera->AddActorLocalRotation(PoseOffset.GetRotation());
           return;
         }
     }
@@ -368,7 +369,6 @@ void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
       C.Value->Tick(DeltaTime);
     }
 }
-
 void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();
