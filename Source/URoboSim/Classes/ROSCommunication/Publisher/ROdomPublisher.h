@@ -1,6 +1,6 @@
 #pragma once
 
-#include "RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Physics/RModel.h"
 
 #include "ROdomPublisher.generated.h"

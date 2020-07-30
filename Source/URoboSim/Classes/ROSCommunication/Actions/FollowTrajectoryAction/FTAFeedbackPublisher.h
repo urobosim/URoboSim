@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ROSCommunication/RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/RROSClient.h"
 #include "Controller/RJointController.h"
 #include "FTAFeedbackPublisher.generated.h"

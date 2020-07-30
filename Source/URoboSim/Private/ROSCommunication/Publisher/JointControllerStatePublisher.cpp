@@ -1,5 +1,5 @@
 
-#include "ROSCommunication/JointTrajectoryControllerStatePublisher.h"
+#include "ROSCommunication/Publisher/JointTrajectoryControllerStatePublisher.h"
 
 URJointTrajectoryControllerStatePublisher::URJointTrajectoryControllerStatePublisher()
 {

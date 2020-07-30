@@ -1,4 +1,4 @@
-#include "ROSCommunication/2DLidarPublisher.h"
+#include "ROSCommunication/Publisher/2DLidarPublisher.h"
 #include "sensor_msgs/LaserScan.h"
 
 UR2DLidarPublisher::UR2DLidarPublisher()

@@ -1,4 +1,4 @@
-#include "ROSCommunication/RROSSubscriberCallback.h"
+#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
 #include "sensor_msgs/JointState.h"
 #include "Conversions.h"
 #include "control_msgs/FollowJointTrajectoryActionGoal.h"

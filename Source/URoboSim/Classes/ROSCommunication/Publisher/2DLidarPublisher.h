@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ROSCommunication/RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Sensor/R2DLidar.h"
 #include "2DLidarPublisher.generated.h"
 

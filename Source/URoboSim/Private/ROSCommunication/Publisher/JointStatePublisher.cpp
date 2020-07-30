@@ -1,4 +1,4 @@
-#include "ROSCommunication/JointStatePublisher.h"
+#include "ROSCommunication/Publisher/JointStatePublisher.h"
 #include "sensor_msgs/JointState.h"
 #include "Physics/RJoint.h"
 

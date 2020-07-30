@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ROSCommunication/RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/RGripperController.h"
 #include "GCAResultPublisher.generated.h"
 

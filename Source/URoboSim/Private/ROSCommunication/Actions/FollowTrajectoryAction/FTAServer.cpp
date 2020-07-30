@@ -3,6 +3,7 @@
 #include "ROSCommunication/Actions/FollowTrajectoryAction/FTAResultPublisher.h"
 #include "ROSCommunication/Actions/FollowTrajectoryAction/FTAFeedbackPublisher.h"
 #include "ROSCommunication/Actions/FollowTrajectoryAction/FTAStatePublisher.h"
+#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAGoalSubscriber.h"
 
 URFollowTrajectoryActionServer::URFollowTrajectoryActionServer()
 {

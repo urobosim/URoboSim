@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ROSBridgeHandler.h"
-#include "ROSCommunication/RPublisher.h"
-#include "ROSCommunication/RSubscriber.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
+#include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "RActionServer.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)

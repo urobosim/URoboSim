@@ -1,4 +1,4 @@
-#include "ROSCommunication/RROSJointStateSubscriberCallback.h"
+#include "ROSCommunication/Subscriber/RROSJointStateSubscriberCallback.h"
 #include "sensor_msgs/JointState.h"
 
 FROSJointStateSubscriberCallback::FROSJointStateSubscriberCallback(

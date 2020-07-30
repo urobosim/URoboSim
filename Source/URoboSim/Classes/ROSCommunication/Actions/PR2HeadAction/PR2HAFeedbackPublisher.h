@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ROSCommunication/RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/RHeadController.h"
 #include "PR2HAFeedbackPublisher.generated.h"
 

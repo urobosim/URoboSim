@@ -3,6 +3,7 @@
 #include "ROSCommunication/Actions/PR2HeadAction/PR2HAResultPublisher.h"
 #include "ROSCommunication/Actions/PR2HeadAction/PR2HAFeedbackPublisher.h"
 #include "ROSCommunication/Actions/PR2HeadAction/PR2HAStatePublisher.h"
+#include "ROSCommunication/Actions/PR2HeadAction/PR2HAGoalSubscriber.h"
 
 URPointHeadActionServer::URPointHeadActionServer()
 {

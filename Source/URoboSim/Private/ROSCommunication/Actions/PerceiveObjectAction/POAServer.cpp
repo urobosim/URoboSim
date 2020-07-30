@@ -3,6 +3,7 @@
 #include "ROSCommunication/Actions/PerceiveObjectAction/POAResultPublisher.h"
 #include "ROSCommunication/Actions/PerceiveObjectAction/POAFeedbackPublisher.h"
 #include "ROSCommunication/Actions/PerceiveObjectAction/POAStatePublisher.h"
+#include "ROSCommunication/Actions/PerceiveObjectAction/POAGoalSubscriber.h"
 
 
 URPerceiveObjectActionServer::URPerceiveObjectActionServer()
