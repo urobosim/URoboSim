@@ -10,7 +10,7 @@
 #include "ROSCommunication/RSubscriber.h"
 #include "ROSCommunication/RROSClient.h"
 #include "ROSCommunication/RROSService.h"
-#include "ROSCommunication/RActionServer.h"
+#include "ROSCommunication/Actions/RActionServer.h"
 #include "Physics/RModel.h"
 #include "ROSUtilities.h"
 #include "RRosComunication.generated.h"
