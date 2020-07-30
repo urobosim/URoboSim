@@ -42,7 +42,7 @@ bool URJointController::CheckTrajectoryStatus()
 {
   bool bFinalTrajectoryPointReached = false;
 
-  if(TrajectoryPointIndex == Trajectory.Num()-1)
+  if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
       bPublishResult = true;
