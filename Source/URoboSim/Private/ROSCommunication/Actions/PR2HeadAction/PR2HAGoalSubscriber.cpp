@@ -1,5 +1,5 @@
 #include "ROSCommunication/Actions/PR2HeadAction/PR2HAGoalSubscriber.h"
-#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
+#include "ROSCommunication/Actions/PR2HeadAction/PR2HAGoalSubscriberCallback.h"
 
 void URPR2HeadActionGoalSubscriber::SetMessageType()
 {

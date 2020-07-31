@@ -1,5 +1,5 @@
 #include "ROSCommunication/Actions/PR2GripperAction/PR2GCAGoalSubscriber.h"
-#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
+#include "ROSCommunication/Actions/PR2GripperAction/PR2GCASubscriberCallback.h"
 
 void URPR2GripperCommandActionGoalSubscriber::SetMessageType()
 {

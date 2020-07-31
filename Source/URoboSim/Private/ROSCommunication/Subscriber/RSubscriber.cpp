@@ -1,7 +1,4 @@
 #include "ROSCommunication/Subscriber/RSubscriber.h"
-#include "Controller/RController.h"
-// #include "geometry_msgs/Twist.h"
-#include "Physics/RModel.h"
 
 void URSubscriber::Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic )
 {

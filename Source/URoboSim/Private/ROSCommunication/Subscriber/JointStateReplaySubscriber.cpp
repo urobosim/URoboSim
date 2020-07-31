@@ -1,6 +1,6 @@
 
 #include "ROSCommunication/Subscriber/JointStateReplaySubscriber.h"
-#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
+#include "ROSCommunication/Subscriber/JointStateReplaySubscriberCallback.h"
 
 void URJointStateReplaySubscriber::SetMessageType()
 {

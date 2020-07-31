@@ -1,6 +1,6 @@
 
 #include "ROSCommunication/Subscriber/VelocityCommandSubscriber.h"
-#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
+#include "ROSCommunication/Subscriber/VelocityCommandSubscriberCallback.h"
 
 void URVelocityCommandSubscriber::SetMessageType()
 {

@@ -4,11 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
-#include "ROSCommunication/Subscriber/RROSSubscriberCallback.h"
+#include "Controller/RController.h"
+#include "Physics/RModel.h"
 #include "RSubscriber.generated.h"
-
-class URControllerComponent;
-class ARModel;
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URSubscriber: public UObject
