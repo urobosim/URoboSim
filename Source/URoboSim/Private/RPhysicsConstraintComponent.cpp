@@ -111,14 +111,12 @@ void URPrismaticConstraintComponent::BeginPlay()
 {
   JointAccuracy = 0.01;
   Super::BeginPlay();
-  FVector FramePos = ParentChildDistance + Offset;
-
-  //TODO Bug happens for PR2 in gripper_joint_constraint, which requieres this
-  //Possible reasons during settup of joint bAttached parrents is false
-  FramePos.Y = FramePos.Y * -1;
-
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
+  if(!GetName().Contains("gripper"))
+    {
+      FVector FramePos = ParentChildDistance + Offset;
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
+    }
 }
 
 
