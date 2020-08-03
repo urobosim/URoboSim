@@ -31,6 +31,6 @@ void FROSVelocityCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> M
       FVector Linear = FConversions::ROSToU(VelocityCommand->GetLinear().GetVector());
       FVector Angular = VelocityCommand->GetAngular().GetVector();
       BaseController->MoveLinear(Linear);
-      BaseController->Turn(Angular.Z * 180. / PI);
+      BaseController->Turn(Angular.Z);
     }
 }

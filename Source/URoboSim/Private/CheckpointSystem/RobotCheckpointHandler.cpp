@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Controller/RJointController.h"
 #include "Controller/RController.h"
+#include "Controller/RBaseController.h"
 #include "Physics/RModel.h"
 
 USaveGame* URobotCheckpointHandler::CreateSaveGameFile()
