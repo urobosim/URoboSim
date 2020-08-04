@@ -72,7 +72,7 @@ public:
 
 	double GetTimeAsDouble()
 	{
-		return Secs + NSecs/100000000;
+		return Secs + NSecs/1000000000;
 	};
 };
 
@@ -121,6 +121,7 @@ public:
 
         UPROPERTY()
           double ActionDuration;
+
 };
 
 
