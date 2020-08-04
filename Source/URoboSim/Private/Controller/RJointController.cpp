@@ -26,15 +26,37 @@ void URJointController::SetJointNames(TArray<FString> InNames)
 
 void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 {
-  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if(State == UJointControllerState::FollowJointTrajectory)
     {
+
+      float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
+      float OldTimeStep = OldTrajectoryPoints.GetTimeAsDouble();
+      float CurrentTimeStep = ActionDuration;
+      float DiffTrajectoryTimeStep =  NextTimeStep - OldTimeStep;
+
+      //if execution is slower than the trajectory demands, use the NextTimeStep for further calculations
+      //if execution is faster than the trajectory demands, use the OldTimeStep for further calculations
+      // in order to cap the linear interpolation between the points
+      if(ActionDuration < OldTimeStep)
+        {
+          CurrentTimeStep = OldTimeStep;
+        }
+      else if(ActionDuration > NextTimeStep)
+        {
+          CurrentTimeStep = NextTimeStep;
+        }
+
+      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f ActionDuration %f CurrentTimestep %f"), NextTimeStep, ActionDuration, CurrentTimeStep);
+
       for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
           FString JointName = TrajectoryStatus.JointNames[i];
           float& JointState = DesiredJointState.FindOrAdd(JointName);
+          float DiffJointStep;
+          DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
 
-          JointState = Trajectory[TrajectoryPointIndex].Points[i];
+          JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
+          // JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
     }
 }
@@ -69,6 +91,7 @@ bool URJointController::CheckTrajectoryPoint()
 
   if(bAllPointsReady)
     {
+      OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
       TrajectoryPointIndex++;
     }
 
@@ -173,6 +196,7 @@ void URJointController::Tick(float InDeltaTime)
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
+      ActionDuration+= InDeltaTime;
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
@@ -291,6 +315,16 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 void URJointController::FollowTrajectory()
 {
   TrajectoryPointIndex = 0;
+  OldTrajectoryPoints.Points.Empty();
+  URJoint* Joint = nullptr;
+  for(auto& JointName : TrajectoryStatus.JointNames)
+    {
+      Joint = Model->Joints[JointName];
+      if(Joint)
+        {
+          OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
+        }
+    }
   State = UJointControllerState::FollowJointTrajectory;
 }
 

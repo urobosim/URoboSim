@@ -68,6 +68,9 @@ class UROBOSIM_API URJointController : public URController
   virtual void MoveJointsKinematic();
 
   UPROPERTY()
+    FTrajectoryPoints OldTrajectoryPoints;
+
+  UPROPERTY()
     ARModel* Model;
 
   UPROPERTY()
