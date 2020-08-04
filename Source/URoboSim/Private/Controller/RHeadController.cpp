@@ -154,7 +154,5 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
       DesAz = Az - AzEl.X;
       float& DesEl = JointController->DesiredJointState.FindOrAdd("head_tilt_joint");
       DesEl = El - AzEl.Y;
-      AzimuthJoint->MaxJointVel = 0.007;
-      ElevationJoint->MaxJointVel = 0.007;
     }
 }
