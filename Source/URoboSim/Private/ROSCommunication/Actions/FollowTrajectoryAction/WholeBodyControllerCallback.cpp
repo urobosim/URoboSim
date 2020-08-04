@@ -34,6 +34,7 @@ void FROSWholeBodyControllerCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 
       actionlib_msgs::GoalID Id = TrajectoryMsg->GetGoalId();
       JointController->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
+      UE_LOG(LogTemp, Log, TEXT("Recieved Trajectory Id: %s"), *Id.GetId());
       for(auto& JointPoint : TrajectoryMsg->GetGoal().GetTrajectory().GetPoints())
         {
           FTrajectoryPoints TempPoints;
