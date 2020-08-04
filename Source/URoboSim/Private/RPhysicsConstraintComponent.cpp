@@ -35,7 +35,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
       float ChildMass = Child->GetMass();
 
       FQuat JointQuat = GetComponentTransform().GetRotation();
-      FVector TargetJointVelocity = TargetVelocity * RefAxis * 5;
+      FVector TargetJointVelocity = TargetVelocity * RefAxis;
       TargetJointVelocity = JointQuat.RotateVector(TargetJointVelocity); // Rotation Axis in Global Frame
 
       FVector COM = Child->GetBodyInstance()->GetCOMPosition();
@@ -48,6 +48,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
       Child->NextTickLinearVelocity = TargetChildLinearVelocity;
       Child->NextTickAngularVelocity = ParentAngularVelocity;
 
+      OldChildPos = Child->GetComponentLocation();
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
       Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
     }
@@ -100,7 +101,7 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
 
 void URContinuousConstraintComponent::BeginPlay()
 {
-  JointAccuracy = 0.10;
+  // JointAccuracy = 0.004;
   FQuat ParentOrientation = Parent->GetComponentQuat();
   FQuat ChildOrientation = Child->GetComponentQuat();
   QInitial = ParentOrientation.Inverse() * ChildOrientation;
@@ -109,7 +110,8 @@ void URContinuousConstraintComponent::BeginPlay()
 
 void URPrismaticConstraintComponent::BeginPlay()
 {
-  JointAccuracy = 0.01;
+  // JointAccuracy = 0.004;
+  OldChildPos = Child->GetComponentLocation();
   Super::BeginPlay();
   if(!GetName().Contains("gripper"))
     {
@@ -303,7 +305,8 @@ void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * 
 
 void URPrismaticConstraintComponent::SetJointVelocity(float Velocity)
 {
-  TargetVelocity = Velocity;
+  //Source of JointVelocity is ROS -> m/s convertet into cm/s
+  TargetVelocity = Velocity * 100;
 }
 
 void URPrismaticConstraintComponent::SetJointEffortFromROS(float InEffort)
@@ -338,7 +341,6 @@ void URContinuousConstraintComponent::SetJointVelocity(float Velocity)
 
 void URPrismaticConstraintComponent::SetJointVelocityInUUnits(float Velocity)
 {
-  //TODO wirte code
   SetJointVelocity(Velocity);
 }
 

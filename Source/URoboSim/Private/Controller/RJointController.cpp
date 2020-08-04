@@ -76,6 +76,7 @@ bool URJointController::CheckTrajectoryPoint()
           if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
             {
               bAllPointsReady = false;
+              UE_LOG(LogTemp, Error, TEXT("Joint %s: TrajPoint not Reached with diff %f"), *Joint->Constraint->GetName(), Diff);
             }
           TrajectoryStatus.Position[i] = CurrentJointPos;
           TrajectoryStatus.Desired[i] = DesiredPos;
@@ -134,12 +135,6 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
           float Vel = Diff / InDeltaTime;
-          //TODO enfernen
-          if(!Joint.Key.Equals("torso_lift_joint"))
-            {
-              Joint.Value->MaxJointVel = MaxJointAngularVel;
-            }
-          //
           if(Joint.Value->MaxJointVel > 0)
             {
               if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
@@ -274,6 +269,19 @@ void URJointController::Init(ARModel* InModel)
       for(auto & Link: Model->Links)
         {
           Link.Value->GetCollision()->SetEnableGravity(false);
+        }
+
+      for(auto & Joint: Model->Joints)
+        {
+          if(Joint.Value->Constraint->IsA(URContinuousConstraintComponent::StaticClass()) or
+             Joint.Value->Constraint->IsA(URRevoluteConstraintComponent::StaticClass()))
+            {
+              Joint.Value->Constraint->JointAccuracy = RevolutAccuracy;
+            }
+          else if(Joint.Value->Constraint->IsA(URPrismaticConstraintComponent::StaticClass()))
+            {
+              Joint.Value->Constraint->JointAccuracy = PrismaticAccuracy;
+            }
         }
     }
 }
