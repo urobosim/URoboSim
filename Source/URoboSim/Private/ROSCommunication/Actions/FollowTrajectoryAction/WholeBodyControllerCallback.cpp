@@ -40,6 +40,7 @@ void FROSWholeBodyControllerCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
           FTrajectoryPoints TempPoints;
           // FTrajectoryPoints TempError;
           TempPoints.Points = JointPoint.GetPositions();
+          TempPoints.Velocities = JointPoint.GetVelocities();
           FROSTime TimeStep(JointPoint.GetTimeFromStart());
           TempPoints.SetTimeStep(TimeStep.Secs, TimeStep.NSecs);
           JointController->Trajectory.Add(TempPoints) ;

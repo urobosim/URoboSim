@@ -61,6 +61,7 @@ struct FTrajectoryPoints
 public:
 	double StartTime;
 	TArray<double> Points;
+	TArray<double> Velocities;
 	double NSecs;
 	double Secs;
 
