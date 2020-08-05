@@ -23,12 +23,11 @@ void URDonbotOdomPublisher::SetOwner(UObject* InOwner)
 
 void URDonbotOdomPublisher::Publish()
 {
-  TSharedPtr<sensor_msgs::JointState> JointState =
-    MakeShareable(new sensor_msgs::JointState());
+  TSharedPtr<sensor_msgs::JointState> JointState = MakeShareable(new sensor_msgs::JointState());
 
   JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), TEXT("0")));
   JointState->SetName(FrameNames);
-  if(this->Owner)
+  if (this->Owner)
   {
     JointState->SetPosition(this->Owner->GetOdomPositionStates());
     JointState->SetVelocity(this->Owner->GetOdomVelocityStates());
