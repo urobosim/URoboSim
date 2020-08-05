@@ -200,11 +200,18 @@ void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
         {
           Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
         }
+<<<<<<< HEAD
 
       /*if(!InSelfColide)
         {
           Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
         }*/
+=======
+      if(!InSelfColide)
+        {
+          Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+        }
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
     }
 }
 

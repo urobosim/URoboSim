@@ -5,6 +5,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/StaticMesh.h"
+#include "SDF/SDFDataAsset.h"
+#include "SDF/SDFGeometry.h"
 #include "AssetRegistryModule.h"
 #include "ObjectMacros.h" // EObjectFlags
 
@@ -12,13 +14,13 @@
 class FXmlFile;
 class FXmlNode;
 class UFbxFactory;
-class USDFDataAsset;
+// class USDFDataAsset;
 class USDFModel;
 class USDFJoint;
 class USDFLink;
 class USDFVisual;
 class USDFCollision;
-class USDFGeometry;
+// class USDFGeometry;
 
 /**
 *

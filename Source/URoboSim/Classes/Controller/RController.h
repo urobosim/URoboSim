@@ -140,6 +140,10 @@ public:
 
         virtual void SetLocation(FVector InPosition);
         virtual void SetRotation(FRotator InRotator);
+<<<<<<< HEAD
+=======
+        virtual void SetTransform(FTransform InTransform);
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
         virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
         virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
         virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);

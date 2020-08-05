@@ -114,10 +114,18 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
           float Vel = Diff / InDeltaTime;
+<<<<<<< HEAD
+=======
+          //TODO enfernen
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
           if(!Joint.Key.Equals("torso_lift_joint"))
             {
               Joint.Value->MaxJointVel = MaxJointAngularVel;
             }
+<<<<<<< HEAD
+=======
+          //
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
           if(Joint.Value->MaxJointVel > 0)
             {
               if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)

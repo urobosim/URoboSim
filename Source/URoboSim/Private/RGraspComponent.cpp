@@ -12,7 +12,12 @@ URGraspComponent::URGraspComponent()
   Constraint->SetupAttachment(this);
   Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
   Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+<<<<<<< HEAD
   Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
+=======
+  // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
+  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
 }
 
 void URGraspComponent::Init(URStaticMeshComponent* InGripper)

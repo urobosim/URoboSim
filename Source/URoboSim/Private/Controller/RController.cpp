@@ -49,6 +49,7 @@ void URBaseController::MoveLinear(FVector InVelocity)
 void URBaseController::Turn(float InVelocity)
 {
   AngularVelocity = -InVelocity;
+<<<<<<< HEAD
 }
 
 void URBaseController::Tick(float InDeltaTime)
@@ -59,6 +60,18 @@ void URBaseController::Tick(float InDeltaTime)
 
 void URBaseController::TurnTick(float InDeltaTime)
 {
+=======
+}
+
+void URBaseController::Tick(float InDeltaTime)
+{
+        TurnTick(InDeltaTime);
+	MoveLinearTick(InDeltaTime);
+}
+
+void URBaseController::TurnTick(float InDeltaTime)
+{
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
   if(AngularVelocity != 0.f)
     {
       FRotator TestRotation = FRotator(0.0f, AngularVelocity *InDeltaTime, 0.0f);
@@ -183,12 +196,27 @@ void URBaseController::SetRotation(FRotator InRotation)
   FRotator NewRotation = InRotation - BaseOrientation;
   NewRotation.Pitch = 0;
   NewRotation.Roll = 0;
+<<<<<<< HEAD
 
   UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
   for(auto& Link : Model->Links)
     {
       AddRelativeRotation(Link.Value, NewRotation);
     }
+=======
+
+  UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeRotation(Link.Value, NewRotation);
+    }
+}
+
+void URBaseController::SetTransform(FTransform InTransform)
+{
+  SetLocation(InTransform.GetLocation());
+  SetRotation(InTransform.GetRotation().Rotator());
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
 }
 
 void URBaseController::SetLocationAndRotation(FVector InPosition, FRotator InRotation)
@@ -205,6 +233,7 @@ void URCameraController::PerceiveObject()
       bool bObjectFound = false;
       TArray<AActor*> PerceivedActors;
       UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(*TypeToPerceive), PerceivedActors);
+<<<<<<< HEAD
 
       if(PerceivedActors.Num()>0)
         {
@@ -237,6 +266,40 @@ void URCameraController::PerceiveObject()
           FVector Temp = PerceivedObject->PoseWorld.GetLocation() - ReferenceLinkTransform.GetLocation();
           FVector Pose = ReferenceLinkTransform.GetRotation().Inverse().RotateVector(Temp) ;
 
+=======
+
+      if(PerceivedActors.Num()>0)
+        {
+          bObjectFound = true;
+          PerceivedObject = NewObject<UPerceivedObject>(this);
+          PerceivedObject->PoseWorld.SetLocation(PerceivedActors[0]->GetActorLocation());
+          PerceivedObject->PoseWorld.SetRotation(PerceivedActors[0]->GetActorQuat());
+          PerceivedObject->Name = PerceivedActors[0]->GetName();
+        }
+
+
+      // for(auto & Object : PerceivedObjects)
+      //   {
+      //     if(Object->Type.Equals(TypeToPerceive, ESearchCase::IgnoreCase))
+      //       {
+      //         PerceivedObject = Object;
+      //         bObjectFound = true;
+      //       }
+      //   }
+
+      if(bObjectFound)
+        {
+
+          URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
+          FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+          FVector Location = ReferenceLinkTransform.GetLocation();
+          Location.Z = 0.0f;
+          ReferenceLinkTransform.SetLocation(Location);
+
+          FVector Temp = PerceivedObject->PoseWorld.GetLocation() - ReferenceLinkTransform.GetLocation();
+          FVector Pose = ReferenceLinkTransform.GetRotation().Inverse().RotateVector(Temp) ;
+
+>>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
           PerceivedObject->Pose.SetLocation(Pose);
           FQuat TempRotator = PerceivedObject->PoseWorld.GetRotation() * ReferenceLinkTransform.GetRotation().Inverse() ;
           PerceivedObject->Pose.SetRotation(TempRotator);
