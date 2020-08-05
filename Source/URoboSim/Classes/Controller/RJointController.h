@@ -68,12 +68,16 @@ class UROBOSIM_API URJointController : public URController
   virtual void MoveJointsKinematic();
 
   UPROPERTY()
+    FTrajectoryPoints OldTrajectoryPoints;
+
+  UPROPERTY()
     ARModel* Model;
 
   UPROPERTY()
     uint32 TrajectoryPointIndex;
 
   void UpdateDesiredJointAngle(float InDeltaTime);
-  bool CheckTrajectoryStatus();
+  virtual bool CheckTrajectoryGoalReached();
+  virtual bool CheckTrajectoryPoint();
   void CallculateJointVelocities(float InDeltaTime);
 };

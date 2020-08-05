@@ -28,21 +28,80 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 {
   if(State == UJointControllerState::FollowJointTrajectory)
     {
+
+      float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
+      float OldTimeStep = OldTrajectoryPoints.GetTimeAsDouble();
+      float CurrentTimeStep = ActionDuration;
+      float DiffTrajectoryTimeStep =  NextTimeStep - OldTimeStep;
+
+      //if execution is slower than the trajectory demands, use the NextTimeStep for further calculations
+      //if execution is faster than the trajectory demands, use the OldTimeStep for further calculations
+      // in order to cap the linear interpolation between the points
+      if(ActionDuration < OldTimeStep)
+        {
+          CurrentTimeStep = OldTimeStep;
+        }
+      else if(ActionDuration > NextTimeStep)
+        {
+          CurrentTimeStep = NextTimeStep;
+        }
+
+      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f ActionDuration %f CurrentTimestep %f"), NextTimeStep, ActionDuration, CurrentTimeStep);
+
       for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
           FString JointName = TrajectoryStatus.JointNames[i];
           float& JointState = DesiredJointState.FindOrAdd(JointName);
+          float DiffJointStep;
+          DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
 
-          JointState = Trajectory[TrajectoryPointIndex].Points[i];
+          JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
+          // JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
     }
 }
 
-bool URJointController::CheckTrajectoryStatus()
+bool URJointController::CheckTrajectoryPoint()
 {
-  bool bFinalTrajectoryPointReached = false;
+  bool bAllPointsReady = true;
+  for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
+    {
+      URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
+      if(Joint)
+        {
+          float CurrentJointPos = Joint->GetEncoderValue();
+          float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
+          float Diff = DesiredPos - CurrentJointPos;
 
-  if(TrajectoryPointIndex == Trajectory.Num()-1)
+          if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
+            {
+              bAllPointsReady = false;
+            }
+          TrajectoryStatus.Position[i] = CurrentJointPos;
+          TrajectoryStatus.Desired[i] = DesiredPos;
+          TrajectoryStatus.Error[i] = Diff;
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("%s of Trajectory not contained in RobotModel"), *TrajectoryStatus.JointNames[i]);
+        }
+    }
+
+  GoalStatusList.Last().Status = 1;
+
+  if(bAllPointsReady)
+    {
+      OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
+      TrajectoryPointIndex++;
+    }
+
+  return bAllPointsReady;
+}
+
+bool URJointController::CheckTrajectoryGoalReached()
+{
+  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
+  if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
       bPublishResult = true;
@@ -52,49 +111,10 @@ bool URJointController::CheckTrajectoryStatus()
       Trajectory.Empty();
       TrajectoryPointIndex = 0;
       ActionDuration = 0.0;
-      bFinalTrajectoryPointReached = true;
-    }
-  else
-    {
-      bool bAllPointsReady = true;
-      for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
-        {
-          URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
-          if(Joint)
-            {
-              float CurrentJointPos = Joint->GetEncoderValue();
-              float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
-              float Diff = DesiredPos - CurrentJointPos;
-
-              if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
-                {
-                  bAllPointsReady = false;
-                }
-              TrajectoryStatus.Position[i] = CurrentJointPos;
-              TrajectoryStatus.Desired[i] = Trajectory[TrajectoryPointIndex].Points[i];
-              TrajectoryStatus.Error[i] = Diff;
-            }
-          else
-            {
-              UE_LOG(LogTemp, Error, TEXT("%s of Trajectory not contained in RobotModel"), *TrajectoryStatus.JointNames[i]);
-            }
-        }
-      FString Error = "";
-      for(auto& error : TrajectoryStatus.Error)
-        {
-          Error.Append(FString::SanitizeFloat(error));
-          Error.Append(" ");
-        }
-
-      if(bAllPointsReady)
-        {
-          TrajectoryPointIndex++;
-        }
-
-      GoalStatusList.Last().Status = 1;
+      return true;
     }
 
-  return bFinalTrajectoryPointReached;
+  return false;
 }
 void URJointController::CallculateJointVelocities(float InDeltaTime)
 {
@@ -182,9 +202,17 @@ void URJointController::Tick(float InDeltaTime)
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
-      if(!CheckTrajectoryStatus())
+      ActionDuration+= InDeltaTime;
+      if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
+        }
+      else
+        {
+          if(!CheckTrajectoryGoalReached())
+            {
+              UpdateDesiredJointAngle(InDeltaTime);
+            }
         }
       CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
@@ -293,6 +321,16 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 void URJointController::FollowTrajectory()
 {
   TrajectoryPointIndex = 0;
+  OldTrajectoryPoints.Points.Empty();
+  URJoint* Joint = nullptr;
+  for(auto& JointName : TrajectoryStatus.JointNames)
+    {
+      Joint = Model->Joints[JointName];
+      if(Joint)
+        {
+          OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
+        }
+    }
   State = UJointControllerState::FollowJointTrajectory;
 }
 

@@ -64,7 +64,7 @@ void URGripperController::Tick(float InDeltaTime)
     {
       bStalled = false;
       CheckGripperActionResult(Error, 0.4);
-      UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
+
       if(bActive)
         {
           GoalStatusList.Last().Status = 1;
@@ -82,6 +82,11 @@ void URGripperController::Tick(float InDeltaTime)
               JointController->SetDesiredJointState(LeftJointName, JointValue + 0.02);
             }
         }
+      else if (OldPosition - Position < -0.3)
+        {
+          UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
+          Release();
+        }
       else if (bStalled)
         {
 
@@ -95,8 +100,8 @@ void URGripperController::Tick(float InDeltaTime)
         {
           UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
           // OldPosition = GripperPosition;
-          UE_LOG(LogTemp, Error, TEXT("Release"));
-          Release();
+          // UE_LOG(LogTemp, Error, TEXT("Release"));
+          // Release();
           OldPosition = GripperPosition;
         }
     }

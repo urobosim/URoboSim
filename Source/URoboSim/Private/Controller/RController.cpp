@@ -2,6 +2,7 @@
 #include "Physics/RLink.h"
 #include "Runtime/Engine/Classes/Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "Math/UnrealMathUtility.h"
 
 void URController::CancelAction()
 {
@@ -21,10 +22,6 @@ void URController::CancelAction()
     }
 }
 
-URBaseController::URBaseController()
-{
-	BaseName = TEXT("base_footprint");
-}
 
 URControllerComponent::URControllerComponent()
 {
@@ -33,7 +30,7 @@ URControllerComponent::URControllerComponent()
 	Model = Cast<ARModel>(GetOwner());
 	if(Model)
 	{
-          Model->Plugins.Add(TEXT("ControllerComponent"), this);
+    Model->Plugins.Add(TEXT("ControllerComponent"), this);
 	}
 }
 
@@ -41,6 +38,7 @@ URControllerComponent::~URControllerComponent()
 {
 }
 
+<<<<<<< HEAD
 void URBaseController::MoveLinear(FVector InVelocity)
 {
   LinearVelocity = InVelocity;
@@ -224,6 +222,8 @@ void URBaseController::SetLocationAndRotation(FVector InPosition, FRotator InRot
   SetLocation(InPosition);
   SetRotation(InRotation);
 }
+=======
+>>>>>>> michael/dev
 
 void URCameraController::PerceiveObject()
 {
@@ -354,25 +354,12 @@ void URCameraController::Init(ARModel* InModel)
         {
 		  MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
           MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
+          MyCamera->AddActorLocalRotation(PoseOffset.GetRotation());
           return;
         }
     }
   UE_LOG(LogTemp, Error, TEXT("Camera %s not found"), *CameraName);
 
-}
-
-void URBaseController::Init(ARModel* InModel)
-{
-  if(!InModel)
-    {
-      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-    }
-  else
-    {
-      Model = InModel;
-      URLink* Base = Model->Links[BaseName];
-      Base->GetCollision()->SetSimulatePhysics(false);
-    }
 }
 
 void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -384,7 +371,6 @@ void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
       C.Value->Tick(DeltaTime);
     }
 }
-
 void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();

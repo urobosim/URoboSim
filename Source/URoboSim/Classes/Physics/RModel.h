@@ -30,9 +30,9 @@ class UROBOSIM_API ARModel : public AActor
 {
   GENERATED_BODY()
 
-    public:
-    // Sets default values for this actor's properties
-    ARModel();
+public:
+// Sets default values for this actor's properties
+ARModel();
 
   // Destructor
   ~ARModel();
@@ -51,19 +51,19 @@ class UROBOSIM_API ARModel : public AActor
 
   virtual FJointState GetJointState();
 
- protected:
-  // Called when the game starts or when spawned
-  virtual void BeginPlay() override;
+protected:
+// Called when the game starts or when spawned
+virtual void BeginPlay() override;
 
 
-  UPROPERTY()
-    TArray<URGraspComponent*> Grippers;
- public:
-  // Called every frame
-  virtual void Tick(float DeltaTime) override;
+UPROPERTY()
+  TArray<URGraspComponent*> Grippers;
+public:
+// Called every frame
+virtual void Tick(float DeltaTime) override;
 
-  void AddJoint(URJoint* Joint);
-  void AddLink(URLink* Link);
-  // Load model
+void AddJoint(URJoint* Joint);
+void AddLink(URLink* Link);
+// Load model
 
 };

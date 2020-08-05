@@ -111,17 +111,21 @@ void URPrismaticConstraintComponent::BeginPlay()
 {
   JointAccuracy = 0.01;
   Super::BeginPlay();
-
-  if(GetOuter()->GetName().Equals("torso_lift_joint"))
+  if(!GetName().Contains("gripper"))
     {
-      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
+      FVector FramePos = ParentChildDistance + Offset;
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
     }
+<<<<<<< HEAD
 
 <<<<<<< HEAD
   //SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
 =======
   SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
 >>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
+=======
+>>>>>>> michael/dev
 }
 
 
@@ -176,6 +180,7 @@ void URPrismaticConstraintComponent::ConnectToComponents()
   if(Parent && Child)
     {
       ParentChildDistance = Child->GetComponentLocation() - Parent->GetComponentLocation();
+      UE_LOG(LogTemp, Error, TEXT("JointName %s ParentChildDistance %s"), *GetName(), *ParentChildDistance.ToString());
     }
   else
     {

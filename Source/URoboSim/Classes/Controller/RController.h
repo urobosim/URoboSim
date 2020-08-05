@@ -6,13 +6,12 @@
 #include "RGraspComponent.h"
 #include "ConstructorHelpers.h"
 #include "Physics/RJoint.h"
-/* #include "ROSCommunication/RRosComunication.h" */
+//#include "ROSCommunication/RRosComunication.h"
 #include "RGBDCamera.h"
 #include "ROSUtilities.h"
 #include "Containers/Queue.h"
+#include "Conversions.h"
 #include "RController.generated.h"
-
-
 
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -73,7 +72,7 @@ public:
 
 	double GetTimeAsDouble()
 	{
-		return Secs + NSecs/100000000;
+		return Secs + NSecs/1000000000;
 	};
 };
 
@@ -122,6 +121,7 @@ public:
 
         UPROPERTY()
           double ActionDuration;
+<<<<<<< HEAD
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -153,23 +153,11 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString BaseName;
 protected:
+=======
+>>>>>>> michael/dev
 
-	virtual void TurnTick(float InDeltaTime);
-	virtual void MoveLinearTick(float InDeltaTime);
-
-	UPROPERTY()
-	ARModel* Model;
-
-
-	UPROPERTY(EditAnywhere)
-	bool bIsKinematic;
-
-	UPROPERTY()
-	float AngularVelocity;
-
-	UPROPERTY()
-	FVector LinearVelocity;
 };
+
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URCameraController : public URController
@@ -184,8 +172,8 @@ public:
 
 	virtual void Tick(float InDeltaTime) override;
 
-        UPROPERTY(BlueprintReadWrite, Instanced  ,EditAnywhere, export, noclear)
-          TArray<UPerceivedObject*> PerceivedObjects;
+	UPROPERTY(BlueprintReadWrite, Instanced  ,EditAnywhere, export, noclear)
+	TArray<UPerceivedObject*> PerceivedObjects;
 
     UPROPERTY()
     FString TypeToPerceive;
@@ -194,7 +182,7 @@ public:
 	ARGBDCamera* Camera;
 
 	UPROPERTY()
-        UPerceivedObject* PerceivedObject;
+	UPerceivedObject* PerceivedObject;
 protected:
 
 	UPROPERTY()
@@ -216,11 +204,11 @@ class UROBOSIM_API URTFController : public URController
     GENERATED_BODY()
 public:
 	virtual void Init(ARModel* InModel) override;
-        virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
-        virtual TMap<FString, FTFInfo> GetTFList();
+	virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
+	virtual TMap<FString, FTFInfo> GetTFList();
 
-        virtual bool UpdateFramePoses();
-        virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
+	virtual bool UpdateFramePoses();
+	virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
 
 	virtual void Tick(float InDeltaTime) override;
 
@@ -229,14 +217,14 @@ protected:
 	UPROPERTY()
 	ARModel* Model;
 
-        UPROPERTY(EditAnywhere)
-          float UpdateRate;
-
-        UPROPERTY()
-          float Time;
+	UPROPERTY(EditAnywhere)
+	float UpdateRate;
 
 	UPROPERTY()
-          TMap<FString, FTFInfo> TFList;
+	float Time;
+
+	UPROPERTY()
+	TMap<FString, FTFInfo> TFList;
 };
 
 USTRUCT(Blueprintable)
