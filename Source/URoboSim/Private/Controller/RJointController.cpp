@@ -24,6 +24,22 @@ void URJointController::SetJointNames(TArray<FString> InNames)
   TrajectoryPointIndex = 0;
 }
 
+void URJointController::SetJointVelocities(float InDeltaTime)
+{
+  if(State == UJointControllerState::FollowJointTrajectory)
+    {
+      for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
+        {
+          URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
+          if(Joint)
+            {
+              Joint->SetJointVelocity(Trajectory[TrajectoryPointIndex].Velocities[i]);
+            }
+        }
+    }
+
+}
+
 void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 {
   if(State == UJointControllerState::FollowJointTrajectory)
@@ -45,8 +61,6 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
         {
           CurrentTimeStep = NextTimeStep;
         }
-
-      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f ActionDuration %f CurrentTimestep %f"), NextTimeStep, ActionDuration, CurrentTimeStep);
 
       for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
@@ -76,8 +90,8 @@ bool URJointController::CheckTrajectoryPoint()
           if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
             {
               bAllPointsReady = false;
-              UE_LOG(LogTemp, Error, TEXT("Joint %s: TrajPoint not Reached with diff %f"), *Joint->Constraint->GetName(), Diff);
             }
+
           TrajectoryStatus.Position[i] = CurrentJointPos;
           TrajectoryStatus.Desired[i] = DesiredPos;
           TrajectoryStatus.Error[i] = Diff;
@@ -92,6 +106,9 @@ bool URJointController::CheckTrajectoryPoint()
 
   if(bAllPointsReady)
     {
+      float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
+      float CurrentTimeStep = ActionDuration;
+      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f, ActionDuration %f"), NextTimeStep, CurrentTimeStep);
       OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
       TrajectoryPointIndex++;
     }
@@ -101,7 +118,7 @@ bool URJointController::CheckTrajectoryPoint()
 
 bool URJointController::CheckTrajectoryGoalReached()
 {
-  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
+  // UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
@@ -195,11 +212,13 @@ void URJointController::Tick(float InDeltaTime)
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
+          // SetJointVelocities(InDeltaTime);
         }
       else
         {
           if(!CheckTrajectoryGoalReached())
             {
+              // SetJointVelocities(InDeltaTime);
               UpdateDesiredJointAngle(InDeltaTime);
             }
         }

@@ -30,7 +30,7 @@ URControllerComponent::URControllerComponent()
 	Model = Cast<ARModel>(GetOwner());
 	if(Model)
 	{
-    Model->Plugins.Add(TEXT("ControllerComponent"), this);
+          Model->Plugins.Add(TEXT("ControllerComponent"), this);
 	}
 }
 
