@@ -121,40 +121,6 @@ public:
 
         UPROPERTY()
           double ActionDuration;
-<<<<<<< HEAD
-};
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URBaseController : public URController
-{
-    GENERATED_BODY()
-public:
-	URBaseController();
-
-	virtual void Init(ARModel* InModel) override;
-	virtual void MoveLinear(FVector InVelocity, float InDeltaTime);
-	virtual void MoveLinear(FVector InVelocity);
-	virtual void MoveLinearToWorld(FVector InVelocity, float InDeltaTime);
-	virtual void Turn(float InVelocity, float InDeltaTime);
-	virtual void Turn(float InVelocity);
-
-        virtual void SetLocation(FVector InPosition);
-        virtual void SetRotation(FRotator InRotator);
-<<<<<<< HEAD
-=======
-        virtual void SetTransform(FTransform InTransform);
->>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
-        virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
-        virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
-        virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
-
-	virtual void Tick(float InDeltaTime) override;
-
-	UPROPERTY(EditAnywhere)
-	FString BaseName;
-protected:
-=======
->>>>>>> michael/dev
 
 };
 
