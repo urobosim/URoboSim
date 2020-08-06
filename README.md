@@ -5,12 +5,8 @@ Unreal engine based robot simulator.
 Version using `SDF` for loading robots.
 See `gzsdf` for converting `URDF` to `SDF`.
 
-<<<<<<< HEAD
-**Dependencies**
-=======
 
 **Plugin Dependencies**
->>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
 
 *  [UUtils](https://github.com/urobosim/UUtils)
 *  [UROSWorldControl](https://github.com/urobosim/UROSWorldControl)
@@ -20,13 +16,6 @@ See `gzsdf` for converting `URDF` to `SDF`.
 **Installation**
 
 *  place the URobosim into the plugin folder of your project
-<<<<<<< HEAD
-*  place all dependencies into the plugin folder of your project
-*  add URoboSim as dependency to the *.Build.cs
-
-**Creating the robot model**
-
-=======
 *  place all plugin dependencies into the plugin folder of your project
 *  add URoboSim as dependency to the *.Build.cs
 
@@ -46,7 +35,6 @@ See `gzsdf` for converting `URDF` to `SDF`.
 **Creating the robot model**
 
 *  Create CollisionChannel Robot in new Projects
->>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
 *  import the sdf file (enable: Combine Meshes)
 *  drag and dorp the sdf file into the map (while dragging wait for the mesh creation to be finished before dropping the model)
 
@@ -58,13 +46,9 @@ See `gzsdf` for converting `URDF` to `SDF`.
     *  Base Name: Name of the Base
 *  JointController:
     *  Base Link: same as BaseController Base Name
-<<<<<<< HEAD
-    *  IgnoreList: Joints that are not controlled
-=======
     *  DesiredJointState: TMap of the desired joint angles, can be set manually
        or by adding a RJointControllerConfigurationClient to the
        ROSCommunication Component 
->>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49
 *  CameraController:
     *  CameraRef: Name of the Reference Link
     *  Camera Name: Name of the Camera (Placed in the world)
@@ -72,15 +56,6 @@ See `gzsdf` for converting `URDF` to `SDF`.
     *  PoseOffset: offset of the camera from ReferenceFrame
 *  HeadController
 *  GripperController(only tested on PR2):
-<<<<<<< HEAD
-    *  GripperCompSetting: Setting of the Gripper Component (ReferenceFrame, Offset, Size of graspeble objects)
-    *  Stiffness
-    *  Max Force
-    *  Dampening
-    *  Right/LeftJointName:
-    *  Right/LeftFingerTipName
-    *  GraspComponent: Name of the GraspComponent (GraspComponent has to be added to model)
-=======
     *  GripperCompSetting: Setting of the Gripper Component (ReferenceFrame, Offset)
     *  Right/LeftJointName:
     *  Right/LeftFingerTipName
@@ -147,4 +122,3 @@ See `gzsdf` for converting `URDF` to `SDF`.
 **Example Workflow**
 
 * 
->>>>>>> 61ff86181300050672543038a0f8f1b68ab86f49

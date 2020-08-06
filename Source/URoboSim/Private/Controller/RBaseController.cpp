@@ -15,17 +15,17 @@ URBaseController::URBaseController()
 
 void URBaseController::Init(ARModel* InModel)
 {
-  if (!InModel)
-  {
-    UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
-  }
+  if(!InModel)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
+    }
   else
-  {
-    Model = InModel;
-    URLink* Base = Model->Links[BaseName];
-    // Base->GetCollision()->SetSimulatePhysics(false);
-    Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
-  }
+    {
+      Model = InModel;
+      URLink* Base = Model->Links[BaseName];
+      // Base->GetCollision()->SetSimulatePhysics(false);
+      Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
+    }
 }
 
 void URBaseController::MoveLinear(FVector InVelocity)
@@ -62,68 +62,75 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
 
 void URBaseController::CalculateOdomStates(float InDeltaTime)
 {
-  FVector BasePose = FConversions::UToROS(Model->GetActorLocation());
-  FQuat BaseQuaternion = FConversions::UToROS(Model->GetActorRotation().Quaternion());
+  TArray<double> OdomPositionStatesOld = OdomPositionStates;
+
+  FVector BasePose =FConversions::UToROS(Model->GetActorLocation());
+  FQuat BaseQuaternion =FConversions::UToROS(Model->GetActorRotation().Quaternion());
   FRotator BaseRotation = BaseQuaternion.Rotator();
 
-  OdomVelocityStates[0] = (BasePose.X - OdomPositionStates[0]) / InDeltaTime;
-  OdomVelocityStates[1] = (BasePose.Y - OdomPositionStates[1]) / InDeltaTime;
-  OdomVelocityStates[2] = (FMath::DegreesToRadians(BaseRotation.Yaw) - OdomPositionStates[2]) / InDeltaTime;
+  OdomPositionStates[0]=BasePose.X;
+  OdomPositionStates[1]=BasePose.Y;
+  OdomPositionStates[2]=FMath::DegreesToRadians(BaseRotation.Yaw);
 
-  OdomPositionStates[0] = BasePose.X;
-  OdomPositionStates[1] = BasePose.Y;
-  OdomPositionStates[2] = FMath::DegreesToRadians(BaseRotation.Yaw);
+  double c_phi = cos(OdomPositionStates[2]);
+  double s_phi = sin(OdomPositionStates[2]);
+  double v_x = (OdomPositionStates[0] - OdomPositionStatesOld[0])/InDeltaTime;
+  double v_y = (OdomPositionStates[1] - OdomPositionStatesOld[1])/InDeltaTime;
+
+  OdomVelocityStates[0] = v_x * c_phi + v_y * s_phi;
+  OdomVelocityStates[1] = -v_x * s_phi + v_y * c_phi;
+  OdomVelocityStates[2] = (OdomPositionStates[2] - OdomPositionStatesOld[2])/InDeltaTime;
 }
 
 TArray<double> URBaseController::GetOdomPositionStates()
 {
-  return OdomPositionStates;
+  return this->OdomPositionStates;
 }
 
 TArray<double> URBaseController::GetOdomVelocityStates()
 {
-  return OdomVelocityStates;
+  return this->OdomVelocityStates;
 }
 
 void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
 {
-  if (InVelocity.Size() != 0.f)
-  {
-    URLink* Base = Model->Links[BaseName];
-    FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-    FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(InVelocity * InDeltaTime);
+  if(InVelocity.Size() != 0.f)
+    {
+      URLink* Base = Model->Links[BaseName];
+      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(InVelocity*InDeltaTime);
 
-    for (auto& Link : Model->Links)
+      for(auto& Link : Model->Links)
+        {
+          // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+          // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+          AddRelativeLocation(Link.Value, DistanceTraveld);
+        }
+    }
+}
+
+void URBaseController::MoveLinearToWorld(FVector InVelocity, float InDeltaTime)
+{
+  FVector DistanceTraveld = InVelocity*InDeltaTime;
+
+  for(auto& Link : Model->Links)
     {
       // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
       // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
       AddRelativeLocation(Link.Value, DistanceTraveld);
     }
-  }
-}
-
-void URBaseController::MoveLinearToWorld(FVector InVelocity, float InDeltaTime)
-{
-  FVector DistanceTraveld = InVelocity * InDeltaTime;
-
-  for (auto& Link : Model->Links)
-  {
-    // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-    // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
-    AddRelativeLocation(Link.Value, DistanceTraveld);
-  }
 }
 
 void URBaseController::Turn(float InVelocity, float InDeltaTime)
 {
-  if (InVelocity != 0.f)
-  {
-    FRotator TestRotation = FRotator(0.0f, InVelocity * InDeltaTime, 0.0f);
-    for (auto& Link : Model->Links)
+  if(InVelocity != 0.f)
     {
-      AddRelativeRotation(Link.Value, TestRotation);
+      FRotator TestRotation = FRotator(0.0f, InVelocity *InDeltaTime, 0.0f);
+      for(auto& Link : Model->Links)
+        {
+          AddRelativeRotation(Link.Value, TestRotation);
+        }
     }
-  }
 }
 
 void URBaseController::AddRelativeLocation(URLink* InLink, FVector InPosition)
@@ -140,7 +147,7 @@ void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
   FRotator Orientation = InLink->GetCollision()->GetComponentRotation();
   FVector Position = InLink->GetCollision()->GetComponentLocation();
 
-  FQuat NewRot = InRotator.Quaternion() * Orientation.Quaternion();
+  FQuat NewRot = InRotator.Quaternion() * Orientation.Quaternion() ;
   InLink->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
 
   FVector LinkBaseOffset = Position - BasePosition;
@@ -155,10 +162,10 @@ void URBaseController::SetLocation(FVector InPosition)
   FVector BasePosition = Base->GetCollision()->GetComponentLocation();
   FVector DistanceTraveld = InPosition - BasePosition;
 
-  for (auto& Link : Model->Links)
-  {
-    AddRelativeLocation(Link.Value, DistanceTraveld);
-  }
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeLocation(Link.Value, DistanceTraveld);
+    }
 }
 void URBaseController::SetRotation(FRotator InRotation)
 {
@@ -169,10 +176,10 @@ void URBaseController::SetRotation(FRotator InRotation)
   NewRotation.Roll = 0;
 
   UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
-  for (auto& Link : Model->Links)
-  {
-    AddRelativeRotation(Link.Value, NewRotation);
-  }
+  for(auto& Link : Model->Links)
+    {
+      AddRelativeRotation(Link.Value, NewRotation);
+    }
 }
 
 void URBaseController::SetTransform(FTransform InTransform)
