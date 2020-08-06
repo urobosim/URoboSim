@@ -4,13 +4,13 @@ URBaseController::URBaseController()
 {
   BaseName = TEXT("base_footprint");
 
-  this->OdomPositionStates.Add(0);
-  this->OdomPositionStates.Add(0);
-  this->OdomPositionStates.Add(0);
+  OdomPositionStates.Add(0);
+  OdomPositionStates.Add(0);
+  OdomPositionStates.Add(0);
 
-  this->OdomVelocityStates.Add(0);
-  this->OdomVelocityStates.Add(0);
-  this->OdomVelocityStates.Add(0);
+  OdomVelocityStates.Add(0);
+  OdomVelocityStates.Add(0);
+  OdomVelocityStates.Add(0);
 }
 
 void URBaseController::Init(ARModel* InModel)
@@ -62,34 +62,27 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
 
 void URBaseController::CalculateOdomStates(float InDeltaTime)
 {
-  TArray<double> OdomPositionStatesOld = OdomPositionStates;
-
   FVector BasePose =FConversions::UToROS(Model->GetActorLocation());
   FQuat BaseQuaternion =FConversions::UToROS(Model->GetActorRotation().Quaternion());
   FRotator BaseRotation = BaseQuaternion.Rotator();
 
-  OdomPositionStates[0]=BasePose.X;
-  OdomPositionStates[1]=BasePose.Y;
-  OdomPositionStates[2]=FMath::DegreesToRadians(BaseRotation.Yaw);
+  OdomVelocityStates[0] = (BasePose.X - OdomPositionStates[0])/InDeltaTime;
+  OdomVelocityStates[1] = (BasePose.Y - OdomPositionStates[1])/InDeltaTime;
+  OdomVelocityStates[2] = (FMath::DegreesToRadians(BaseRotation.Yaw) - OdomPositionStates[2])/InDeltaTime;
 
-  double c_phi = cos(OdomPositionStates[2]);
-  double s_phi = sin(OdomPositionStates[2]);
-  double v_x = (OdomPositionStates[0] - OdomPositionStatesOld[0])/InDeltaTime;
-  double v_y = (OdomPositionStates[1] - OdomPositionStatesOld[1])/InDeltaTime;
-
-  OdomVelocityStates[0] = v_x * c_phi + v_y * s_phi;
-  OdomVelocityStates[1] = -v_x * s_phi + v_y * c_phi;
-  OdomVelocityStates[2] = (OdomPositionStates[2] - OdomPositionStatesOld[2])/InDeltaTime;
+  OdomPositionStates[0] = BasePose.X;
+  OdomPositionStates[1] = BasePose.Y;
+  OdomPositionStates[2] = FMath::DegreesToRadians(BaseRotation.Yaw);
 }
 
 TArray<double> URBaseController::GetOdomPositionStates()
 {
-  return this->OdomPositionStates;
+  return OdomPositionStates;
 }
 
 TArray<double> URBaseController::GetOdomVelocityStates()
 {
-  return this->OdomVelocityStates;
+  return OdomVelocityStates;
 }
 
 void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
