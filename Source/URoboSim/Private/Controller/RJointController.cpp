@@ -159,20 +159,28 @@ void URJointController::SetDesiredJointState(FString JointName, float InJointSta
     {
       float& JointValue = DesiredJointState.FindOrAdd(JointName);
       // UE_LOG(LogTemp, Warning, TEXT("JointName %s Upper %f Lower %f"), *JointName, Joint->Constraint->Upper, Joint->Constraint->Lower);
-      if(InJointState > FMath::DegreesToRadians(Joint->Constraint->Upper))
+      //TODO: Remove hardcode
+      if (Joint->GetName().Equals("gripper_base_gripper_left_joint") || Joint->GetName().Equals("gripper_base_gripper_right_joint"))
+      {
+        JointValue = InJointState;
+      }
+      else
+      {
+        if(InJointState > FMath::DegreesToRadians(Joint->Constraint->Upper))
         {
           UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Upper));
           JointValue =  FMath::DegreesToRadians(Joint->Constraint->Upper);
         }
-      else if(InJointState < FMath::DegreesToRadians(Joint->Constraint->Lower))
-        {
-          UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Lower));
-          JointValue =  FMath::DegreesToRadians(Joint->Constraint->Lower);
-        }
-      else
-        {
-          JointValue = InJointState;
-        }
+        else if(InJointState < FMath::DegreesToRadians(Joint->Constraint->Lower))
+          {
+            UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *JointName, FMath::DegreesToRadians(Joint->Constraint->Lower));
+            JointValue =  FMath::DegreesToRadians(Joint->Constraint->Lower);
+          }
+        else
+          {
+            JointValue = InJointState;
+          }
+      }
     }
   else
     {
