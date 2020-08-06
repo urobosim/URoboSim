@@ -57,24 +57,33 @@ public:
 USTRUCT()
 struct FTrajectoryPoints
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-	double StartTime;
-	TArray<double> Points;
-	TArray<double> Velocities;
-	double NSecs;
-	double Secs;
+  double StartTime;
+  TArray<double> Points;
+  TArray<double> Velocities;
+  double NSecs;
+  double Secs;
 
-	void SetTimeStep(double InSecs, double InNSecs)
-	{
-		Secs = InSecs;
-		NSecs = InNSecs;
-	};
+  void SetTimeStep(double InSecs, double InNSecs)
+  {
+    Secs = InSecs;
+    NSecs = InNSecs;
+  };
 
-	double GetTimeAsDouble()
-	{
-		return Secs + NSecs/1000000000;
-	};
+  double GetTimeAsDouble()
+  {
+    return Secs + NSecs/1000000000;
+  };
+
+  void Reset()
+  {
+    StartTime = 0.0;
+    Points.Empty();
+    Velocities.Empty();
+    NSecs = 0;
+    Secs = 0;
+  };
 };
 
 USTRUCT()
