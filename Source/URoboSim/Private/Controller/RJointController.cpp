@@ -70,7 +70,11 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
           float DiffJointStep;
           DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
 
-          JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
+          if(JointName.Contains("torso"))
+            {
+              UE_LOG(LogTemp, Log, TEXT("DiffTrajectoryTimeStep %f DiffJointStep %f"), DiffTrajectoryTimeStep, DiffJointStep);
+            }
+              JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
           // JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
     }
@@ -91,6 +95,7 @@ bool URJointController::CheckTrajectoryPoint()
           if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
             {
               bAllPointsReady = false;
+              UE_LOG(LogTemp, Log, TEXT("PointNotReached: %s Diff %f"), *Joint->GetName(), Diff);
             }
 
           TrajectoryStatus.Position[i] = CurrentJointPos;
@@ -119,7 +124,7 @@ bool URJointController::CheckTrajectoryPoint()
 
 bool URJointController::CheckTrajectoryGoalReached()
 {
-  // UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
+  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
@@ -153,6 +158,7 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
           float Vel = Diff / InDeltaTime;
+          float VelSave = Vel;
           if(Joint.Value->MaxJointVel > 0)
             {
               if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
@@ -160,6 +166,11 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
                   Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
                 }
             }
+          // if(Joint.Value->GetName().Contains("l_shoulder_lift"))
+          //   {
+          //     UE_LOG(LogTemp, Error, TEXT("Vel: %f VelSave %f"), Vel, VelSave);
+          //     UE_LOG(LogTemp, Error, TEXT("CurrentJointPos: %f DesiredPos %f Diff %f"), CurrentJointPos, DesiredPos, Diff);
+          //   }
           Joint.Value->SetJointVelocity(Vel);
         }
     }
