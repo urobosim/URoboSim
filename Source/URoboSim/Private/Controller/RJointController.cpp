@@ -22,6 +22,7 @@ void URJointController::SetJointNames(TArray<FString> InNames)
   bTrajectoryPointsReached.AddDefaulted(JointNum);
   ActionDuration = 0.0;
   TrajectoryPointIndex = 0;
+  Trajectory.Empty();
 }
 
 void URJointController::SetJointVelocities(float InDeltaTime)
@@ -208,7 +209,6 @@ void URJointController::Tick(float InDeltaTime)
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
-      ActionDuration+= InDeltaTime;
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
@@ -224,6 +224,7 @@ void URJointController::Tick(float InDeltaTime)
         }
       CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
+      ActionDuration+= InDeltaTime;
       break;
 
     case UJointControllerState::Normal:
@@ -342,7 +343,7 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 void URJointController::FollowTrajectory()
 {
   TrajectoryPointIndex = 0;
-  OldTrajectoryPoints.Points.Empty();
+  OldTrajectoryPoints.Reset();
   URJoint* Joint = nullptr;
   for(auto& JointName : TrajectoryStatus.JointNames)
     {
