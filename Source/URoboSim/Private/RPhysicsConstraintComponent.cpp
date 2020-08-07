@@ -48,7 +48,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
       Child->NextTickLinearVelocity = TargetChildLinearVelocity;
       Child->NextTickAngularVelocity = ParentAngularVelocity;
 
-      OldChildPos = Child->GetComponentLocation();
+      // OldChildPos = Child->GetComponentLocation();
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
       Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
     }
@@ -101,7 +101,7 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
 
 void URContinuousConstraintComponent::BeginPlay()
 {
-  // JointAccuracy = 0.004;
+  JointAccuracy = 0.004;
   FQuat ParentOrientation = Parent->GetComponentQuat();
   FQuat ChildOrientation = Child->GetComponentQuat();
   QInitial = ParentOrientation.Inverse() * ChildOrientation;
@@ -110,8 +110,8 @@ void URContinuousConstraintComponent::BeginPlay()
 
 void URPrismaticConstraintComponent::BeginPlay()
 {
-  // JointAccuracy = 0.004;
-  OldChildPos = Child->GetComponentLocation();
+  JointAccuracy = 0.004;
+  // OldChildPos = Child->GetComponentLocation();
   Super::BeginPlay();
   if(!GetName().Contains("gripper"))
     {

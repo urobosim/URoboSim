@@ -271,18 +271,18 @@ void URJointController::Init(ARModel* InModel)
           Link.Value->GetCollision()->SetEnableGravity(false);
         }
 
-      for(auto & Joint: Model->Joints)
-        {
-          if(Joint.Value->Constraint->IsA(URContinuousConstraintComponent::StaticClass()) or
-             Joint.Value->Constraint->IsA(URRevoluteConstraintComponent::StaticClass()))
-            {
-              Joint.Value->Constraint->JointAccuracy = RevolutAccuracy;
-            }
-          else if(Joint.Value->Constraint->IsA(URPrismaticConstraintComponent::StaticClass()))
-            {
-              Joint.Value->Constraint->JointAccuracy = PrismaticAccuracy;
-            }
-        }
+      // for(auto & Joint: Model->Joints)
+      //   {
+      //     if(Joint.Value->Constraint->IsA(URContinuousConstraintComponent::StaticClass()) or
+      //        Joint.Value->Constraint->IsA(URRevoluteConstraintComponent::StaticClass()))
+      //       {
+      //         Joint.Value->Constraint->JointAccuracy = RevolutAccuracy;
+      //       }
+      //     else if(Joint.Value->Constraint->IsA(URPrismaticConstraintComponent::StaticClass()))
+      //       {
+      //         Joint.Value->Constraint->JointAccuracy = PrismaticAccuracy;
+      //       }
+        // }
     }
 }
 
