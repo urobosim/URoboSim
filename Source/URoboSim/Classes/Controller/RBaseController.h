@@ -56,6 +56,9 @@ protected:
 	UPROPERTY()
 	FVector LinearVelocity;
 
+        UPROPERTY()
+        FTransform TargetPose;
+
 	UPROPERTY()
 	TArray<double> OdomPositionStates;
 

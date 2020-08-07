@@ -25,6 +25,7 @@ void URBaseController::Init(ARModel* InModel)
       URLink* Base = Model->Links[BaseName];
       // Base->GetCollision()->SetSimulatePhysics(false);
       Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
+      TargetPose = Base->GetCollision()->GetComponentTransform();
     }
 }
 
@@ -47,9 +48,17 @@ void URBaseController::Tick(float InDeltaTime)
 
 void URBaseController::TurnTick(float InDeltaTime)
 {
-  FVector AngularVelocityVector = FVector(0.0f, 0.0f, AngularVelocity);
+  FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
   URLink* Base = Model->Links[BaseName];
-  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(AngularVelocityVector);
+  TargetPose.ConcatenateRotation(AngularMotion);
+  float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
+  FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
+  float AngularVelocityAbs = FMath::Abs(AngularVelocity);
+  if(NextVel.Size() > 1.2 * AngularVelocityAbs)
+    {
+      NextVel = NextVel.GetClampedToMaxSize(1.2 * AngularVelocityAbs);
+    }
+  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
@@ -57,7 +66,18 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
   URLink* Base = Model->Links[BaseName];
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
   FVector VelocityInBaseCoordinates = BaseOrientation.Quaternion().RotateVector(LinearVelocity);
-  Base->GetCollision()->SetPhysicsLinearVelocity(VelocityInBaseCoordinates);
+
+  TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
+
+  FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
+  NextVel /= InDeltaTime;
+  if(NextVel.Size() > 1.2 * LinearVelocity.Size())
+    {
+      NextVel = NextVel.GetClampedToMaxSize(1.2 * LinearVelocity.Size());
+    }
+
+
+  Base->GetCollision()->SetPhysicsLinearVelocity(NextVel);
 }
 
 void URBaseController::CalculateOdomStates(float InDeltaTime)
