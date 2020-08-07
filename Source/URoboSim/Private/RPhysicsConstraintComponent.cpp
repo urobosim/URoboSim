@@ -34,38 +34,19 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
     {
       float ChildMass = Child->GetMass();
 
-      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
-      //Convert rotation axis into picht(y), yaw(z), roll(x)
-      FRotator ParentAngularRotation(ParentAngularVelocity.Y, ParentAngularVelocity.Z, ParentAngularVelocity.X);
-      ParentAngularRotation *= InDeltaT;
-
       FQuat JointQuat = GetComponentTransform().GetRotation();
       FVector TargetJointVelocity = TargetVelocity * RefAxis;
       TargetJointVelocity = JointQuat.RotateVector(TargetJointVelocity); // Rotation Axis in Global Frame
 
-      FVector COMChild = Child->GetBodyInstance()->GetCOMPosition();
-      FVector COMParent = Parent->GetBodyInstance()->GetCOMPosition();
+      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
 
-      FVector COMChildParent = COMChild - COMParent;
-      FVector NewCOMPose = ParentAngularRotation.Quaternion().RotateVector(COMChildParent);
-
-      FVector COMLinearMotion = NewCOMPose - COMChildParent;
-
-      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocityAtPoint(COMChild);
-      // FVector ParentLinearVelocity = COMLinearMotion / InDeltaT;
+      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocityAtPoint(COM);
+      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
 
       FVector TargetChildLinearVelocity = ParentLinearVelocity + TargetJointVelocity;
 
-      // Child->NextTickLinearVelocity = TargetChildLinearVelocity;
-      // Child->NextTickAngularVelocity = ParentAngularVelocity;
-      // if(GetName().Contains("torso"))
-      //   {
-      //     UE_LOG(LogTemp, Error, TEXT("Torso: ParentLinearVelocity %s TargetJointVelocity %s"), *ParentLinearVelocity.ToString(), *TargetJointVelocity.ToString());
-      //   }
-
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
-      Child->SetPhysicsAngularVelocityInRadians(FVector(0, 0, 0));
-      // Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
+      Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
     }
 }
 
@@ -85,65 +66,40 @@ void URContinuousConstraintComponent::UpdateJointVelocity(float InDeltaT)
     {
       float ChildMass = Child->GetMass();
 
-
-      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
-      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocity();
-      //Distance the parent rotate during the tick Convert rotation axis into picht(y), yaw(z), roll(x)
-      FRotator ParentAngularRotation(ParentAngularVelocity.Y, ParentAngularVelocity.Z, ParentAngularVelocity.X);
-      ParentAngularRotation *= InDeltaT;
-
-
-      FVector COMChild = Child->GetBodyInstance()->GetCOMPosition();
-      FVector COMParent = Parent->GetBodyInstance()->GetCOMPosition();
-
-
       FRotator JointRotation = GetComponentRotation();
-      FVector JointPosition = GetComponentLocation();
-
-      FVector COMConstraintParent = JointPosition - COMParent;
-      FVector COMChildConstraint = COMChild - JointPosition;
-
-
       FVector TargetJointAngularVelocity = TargetVelocity * RefAxis;
       TargetJointAngularVelocity = ROSAngularVelocityToU(TargetJointAngularVelocity);
-      FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
 
-      //Rotation in one Tick based on the TargetVelocity
+      FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
       FRotator TargetJointAngularVelocityRotator(TargetJointAngularVelocityWorld.Y, TargetJointAngularVelocityWorld.Z, TargetJointAngularVelocityWorld.X);
       TargetJointAngularVelocityRotator *= InDeltaT;
-      //New Position of the constraint only based on the rotation
-      FVector NewCOMChildPose = ParentAngularRotation.Quaternion().RotateVector(COMChildConstraint);
-      // Apply the target rotation
-      NewCOMChildPose = TargetJointAngularVelocityRotator.Quaternion().RotateVector(NewCOMChildPose);
 
-      //New Position of the constraint only based on the rotation of Parent around its COM
-      FVector NewConstraintPose = ParentAngularRotation.Quaternion().RotateVector(COMConstraintParent);
+      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
+      FVector COMParentChild = COM - Parent->GetBodyInstance()->GetCOMPosition();
+      FVector DistanceJointCOM = COM - GetComponentLocation();
 
-      // Apply offset of the constraint new position
-      NewCOMChildPose += NewConstraintPose;
 
-      FVector COMLinearMotion = NewCOMChildPose  - (COMChildConstraint + COMConstraintParent);
+      FVector NewCOM = TargetJointAngularVelocityRotator.Quaternion().RotateVector(COMParentChild);
 
-      // FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocityAtPoint(COMChild);
-      FVector COMTargetVelocity = COMLinearMotion / InDeltaT;
-      // FVector DistanceJointCOM = COM - GetComponentLocation();
-
-      FVector ChildAngularVelocity = ParentAngularVelocity;
-      FVector ChildLinearVelocity = ParentLinearVelocity;
+      FVector COMTargetVelocityOld = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
+      FVector COMTargetVelocity = TargetJointAngularVelocityRotator.Quaternion().RotateVector(DistanceJointCOM) - DistanceJointCOM;
+      COMTargetVelocity /= InDeltaT;
 
       // if(GetName().Contains("l_elbow_flex"))
       //   {
-      //     // UE_LOG(LogTemp, Error, TEXT("Elbow: COMTargetVelocity %s ChildLinearVelocity %s"), *COMTargetVelocity.ToString(), *ChildLinearVelocity.ToString());
-      //     UE_LOG(LogTemp, Error, TEXT("COMChildconstraint %s  COMConstraintparent %s"), *COMChildConstraint.ToString() ,*COMConstraintParent.ToString());
-      //     UE_LOG(LogTemp, Error, TEXT("TargetJointAngularVelocityWorld %s  ChildAngularVelocity %s"), *TargetJointAngularVelocityWorld.ToString() ,*ChildAngularVelocity.ToString());
+      //     // UE_LOG(LogTemp, Error, TEXT("COMParentChild %s NewCOMParentChild %s"), *COMParentChild.ToString(), *NewCOM.ToString());
+      //     // UE_LOG(LogTemp, Error, TEXT("COM %s ComponenLocation %s"), *COM.ToString(), *Child->GetComponentLocation().ToString());
+      //     UE_LOG(LogTemp, Error, TEXT("COMTargetvelocityold %s COMTargetVelocity %s"), *COMTargetVelocityOld.ToString(), *COMTargetVelocity.ToString());
+      //     UE_LOG(LogTemp, Error, TEXT("TargetJointAngularVelocityWorld %s TargetJointAngularVelocityRotator %s"), *TargetJointAngularVelocityWorld.ToString(), *TargetJointAngularVelocityRotator.ToString());
       //   }
-      COMTargetVelocity = FVector::CrossProduct(TargetJointAngularVelocityWorld, COMChildConstraint);
-      ChildLinearVelocity += COMTargetVelocity;
-      ChildAngularVelocity += TargetJointAngularVelocityWorld;
 
-      Child->SetPhysicsLinearVelocity(ChildLinearVelocity);
-      Child->SetPhysicsAngularVelocityInRadians(ChildAngularVelocity);
-      // Child->SetPhysicsAngularVelocityInRadians(FVector(0, 0, 0));
+
+      COMTargetVelocity += Parent->GetPhysicsLinearVelocityAtPoint(COM);
+
+      FVector CurrentParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
+
+      Child->SetPhysicsLinearVelocity(COMTargetVelocity);
+      Child->SetPhysicsAngularVelocityInRadians(CurrentParentAngularVelocity + TargetJointAngularVelocityWorld);
     }
 }
 

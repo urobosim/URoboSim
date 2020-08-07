@@ -70,10 +70,10 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
           float DiffJointStep;
           DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
 
-          if(JointName.Contains("torso"))
-            {
-              UE_LOG(LogTemp, Log, TEXT("DiffTrajectoryTimeStep %f DiffJointStep %f"), DiffTrajectoryTimeStep, DiffJointStep);
-            }
+          // if(JointName.Contains("torso"))
+          //   {
+          //     UE_LOG(LogTemp, Log, TEXT("DiffTrajectoryTimeStep %f DiffJointStep %f ActionDuration %f"), DiffTrajectoryTimeStep, DiffJointStep, ActionDuration);
+          //   }
               JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
           // JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
@@ -83,6 +83,12 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 bool URJointController::CheckTrajectoryPoint()
 {
   bool bAllPointsReady = true;
+  float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
+  if(NextTimeStep == 0)
+    {
+      TrajectoryPointIndex++;
+    }
+
   for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
     {
       URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
@@ -95,7 +101,7 @@ bool URJointController::CheckTrajectoryPoint()
           if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
             {
               bAllPointsReady = false;
-              UE_LOG(LogTemp, Log, TEXT("PointNotReached: %s Diff %f"), *Joint->GetName(), Diff);
+              UE_LOG(LogTemp, Log, TEXT("PointNotReached: %s Diff %f ActionDuration %f"), *Joint->GetName(), Diff, ActionDuration);
             }
 
           TrajectoryStatus.Position[i] = CurrentJointPos;
@@ -110,16 +116,18 @@ bool URJointController::CheckTrajectoryPoint()
 
   GoalStatusList.Last().Status = 1;
 
-  if(bAllPointsReady)
+  if(ActionDuration > NextTimeStep)
+  // if(bAllPointsReady)
     {
-      float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
       float CurrentTimeStep = ActionDuration;
       UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f, ActionDuration %f"), NextTimeStep, CurrentTimeStep);
       OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
       TrajectoryPointIndex++;
+      return true;
     }
 
-  return bAllPointsReady;
+  return false;
+  // return bAllPointsReady;
 }
 
 bool URJointController::CheckTrajectoryGoalReached()
