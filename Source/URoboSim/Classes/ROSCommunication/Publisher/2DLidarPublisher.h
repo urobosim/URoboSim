@@ -24,4 +24,7 @@ protected:
 
     UPROPERTY()
       UR2DLidar* Owner;
+
+    UPROPERTY(EditAnywhere)
+    FString LaserLink = TEXT("base_laser_link");
 };

@@ -33,7 +33,7 @@ void UR2DLidarPublisher::Publish()
   if(Owner->bPublishResult)
     {
       TSharedPtr<sensor_msgs::LaserScan> ScanData = MakeShareable(new sensor_msgs::LaserScan());
-      ScanData->SetHeader(std_msgs::Header(Seq, FROSTime(), "base_laser_link"));
+      ScanData->SetHeader(std_msgs::Header(Seq, FROSTime(), LaserLink));
       ScanData->SetAngleMin(Owner->ScanAngleMin);
       ScanData->SetAngleMax(Owner->ScanAngleMax);
       ScanData->SetAngleIncrement(Owner->AngularIncrement);
