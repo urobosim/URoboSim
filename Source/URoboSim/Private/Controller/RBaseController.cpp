@@ -1,4 +1,5 @@
 #include "Controller/RBaseController.h"
+#include "Math/Quat.h"
 
 URBaseController::URBaseController()
 {
@@ -25,23 +26,35 @@ void URBaseController::Init(ARModel* InModel)
       URLink* Base = Model->Links[BaseName];
       // Base->GetCollision()->SetSimulatePhysics(false);
       Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
+      TargetPose = Base->GetCollision()->GetComponentTransform();
+      MaxLinearVelocity = 0.0;
+      MaxAngularVelocity = 0.0;
     }
 }
 
 void URBaseController::MoveLinear(FVector InVelocity)
 {
   LinearVelocity = InVelocity;
+  if(MaxLinearVelocity < InVelocity.Size())
+    {
+      MaxLinearVelocity = InVelocity.Size();
+    }
 }
 
 void URBaseController::Turn(float InVelocity)
 {
   AngularVelocity = -InVelocity;
+
+  if(MaxAngularVelocity < AngularVelocity)
+    {
+      MaxAngularVelocity = AngularVelocity;
+    }
 }
 
 void URBaseController::Tick(float InDeltaTime)
 {
-  TurnTick(InDeltaTime);
   MoveLinearTick(InDeltaTime);
+  TurnTick(InDeltaTime);
   CalculateOdomStates(InDeltaTime);
 }
 
@@ -49,15 +62,51 @@ void URBaseController::TurnTick(float InDeltaTime)
 {
   FVector AngularVelocityVector = FVector(0.0f, 0.0f, AngularVelocity);
   URLink* Base = Model->Links[BaseName];
-  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(AngularVelocityVector);
+  TargetPose.ConcatenateRotation(AngularMotion);
+  float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
+  FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
+  if(NextVel.Size() > MaxAngularVelocity)
+    {
+      NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
+    }
+  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
 {
   URLink* Base = Model->Links[BaseName];
-  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-  FVector VelocityInBaseCoordinates = BaseOrientation.Quaternion().RotateVector(LinearVelocity);
-  Base->GetCollision()->SetPhysicsLinearVelocity(VelocityInBaseCoordinates);
+  // FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  // FVector VelocityInBaseCoordinates = BaseOrientation.Quaternion().RotateVector(LinearVelocity);
+  if(FMath::Abs(AngularVelocity) >= 0.00001f)
+    {
+      float Theta0 = FMath::DegreesToRadians(TargetPose.GetRotation().Rotator().Yaw);
+      float Theta1 = Theta0 + AngularVelocity * InDeltaTime;
+      float dX = (FMath::Sin(Theta1) * LinearVelocity.X  + FMath::Cos(Theta1) * LinearVelocity.Y) / AngularVelocity;
+      dX = dX - (FMath::Sin(Theta0) * LinearVelocity.X  + FMath::Cos(Theta0) * LinearVelocity.Y) / AngularVelocity;
+      float dY = (-1 * FMath::Cos(Theta1) * LinearVelocity.X  + FMath::Sin(Theta1) * LinearVelocity.Y) / AngularVelocity;
+      dY = dY - (-1 * FMath::Cos(Theta0) * LinearVelocity.X  + FMath::Sin(Theta0) * LinearVelocity.Y) / AngularVelocity;
+      TargetPose.AddToTranslation(FVector(dX, dY, 0.0f));
+      UE_LOG(LogTemp, Error, TEXT("LinearVelocity %s AngularVelocity %f"), *LinearVelocity.ToString(), AngularVelocity);
+      UE_LOG(LogTemp, Error, TEXT("Theta0 %f, Theta1 %f, dx %f, dy %f"), Theta0, Theta1, dX, dY);
+    }
+  else
+    {
+      FVector VelocityInBaseCoordinates = TargetPose.GetRotation().RotateVector(LinearVelocity);
+      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s VelocityInBaseCoordinates %s"), *TargetPose.GetRotation().Rotator().ToString(), *VelocityInBaseCoordinates.ToString());
+      TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
+    }
+
+  // TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
+
+  FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
+  NextVel /= InDeltaTime;
+  if(NextVel.Size() > MaxLinearVelocity)
+    {
+      NextVel = NextVel.GetClampedToMaxSize(MaxLinearVelocity);
+    }
+
+
+  Base->GetCollision()->SetPhysicsLinearVelocity(NextVel);
 }
 
 void URBaseController::CalculateOdomStates(float InDeltaTime)

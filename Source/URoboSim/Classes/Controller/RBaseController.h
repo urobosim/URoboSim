@@ -61,4 +61,10 @@ protected:
 
 	UPROPERTY()
 	TArray<double> OdomVelocityStates;
+
+	UPROPERTY()
+        float MaxLinearVelocity;
+
+	UPROPERTY()
+        float MaxAngularVelocity;
 };
