@@ -60,43 +60,41 @@ void URBaseController::Tick(float InDeltaTime)
 
 void URBaseController::TurnTick(float InDeltaTime)
 {
-  FVector AngularVelocityVector = FVector(0.0f, 0.0f, AngularVelocity);
   URLink* Base = Model->Links[BaseName];
-  // TargetPose.SetRotation(TargetPose.GetRotation() + AngularMotion);
-  TargetPose.ConcatenateRotation(AngularMotion);
-  float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
-  FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
-  if(NextVel.Size() > MaxAngularVelocity)
-    {
-      NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
-    }
-  UE_LOG(LogTemp, Error, TEXT("NextVelAngular %s AngularDistance %f"), *NextVel.ToString(), AngularDistance);
-  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
+  FQuat BaseRotation = Base->GetCollision()->GetComponentQuat();
+  // FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
+  // TargetPose.ConcatenateRotation(AngularMotion);
+  // float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
+  // FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
+  // if(NextVel.Size() > MaxAngularVelocity)
+  //   {
+  //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
+  //   }
+  // UE_LOG(LogTemp, Error, TEXT("NextVelAngular %s AngularDistance %f"), *NextVel.ToString(), AngularDistance);
+  // Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
+  FVector AngularMotion = FVector(0.0f, 0.0f, 1.0f) * AngularVelocity;
+  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(AngularMotion);
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
 {
   URLink* Base = Model->Links[BaseName];
-  // FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
   // FVector VelocityInBaseCoordinates = BaseOrientation.Quaternion().RotateVector(LinearVelocity);
   if(FMath::Abs(AngularVelocity) >= 0.00001f)
     {
-      float Theta0 = FMath::DegreesToRadians(TargetPose.GetRotation().Rotator().Yaw);
+      float Theta0 = FMath::DegreesToRadians(BaseOrientation.Yaw);
       float Theta1 = Theta0 + AngularVelocity * InDeltaTime;
       float dX = (FMath::Sin(Theta1) * LinearVelocity.X  + FMath::Cos(Theta1) * LinearVelocity.Y) / AngularVelocity;
       dX = dX - (FMath::Sin(Theta0) * LinearVelocity.X  + FMath::Cos(Theta0) * LinearVelocity.Y) / AngularVelocity;
       float dY = (-1 * FMath::Cos(Theta1) * LinearVelocity.X  + FMath::Sin(Theta1) * LinearVelocity.Y) / AngularVelocity;
       dY = dY - (-1 * FMath::Cos(Theta0) * LinearVelocity.X  + FMath::Sin(Theta0) * LinearVelocity.Y) / AngularVelocity;
       TargetPose.AddToTranslation(FVector(dX, dY, 0.0f));
-      UE_LOG(LogTemp, Error, TEXT("LinearVelocity %s AngularVelocity %f"), *LinearVelocity.ToString(), AngularVelocity);
-      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s TargetLocation %s"), *TargetPose.GetRotation().Rotator().ToString(), *TargetPose.GetLocation().ToString());
-      // UE_LOG(LogTemp, Error, TEXT("Theta0 %f, Theta1 %f, dx %f, dy %f"), Theta0, Theta1, dX, dY);
     }
   else
     {
-      FVector VelocityInBaseCoordinates = TargetPose.GetRotation().RotateVector(LinearVelocity);
-      UE_LOG(LogTemp, Error, TEXT("LinearVelocity %s AngularVelocity %f"), *LinearVelocity.ToString(), AngularVelocity);
-      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s TargetLocation %s"), *TargetPose.GetRotation().Rotator().ToString(), *TargetPose.GetLocation().ToString());
+      // FVector VelocityInBaseCoordinates = TargetPose.GetRotation().RotateVector(LinearVelocity);
+      FVector VelocityInBaseCoordinates = BaseOrientation.RotateVector(LinearVelocity);
       TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
     }
 
