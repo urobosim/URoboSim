@@ -35,6 +35,12 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY(EditAnywhere)
     FString BaseLink;
 
+  UPROPERTY(EditAnywhere)
+    float RevolutAccuracy;
+
+  UPROPERTY(EditAnywhere)
+    float PrismaticAccuracy;
+
   UPROPERTY()
     TArray<FTrajectoryPoints> Trajectory;
 
@@ -80,4 +86,5 @@ class UROBOSIM_API URJointController : public URController
   virtual bool CheckTrajectoryGoalReached();
   virtual bool CheckTrajectoryPoint();
   void CallculateJointVelocities(float InDeltaTime);
+  void SetJointVelocities(float InDeltaTime);
 };

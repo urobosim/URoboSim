@@ -11,11 +11,4 @@ class UROBOSIM_API URStaticMeshComponent : public UStaticMeshComponent
     GENERATED_BODY()
 
 public:
-	UPROPERTY()
-	FVector NextTickLinearVelocity;
-
-	UPROPERTY()
-	FVector NextTickAngularVelocity;
-
-	virtual void SetNextVelocities();
 };

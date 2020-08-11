@@ -45,7 +45,7 @@ public:
 	void AddJoint(class URJoint* InJoint);
 
 	virtual void UpdateVelocity(float InDeltaTime);
-	virtual void SetNextVelocities();
+	// virtual void SetNextVelocities();
 
 	UPROPERTY(EditAnywhere)
 	FTransform Pose;

@@ -67,11 +67,3 @@ void URLink::UpdateVelocity(float InDeltaTime)
       Joint->UpdateVelocity(InDeltaTime);
     }
 }
-
-void URLink::SetNextVelocities()
-{
-	if(Collisions.Num()>0)
-	{
-		Collisions[0]->SetNextVelocities();
-	}
-}
