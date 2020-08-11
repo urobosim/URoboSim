@@ -69,13 +69,7 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
           float& JointState = DesiredJointState.FindOrAdd(JointName);
           float DiffJointStep;
           DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
-
-          // if(JointName.Contains("torso"))
-          //   {
-          //     UE_LOG(LogTemp, Log, TEXT("DiffTrajectoryTimeStep %f DiffJointStep %f ActionDuration %f"), DiffTrajectoryTimeStep, DiffJointStep, ActionDuration);
-          //   }
-              JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
-          // JointState = Trajectory[TrajectoryPointIndex].Points[i];
+          JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
         }
     }
 }
@@ -98,12 +92,6 @@ bool URJointController::CheckTrajectoryPoint()
           float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
           float Diff = DesiredPos - CurrentJointPos;
 
-          if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
-            {
-              bAllPointsReady = false;
-              UE_LOG(LogTemp, Log, TEXT("PointNotReached: %s Diff %f ActionDuration %f"), *Joint->GetName(), Diff, ActionDuration);
-            }
-
           TrajectoryStatus.Position[i] = CurrentJointPos;
           TrajectoryStatus.Desired[i] = DesiredPos;
           TrajectoryStatus.Error[i] = Diff;
@@ -117,22 +105,18 @@ bool URJointController::CheckTrajectoryPoint()
   GoalStatusList.Last().Status = 1;
 
   if(ActionDuration > NextTimeStep)
-  // if(bAllPointsReady)
     {
       float CurrentTimeStep = ActionDuration;
-      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f, ActionDuration %f"), NextTimeStep, CurrentTimeStep);
       OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
       TrajectoryPointIndex++;
       return true;
     }
 
   return false;
-  // return bAllPointsReady;
 }
 
 bool URJointController::CheckTrajectoryGoalReached()
 {
-  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
