@@ -22,6 +22,23 @@ void URJointController::SetJointNames(TArray<FString> InNames)
   bTrajectoryPointsReached.AddDefaulted(JointNum);
   ActionDuration = 0.0;
   TrajectoryPointIndex = 0;
+  Trajectory.Empty();
+}
+
+void URJointController::SetJointVelocities(float InDeltaTime)
+{
+  if(State == UJointControllerState::FollowJointTrajectory)
+    {
+      for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
+        {
+          URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
+          if(Joint)
+            {
+              Joint->SetJointVelocity(Trajectory[TrajectoryPointIndex].Velocities[i]);
+            }
+        }
+    }
+
 }
 
 void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
@@ -46,17 +63,13 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
           CurrentTimeStep = NextTimeStep;
         }
 
-      UE_LOG(LogTemp, Error, TEXT("NextTimeStep %f ActionDuration %f CurrentTimestep %f"), NextTimeStep, ActionDuration, CurrentTimeStep);
-
       for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
           FString JointName = TrajectoryStatus.JointNames[i];
           float& JointState = DesiredJointState.FindOrAdd(JointName);
           float DiffJointStep;
           DiffJointStep = Trajectory[TrajectoryPointIndex].Points[i] - OldTrajectoryPoints.Points[i];
-
           JointState = DiffJointStep / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.Points[i];
-          // JointState = Trajectory[TrajectoryPointIndex].Points[i];
         }
     }
 }
@@ -64,6 +77,12 @@ void URJointController::UpdateDesiredJointAngle(float InDeltaTime)
 bool URJointController::CheckTrajectoryPoint()
 {
   bool bAllPointsReady = true;
+  float NextTimeStep = Trajectory[TrajectoryPointIndex].GetTimeAsDouble();
+  if(NextTimeStep == 0)
+    {
+      TrajectoryPointIndex++;
+    }
+
   for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
     {
       URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
@@ -73,11 +92,6 @@ bool URJointController::CheckTrajectoryPoint()
           float DesiredPos = Trajectory[TrajectoryPointIndex].Points[i];
           float Diff = DesiredPos - CurrentJointPos;
 
-          if(FMath::Abs(Diff) > Joint->Constraint->JointAccuracy)
-            {
-              bAllPointsReady = false;
-              UE_LOG(LogTemp, Error, TEXT("Joint %s: TrajPoint not Reached with diff %f"), *Joint->Constraint->GetName(), Diff);
-            }
           TrajectoryStatus.Position[i] = CurrentJointPos;
           TrajectoryStatus.Desired[i] = DesiredPos;
           TrajectoryStatus.Error[i] = Diff;
@@ -90,18 +104,19 @@ bool URJointController::CheckTrajectoryPoint()
 
   GoalStatusList.Last().Status = 1;
 
-  if(bAllPointsReady)
+  if(ActionDuration > NextTimeStep)
     {
+      float CurrentTimeStep = ActionDuration;
       OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
       TrajectoryPointIndex++;
+      return true;
     }
 
-  return bAllPointsReady;
+  return false;
 }
 
 bool URJointController::CheckTrajectoryGoalReached()
 {
-  UE_LOG(LogTemp, Error, TEXT("TrajectoryPointIndex %d, TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if(TrajectoryPointIndex == Trajectory.Num())
     {
       State = UJointControllerState::Normal;
@@ -135,6 +150,7 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
           float Vel = Diff / InDeltaTime;
+          float VelSave = Vel;
           if(Joint.Value->MaxJointVel > 0)
             {
               if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
@@ -142,6 +158,11 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
                   Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
                 }
             }
+          // if(Joint.Value->GetName().Contains("l_shoulder_lift"))
+          //   {
+          //     UE_LOG(LogTemp, Error, TEXT("Vel: %f VelSave %f"), Vel, VelSave);
+          //     UE_LOG(LogTemp, Error, TEXT("CurrentJointPos: %f DesiredPos %f Diff %f"), CurrentJointPos, DesiredPos, Diff);
+          //   }
           Joint.Value->SetJointVelocity(Vel);
         }
     }
@@ -199,20 +220,22 @@ void URJointController::Tick(float InDeltaTime)
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
-      ActionDuration+= InDeltaTime;
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
+          // SetJointVelocities(InDeltaTime);
         }
       else
         {
           if(!CheckTrajectoryGoalReached())
             {
+              // SetJointVelocities(InDeltaTime);
               UpdateDesiredJointAngle(InDeltaTime);
             }
         }
       CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
+      ActionDuration+= InDeltaTime;
       break;
 
     case UJointControllerState::Normal:
@@ -331,7 +354,7 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 void URJointController::FollowTrajectory()
 {
   TrajectoryPointIndex = 0;
-  OldTrajectoryPoints.Points.Empty();
+  OldTrajectoryPoints.Reset();
   URJoint* Joint = nullptr;
   for(auto& JointName : TrajectoryStatus.JointNames)
     {
