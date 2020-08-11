@@ -45,9 +45,9 @@ void URBaseController::Turn(float InVelocity)
 {
   AngularVelocity = -InVelocity;
 
-  if(MaxAngularVelocity < AngularVelocity)
+  if(MaxAngularVelocity < FMath::Abs(AngularVelocity))
     {
-      MaxAngularVelocity = AngularVelocity;
+      MaxAngularVelocity = FMath::Abs(AngularVelocity);
     }
 }
 
@@ -62,6 +62,7 @@ void URBaseController::TurnTick(float InDeltaTime)
 {
   FVector AngularVelocityVector = FVector(0.0f, 0.0f, AngularVelocity);
   URLink* Base = Model->Links[BaseName];
+  // TargetPose.SetRotation(TargetPose.GetRotation() + AngularMotion);
   TargetPose.ConcatenateRotation(AngularMotion);
   float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
   FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
@@ -69,6 +70,7 @@ void URBaseController::TurnTick(float InDeltaTime)
     {
       NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
     }
+  UE_LOG(LogTemp, Error, TEXT("NextVelAngular %s AngularDistance %f"), *NextVel.ToString(), AngularDistance);
   Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
 }
 
@@ -87,12 +89,14 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
       dY = dY - (-1 * FMath::Cos(Theta0) * LinearVelocity.X  + FMath::Sin(Theta0) * LinearVelocity.Y) / AngularVelocity;
       TargetPose.AddToTranslation(FVector(dX, dY, 0.0f));
       UE_LOG(LogTemp, Error, TEXT("LinearVelocity %s AngularVelocity %f"), *LinearVelocity.ToString(), AngularVelocity);
-      UE_LOG(LogTemp, Error, TEXT("Theta0 %f, Theta1 %f, dx %f, dy %f"), Theta0, Theta1, dX, dY);
+      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s TargetLocation %s"), *TargetPose.GetRotation().Rotator().ToString(), *TargetPose.GetLocation().ToString());
+      // UE_LOG(LogTemp, Error, TEXT("Theta0 %f, Theta1 %f, dx %f, dy %f"), Theta0, Theta1, dX, dY);
     }
   else
     {
       FVector VelocityInBaseCoordinates = TargetPose.GetRotation().RotateVector(LinearVelocity);
-      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s VelocityInBaseCoordinates %s"), *TargetPose.GetRotation().Rotator().ToString(), *VelocityInBaseCoordinates.ToString());
+      UE_LOG(LogTemp, Error, TEXT("LinearVelocity %s AngularVelocity %f"), *LinearVelocity.ToString(), AngularVelocity);
+      UE_LOG(LogTemp, Log, TEXT("TargetRotation %s TargetLocation %s"), *TargetPose.GetRotation().Rotator().ToString(), *TargetPose.GetLocation().ToString());
       TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
     }
 
