@@ -63,6 +63,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
 
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
   virtual float GetJointVelocity(){return 0.;};
 
@@ -130,6 +131,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   };
 
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState) override;
   virtual void SetPosition(USDFJoint* InJoint);
   virtual void BeginPlay() override;
 
@@ -203,5 +205,6 @@ class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraint
     public:
     virtual void SetTargetPosition(float InTargetPos);
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState) override;
 
 };
