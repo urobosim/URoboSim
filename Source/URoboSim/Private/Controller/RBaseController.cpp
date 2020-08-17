@@ -62,18 +62,19 @@ void URBaseController::TurnTick(float InDeltaTime)
 {
   URLink* Base = Model->Links[BaseName];
   FQuat BaseRotation = Base->GetCollision()->GetComponentQuat();
-  // FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
-  // TargetPose.ConcatenateRotation(AngularMotion);
-  // float AngularDistance = TargetPose.GetRotation().AngularDistance(Base->GetCollision()->GetComponentQuat());
-  // FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
-  // if(NextVel.Size() > MaxAngularVelocity)
-  //   {
-  //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
-  //   }
-  // UE_LOG(LogTemp, Error, TEXT("NextVelAngular %s AngularDistance %f"), *NextVel.ToString(), AngularDistance);
-  // Base->GetCollision()->SetPhysicsAngularVelocityInRadians(FMath::Sign(AngularVelocity) * NextVel);
-  FVector AngularMotion = FVector(0.0f, 0.0f, 1.0f) * AngularVelocity;
-  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(AngularMotion);
+  FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
+  TargetPose.ConcatenateRotation(AngularMotion);
+
+  float TargetAngle = TargetPose.GetRotation().GetRotationAxis().Z * TargetPose.GetRotation().GetAngle();
+  float CurrentAngle = BaseRotation.GetRotationAxis().Z * BaseRotation.GetAngle();
+
+  float AngularDistance = TargetAngle - CurrentAngle;
+  FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
+  if(NextVel.Size() > MaxAngularVelocity)
+    {
+      NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
+    }
+  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(NextVel);
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
