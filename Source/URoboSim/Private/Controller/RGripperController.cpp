@@ -63,7 +63,7 @@ void URGripperController::Tick(float InDeltaTime)
     if(bActive)
     {
       bStalled = false;
-      CheckGripperActionResult(Error, 0.4);
+      CheckGripperActionResult(Error, 0.1);
 
       if(bActive)
         {
@@ -82,10 +82,11 @@ void URGripperController::Tick(float InDeltaTime)
               JointController->SetDesiredJointState(LeftJointName, JointValue + 0.02);
             }
         }
-      else if (OldPosition - Position < -0.3)
+      else if (OldPosition - Position < -0.12)
         {
           UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
           Release();
+          OldPosition = GripperPosition;
         }
       else if (bStalled)
         {
