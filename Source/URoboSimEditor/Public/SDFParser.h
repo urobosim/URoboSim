@@ -10,6 +10,7 @@
 #include "AssetRegistryModule.h"
 #include "ObjectMacros.h" // EObjectFlags
 #include "SDFParserBase.h"
+//#include "SDFParserInterface.h"
 
 // Forward declaration
 class FXmlFile;
@@ -27,7 +28,7 @@ class USDFCollision;
 /**
 * SDF parser class
 */
-class UROBOSIM_API FSDFParser : FSDFParserBase
+class UROBOSIM_API FSDFParser : public FSDFParserBase
 {
 public:
 	// Default constructor
@@ -46,7 +47,8 @@ public:
 
 protected:
     /* Begin parser functions */
-
+    // Parse <link> node
+    virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
 	// Parse <link> node
     virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override; //possible there are some errors for the runtime verison
@@ -64,10 +66,10 @@ protected:
 	// Get mesh absolute path
 	FString GetMeshAbsolutePath(const FString& Uri);
 
-        FName GenerateMeshName(ESDFType InType, FString InName);
-        FString GeneratePackageName(FName MeshName);
-        bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
-        USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+    FName GenerateMeshName(ESDFType InType, FString InName);
+    FString GeneratePackageName(FName MeshName);
+    bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
+    USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
 
 	// Import .fbx meshes from data asset
 	UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);

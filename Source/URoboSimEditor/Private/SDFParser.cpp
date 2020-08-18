@@ -1,12 +1,12 @@
-// Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Michael Neumann
+//// Copyright 2018, Institute for Artificial Intelligence - University of Bremen
+//// Author: Michael Neumann
 
-#include "SDFParser.h"
-#include "Conversions.h"
-#include "Paths.h"
-#include "XmlFile.h"
-#include "Factories/FbxFactory.h"
-#include "RStaticMeshEditUtils.h"
+//#include "SDFParser.h"
+//#include "Conversions.h"
+//#include "Paths.h"
+//#include "XmlFile.h"
+//#include "Factories/FbxFactory.h"
+//#include "RStaticMeshEditUtils.h"
 
 //// Default constructor
 //FSDFParser::FSDFParser() : AssetRegistryModule(FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry")))
@@ -19,8 +19,9 @@
 //// Constructor with load from path
 //FSDFParser::FSDFParser(const FString& InFilename) : AssetRegistryModule(FModuleManager::LoadModuleChecked<FAssetRegistryModule>(FName("AssetRegistry")))
 //{
-//    this->XmlFile=nullptr;
-//    this->bSDFLoaded=false;
+
+//  this->XmlFile=nullptr;
+//  this->bSDFLoaded=false;
 //  LoadSDF(InFilename);
 //}
 
@@ -32,7 +33,7 @@
 
 
 
-// Create data asset and parse sdf data into it
+//// Create data asset and parse sdf data into it
 //USDFDataAsset* FSDFParser::ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags)
 //{
 //  if (!bSDFLoaded)
@@ -79,7 +80,78 @@
 
 //  return bSDFLoaded;
 //}
+////// Parse <link> node
+//void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
+//{
+//  // Ptr to the new link
+//  USDFLink* NewLink = nullptr;
 
+//  // Get "name" from node attribute
+//  const FString Name = InNode->GetAttribute(TEXT("name"));
+//  if (!Name.IsEmpty())
+//    {
+//      NewLink = NewObject<USDFLink>(OutModel, FName(*Name));
+//      NewLink->Name = Name;
+//      CurrentLinkName = Name;
+//    }
+//  else
+//    {
+//      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <link> has no \"name\" attribute, added a default value.."),
+//             *FString(__FUNCTION__), __LINE__);
+//      NewLink = NewObject<USDFLink>(OutModel/*, FName(TEXT("__default__"))*/);
+//      NewLink->Name = TEXT("__default__");
+//    }
+
+//  // Iterate <link> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("pose")))
+//        {
+//          NewLink->Pose = PoseContentToFTransform(ChildNode->GetContent());
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("inertial")))
+//        {
+//          ParseLinkInertial(ChildNode, NewLink);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("visual")))
+//        {
+//          ParseVisual(ChildNode, NewLink);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("collision")))
+//        {
+//          ParseCollision(ChildNode, NewLink);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("self_collide")))
+//        {
+//          NewLink->bSelfCollide = ChildNode->GetContent().ToBool();
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("gravity")))
+//        {
+//          NewLink->bGravity = ChildNode->GetContent().ToBool();
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <link> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//  if(NewLink->Collisions.Num() == 0)
+//    {
+//      USDFCollision* Collision = FSDFParser::CreateVirtualCollision(NewLink);
+//      if(Collision)
+//        {
+//          NewLink->Collisions.Add(Collision);
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Error, TEXT("Creation of Virtual Link % failed"), *CurrentLinkName);
+//        }
+//    }
+
+//  // Add link to the data asset
+//  OutModel->Links.Add(NewLink);
+//}
 
 //// Parse <visual> node
 //void FSDFParser::ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink)
@@ -184,6 +256,29 @@
 
 
 
+//// Parse <geometry> <mesh> node
+//void FSDFParser::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
+//{
+//  // Set geometry type
+//  OutGeometry->Type = ESDFGeometryType::Mesh;
+
+//  // Iterate <geometry> <mesh> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("uri")))
+//        {
+//          // Import mesh, set Uri as the relative path from the asset to the mesh uasset
+//          OutGeometry->Uri = ChildNode->GetContent();
+//          OutGeometry->Mesh = ImportMesh(OutGeometry->Uri, Type);
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <mesh> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
 
 
@@ -333,6 +428,7 @@
 //    }
 //}
 
+
 //USDFCollision* FSDFParser::CreateVirtualCollision(USDFLink* OutLink)
 //{
 //  USDFCollision* NewCollision = NewObject<USDFCollision>(OutLink, FName(*CurrentLinkName));
@@ -344,3 +440,15 @@
 //  NewCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, ESDFGeometryType::Box, CurrentLinkName, RStaticMeshUtils::GetGeometryParameter(NewCollision->Geometry));
 //  return NewCollision;
 //}
+
+////USDFCollision* FSDFParser::CreateVirtualCollision(USDFLink* OutLink)
+////{
+////  USDFCollision* NewCollision = NewObject<USDFCollision>(OutLink, FName(*CurrentLinkName));
+////  NewCollision->Name = CurrentLinkName;
+////  NewCollision->Pose = FTransform();
+////  NewCollision->Geometry = NewObject<USDFGeometry>(NewCollision);
+////  NewCollision->Geometry->Type = ESDFGeometryType::Box;
+////  NewCollision->Geometry->Size = FVector(0.5f, 0.5f, 0.5f);
+////  NewCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, ESDFGeometryType::Box, CurrentLinkName, RStaticMeshUtils::GetGeometryParameter(NewCollision->Geometry));
+////  return NewCollision;
+////}
