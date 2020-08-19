@@ -28,7 +28,7 @@ class USDFCollision;
 /**
 * SDF parser class
 */
-class UROBOSIM_API FSDFParser : public FSDFParserBase
+class UROBOSIMEDITOR_API FSDFParser : public FSDFParserBase
 {
 public:
 	// Default constructor
