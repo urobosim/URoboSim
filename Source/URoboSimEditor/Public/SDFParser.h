@@ -9,8 +9,8 @@
 #include "SDF/SDFGeometry.h"
 #include "AssetRegistryModule.h"
 #include "ObjectMacros.h" // EObjectFlags
-#include "SDFParserBase.h"
-//#include "SDFParserInterface.h"
+//#include "SDFParserBase.h"
+#include "SDFParserInterface.h"
 
 // Forward declaration
 class FXmlFile;
@@ -25,63 +25,123 @@ class USDFCollision;
 // class USDFGeometry;
 
 
+
 /**
 * SDF parser class
 */
-class UROBOSIMEDITOR_API FSDFParser : public FSDFParserBase
+class /*UROBOSIM_API*/UROBOSIMEDITOR_API FSDFParser :public ISDFParserInterface //: public FSDFParserBase
 {
 public:
-	// Default constructor
-	FSDFParser();
+    // Default constructor
+    FSDFParser();
 
-	// Constructor with load from path
-	FSDFParser(const FString& InFilename);
+    // Constructor with load from path
+    FSDFParser(const FString& InFilename);
 
-	// Destructor
-	~FSDFParser();
+    // Destructor
+    ~FSDFParser();
 
-    virtual bool LoadSDF (const FString& InFilename) override;
+    // Load sdf from path
+    virtual bool LoadSDF(const FString& InFilename) override;
 
-	// Create data asset and parse sdf data into it
-    virtual USDFDataAsset* ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags) override;
+    // Clear parser
+    virtual void Clear() override;
 
-protected:
+    // Create data asset and parse sdf data into it
+    virtual USDFDataAsset* ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags)override;
+
+private:
     /* Begin parser functions */
+    // Check if sdf data is valid
+    virtual bool IsValidSDF() override;
+
+    // Parse <sdf> node
+    virtual void ParseSDF() override;
+
+    // Parse <model> node
+    virtual void ParseModel(const FXmlNode* InNode) override;
+
     // Parse <link> node
     virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
-	// Parse <link> node
-    virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override; //possible there are some errors for the runtime verison
+    // Parse <link> <inertial> node
+    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
-	// Parse <geometry> <mesh> node
-    virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override; // Also maybe
+    // Parse <visual> node
+    virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
-	/* End parser functions */
+    // Parse <collision> node
     virtual void ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
-	/* Begin helper functions */
-	// Fix file path
-	void SetDirectoryPath(const FString& InFilename);
+    // Parse <geometry> node
+    virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
-	// Get mesh absolute path
-	FString GetMeshAbsolutePath(const FString& Uri);
+    // Parse <geometry> <mesh> node
+    virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
-    FName GenerateMeshName(ESDFType InType, FString InName);
-    FString GeneratePackageName(FName MeshName);
-    bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
-    USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+    // Parse <geometry> <box> node
+    virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
-	// Import .fbx meshes from data asset
-	UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
-	UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
+    // Parse <geometry> <cylinder> node
+    virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
-	/* End helper functions */
+    // Parse <geometry> <sphere> node
+    virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
-	// Cached directory path
-	FString DirPath;
+    // Parse <joint> node
+    virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
-	// Fbx factory
-	UFbxFactory* FbxFactory;
+    // Parse <joint> <axis> node
+    virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
+
+    // Parse <joint> <axis> <limit> node
+    virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
+    /* End parser functions */
+
+
+    /* Begin helper functions */
+    // Fix file path
+    void SetDirectoryPath(const FString& InFilename);
+
+    // Get mesh absolute path
+    FString GetMeshAbsolutePath(const FString& Uri);
+
+        FName GenerateMeshName(ESDFType InType, FString InName);
+        FString GeneratePackageName(FName MeshName);
+        bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
+        USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+
+    // Import .fbx meshes from data asset
+    UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
+    UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
+
+    // From <pose>z y z r p y</pose> to FTransform
+    virtual FTransform PoseContentToFTransform(const FString& InPoseData) override;
+
+    // From <size>z y z</size> to FVector
+    virtual FVector SizeToFVector(const FString& InSizeData) override;
+
+    // From <xzy>z y z</xzy> to FVector
+    virtual FVector XyzToFVector(const FString& InXyzData) override;
+    /* End helper functions */
+
+
+//    // Reader for the xml file
+//    FXmlFile* XmlFile;
+
+////    // Flag if parser is loaded
+//    bool bSDFLoaded;
+
+////    // Pointer to the generated data asset
+    USDFDataAsset* DataAsset;
+
+    // Cached directory path
+    FString DirPath;
+
+    FString CurrentLinkName;
+
+    // Fbx factory
+    UFbxFactory* FbxFactory;
 
     FAssetRegistryModule& AssetRegistryModule;
 };
