@@ -104,8 +104,7 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
 {
   URLink* Base = Model->Links[BaseName];
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-  // FVector VelocityInBaseCoordinates = BaseOrientation.Quaternion().RotateVector(LinearVelocity);
-  if(FMath::Abs(AngularVelocity) >= 0.00001f)
+  if(AngularVelocity != 0.0f)
     {
       float Theta0 = FMath::DegreesToRadians(BaseOrientation.Yaw);
       float Theta1 = Theta0 + AngularVelocity * InDeltaTime;
