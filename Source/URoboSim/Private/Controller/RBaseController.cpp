@@ -28,7 +28,7 @@ void URBaseController::Init(ARModel* InModel)
       Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
       TargetPose = Base->GetCollision()->GetComponentTransform();
       MaxLinearVelocity = 0.0;
-      MaxAngularVelocity = 0.0;
+      MaxAngularVelocity = 0.5;
     }
 }
 
@@ -64,11 +64,34 @@ void URBaseController::TurnTick(float InDeltaTime)
   FQuat BaseRotation = Base->GetCollision()->GetComponentQuat();
   FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
   TargetPose.ConcatenateRotation(AngularMotion);
+  // TargetPose.NormalizeRotation();
+  // TargetPose.GetRotation().Normalize(1.0f);
 
-  float TargetAngle = TargetPose.GetRotation().GetRotationAxis().Z * TargetPose.GetRotation().GetAngle();
+
+  float TargetAngle = TargetPose.GetRotation().GetAngle();
+  while(TargetAngle > PI)
+    {
+      TargetAngle -= 2* PI;
+    }
+  while(TargetAngle < -1 * PI)
+    {
+      TargetAngle += 2* PI;
+    }
+
+  TargetAngle *= TargetPose.GetRotation().GetRotationAxis().Z;
   float CurrentAngle = BaseRotation.GetRotationAxis().Z * BaseRotation.GetAngle();
+  UE_LOG(LogTemp, Log, TEXT("TargetAngle %f, CurrentAngle %f"), TargetAngle, CurrentAngle);
 
   float AngularDistance = TargetAngle - CurrentAngle;
+  while(AngularDistance > PI)
+    {
+      AngularDistance -= 2* PI;
+    }
+  while(AngularDistance < -1 * PI)
+    {
+      AngularDistance += 2* PI;
+    }
+
   FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
   if(NextVel.Size() > MaxAngularVelocity)
     {
@@ -103,10 +126,10 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
 
   FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
   NextVel /= InDeltaTime;
-  if(NextVel.Size() > MaxLinearVelocity)
-    {
-      NextVel = NextVel.GetClampedToMaxSize(MaxLinearVelocity);
-    }
+  // if(NextVel.Size() > MaxLinearVelocity)
+  //   {
+  //     NextVel = NextVel.GetClampedToMaxSize(MaxLinearVelocity);
+  //   }
 
 
   Base->GetCollision()->SetPhysicsLinearVelocity(NextVel);
