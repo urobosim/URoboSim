@@ -5,7 +5,6 @@
 #include "ROSCommunication/RROSClient.h"
 // #include "Controller/RController.h"
 // #include "ROSCommunication/RRosCommunicationComponent.h"
-#include "Physics/RModel.h"
 #include "XmlFile.h"
 
 
@@ -90,17 +89,26 @@ void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridg
                       float SoftUpperLimit = FCString::Atof(*ChildNode->GetAttribute("soft_upper_limit"));
 
                       UE_LOG(LogTemp, Warning, TEXT("%s: Lower %s Upper: %s"), *MyName, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
-                      if(0.0f < SoftLowerLimit)
-                        {
-                          float& JointState = JointNames->FindOrAdd(MyName);
-                          JointState = SoftLowerLimit;
-                        }
-                      else if(0.0f > SoftUpperLimit)
-                        {
-                          float& JointState = JointNames->FindOrAdd(MyName);
-                          JointState = SoftUpperLimit;
-                        }
 
+                      if(Model)
+                        {
+                          if(URJoint* Joint = Model->Joints[MyName])
+                            {
+                              Joint->Constraint->SoftUpper = SoftUpperLimit;
+                              Joint->Constraint->SoftLower = SoftLowerLimit;
+                            }
+
+                          if(0.0f < SoftLowerLimit)
+                            {
+                              float& JointState = JointNames->FindOrAdd(MyName);
+                              JointState = SoftLowerLimit;
+                            }
+                          else if(0.0f > SoftUpperLimit)
+                            {
+                              float& JointState = JointNames->FindOrAdd(MyName);
+                              JointState = SoftUpperLimit;
+                            }
+                        }
                       // for(auto& Attributs : ChildNode->GetAttributes())
                       //   {
                       //     UE_LOG(LogTemp, Error, TEXT("safety %s"), *Attributs.GetTag());
@@ -125,8 +133,9 @@ void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridg
   // }
 }
 
-FROSJointLimitControllerConfigurationClient::FROSJointLimitControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType):
+FROSJointLimitControllerConfigurationClient::FROSJointLimitControllerConfigurationClient(TMap<FString, float>* OutJointNames, AActor* InModel, const FString& InName, const FString& InType):
 	FROSBridgeSrvClient(InName, InType)
 {
-	JointNames = OutJointNames;
+  Model = Cast<ARModel>(InModel);
+  JointNames = OutJointNames;
 }

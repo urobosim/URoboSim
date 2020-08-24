@@ -58,7 +58,7 @@ void URJointControllerConfigurationClient::CreateClient()
 
   LimitRequest = MakeShareable(new rosapi::GetParam::Request(LimitParamTopic, ""));
   LimitResponse = MakeShareable(new rosapi::GetParam::Response());
-  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient(JointNames, ControllerComp->GetOwner(), TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
 
 
   FTimerHandle MyTimerHandle;

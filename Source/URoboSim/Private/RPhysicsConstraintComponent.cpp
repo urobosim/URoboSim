@@ -2,19 +2,46 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Physics/RJoint.h"
 
+
+float URConstraintComponent::GetUpperLimit()
+{
+  if(SoftUpper != 0.0f)
+    {
+      return SoftUpper;
+    }
+  else
+    {
+      return Upper;
+    }
+}
+
+float URConstraintComponent::GetLowerLimit()
+{
+  if(SoftLower != 0.0f)
+    {
+      return SoftLower;
+    }
+  else
+    {
+      return Lower;
+    }
+}
+
 float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
 {
   float JointValue;
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
 
-  if(InJointState > Upper)
+  if(InJointState > UsedUpper)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), Upper);
-      JointValue =  Upper;
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), UsedUpper);
+      JointValue =  UsedUpper;
     }
-  else if(InJointState < Lower)
+  else if(InJointState < UsedLower)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), Lower);
-      JointValue =  Lower;
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), UsedLower);
+      JointValue =  UsedLower;
     }
   else
     {

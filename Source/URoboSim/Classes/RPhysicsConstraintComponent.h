@@ -55,6 +55,12 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     float Lower;
 
+  UPROPERTY()
+    float SoftUpper = 0;
+
+  UPROPERTY()
+    float SoftLower = 0;
+
   virtual void ConnectToComponents(){};
   virtual void EnableMotor(bool InEnable){};
   virtual void SetTargetPosition(float InTargetPos){};
@@ -80,6 +86,9 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void UpdateEncoderValue(float InValue);
   virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
 
+  virtual float GetUpperLimit();
+  virtual float GetLowerLimit();
+
   UPROPERTY()
     float JointAccuracy;
 
@@ -98,6 +107,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     FVector Offset;
  protected:
+
 
   UPROPERTY()
     float TargetVelocity;
