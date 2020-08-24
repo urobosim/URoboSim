@@ -40,7 +40,7 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
     }
   TimePassed = 0;
 
-  FVector LidarBodyLoc = GetComponentLocation();
+  FVector LidarBodyLoc = GetComponentLocation() + Offset;
   FRotator LidarBodyRot = GetComponentRotation();
 
   for(int i = 0; i < (int) SCSResolution; i++)
