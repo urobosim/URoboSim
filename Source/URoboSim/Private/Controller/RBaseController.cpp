@@ -64,11 +64,9 @@ void URBaseController::TurnTick(float InDeltaTime)
   FQuat BaseRotation = Base->GetCollision()->GetComponentQuat();
   FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
   TargetPose.ConcatenateRotation(AngularMotion);
-  // TargetPose.NormalizeRotation();
-  // TargetPose.GetRotation().Normalize(1.0f);
-
 
   float TargetAngle = TargetPose.GetRotation().GetAngle();
+  //Normalize the TargetAngle in Interval [-pi, pi]
   while(TargetAngle > PI)
     {
       TargetAngle -= 2* PI;
@@ -80,9 +78,9 @@ void URBaseController::TurnTick(float InDeltaTime)
 
   TargetAngle *= TargetPose.GetRotation().GetRotationAxis().Z;
   float CurrentAngle = BaseRotation.GetRotationAxis().Z * BaseRotation.GetAngle();
-  UE_LOG(LogTemp, Log, TEXT("TargetAngle %f, CurrentAngle %f"), TargetAngle, CurrentAngle);
 
   float AngularDistance = TargetAngle - CurrentAngle;
+  //Normalize the AngularDistance in Interval [-pi, pi]
   while(AngularDistance > PI)
     {
       AngularDistance -= 2* PI;
@@ -104,8 +102,12 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
 {
   URLink* Base = Model->Links[BaseName];
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+
+  //Check if AngularVelocity is 0 to avoid divivision by 0
   if(AngularVelocity != 0.0f)
     {
+      // Calculate the resulting position after one tick by using the Integral of Rx (R = rotation matrix, x = Position https://en.wikipedia.org/wiki/Rotation_matrix)
+      // in the intervall of 0 to InDeltaTime
       float Theta0 = FMath::DegreesToRadians(BaseOrientation.Yaw);
       float Theta1 = Theta0 + AngularVelocity * InDeltaTime;
       float dX = (FMath::Sin(Theta1) * LinearVelocity.X  + FMath::Cos(Theta1) * LinearVelocity.Y) / AngularVelocity;
@@ -116,20 +118,14 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
     }
   else
     {
-      // FVector VelocityInBaseCoordinates = TargetPose.GetRotation().RotateVector(LinearVelocity);
+      //if the AngularVelocity == 0, rotate the LinearVelocity from Base to World coordinates
       FVector VelocityInBaseCoordinates = BaseOrientation.RotateVector(LinearVelocity);
       TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
     }
 
-  // TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
-
+  //Calculate velocity in order to move from current position to the target position
   FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
   NextVel /= InDeltaTime;
-  // if(NextVel.Size() > MaxLinearVelocity)
-  //   {
-  //     NextVel = NextVel.GetClampedToMaxSize(MaxLinearVelocity);
-  //   }
-
 
   Base->GetCollision()->SetPhysicsLinearVelocity(NextVel);
 }
@@ -169,8 +165,6 @@ void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
 
       for(auto& Link : Model->Links)
         {
-          // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-          // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
           AddRelativeLocation(Link.Value, DistanceTraveld);
         }
     }
@@ -182,8 +176,6 @@ void URBaseController::MoveLinearToWorld(FVector InVelocity, float InDeltaTime)
 
   for(auto& Link : Model->Links)
     {
-      // FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-      // Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
       AddRelativeLocation(Link.Value, DistanceTraveld);
     }
 }
