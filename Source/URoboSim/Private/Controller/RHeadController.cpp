@@ -27,6 +27,7 @@ void URHeadTrajectoryController::Init(ARModel* InModel)
           {
             UE_LOG(LogTemp, Error, TEXT("JointController not found"));
           }
+        ActionDuration = 0;
 }
 
 void URHeadTrajectoryController::Tick(float InDeltaTime)
@@ -37,6 +38,10 @@ void URHeadTrajectoryController::Tick(float InDeltaTime)
       GoalStatusList.Last().Status = 1;
       UpdateHeadDirection();
       CheckPointHeadState();
+      if(bActive)
+        {
+          ActionDuration += InDeltaTime;
+        }
     }
 }
 
@@ -107,13 +112,14 @@ void URPR2HeadTrajectoryController::CheckPointHeadState()
         float Az = AzimuthJoint->GetJointPosition();
         float El = ElevationJoint->GetJointPosition();
 
+
         float DesiredAz = JointController->DesiredJointState["head_pan_joint"];
         float DesiredEl = JointController->DesiredJointState["head_tilt_joint"];
 
         float DiffAz = DesiredAz - Az;
         float DiffEl = DesiredEl - El;
 
-        if(FMath::Abs(DiffAz) < 0.02 && FMath::Abs(DiffEl) < 0.02 )
+        if((FMath::Abs(DiffAz) < 0.02 && FMath::Abs(DiffEl) < 0.02)|| ActionDuration > 1.0f)
         {
             GoalStatusList.Last().Status = 3;
             bPublishResult = true;
@@ -151,8 +157,10 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
       float El = ElevationJoint->GetJointPosition();
 
       float& DesAz = JointController->DesiredJointState.FindOrAdd("head_pan_joint");
-      DesAz = Az - AzEl.X;
+      DesAz = AzimuthJoint->Constraint->ClampJointStateToConstraintLimit(Az - AzEl.X);
+      // DesAz = Az - AzEl.X;
       float& DesEl = JointController->DesiredJointState.FindOrAdd("head_tilt_joint");
-      DesEl = El - AzEl.Y;
+      DesEl = ElevationJoint->Constraint->ClampJointStateToConstraintLimit(El - AzEl.Y);
+      // DesEl = El - AzEl.Y;
     }
 }
