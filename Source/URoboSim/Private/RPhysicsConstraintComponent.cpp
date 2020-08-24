@@ -2,6 +2,75 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Physics/RJoint.h"
 
+
+float URConstraintComponent::GetUpperLimit()
+{
+  if(SoftUpper != 0.0f)
+    {
+      return SoftUpper;
+    }
+  else
+    {
+      return Upper;
+    }
+}
+
+float URConstraintComponent::GetLowerLimit()
+{
+  if(SoftLower != 0.0f)
+    {
+      return SoftLower;
+    }
+  else
+    {
+      return Lower;
+    }
+}
+
+float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
+{
+  float JointValue;
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
+
+  if(InJointState > UsedUpper)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), UsedUpper);
+      JointValue =  UsedUpper;
+    }
+  else if(InJointState < UsedLower)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), UsedLower);
+      JointValue =  UsedLower;
+    }
+  else
+    {
+      JointValue = InJointState;
+    }
+  return JointValue;
+}
+
+float URRevoluteConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
+{
+  float JointValue;
+  if(InJointState > FMath::DegreesToRadians(Upper))
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), FMath::DegreesToRadians(Upper));
+      JointValue =  FMath::DegreesToRadians(Upper);
+    }
+  else if(InJointState < FMath::DegreesToRadians(Lower))
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), FMath::DegreesToRadians(Lower));
+      JointValue =  FMath::DegreesToRadians(Lower);
+    }
+  else
+    {
+      JointValue = InJointState;
+    }
+
+  return JointValue;
+}
+
 float URContinuousConstraintComponent::CheckPositionRange(float InTargetJointPos)
 {
   bool bNormalized = false;

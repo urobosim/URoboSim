@@ -63,7 +63,7 @@ void URGripperController::Tick(float InDeltaTime)
     if(bActive)
     {
       bStalled = false;
-      CheckGripperActionResult(Error, 0.4);
+      CheckGripperActionResult(Error, 0.1);
 
       if(bActive)
         {
@@ -73,19 +73,20 @@ void URGripperController::Tick(float InDeltaTime)
           JointValue = (LeftFinger->GetEncoderValue() + RightFinger->GetEncoderValue()) / 2.0;
           if(Error < 0)
             {
-              JointController->SetDesiredJointState(RightJointName, JointValue - 0.02);
-              JointController->SetDesiredJointState(LeftJointName, JointValue  - 0.02);
+              JointController->SetDesiredJointState(RightJointName, JointValue - 0.04);
+              JointController->SetDesiredJointState(LeftJointName, JointValue  - 0.04);
             }
           else
             {
-              JointController->SetDesiredJointState(RightJointName, JointValue + 0.02);
-              JointController->SetDesiredJointState(LeftJointName, JointValue + 0.02);
+              JointController->SetDesiredJointState(RightJointName, JointValue + 0.04);
+              JointController->SetDesiredJointState(LeftJointName, JointValue + 0.04);
             }
         }
-      else if (OldPosition - Position < -0.3)
+      else if (OldPosition - Position < -0.12)
         {
           UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
           Release();
+          OldPosition = GripperPosition;
         }
       else if (bStalled)
         {
