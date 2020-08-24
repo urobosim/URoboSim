@@ -4,13 +4,11 @@
 #include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSrvClient.h"
-// #include "PR2UnrealSimulator/RegisterRobot.h"
-// #include "PR2UnrealSimulator/UpdateWorld.h"
 #include "ROSCommunication/RROSClientImpl.h"
 #include "RUtilityClasses.h"
+#include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
 #include "Controller/RJointController.h"
-// #include "Physics/RModel.h"
 #include "RROSClient.generated.h"
 
 

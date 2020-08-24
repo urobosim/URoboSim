@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
 #include "Controller/RJointController.h"
 #include "Physics/RModel.h"

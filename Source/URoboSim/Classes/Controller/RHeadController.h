@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Physics/RModel.h"
+#include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
 #include "RHeadController.generated.h"
 

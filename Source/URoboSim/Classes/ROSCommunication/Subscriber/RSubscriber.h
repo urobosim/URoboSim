@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
-#include "Controller/RController.h"
+#include "Controller/RControllerComponent.h"
 #include "Physics/RModel.h"
 #include "RSubscriber.generated.h"
 

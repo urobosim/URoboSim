@@ -22,23 +22,6 @@ void URController::CancelAction()
     }
 }
 
-
-URControllerComponent::URControllerComponent()
-{
-	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.TickGroup = TG_PrePhysics;
-	Model = Cast<ARModel>(GetOwner());
-	if(Model)
-	{
-          Model->Plugins.Add(TEXT("ControllerComponent"), this);
-	}
-}
-
-URControllerComponent::~URControllerComponent()
-{
-}
-
-
 void URCameraController::PerceiveObject()
 {
   if(bActive)
@@ -141,48 +124,6 @@ void URCameraController::Init(ARModel* InModel)
 
 }
 
-void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-  float realtimeSeconds = FPlatformTime::Seconds();
-  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-  for(auto& C : Controller.ControllerList)
-    {
-      C.Value->Tick(DeltaTime);
-    }
-}
-void URControllerComponent::BeginPlay()
-{
-  Super::BeginPlay();
-
-  if(!Model)
-    {
-      UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
-    }
-  else
-    {
-      for(auto& C : Controller.ControllerList)
-        {
-          C.Value->Init(Model);
-        }
-    }
-}
-
-void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
-{
-  for(int i = 0; i < InJointNames.Num();i++)
-    {
-      Model->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
-    }
-}
-
-URController* URControllerComponent::ControllerList(FString ControllerName)
-{
-  if(Controller.ControllerList.Contains(ControllerName))
-    {
-      return Controller.ControllerList[ControllerName];
-    }
-  return nullptr;
-}
 
 void URTFController::Init(ARModel* InModel)
 {
