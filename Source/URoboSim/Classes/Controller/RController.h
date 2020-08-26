@@ -212,29 +212,3 @@ struct FRControllerContainer
 	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
 	TMap<FString, URController*> ControllerList;
 };
-
-
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class UROBOSIM_API URControllerComponent : public UActorComponent
-{
-    GENERATED_BODY()
-public:
-	URControllerComponent();
-	~URControllerComponent();
-
-	virtual URController* ControllerList(FString ControllerName);
-
-	virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UPROPERTY(EditAnywhere)
-	FRControllerContainer Controller;
-
-protected:
-	virtual void BeginPlay() override;
-
-	UPROPERTY()
-	ARModel* Model;
-
-};
