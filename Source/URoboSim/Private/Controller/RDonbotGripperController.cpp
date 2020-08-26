@@ -2,8 +2,8 @@
 
 void URDonbotGripperController::UpdateGripper()
 {
-    JointController->SetDesiredJointState(FingerRightName, GripperPosition);
-    JointController->SetDesiredJointState(FingerLeftName, GripperPosition);
+    JointController->SetDesiredJointState(FingerRightName, 2*GripperPosition);
+    JointController->SetDesiredJointState(FingerLeftName, -GripperPosition);
 }
 
 void URDonbotGripperController::Tick(float InDeltaTime)
@@ -29,7 +29,7 @@ void URDonbotGripperController::Tick(float InDeltaTime)
 
 URDonbotGripperController::URDonbotGripperController()
 {
-    FingerRightName = TEXT("gripper_base_gripper_right_joint");
+    FingerRightName = TEXT("gripper_joint");
     FingerLeftName = TEXT("gripper_base_gripper_left_joint");
 }
 

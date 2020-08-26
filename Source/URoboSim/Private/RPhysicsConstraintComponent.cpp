@@ -30,8 +30,8 @@ float URConstraintComponent::GetLowerLimit()
 float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
 {
   float JointValue;
-  float UsedUpper = GetUpperLimit();
-  float UsedLower = GetLowerLimit();
+  float UsedUpper = GetUpperLimit()/100;
+  float UsedLower = GetLowerLimit()/100;
 
   if(InJointState > UsedUpper)
     {
@@ -116,6 +116,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
 
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
       Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
+
     }
 }
 
@@ -282,9 +283,9 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   FVector ParentPosition = Parent->GetComponentLocation();
   FVector ChildPosition = Child->GetComponentLocation();
 
-  FRotator ParentRotation = Parent->GetComponentRotation();
   FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
-  float JointPosition = ((ParentPosition-ChildPosition)*JointAxis).Size()-(ParentChildDistance*RefAxis).Size();
+  float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) - FVector::DotProduct(ParentChildDistance, RefAxis);
+
   return JointPosition;
 }
 
