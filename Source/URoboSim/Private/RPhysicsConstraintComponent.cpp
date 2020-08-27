@@ -53,15 +53,17 @@ float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJ
 float URRevoluteConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
 {
   float JointValue;
-  if(InJointState > FMath::DegreesToRadians(Upper))
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
+  if(InJointState > UsedUpper)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), FMath::DegreesToRadians(Upper));
-      JointValue =  FMath::DegreesToRadians(Upper);
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), Upper);
+      JointValue =  UsedUpper;
     }
-  else if(InJointState < FMath::DegreesToRadians(Lower))
+  else if(InJointState < UsedLower)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), FMath::DegreesToRadians(Lower));
-      JointValue =  FMath::DegreesToRadians(Lower);
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), Lower);
+      JointValue =  UsedLower;
     }
   else
     {
@@ -284,7 +286,8 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
 
   FRotator ParentRotation = Parent->GetComponentRotation();
   FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
-  float JointPosition = ((ParentPosition-ChildPosition)*JointAxis).Size()-(ParentChildDistance*RefAxis).Size();
+  float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
+
   return JointPosition;
 }
 
