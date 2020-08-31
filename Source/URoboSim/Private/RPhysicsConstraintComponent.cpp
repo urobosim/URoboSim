@@ -30,8 +30,8 @@ float URConstraintComponent::GetLowerLimit()
 float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
 {
   float JointValue;
-  float UsedUpper = GetUpperLimit()/100;
-  float UsedLower = GetLowerLimit()/100;
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
 
   if(InJointState > UsedUpper)
     {
