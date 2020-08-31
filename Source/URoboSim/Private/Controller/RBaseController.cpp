@@ -27,7 +27,7 @@ void URBaseController::Init(ARModel* InModel)
       // Base->GetCollision()->SetSimulatePhysics(false);
       Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
       TargetPose = Base->GetCollision()->GetComponentTransform();
-      MaxLinearVelocity = 0.0;
+      MaxLinearVelocity = 0.5;
       MaxAngularVelocity = 0.5;
     }
 }
@@ -104,7 +104,7 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
 
   //Check if AngularVelocity is 0 to avoid divivision by 0
-  if(AngularVelocity != 0.0f)
+  if(FMath::Abs(AngularVelocity) > 0.0001f)
     {
       // Calculate the resulting position after one tick by using the Integral of Rx (R = rotation matrix, x = Position https://en.wikipedia.org/wiki/Rotation_matrix)
       // in the intervall of 0 to InDeltaTime
