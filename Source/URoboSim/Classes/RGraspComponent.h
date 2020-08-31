@@ -37,10 +37,13 @@ public:
 	AStaticMeshActor* FixatedObject;
 
 	UPROPERTY()
-        bool bObjectGrasped;
+	bool bObjectGrasped;
+
 
 protected:
 
+	UPROPERTY(EditAnywhere)
+	float GraspRadius = 10.f;
 
 	UPROPERTY()
 	URStaticMeshComponent* Gripper;
