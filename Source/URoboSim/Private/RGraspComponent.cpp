@@ -4,7 +4,7 @@
 
 URGraspComponent::URGraspComponent()
 {
-  InitSphereRadius(10.f);
+  InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
   FString ConstraintName = TEXT("Constraint_") + GetName();

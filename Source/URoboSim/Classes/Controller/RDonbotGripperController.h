@@ -53,6 +53,12 @@ protected:
   UPROPERTY(EditAnywhere)
   float GripperPosition;
 
+  UPROPERTY(EditAnywhere)
+  float OpenedPosition = 0.051f;
+
+  UPROPERTY(EditAnywhere)
+  float ClosedPosition = 0.01f;
+
   UPROPERTY()
   ARModel* Model = nullptr;
 

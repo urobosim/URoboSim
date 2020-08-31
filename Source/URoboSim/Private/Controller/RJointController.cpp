@@ -177,7 +177,6 @@ void URJointController::SetDesiredJointState(FString JointName, float InJointSta
       // UE_LOG(LogTemp, Warning, TEXT("JointName %s Upper %f Lower %f"), *JointName, Joint->Constraint->Upper, Joint->Constraint->Lower);
       //TODO: Remove hardcode
 
-
       JointValue = Joint->Constraint->ClampJointStateToConstraintLimit(InJointState);
 
     }
