@@ -118,6 +118,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
 
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
       Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
+
     }
 }
 
@@ -284,7 +285,6 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   FVector ParentPosition = Parent->GetComponentLocation();
   FVector ChildPosition = Child->GetComponentLocation();
 
-  FRotator ParentRotation = Parent->GetComponentRotation();
   FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
   float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
 

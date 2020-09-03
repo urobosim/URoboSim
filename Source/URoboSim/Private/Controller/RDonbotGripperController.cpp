@@ -2,8 +2,8 @@
 
 void URDonbotGripperController::UpdateGripper()
 {
-    JointController->SetDesiredJointState(FingerRightName, GripperPosition);
-    JointController->SetDesiredJointState(FingerLeftName, GripperPosition);
+    JointController->SetDesiredJointState(FingerRightName, 2*GripperPosition);
+    JointController->SetDesiredJointState(FingerLeftName, -GripperPosition);
 }
 
 void URDonbotGripperController::Tick(float InDeltaTime)
@@ -29,7 +29,7 @@ void URDonbotGripperController::Tick(float InDeltaTime)
 
 URDonbotGripperController::URDonbotGripperController()
 {
-    FingerRightName = TEXT("gripper_base_gripper_right_joint");
+    FingerRightName = TEXT("gripper_joint");
     FingerLeftName = TEXT("gripper_base_gripper_left_joint");
 }
 
@@ -38,7 +38,7 @@ void URDonbotGripperController::Grasp()
     if (GraspComponent && GraspComponent->TryToFixate())
     {
         bIsGrasping = true;
-        GripperPosition = 0.01f; //TODO: Change hardcode
+        GripperPosition = ClosedPosition;
     }
 }
 
@@ -48,7 +48,7 @@ void URDonbotGripperController::Release()
     {
         UE_LOG(LogTemp, Warning, TEXT("Start releasing"))
         bIsGrasping = false;
-        GripperPosition = 0.051f; //TODO: Change hardcode
+        GripperPosition = OpenedPosition; //TODO: Change hardcode
         GraspComponent->TryToDetach();
     }
 }
@@ -100,6 +100,6 @@ void URDonbotGripperController::Init(ARModel* InModel)
             }
         }
 
-        GripperPosition = 0.051f; //TODO: Change hardcode
+        GripperPosition = OpenedPosition;
     }
 }
