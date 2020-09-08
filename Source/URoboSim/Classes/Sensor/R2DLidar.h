@@ -80,6 +80,9 @@ public:
 
   UPROPERTY()
     float AngularIncrement;
+
+  UPROPERTY(EditAnywhere, Category = "LiDAR|Scanning Specs")
+  FString LidarRef;
  private:
 
   UPROPERTY()
@@ -103,4 +106,7 @@ public:
 
   UPROPERTY()
   TArray<float> DistanceMeasurement;
+
+  UPROPERTY()
+  URStaticMeshComponent* ReferenceLink = nullptr;
 };
