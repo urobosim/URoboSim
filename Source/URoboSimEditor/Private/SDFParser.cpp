@@ -257,7 +257,7 @@ void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
         }
       else
         {
-          UE_LOG(LogTemp, Error, TEXT("Creation of Virtual Link % failed"), *CurrentLinkName);
+          UE_LOG(LogTemp, Error, TEXT("Creation of Virtual Link %s failed"), *CurrentLinkName);
         }
     }
 
@@ -265,28 +265,28 @@ void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
   OutModel->Links.Add(NewLink);
 }
 
-// Parse <link> <inertial> node
-void FSDFParser::ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink)
-{
-  // Iterate <link> <inertial> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("mass")))
-        {
-          OutLink->Inertial->Mass = FCString::Atof(*ChildNode->GetContent());
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("pose")))
-        {
-          OutLink->Inertial->Pose = PoseContentToFTransform(ChildNode->GetContent());
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <inertial> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+//// Parse <link> <inertial> node
+//void FSDFParser::ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink)
+//{
+//  // Iterate <link> <inertial> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("mass")))
+//        {
+//          OutLink->Inertial->Mass = FCString::Atof(*ChildNode->GetContent());
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("pose")))
+//        {
+//          OutLink->Inertial->Pose = PoseContentToFTransform(ChildNode->GetContent());
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <inertial> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
 // Parse <visual> node
 void FSDFParser::ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink)
@@ -390,35 +390,35 @@ void FSDFParser::ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink)
 }
 
 // Parse <geometry> node
-void FSDFParser::ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
-{
-  // Iterate <geometry> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("mesh")))
-        {
-          ParseGeometryMesh(ChildNode, OutGeometry, Type);
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("box")))
-        {
-          ParseGeometryBox(ChildNode, OutGeometry);
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("cylinder")))
-        {
-          ParseGeometryCylinder(ChildNode, OutGeometry);
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("sphere")))
-        {
-          ParseGeometrySphere(ChildNode, OutGeometry);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+//void FSDFParser::ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
+//{
+//  // Iterate <geometry> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("mesh")))
+//        {
+//          ParseGeometryMesh(ChildNode, OutGeometry, Type);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("box")))
+//        {
+//          ParseGeometryBox(ChildNode, OutGeometry);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("cylinder")))
+//        {
+//          ParseGeometryCylinder(ChildNode, OutGeometry);
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("sphere")))
+//        {
+//          ParseGeometrySphere(ChildNode, OutGeometry);
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
 // Parse <geometry> <mesh> node
 void FSDFParser::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
@@ -445,207 +445,207 @@ void FSDFParser::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeo
 }
 
 // Parse <geometry> <box> node
-void FSDFParser::ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
-{
-  // Set geometry type
-  OutGeometry->Type = ESDFGeometryType::Box;
+//void FSDFParser::ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
+//{
+//  // Set geometry type
+//  OutGeometry->Type = ESDFGeometryType::Box;
 
-  // Iterate <geometry> <box> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("size")))
-        {
-          OutGeometry->Size = SizeToFVector(ChildNode->GetContent());
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <box> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
+//  // Iterate <geometry> <box> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("size")))
+//        {
+//          OutGeometry->Size = SizeToFVector(ChildNode->GetContent());
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <box> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
 
-}
+//}
 
 // Parse <geometry> <cylinder> node
-void FSDFParser::ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
-{
-  // Set geometry type
-  OutGeometry->Type = ESDFGeometryType::Cylinder;
+//void FSDFParser::ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
+//{
+//  // Set geometry type
+//  OutGeometry->Type = ESDFGeometryType::Cylinder;
 
-  // Iterate <geometry> <cylinder> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("radius")))
-        {
-          OutGeometry->Radius = FConversions::MToCm(
-                                                    FCString::Atof(*ChildNode->GetContent()));
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("length")))
-        {
-          OutGeometry->Length = FConversions::MToCm(
-                                                    FCString::Atof(*ChildNode->GetContent()));
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <cylinder> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
+//  // Iterate <geometry> <cylinder> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("radius")))
+//        {
+//          OutGeometry->Radius = FConversions::MToCm(
+//                                                    FCString::Atof(*ChildNode->GetContent()));
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("length")))
+//        {
+//          OutGeometry->Length = FConversions::MToCm(
+//                                                    FCString::Atof(*ChildNode->GetContent()));
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <cylinder> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
 
-  // if(OutGeometry->Radius != 0 && OutGeometry->Length != 0)
-  // {
-  //   OutGeometry->Mesh = ;
-  // }
-}
+//  // if(OutGeometry->Radius != 0 && OutGeometry->Length != 0)
+//  // {
+//  //   OutGeometry->Mesh = ;
+//  // }
+//}
 
 // Parse <geometry> <sphere> node
-void FSDFParser::ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
-{
-  // Set geometry type
-  OutGeometry->Type = ESDFGeometryType::Sphere;
+//void FSDFParser::ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry)
+//{
+//  // Set geometry type
+//  OutGeometry->Type = ESDFGeometryType::Sphere;
 
-  // Iterate <geometry> <sphere> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("radius")))
-        {
-          OutGeometry->Radius = FConversions::MToCm(
-                                                    FCString::Atof(*ChildNode->GetContent()));
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <sphere> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+//  // Iterate <geometry> <sphere> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("radius")))
+//        {
+//          OutGeometry->Radius = FConversions::MToCm(
+//                                                    FCString::Atof(*ChildNode->GetContent()));
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <sphere> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
-// Parse <joint> node
-void FSDFParser::ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel)
-{
-  // Pointer to the new joint
-  USDFJoint* NewJoint = nullptr;
+//// Parse <joint> node
+//void FSDFParser::ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel)
+//{
+//  // Pointer to the new joint
+//  USDFJoint* NewJoint = nullptr;
 
-  // Get "name" from node attribute
-  const FString Name = InNode->GetAttribute(TEXT("name"));
-  if (!Name.IsEmpty())
-    {
-      NewJoint = NewObject<USDFJoint>(OutModel, FName(*Name));
-      NewJoint->Name = Name;
-    }
-  else
-    {
-      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"name\" attribute, added a default value.."),
-             *FString(__FUNCTION__), __LINE__);
-      NewJoint = NewObject<USDFJoint>(OutModel/*, FName(TEXT("__default__"))*/);
-      NewJoint->Name = TEXT("__default__");
-    }
+//  // Get "name" from node attribute
+//  const FString Name = InNode->GetAttribute(TEXT("name"));
+//  if (!Name.IsEmpty())
+//    {
+//      NewJoint = NewObject<USDFJoint>(OutModel, FName(*Name));
+//      NewJoint->Name = Name;
+//    }
+//  else
+//    {
+//      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"name\" attribute, added a default value.."),
+//             *FString(__FUNCTION__), __LINE__);
+//      NewJoint = NewObject<USDFJoint>(OutModel/*, FName(TEXT("__default__"))*/);
+//      NewJoint->Name = TEXT("__default__");
+//    }
 
-  // Get "type" from node attribute
-  const FString Type = InNode->GetAttribute(TEXT("type"));
-  if (!Name.IsEmpty())
-    {
-      NewJoint->Type = Type;
-    }
-  else
-    {
-      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"type\" attribute, added a default value.."),
-             *FString(__FUNCTION__), __LINE__);
-      NewJoint->Name = TEXT("__default__");
-    }
+//  // Get "type" from node attribute
+//  const FString Type = InNode->GetAttribute(TEXT("type"));
+//  if (!Name.IsEmpty())
+//    {
+//      NewJoint->Type = Type;
+//    }
+//  else
+//    {
+//      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"type\" attribute, added a default value.."),
+//             *FString(__FUNCTION__), __LINE__);
+//      NewJoint->Name = TEXT("__default__");
+//    }
 
-  // Iterate <joint> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("parent")))
-        {
-          NewJoint->Parent = ChildNode->GetContent();
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("child")))
-        {
-          NewJoint->Child = ChildNode->GetContent();
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("pose")))
-        {
-          NewJoint->Pose = PoseContentToFTransform(ChildNode->GetContent());
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("axis")))
-        {
-          ParseJointAxis(ChildNode, NewJoint);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
+//  // Iterate <joint> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("parent")))
+//        {
+//          NewJoint->Parent = ChildNode->GetContent();
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("child")))
+//        {
+//          NewJoint->Child = ChildNode->GetContent();
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("pose")))
+//        {
+//          NewJoint->Pose = PoseContentToFTransform(ChildNode->GetContent());
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("axis")))
+//        {
+//          ParseJointAxis(ChildNode, NewJoint);
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
 
-  // Add link to the data asset
-  OutModel->Joints.Add(NewJoint);
-}
+//  // Add link to the data asset
+//  OutModel->Joints.Add(NewJoint);
+//}
 
-// Parse <joint> <axis> node
-void FSDFParser::ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint)
-{
-  // Iterate <joint> <axis> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("xyz")))
-        {
-          OutJoint->Axis->Xyz = XyzToFVector(ChildNode->GetContent());
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("use_parent_model_frame")))
-        {
-          OutJoint->Axis->bUseParentModelFrame = ChildNode->GetContent().ToBool();
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("limit")))
-        {
-          ParseJointAxisLimit(ChildNode, OutJoint);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> <axis> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+//// Parse <joint> <axis> node
+//void FSDFParser::ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint)
+//{
+//  // Iterate <joint> <axis> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("xyz")))
+//        {
+//          OutJoint->Axis->Xyz = XyzToFVector(ChildNode->GetContent());
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("use_parent_model_frame")))
+//        {
+//          OutJoint->Axis->bUseParentModelFrame = ChildNode->GetContent().ToBool();
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("limit")))
+//        {
+//          ParseJointAxisLimit(ChildNode, OutJoint);
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> <axis> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
-// Parse <joint> <axis> <limit> node
-void FSDFParser::ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint)
-{
-  // Iterate <joint> <axis> <limit> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("lower")))
-        {
-          OutJoint->Axis->SetLowerLimitFromSDF(FCString::Atof(*ChildNode->GetContent()));
+//// Parse <joint> <axis> <limit> node
+//void FSDFParser::ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint)
+//{
+//  // Iterate <joint> <axis> <limit> child nodes
+//  for (const auto& ChildNode : InNode->GetChildrenNodes())
+//    {
+//      if (ChildNode->GetTag().Equals(TEXT("lower")))
+//        {
+//          OutJoint->Axis->SetLowerLimitFromSDF(FCString::Atof(*ChildNode->GetContent()));
 
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("upper")))
-        {
-          OutJoint->Axis->SetUpperLimitFromSDF(FCString::Atof(*ChildNode->GetContent()));
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("effort")))
-        {
-          OutJoint->Axis->Effort = FCString::Atof(*ChildNode->GetContent());
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("velocity")))
-        {
-          OutJoint->Axis->Velocity = FCString::Atof(*ChildNode->GetContent());
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> <axis> <limit> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("upper")))
+//        {
+//          OutJoint->Axis->SetUpperLimitFromSDF(FCString::Atof(*ChildNode->GetContent()));
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("effort")))
+//        {
+//          OutJoint->Axis->Effort = FCString::Atof(*ChildNode->GetContent());
+//        }
+//      else if (ChildNode->GetTag().Equals(TEXT("velocity")))
+//        {
+//          OutJoint->Axis->Velocity = FCString::Atof(*ChildNode->GetContent());
+//        }
+//      else
+//        {
+//          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> <axis> <limit> child <%s> not supported, ignored.."),
+//                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+//          continue;
+//        }
+//    }
+//}
 
 
 /* Begin helper functions */
@@ -772,72 +772,72 @@ UStaticMesh* FSDFParser::ImportMesh(const FString& Uri, ESDFType Type)
 }
 
 // From <pose>z y z r p y</pose> to FTransform
-FTransform FSDFParser::PoseContentToFTransform(const FString& InPoseData)
-{
-  // <pose>x=[0] y=[1] z=[2] r=[3] p=[4] y=[5]</pose>
-  TArray<FString> PoseDataArray;
-  int32 ArrSize = InPoseData.ParseIntoArray(PoseDataArray, TEXT(" "), true);
+//FTransform FSDFParser::PoseContentToFTransform(const FString& InPoseData)
+//{
+//  // <pose>x=[0] y=[1] z=[2] r=[3] p=[4] y=[5]</pose>
+//  TArray<FString> PoseDataArray;
+//  int32 ArrSize = InPoseData.ParseIntoArray(PoseDataArray, TEXT(" "), true);
 
-  if (ArrSize == 6)
-    {
-      // roll [3], pitch [4], yaw [5] --> pitch [4], yaw [5], roll [3]
-      const FRotator Rot(FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[4]) < 0 ? FCString::Atof(*PoseDataArray[4]) + 2*PI : FCString::Atof(*PoseDataArray[4])),	// pitch
-                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[5])< 0 ? FCString::Atof(*PoseDataArray[5]) + 2*PI : FCString::Atof(*PoseDataArray[5])),		// yaw
-                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[3])< 0 ? FCString::Atof(*PoseDataArray[3]) + 2*PI : FCString::Atof(*PoseDataArray[3])));		// roll
+//  if (ArrSize == 6)
+//    {
+//      // roll [3], pitch [4], yaw [5] --> pitch [4], yaw [5], roll [3]
+//      const FRotator Rot(FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[4]) < 0 ? FCString::Atof(*PoseDataArray[4]) + 2*PI : FCString::Atof(*PoseDataArray[4])),	// pitch
+//                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[5])< 0 ? FCString::Atof(*PoseDataArray[5]) + 2*PI : FCString::Atof(*PoseDataArray[5])),		// yaw
+//                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[3])< 0 ? FCString::Atof(*PoseDataArray[3]) + 2*PI : FCString::Atof(*PoseDataArray[3])));		// roll
 
-      const FVector Loc = FVector(FCString::Atof(*PoseDataArray[0]),
-                                  FCString::Atof(*PoseDataArray[1]),
-                                  FCString::Atof(*PoseDataArray[2]));
+//      const FVector Loc = FVector(FCString::Atof(*PoseDataArray[0]),
+//                                  FCString::Atof(*PoseDataArray[1]),
+//                                  FCString::Atof(*PoseDataArray[2]));
 
-      const FTransform Trans = FConversions::ROSToU(FTransform(Rot, Loc));
+//      const FTransform Trans = FConversions::ROSToU(FTransform(Rot, Loc));
 
-      return Trans;
-    }
+//      return Trans;
+//    }
 
-  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <pose>%s</pose> is an unsupported format!"),
-         *FString(__FUNCTION__), __LINE__, *InPoseData);
-  return FTransform();
-}
+//  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <pose>%s</pose> is an unsupported format!"),
+//         *FString(__FUNCTION__), __LINE__, *InPoseData);
+//  return FTransform();
+//}
 
-// From <>z y z</> to FVector
-FVector FSDFParser::XyzToFVector(const FString& InXyzData)
-{
-  // <size>x=[0] y=[1] z=[2]</size>
-  TArray<FString> DataArray;
-  int32 ArrSize = InXyzData.ParseIntoArray(DataArray, TEXT(" "), true);
+//// From <>z y z</> to FVector
+//FVector FSDFParser::XyzToFVector(const FString& InXyzData)
+//{
+//  // <size>x=[0] y=[1] z=[2]</size>
+//  TArray<FString> DataArray;
+//  int32 ArrSize = InXyzData.ParseIntoArray(DataArray, TEXT(" "), true);
 
-  if (ArrSize == 3)
-    {
-      return FVector(FCString::Atof(*DataArray[0]),
-                     -FCString::Atof(*DataArray[1]),
-                     FCString::Atof(*DataArray[2]));
-    }
+//  if (ArrSize == 3)
+//    {
+//      return FVector(FCString::Atof(*DataArray[0]),
+//                     -FCString::Atof(*DataArray[1]),
+//                     FCString::Atof(*DataArray[2]));
+//    }
 
-  // Unsupported <pose> format, return default transform
-  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <xyz>%s</xyz> is an unsupported format!"),
-         __FUNCTION__, __LINE__, *InXyzData);
-  return FVector();
-}
+//  // Unsupported <pose> format, return default transform
+//  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <xyz>%s</xyz> is an unsupported format!"),
+//         __FUNCTION__, __LINE__, *InXyzData);
+//  return FVector();
+//}
 
-// From <size>z y z</size> to FVector
-FVector FSDFParser::SizeToFVector(const FString& InSizeData)
-{
-  // <size>x=[0] y=[1] z=[2]</size>
-  TArray<FString> DataArray;
-  int32 ArrSize = InSizeData.ParseIntoArray(DataArray, TEXT(" "), true);
+//// From <size>z y z</size> to FVector
+//FVector FSDFParser::SizeToFVector(const FString& InSizeData)
+//{
+//  // <size>x=[0] y=[1] z=[2]</size>
+//  TArray<FString> DataArray;
+//  int32 ArrSize = InSizeData.ParseIntoArray(DataArray, TEXT(" "), true);
 
-  if (ArrSize == 3)
-    {
-      return FConversions::MToCm(FVector(FCString::Atof(*DataArray[0]),
-                                         FCString::Atof(*DataArray[1]),
-                                         FCString::Atof(*DataArray[2])));
-    }
+//  if (ArrSize == 3)
+//    {
+//      return FConversions::MToCm(FVector(FCString::Atof(*DataArray[0]),
+//                                         FCString::Atof(*DataArray[1]),
+//                                         FCString::Atof(*DataArray[2])));
+//    }
 
-  // Unsupported <pose> format, return default transform
-  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <size>%s</size> is an unsupported format!"),
-         __FUNCTION__, __LINE__, *InSizeData);
-  return FVector();
-}
+//  // Unsupported <pose> format, return default transform
+//  UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <size>%s</size> is an unsupported format!"),
+//         __FUNCTION__, __LINE__, *InSizeData);
+//  return FVector();
+//}
 
 bool FSDFParser::CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type)
 {

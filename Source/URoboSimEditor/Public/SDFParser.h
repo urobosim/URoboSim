@@ -29,7 +29,7 @@ class USDFCollision;
 /**
 * SDF parser class
 */
-class /*UROBOSIM_API*/UROBOSIMEDITOR_API FSDFParser :public ISDFParserInterface //: public FSDFParserBase
+class UROBOSIMEDITOR_API FSDFParser :public ISDFParserInterface //: public FSDFParserBase
 {
 public:
     // Default constructor
@@ -65,7 +65,7 @@ private:
     virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
     // Parse <link> <inertial> node
-    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
+//    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
     // Parse <visual> node
     virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override;
@@ -74,28 +74,28 @@ private:
     virtual void ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
     // Parse <geometry> node
-    virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
+//    virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
     // Parse <geometry> <mesh> node
     virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
     // Parse <geometry> <box> node
-    virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
+//    virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
     // Parse <geometry> <cylinder> node
-    virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
+//    virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
     // Parse <geometry> <sphere> node
-    virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
+//    virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
 
     // Parse <joint> node
-    virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel) override;
+//    virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
-    // Parse <joint> <axis> node
-    virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
+//    // Parse <joint> <axis> node
+//    virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
 
-    // Parse <joint> <axis> <limit> node
-    virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
+//    // Parse <joint> <axis> <limit> node
+//    virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
     /* End parser functions */
 
 
@@ -116,13 +116,13 @@ private:
     UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
 
     // From <pose>z y z r p y</pose> to FTransform
-    virtual FTransform PoseContentToFTransform(const FString& InPoseData) override;
+//    virtual FTransform PoseContentToFTransform(const FString& InPoseData) override;
 
-    // From <size>z y z</size> to FVector
-    virtual FVector SizeToFVector(const FString& InSizeData) override;
+//    // From <size>z y z</size> to FVector
+//    virtual FVector SizeToFVector(const FString& InSizeData) override;
 
-    // From <xzy>z y z</xzy> to FVector
-    virtual FVector XyzToFVector(const FString& InXyzData) override;
+//    // From <xzy>z y z</xzy> to FVector
+//    virtual FVector XyzToFVector(const FString& InXyzData) override;
     /* End helper functions */
 
 

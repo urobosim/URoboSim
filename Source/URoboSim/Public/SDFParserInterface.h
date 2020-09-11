@@ -55,7 +55,7 @@ public:
         virtual bool LoadSDF(const FString& InFilename);
 
 //        // Clear parser
-        virtual void Clear();
+        virtual void Clear(); //
 
 //        // Create data asset and parse sdf data into it
         virtual USDFDataAsset* ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags);
@@ -63,7 +63,7 @@ public:
 //    protected:
 //        /* Begin parser functions */
 //        // Check if sdf data is valid
-        virtual bool IsValidSDF();
+        virtual bool IsValidSDF(); //
 
 //        // Parse <sdf> node
         virtual void ParseSDF();
@@ -75,7 +75,7 @@ public:
         virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel);
 
         // Parse <link> <inertial> node
-        virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink);
+        virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink); //
 
         // Parse <visual> node
         virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink);
@@ -84,39 +84,39 @@ public:
         virtual void ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink);
 
         // Parse <geometry> node
-        virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type);
+        virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type); //
 
         // Parse <geometry> <mesh> node
         virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type);
 
         // Parse <geometry> <box> node
-        virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry);
+        virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry);//
 
         // Parse <geometry> <cylinder> node
-        virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry);
+        virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry);//
 
         // Parse <geometry> <sphere> node
-        virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry);
+        virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry);//
 
         // Parse <joint> node
-        virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel);
+        virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel);//
 
         // Parse <joint> <axis> node
-        virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint);
+        virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint);//
 
         // Parse <joint> <axis> <limit> node
-        virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint);
+        virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint);//
         /* End parser functions */
 
         /*Beginner of Helper Functions*/
         // From <pose>z y z r p y</pose> to FTransform
-        virtual FTransform PoseContentToFTransform(const FString& InPoseData);
+        virtual FTransform PoseContentToFTransform(const FString& InPoseData);//
 
         // From <size>z y z</size> to FVector
-        virtual FVector SizeToFVector(const FString& InSizeData);
+        virtual FVector SizeToFVector(const FString& InSizeData);//
 
         // From <xzy>z y z</xzy> to FVector
-        virtual FVector XyzToFVector(const FString& InXyzData);
+        virtual FVector XyzToFVector(const FString& InXyzData);//
         /* End helper functions */
 
 
