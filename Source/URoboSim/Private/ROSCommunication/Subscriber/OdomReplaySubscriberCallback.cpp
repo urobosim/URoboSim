@@ -30,9 +30,11 @@ void FROSOdomReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
       // for(int i = 0; i < TFMessage.Num(); i++)
         {
           FString FrameName = TF.GetChildFrameId();
+          FrameName.RemoveFromStart(TEXT("/"));
           if(FrameName.Equals(BaseController->BaseName))
             {
               FString ParentFrame = TF.GetHeader().GetFrameId();
+              ParentFrame.RemoveFromStart(TEXT("/"));
               if(!ParentFrame.Equals("map"))
                 {
                   UE_LOG(LogTemp, Error, TEXT("Frame not in map coordinates"));
@@ -41,6 +43,10 @@ void FROSOdomReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 
               BaseController->SetLocationAndRotation(FConversions::ROSToU(TF.GetTransform().GetTranslation().GetVector()),
                                                      FConversions::ROSToU(TF.GetTransform().GetRotation().GetQuat()).Rotator());
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("FrameName %s different from BaseName %s"), *FrameName, *BaseController->BaseName);
             }
         }
     }
