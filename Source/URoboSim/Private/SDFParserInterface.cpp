@@ -3,9 +3,6 @@
 
 #include "SDFParserInterface.h"
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "SDFParserBase.h"
 #include "XmlFile.h"
 #include "Conversions.h"
 
