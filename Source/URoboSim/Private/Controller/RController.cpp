@@ -138,6 +138,7 @@ void URTFController::Init(ARModel* InModel)
       for(auto& Link : Model->Links)
         {
           Link.Value->GetCollision()->SetSimulatePhysics(false);
+          // Link.Value->GetCollision()->SetCollisionProfileName(false);
         }
     }
 }
@@ -162,28 +163,61 @@ bool URTFController::UpdateFramePoses()
         {
           FString ChildName = TF.Key;
           FString ParentName = TF.Value.ParentFrame;
-          if(Model->Links.Contains(ChildName) && Model->Links.Contains(ParentName))
+          URStaticMeshComponent* Child = nullptr;
+          URStaticMeshComponent* Parent = nullptr;
+          for(auto& Link : Model->Links)
             {
-              SetLinkPose(Model->Links[ChildName], Model->Links[ParentName], TF.Value.Pose);
+              if(!Child)
+                {
+                  Child = Link.Value->GetCollision(ChildName, false);
+                }
+
+              if(!Parent)
+                {
+                  Parent = Link.Value->GetCollision(ParentName, false);
+                }
+
+              // if(Child)
+              //   {
+              //     UE_LOG(LogTemp, Error, TEXT("Model does not contain Frame %s"), *TF.Key);
+              //     break;
+              //   }
             }
-          else
-            {
-              UE_LOG(LogTemp, Error, TEXT("Model does not contain Frame %s or ParentFrame %s"), *TF.Key, *TF.Value.ParentFrame);
-            }
+
+          // if(!Child)
+          //   {
+          //     UE_LOG(LogTemp, Error, TEXT("Model does not contain Frame %s"), *TF.Key);
+          //     continue;
+          //   }
+
+          // if(!Parent)
+          //   {
+          //     UE_LOG(LogTemp, Error, TEXT("Model does not contain ParentFrame %s"), *TF.Value.ParentFrame);
+          //     continue;
+          //   }
+
+          SetLinkPose(Child, Parent, TF.Value.Pose);
         }
     }
 
   return false;
 }
 
-void URTFController::SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose)
+void URTFController::SetLinkPose(URStaticMeshComponent* InChildLink, URStaticMeshComponent* InParentLink, FTransform InPose)
 {
-  FTransform ParentTransform = InParentLink->GetCollision()->GetComponentTransform();
+  if (!InChildLink)
+    { return; }
+  if (!InParentLink)
+    { return; }
+
+  FTransform ParentTransform = InParentLink->GetComponentTransform();
   FVector NewLocation = ParentTransform.GetLocation() + ParentTransform.GetRotation().RotateVector(InPose.GetLocation());
+  // FQuat NewRotation = ParentTransform.GetRotation() * InPose.GetRotation();
   FQuat NewRotation = ParentTransform.GetRotation() * InPose.GetRotation();
 
   FTransform NewTransform = FTransform(NewRotation, NewLocation, FVector(1.0f, 1.0f, 1.0f));
-  InChildLink->GetCollision()->SetWorldTransform(NewTransform, false, nullptr, ETeleportType::TeleportPhysics);
+  UE_LOG(LogTemp, Error, TEXT("ChildName %s NewTransform %s"), *InChildLink->GetName(), *NewTransform.ToString());
+  InChildLink->SetWorldTransform(NewTransform, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
 void URTFController::Tick(float InDeltaTime)

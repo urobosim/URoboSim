@@ -53,6 +53,12 @@ protected:
 	UPROPERTY()
 	float AngularVelocity;
 
+	UPROPERTY(EditAnywhere)
+	float HackRotationFactor = 1;
+
+	UPROPERTY(EditAnywhere)
+	float HackLinearFactor = 1;
+
 	UPROPERTY()
 	FVector LinearVelocity;
 
@@ -70,4 +76,17 @@ protected:
 
 	UPROPERTY()
         float MaxAngularVelocity;
+};
+
+UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URBaseControllerKinematic : public URBaseController
+{
+    GENERATED_BODY()
+public:
+
+  virtual void TurnTick(float InDeltaTime) override;
+  virtual void MoveLinearTick(float InDeltaTime) override;
+  virtual void SetLocation(FVector InPosition) override;
+  virtual void SetRotation(FRotator InRotator) override;
+
 };

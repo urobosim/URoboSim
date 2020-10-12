@@ -78,6 +78,14 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY()
     bool bStalled;
 
+  UPROPERTY(EditAnywhere)
+    bool bUseMultipleConstraints = true;
+
+  UPROPERTY(EditAnywhere)
+    float GripperSpeedFactor = 0.03;
+
+  UPROPERTY()
+    float PoseOffsetFromJoints = 0;
 
   UPROPERTY()
     FGraspResult Result;
@@ -106,8 +114,12 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY()
     URJoint* LeftFingerTip;
 
+  UPROPERTY(EditAnywhere)
+    bool bDisableCollision;
 
  protected:
+
+  virtual void SetGripperCollision(bool InCollisionEnabled);
 
   UPROPERTY()
     bool bSuccessGrasp = false;

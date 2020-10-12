@@ -2,7 +2,8 @@
 
 void URGripperController::UpdateGripper()
 {
-    bActive = true;
+  SetGripperCollision(true);
+  bActive = true;
 }
 
 void URGripperController::CheckGripperActionResult(float InError, float InThreshold = 0.5)
@@ -54,56 +55,69 @@ void URGripperController::Tick(float InDeltaTime)
         return;
       }
 
-    RightFinger->bActuate = true;
-    LeftFinger->bActuate = true;
 
     FVector DirectionTipToTip = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation());
-    GripperPosition = FMath::Abs((DirectionTipToTip).Size() -3 );
+    GripperPosition = FMath::Abs((DirectionTipToTip).Size() - PoseOffsetFromJoints );
     Error = Position-GripperPosition;
+
     if(bActive)
     {
+
       bStalled = false;
       CheckGripperActionResult(Error, 0.1);
 
+      if (GraspComponent->bObjectGrasped && (OldPosition - Position < -0.12))
+        {
+          UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
+          Release();
+          RightFinger->bActuate = true;
+          LeftFinger->bActuate = true;
+        }
+
       if(bActive)
         {
+          RightFinger->bActuate = true;
+          LeftFinger->bActuate = true;
           GoalStatusList.Last().Status = 1;
           ActionDuration += InDeltaTime;
 
           JointValue = (LeftFinger->GetEncoderValue() + RightFinger->GetEncoderValue()) / 2.0;
+
+          // The larger the error the faster the gripper should move. Close to the goal it should be slow to avoid oscillation
+          float Speed = 0.02 + GripperSpeedFactor * (FMath::Abs(Error) / 6.5);
           if(Error < 0)
             {
-              JointController->SetDesiredJointState(RightJointName, JointValue - 0.04);
-              JointController->SetDesiredJointState(LeftJointName, JointValue  - 0.04);
+              JointController->SetDesiredJointState(RightJointName, JointValue - Speed);
+              JointController->SetDesiredJointState(LeftJointName, JointValue  - Speed);
             }
           else
             {
-              JointController->SetDesiredJointState(RightJointName, JointValue + 0.04);
-              JointController->SetDesiredJointState(LeftJointName, JointValue + 0.04);
+              JointController->SetDesiredJointState(RightJointName, JointValue + Speed);
+              JointController->SetDesiredJointState(LeftJointName, JointValue + Speed);
             }
         }
-      else if (OldPosition - Position < -0.12)
+      else if (bStalled && (OldPosition - Position >= -0.12))
         {
-          UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
-          Release();
+          RightFinger->bActuate = true;
+          LeftFinger->bActuate = true;
+
+          JointController->SetDesiredJointState(RightJointName, RightFinger->GetEncoderValue());
+          JointController->SetDesiredJointState(LeftJointName, LeftFinger->GetEncoderValue());
+
           OldPosition = GripperPosition;
-        }
-      else if (bStalled)
-        {
-
-
-          UE_LOG(LogTemp, Error, TEXT("Grasp"));
+          UE_LOG(LogTemp, Error, TEXT("Grasp: OldPosition %f NewPosition %f"), OldPosition, Position);
           Grasp();
 
-          OldPosition = GripperPosition;
         }
       else
         {
+          RightFinger->bActuate = true;
+          LeftFinger->bActuate = true;
+          OldPosition = GripperPosition;
           UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
           // OldPosition = GripperPosition;
           // UE_LOG(LogTemp, Error, TEXT("Release"));
           // Release();
-          OldPosition = GripperPosition;
         }
     }
 }
@@ -120,6 +134,7 @@ bool URGripperController::Grasp()
 {
   if(GraspComponent)
     {
+      SetGripperCollision(false);
       return GraspComponent->TryToFixate();
     }
   return false;
@@ -152,6 +167,7 @@ void URGripperController::Init(ARModel* InModel)
       RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
       LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
 
+
       if(!RightFinger )
         {
           UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
@@ -174,6 +190,16 @@ void URGripperController::Init(ARModel* InModel)
           return;
         }
 
+      if(bDisableCollision)
+        {
+          RightFinger->Child->DisableCollision();
+          LeftFinger->Child->DisableCollision();
+          RightFingerTip->Child->DisableCollision();
+          LeftFingerTip->Child->DisableCollision();
+        }
+
+      PoseOffsetFromJoints = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size();
+
       ControllerComp = Cast<URControllerComponent>(GetOuter());
       JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
 
@@ -191,7 +217,15 @@ void URGripperController::Init(ARModel* InModel)
               URLink* ReferenceLink = Model->Links[GraspCompSetting.GripperName];
               GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
               GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-              GraspComponent->Init(ReferenceLink->GetCollision());
+
+              if(bUseMultipleConstraints)
+                {
+                  GraspComponent->Init(RightFinger->Child->GetCollision(), LeftFinger->Child->GetCollision());
+                }
+              else
+                {
+                  GraspComponent->Init(ReferenceLink->GetCollision());
+                }
             }
         }
 
@@ -200,5 +234,23 @@ void URGripperController::Init(ARModel* InModel)
       float& LeftJointValue = JointController->DesiredJointState.FindOrAdd(LeftJointName);
       LeftJointValue = LeftFinger->GetEncoderValue();
       JointValue = (RightJointValue + LeftJointValue) / 2.0;
+    }
+}
+
+void URGripperController::SetGripperCollision(bool InCollisionEnabled)
+{
+  if(InCollisionEnabled)
+    {
+      RightFinger->Child->EnableCollision();
+      LeftFinger->Child->EnableCollision();
+      RightFingerTip->Child->EnableCollision();
+      LeftFingerTip->Child->EnableCollision();
+    }
+  else
+    {
+      RightFinger->Child->DisableCollision();
+      LeftFinger->Child->DisableCollision();
+      RightFingerTip->Child->DisableCollision();
+      LeftFingerTip->Child->DisableCollision();
     }
 }

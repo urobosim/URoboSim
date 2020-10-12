@@ -25,6 +25,7 @@ void URJointController::SetJointNames(TArray<FString> InNames)
   Trajectory.Empty();
 }
 
+
 void URJointController::SetJointVelocities(float InDeltaTime)
 {
   if(State == UJointControllerState::FollowJointTrajectory)
@@ -132,6 +133,7 @@ bool URJointController::CheckTrajectoryGoalReached()
 
   return false;
 }
+
 void URJointController::CallculateJointVelocities(float InDeltaTime)
 {
   FString Velocity = "";
@@ -151,16 +153,16 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
 
           float Vel = Diff / InDeltaTime;
           float VelSave = Vel;
-          if(Joint.Value->MaxJointVel > 0)
-            {
-              if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
-                {
-                  Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
-                }
-            }
-          // if(Joint.Value->GetName().Contains("l_shoulder_lift"))
+          // if(Joint.Value->MaxJointVel > 0)
           //   {
-          //     UE_LOG(LogTemp, Error, TEXT("Vel: %f VelSave %f"), Vel, VelSave);
+          //     if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
+          //       {
+          //         Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
+          //       }
+          //   }
+          // if(Joint.Value->GetName().Contains("torso_lift_joint"))
+          //   {
+          //     // UE_LOG(LogTemp, Error, TEXT("Vel: %f VelSave %f"), Vel, VelSave);
           //     UE_LOG(LogTemp, Error, TEXT("CurrentJointPos: %f DesiredPos %f Diff %f"), CurrentJointPos, DesiredPos, Diff);
           //   }
           Joint.Value->SetJointVelocity(Vel);
@@ -202,6 +204,7 @@ void URJointController::Tick(float InDeltaTime)
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
+      ActionDuration+= InDeltaTime * SpeedFactorHack;
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
@@ -217,7 +220,6 @@ void URJointController::Tick(float InDeltaTime)
         }
       CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
-      ActionDuration+= InDeltaTime;
       break;
 
     case UJointControllerState::Normal:
@@ -282,6 +284,10 @@ void URJointController::Init(ARModel* InModel)
       for(auto & Link: Model->Links)
         {
           Link.Value->GetCollision()->SetEnableGravity(false);
+          if(bDisableCollision)
+          {
+            Link.Value->DisableCollision();
+          }
         }
 
       // for(auto & Joint: Model->Joints)

@@ -184,7 +184,7 @@ public:
 	virtual TMap<FString, FTFInfo> GetTFList();
 
 	virtual bool UpdateFramePoses();
-	virtual void SetLinkPose(URLink* InChildLink, URLink* InParentLink, FTransform InPose);
+	virtual void SetLinkPose(URStaticMeshComponent* InChildLink, URStaticMeshComponent* InParentLink, FTransform InPose);
 
 	virtual void Tick(float InDeltaTime) override;
 

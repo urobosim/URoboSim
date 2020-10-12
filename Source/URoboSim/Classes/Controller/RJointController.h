@@ -41,6 +41,10 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY(EditAnywhere)
     float PrismaticAccuracy;
 
+
+  UPROPERTY(EditAnywhere)
+    bool bDisableCollision;
+
   UPROPERTY()
     TArray<FTrajectoryPoints> Trajectory;
 
@@ -69,6 +73,8 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY(EditAnywhere)
     UJointControllerMode Mode;
 
+  UPROPERTY(EditAnywhere)
+    float SpeedFactorHack = 1;
   virtual void MoveJoints(float InDeltaTime);
   virtual void MoveJointsDynamic(float InDeltaTime);
   virtual void MoveJointsKinematic();

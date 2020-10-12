@@ -36,8 +36,12 @@ public:
 	virtual void SetPose(FTransform InPose);
 	virtual void SetPose(FVector InLocation, FQuat InRotation);
 
+	virtual void DisableCollision();
+	virtual void EnableCollision();
+
 	URStaticMeshComponent* GetVisual();
 	URStaticMeshComponent* GetCollision();
+	URStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
         TArray<class URJoint*> GetJoints();
 
 	float GetNumCollisions();

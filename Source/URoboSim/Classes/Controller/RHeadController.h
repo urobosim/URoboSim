@@ -3,6 +3,7 @@
 #include "Physics/RModel.h"
 #include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
+#include "Controller/RJointController.h"
 #include "RHeadController.generated.h"
 
 
@@ -36,6 +37,7 @@ public:
 
     virtual void UpdateHeadDirection(){};
 protected:
+
     UPROPERTY()
       URJointController* JointController;
 
