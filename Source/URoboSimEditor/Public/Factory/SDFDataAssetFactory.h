@@ -15,7 +15,7 @@ class USDFDataAsset;
  *
  */
 UCLASS()
-class UROBOSIM_API USDFDataAssetFactory : public UFactory/*, public FReimportHandler*/
+class UROBOSIMEDITOR_API USDFDataAssetFactory : public UFactory/*, public FReimportHandler*/
 {
 	GENERATED_BODY()
 
