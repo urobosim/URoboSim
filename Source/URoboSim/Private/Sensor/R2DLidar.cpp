@@ -29,6 +29,21 @@ void UR2DLidar::Init()
   AngularIncrement = FMath::Abs((ScanAngleMax - ScanAngleMin) / SampleNumber);
   SCSResolution = FMath::CeilToInt(360./ FMath::RadiansToDegrees(AngularIncrement));
   DistanceMeasurement.AddZeroed(SCSResolution);
+  TArray<URStaticMeshComponent*> ActorComponents;
+  GetOwner()->GetComponents(ActorComponents);
+
+  for (auto& Component : ActorComponents)
+  {
+    if (Component->GetName().Equals(LidarRef))
+    {
+      ReferenceLink = Component;
+    }
+  }
+  if (!ReferenceLink)
+  {
+    UE_LOG(LogTemp, Error, TEXT("LidarRef not found"));
+    return;
+  }
 }
 
 void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -40,8 +55,8 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
     }
   TimePassed = 0;
 
-  FVector LidarBodyLoc = GetComponentLocation() + Offset;
-  FRotator LidarBodyRot = GetComponentRotation();
+  FVector LidarBodyLoc = ReferenceLink->GetComponentLocation() + Offset;
+  FRotator LidarBodyRot = ReferenceLink->GetComponentRotation();
 
   for(int i = 0; i < (int) SCSResolution; i++)
     {

@@ -6,43 +6,17 @@
 
 USDFJointAxis::USDFJointAxis()
 {
-	Xyz = FVector(0.0, 0.0, 1.0);
+  Xyz = FVector(0.0, 0.0, 1.0);
 }
 
 void USDFJointAxis::SetLowerLimitFromSDF(float LowerLimit)
 {
-	USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
-
-	if(Owner->Type.Equals("revolute"))
-	{
-		Lower = FMath::RadiansToDegrees(LowerLimit);
-	}
-	else if(Owner->Type.Equals("prismatic"))
-	{
-		Lower = LowerLimit * 100;
-	}
-	else
-	{
-		Lower = LowerLimit;
-	}
-
+  USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
+  Lower = LowerLimit;
 }
 
 void USDFJointAxis::SetUpperLimitFromSDF(float UpperLimit)
 {
-	USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
-
-	if(Owner->Type.Equals("revolute"))
-	{
-		Upper = FMath::RadiansToDegrees(UpperLimit);
-	}
-	else if(Owner->Type.Equals("prismatic"))
-	{
-		Upper = UpperLimit * 100;
-	}
-	else
-	{
-		Upper = UpperLimit;
-	}
-
+  USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
+  Upper = UpperLimit;
 }
