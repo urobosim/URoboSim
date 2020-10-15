@@ -9,6 +9,11 @@ URBaseController::URBaseController()
   OdomPositionStates.Add(0);
   OdomPositionStates.Add(0);
 
+  WheelSetting.WheelVelocities.Add(0);
+  WheelSetting.WheelVelocities.Add(0);
+  WheelSetting.WheelVelocities.Add(0);
+  WheelSetting.WheelVelocities.Add(0);
+
   OdomVelocityStates.Add(0);
   OdomVelocityStates.Add(0);
   OdomVelocityStates.Add(0);
@@ -27,7 +32,7 @@ void URBaseController::Init(ARModel* InModel)
       // Base->GetCollision()->SetSimulatePhysics(false);
       Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
       TargetPose = Base->GetCollision()->GetComponentTransform();
-      MaxLinearVelocity = 0.0;
+      MaxLinearVelocity = 0.5;
       MaxAngularVelocity = 0.5;
     }
 }
@@ -56,6 +61,7 @@ void URBaseController::Tick(float InDeltaTime)
   MoveLinearTick(InDeltaTime);
   TurnTick(InDeltaTime);
   CalculateOdomStates(InDeltaTime);
+  MoveWheelTick(InDeltaTime);
 }
 
 void URBaseController::TurnTick(float InDeltaTime)
@@ -104,7 +110,7 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
   FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
 
   //Check if AngularVelocity is 0 to avoid divivision by 0
-  if(AngularVelocity != 0.0f)
+  if(FMath::Abs(AngularVelocity) > 0.0001f)
     {
       // Calculate the resulting position after one tick by using the Integral of Rx (R = rotation matrix, x = Position https://en.wikipedia.org/wiki/Rotation_matrix)
       // in the intervall of 0 to InDeltaTime
@@ -143,6 +149,26 @@ void URBaseController::CalculateOdomStates(float InDeltaTime)
   OdomPositionStates[0] = BasePose.X;
   OdomPositionStates[1] = BasePose.Y;
   OdomPositionStates[2] = FMath::DegreesToRadians(BaseRotation.Yaw);
+}
+
+void URBaseController::MoveWheelTick(float InDeltaTime)
+{
+  if (Model->Links.Contains(WheelSetting.WheelLeftUp) &&
+      Model->Links.Contains(WheelSetting.WheelLeftDown) &&
+      Model->Links.Contains(WheelSetting.WheelRightUp) &&
+      Model->Links.Contains(WheelSetting.WheelRightDown))
+      {
+        WheelSetting.WheelVelocities[0] = (LinearVelocity.X + LinearVelocity.Y + WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
+        WheelSetting.WheelVelocities[1] = (LinearVelocity.X - LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
+        WheelSetting.WheelVelocities[2] = (LinearVelocity.X - LinearVelocity.Y + WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
+        WheelSetting.WheelVelocities[3] = (LinearVelocity.X + LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
+
+        FVector RotationAxis = Model->Links[BaseName]->GetCollision()->GetComponentQuat().GetAxisY();
+        Model->Links[WheelSetting.WheelLeftUp]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[0]);
+        Model->Links[WheelSetting.WheelRightUp]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[1]);
+        Model->Links[WheelSetting.WheelLeftDown]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[2]);
+        Model->Links[WheelSetting.WheelRightDown]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[3]);
+      }
 }
 
 TArray<double> URBaseController::GetOdomPositionStates()
