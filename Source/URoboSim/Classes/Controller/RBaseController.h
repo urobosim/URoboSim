@@ -10,10 +10,37 @@
 #include "Conversions.h"
 #include "RBaseController.generated.h"
 
+USTRUCT()
+struct FWheelSetting
+{
+  GENERATED_BODY()
+public:
+  UPROPERTY(EditAnywhere)
+	float WheelRadius = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float WheelToCenterSum = 70.65f;
+
+	UPROPERTY(EditAnywhere)
+	FString WheelLeftUp = FString(TEXT("wheel_left_up"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelRightUp = FString(TEXT("wheel_right_up"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelLeftDown = FString(TEXT("wheel_left_down"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelRightDown = FString(TEXT("wheel_right_down"));
+
+  UPROPERTY(VisibleAnywhere)
+  TArray<double> WheelVelocities;
+};
+
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URBaseController : public URController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 public:
 	URBaseController();
 
@@ -43,12 +70,16 @@ protected:
 	virtual void TurnTick(float InDeltaTime);
 	virtual void MoveLinearTick(float InDeltaTime);
 	virtual void CalculateOdomStates(float InDeltaTime);
+	virtual void MoveWheelTick(float InDeltaTime);
 
 	UPROPERTY()
 	ARModel* Model;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsKinematic;
+
+	UPROPERTY(EditAnywhere)
+	FWheelSetting WheelSetting;
 
 	UPROPERTY()
 	float AngularVelocity;
@@ -63,11 +94,11 @@ protected:
 	TArray<double> OdomVelocityStates;
 
 	UPROPERTY()
-        FTransform TargetPose;
+	FTransform TargetPose;
 
 	UPROPERTY()
-        float MaxLinearVelocity;
+	float MaxLinearVelocity;
 
 	UPROPERTY()
-        float MaxAngularVelocity;
+	float MaxAngularVelocity;
 };
