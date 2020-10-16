@@ -2,13 +2,16 @@
 
 #pragma once
 
-#include "Physics/RModel.h"
 #include "ConstructorHelpers.h"
-#include "Physics/RJoint.h"
-#include "ROSUtilities.h"
 #include "Containers/Queue.h"
+#include "Controller/RController.h"
 #include "Conversions.h"
+#include "Physics/RJoint.h"
+#include "Physics/RModel.h"
+#include "ROSUtilities.h"
+// clang-format off
 #include "RBaseController.generated.h"
+// clang-format on
 
 USTRUCT()
 struct FWheelSetting
