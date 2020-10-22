@@ -25,16 +25,16 @@ public:
 	float WheelToCenterSum = 70.65f;
 
 	UPROPERTY(EditAnywhere)
-	FString WheelLeftUp = FString(TEXT("wheel_left_up"));
+	FString WheelFrontLeft = FString(TEXT("wheel_front_left"));
 
 	UPROPERTY(EditAnywhere)
-	FString WheelRightUp = FString(TEXT("wheel_right_up"));
+	FString WheelFrontRight = FString(TEXT("wheel_front_right"));
 
 	UPROPERTY(EditAnywhere)
-	FString WheelLeftDown = FString(TEXT("wheel_left_down"));
+	FString WheelBackLeft = FString(TEXT("wheel_back_left"));
 
 	UPROPERTY(EditAnywhere)
-	FString WheelRightDown = FString(TEXT("wheel_right_down"));
+	FString WheelBackRight = FString(TEXT("wheel_back_right"));
 
   UPROPERTY(VisibleAnywhere)
   TArray<double> WheelVelocities;

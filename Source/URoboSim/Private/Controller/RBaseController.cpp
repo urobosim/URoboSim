@@ -153,10 +153,10 @@ void URBaseController::CalculateOdomStates(float InDeltaTime)
 
 void URBaseController::MoveWheelTick(float InDeltaTime)
 {
-  if (Model->Links.Contains(WheelSetting.WheelLeftUp) &&
-      Model->Links.Contains(WheelSetting.WheelLeftDown) &&
-      Model->Links.Contains(WheelSetting.WheelRightUp) &&
-      Model->Links.Contains(WheelSetting.WheelRightDown))
+  if (Model->Links.Contains(WheelSetting.WheelFrontLeft) &&
+      Model->Links.Contains(WheelSetting.WheelBackLeft) &&
+      Model->Links.Contains(WheelSetting.WheelFrontRight) &&
+      Model->Links.Contains(WheelSetting.WheelBackRight))
       {
         WheelSetting.WheelVelocities[0] = (LinearVelocity.X + LinearVelocity.Y + WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
         WheelSetting.WheelVelocities[1] = (LinearVelocity.X - LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
@@ -164,10 +164,10 @@ void URBaseController::MoveWheelTick(float InDeltaTime)
         WheelSetting.WheelVelocities[3] = (LinearVelocity.X + LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
 
         FVector RotationAxis = Model->Links[BaseName]->GetCollision()->GetComponentQuat().GetAxisY();
-        Model->Links[WheelSetting.WheelLeftUp]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[0]);
-        Model->Links[WheelSetting.WheelRightUp]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[1]);
-        Model->Links[WheelSetting.WheelLeftDown]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[2]);
-        Model->Links[WheelSetting.WheelRightDown]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[3]);
+        Model->Links[WheelSetting.WheelFrontLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[0]);
+        Model->Links[WheelSetting.WheelFrontRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[1]);
+        Model->Links[WheelSetting.WheelBackLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[2]);
+        Model->Links[WheelSetting.WheelBackRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[3]);
       }
 }
 
