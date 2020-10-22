@@ -1,11 +1,9 @@
 #pragma once
 
-#include "Physics/RModel.h"
 #include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
-#include "Controller/RJointController.h"
+#include "Physics/RModel.h"
 #include "RHeadController.generated.h"
-
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URHeadTrajectoryController : public URController

@@ -2,18 +2,48 @@
 
 #pragma once
 
-#include "Physics/RModel.h"
 #include "ConstructorHelpers.h"
-#include "Physics/RJoint.h"
-#include "ROSUtilities.h"
 #include "Containers/Queue.h"
+#include "Controller/RController.h"
 #include "Conversions.h"
+#include "Physics/RJoint.h"
+#include "Physics/RModel.h"
+#include "ROSUtilities.h"
+// clang-format off
 #include "RBaseController.generated.h"
+// clang-format on
+
+USTRUCT()
+struct FWheelSetting
+{
+  GENERATED_BODY()
+public:
+  UPROPERTY(EditAnywhere)
+	float WheelRadius = 10.f;
+
+	UPROPERTY(EditAnywhere)
+	float WheelToCenterSum = 70.65f;
+
+	UPROPERTY(EditAnywhere)
+	FString WheelFrontLeft = FString(TEXT("wheel_front_left"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelFrontRight = FString(TEXT("wheel_front_right"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelBackLeft = FString(TEXT("wheel_back_left"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelBackRight = FString(TEXT("wheel_back_right"));
+
+  UPROPERTY(VisibleAnywhere)
+  TArray<double> WheelVelocities;
+};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URBaseController : public URController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 public:
 	URBaseController();
 
@@ -43,12 +73,16 @@ protected:
 	virtual void TurnTick(float InDeltaTime);
 	virtual void MoveLinearTick(float InDeltaTime);
 	virtual void CalculateOdomStates(float InDeltaTime);
+	virtual void MoveWheelTick(float InDeltaTime);
 
 	UPROPERTY()
 	ARModel* Model;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsKinematic;
+
+	UPROPERTY(EditAnywhere)
+	FWheelSetting WheelSetting;
 
 	UPROPERTY()
 	float AngularVelocity;
@@ -69,13 +103,13 @@ protected:
 	TArray<double> OdomVelocityStates;
 
 	UPROPERTY()
-        FTransform TargetPose;
+	FTransform TargetPose;
 
 	UPROPERTY()
-        float MaxLinearVelocity;
+	float MaxLinearVelocity;
 
 	UPROPERTY()
-        float MaxAngularVelocity;
+	float MaxAngularVelocity;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)

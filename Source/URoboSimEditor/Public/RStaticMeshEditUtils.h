@@ -45,7 +45,7 @@ enum class ECollisionType : uint8
 
 /*This class provides utility functions to create and edit static meshs*/
 
-class UROBOSIMEDITOR_API RStaticMeshUtils
+class UROBOSIM_API RStaticMeshUtils
 {
 public:
 
