@@ -2,8 +2,10 @@
 
 #include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
+#include "Controller/RJointController.h"
 #include "Physics/RModel.h"
 #include "RHeadController.generated.h"
+// clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URHeadTrajectoryController : public URController
