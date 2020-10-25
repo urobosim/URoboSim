@@ -8,18 +8,21 @@ void URPluginComponent::OnComponentCreated()
   RegisterPlugin();
 }
 
+ARModel* URPluginComponent::GetOwner()
+{
+  return Cast<ARModel>(Super::GetOwner());
+}
+
 void URPluginComponent::RegisterPlugin()
 {
-  Model = Cast<ARModel>(GetOwner());
-  FString PluginName = GetPluginName();
-  if(Model)
-    {
-      Model->Plugins.Add(PluginName, this);
-    }
+  if (GetOwner())
+  {
+    GetOwner()->Plugins.Add(GetPluginName(), this);
+  }
   else
-    {
-      UE_LOG(LogTemp, Error, TEXT("%s not Attached to a ARModel"), *GetName());
-    }
+  {
+    UE_LOG(LogTemp, Error, TEXT("%s not Attached to a ARModel"), *GetName());
+  }
 }
 
 FString URPluginComponent::GetPluginName()

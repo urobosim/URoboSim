@@ -28,7 +28,7 @@ void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();
 
-  if(!Model)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
     }
@@ -36,7 +36,7 @@ void URControllerComponent::BeginPlay()
     {
       for(auto& C : Controller.ControllerList)
         {
-          C.Value->Init(Model);
+          C.Value->Init(GetOwner());
         }
     }
 }
@@ -45,7 +45,7 @@ void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TAr
 {
   for(int i = 0; i < InJointNames.Num();i++)
     {
-      Model->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
+      GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
     }
 }
 
