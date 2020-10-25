@@ -148,24 +148,22 @@ void URGripperController::Release()
     }
 }
 
-void URGripperController::Init(ARModel* InModel)
+void URGripperController::Init()
 {
-  if(!InModel)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("GripperController not attached to ARModel"));
     }
   else
     {
-
-      Model = InModel;
       TArray<URGraspComponent* > TempGraspComponents;
-      Model->GetComponents<URGraspComponent>(TempGraspComponents);
+      GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
 
-      RightFinger = Model->Joints.FindRef(RightJointName);
-      LeftFinger = Model->Joints.FindRef(LeftJointName);
+      RightFinger = GetOwner()->Joints.FindRef(RightJointName);
+      LeftFinger = GetOwner()->Joints.FindRef(LeftJointName);
 
-      RightFingerTip = Model->Joints.FindRef(RightFingerTipName);
-      LeftFingerTip = Model->Joints.FindRef(LeftFingerTipName);
+      RightFingerTip = GetOwner()->Joints.FindRef(RightFingerTipName);
+      LeftFingerTip = GetOwner()->Joints.FindRef(LeftFingerTipName);
 
 
       if(!RightFinger )
@@ -214,7 +212,7 @@ void URGripperController::Init(ARModel* InModel)
           if(GraspComp->GetName().Equals(GraspComponentName))
             {
               GraspComponent = GraspComp;
-              URLink* ReferenceLink = Model->Links[GraspCompSetting.GripperName];
+              URLink* ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
               GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
               GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
 

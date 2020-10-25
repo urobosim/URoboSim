@@ -36,7 +36,8 @@ void URControllerComponent::BeginPlay()
     {
       for(auto& C : Controller.ControllerList)
         {
-          C.Value->Init(GetOwner());
+          C.Value->SetOwner(GetOwner());
+          C.Value->Init();
         }
     }
 }

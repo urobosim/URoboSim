@@ -20,7 +20,7 @@ class UROBOSIM_API URBaseController : public URController
 public:
 	URBaseController();
 
-	virtual void Init(ARModel* InModel) override;
+	virtual void Init() override;
 	virtual void MoveLinear(FVector InVelocity, float InDeltaTime);
 	virtual void MoveLinear(FVector InVelocity);
 	virtual void MoveLinearToWorld(FVector InVelocity, float InDeltaTime);
@@ -46,9 +46,6 @@ protected:
 	virtual void TurnTick(float InDeltaTime);
 	virtual void MoveLinearTick(float InDeltaTime);
 	virtual void CalculateOdomStates(float InDeltaTime);
-
-	UPROPERTY()
-	ARModel* Model;
 
 	UPROPERTY(EditAnywhere)
 	bool bIsKinematic;

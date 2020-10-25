@@ -7,16 +7,15 @@ URHeadTrajectoryController::URHeadTrajectoryController()
 {
 }
 
-void URHeadTrajectoryController::Init(ARModel* InModel)
+void URHeadTrajectoryController::Init()
 {
 	bActive = false;
-	if(!InModel)
+	if(!GetOwner())
 	{
 		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
 	}
 	else
 	{
-          Model = InModel;
         }
 
 
@@ -48,7 +47,7 @@ void URHeadTrajectoryController::Tick(float InDeltaTime)
 FVector URHeadTrajectoryController::CalculateNewViewDirection()
 {
   FVector Direction;
-  if(Model)
+  if(GetOwner())
     {
       FTransform ReferenceLinkTransform ;
       if(FrameId.Equals(TEXT("map")))
@@ -57,7 +56,7 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
         }
       else
         {
-          URLink* ReferenceLink = Model->Links.FindRef(FrameId);
+          URLink* ReferenceLink = GetOwner()->Links.FindRef(FrameId);
           if(!ReferenceLink)
             {
               UE_LOG(LogTemp, Error, TEXT("ReferenceLink %s not found"), *FrameId);
@@ -67,7 +66,7 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
         }
 
       TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
+      GetOwner()->GetComponents(ActorComponents);
       URStaticMeshComponent* PointingLink = nullptr;
       for(auto & Component : ActorComponents)
         {
@@ -104,10 +103,10 @@ void URPR2HeadTrajectoryController::UpdateHeadDirection()
 
 void URPR2HeadTrajectoryController::CheckPointHeadState()
 {
-    if(Model)
+    if(GetOwner())
     {
-        URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-        URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
+        URJoint* AzimuthJoint = GetOwner()->Joints.FindRef("head_pan_joint");
+        URJoint* ElevationJoint = GetOwner()->Joints.FindRef("head_tilt_joint");
 
         float Az = AzimuthJoint->GetJointPosition();
         float El = ElevationJoint->GetJointPosition();
@@ -130,10 +129,10 @@ void URPR2HeadTrajectoryController::CheckPointHeadState()
 
 void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
 {
-  if(Model)
+  if(GetOwner())
     {
       TArray<URStaticMeshComponent*> ActorComponents;
-      Model->GetComponents(ActorComponents);
+      GetOwner()->GetComponents(ActorComponents);
       URStaticMeshComponent* PointingLink = nullptr;
       for(auto & Component : ActorComponents)
         {
@@ -150,8 +149,8 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
       FQuat ReferenceQuat = PointingLink->GetComponentQuat();
       FVector2D AzEl = FMath::GetAzimuthAndElevation(InNewDirection.GetSafeNormal(), ReferenceQuat.GetAxisX(), ReferenceQuat.GetAxisY(), ReferenceQuat.GetAxisZ());
 
-      URJoint* AzimuthJoint = Model->Joints.FindRef("head_pan_joint");
-      URJoint* ElevationJoint = Model->Joints.FindRef("head_tilt_joint");
+      URJoint* AzimuthJoint = GetOwner()->Joints.FindRef("head_pan_joint");
+      URJoint* ElevationJoint = GetOwner()->Joints.FindRef("head_tilt_joint");
 
       float Az = AzimuthJoint->GetJointPosition();
       float El = ElevationJoint->GetJointPosition();

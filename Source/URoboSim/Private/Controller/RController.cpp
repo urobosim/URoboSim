@@ -4,6 +4,16 @@
 #include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMathUtility.h"
 
+void URController::SetOwner(ARModel* Model)
+{
+  Owner = Model;
+}
+
+const ARModel* URController::GetOwner()
+{
+  return Owner;
+}
+
 void URController::CancelAction()
 {
   if(bCancel)
@@ -53,7 +63,7 @@ void URCameraController::PerceiveObject()
       if(bObjectFound)
         {
 
-          URLink* ReferenceLink = Model->Links.FindRef(TEXT("base_footprint"));
+          URLink* ReferenceLink = GetOwner()->Links.FindRef(TEXT("base_footprint"));
           FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
           FVector Location = ReferenceLinkTransform.GetLocation();
           Location.Z = 0.0f;
@@ -82,18 +92,17 @@ void URCameraController::Tick(float InDeltaTime)
 {
 }
 
-void URCameraController::Init(ARModel* InModel)
+void URCameraController::Init()
 {
-  if(!InModel)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
       return;
     }
-  Model = InModel;
   TArray<AActor*> FoundActors;
   TArray<URStaticMeshComponent*> ActorComponents;
   URStaticMeshComponent* ReferenceLink = nullptr;
-  Model->GetComponents(ActorComponents);
+  GetOwner()->GetComponents(ActorComponents);
 
   for(auto & Component : ActorComponents)
     {
@@ -125,17 +134,16 @@ void URCameraController::Init(ARModel* InModel)
 }
 
 
-void URTFController::Init(ARModel* InModel)
+void URTFController::Init()
 {
-  if(!InModel)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
     }
   else
     {
-      Model = InModel;
       Time = 0.0f;
-      for(auto& Link : Model->Links)
+      for(auto& Link : GetOwner()->Links)
         {
           Link.Value->GetCollision()->SetSimulatePhysics(false);
           // Link.Value->GetCollision()->SetCollisionProfileName(false);
@@ -165,7 +173,7 @@ bool URTFController::UpdateFramePoses()
           FString ParentName = TF.Value.ParentFrame;
           URStaticMeshComponent* Child = nullptr;
           URStaticMeshComponent* Parent = nullptr;
-          for(auto& Link : Model->Links)
+          for(auto& Link : GetOwner()->Links)
             {
               if(!Child)
                 {
