@@ -49,7 +49,7 @@ class UROBOSIM_API URGripperController : public URController
     public:
     URGripperController();
 
-  virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
   virtual bool Grasp();
   virtual void Release();
   virtual void UpdateGripper();

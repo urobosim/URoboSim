@@ -14,7 +14,7 @@ class UROBOSIM_API URHeadTrajectoryController : public URController
 public:
 	URHeadTrajectoryController();
 
-	virtual void Init(ARModel* InModel) override;
+	virtual void Init() override;
 	virtual void Tick(float InDeltaTime);
 
 	UPROPERTY()

@@ -19,25 +19,25 @@ void UROmniwheelController::Tick(float InDeltaTime)
 
 void UROmniwheelController::MoveWheelTick(const float &InDeltaTime)
 {
-  if (Model->Links.Contains(WheelSetting.WheelFrontLeft) &&
-      Model->Links.Contains(WheelSetting.WheelBackLeft) &&
-      Model->Links.Contains(WheelSetting.WheelFrontRight) &&
-      Model->Links.Contains(WheelSetting.WheelBackRight))
+  if (GetOwner()->Links.Contains(WheelSetting.WheelFrontLeft) &&
+      GetOwner()->Links.Contains(WheelSetting.WheelBackLeft) &&
+      GetOwner()->Links.Contains(WheelSetting.WheelFrontRight) &&
+      GetOwner()->Links.Contains(WheelSetting.WheelBackRight))
       {
         WheelSetting.WheelVelocities[0] = (LinearVelocity.X + LinearVelocity.Y + WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
         WheelSetting.WheelVelocities[1] = (LinearVelocity.X - LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
         WheelSetting.WheelVelocities[2] = (LinearVelocity.X - LinearVelocity.Y + WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
         WheelSetting.WheelVelocities[3] = (LinearVelocity.X + LinearVelocity.Y - WheelSetting.WheelToCenterSum * AngularVelocity) / WheelSetting.WheelRadius;
 
-        FVector RotationAxis = Model->Links[BaseName]->GetCollision()->GetComponentQuat().GetAxisY();
-        Model->Links[WheelSetting.WheelFrontLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[0]);
-        Model->Links[WheelSetting.WheelFrontRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[1]);
-        Model->Links[WheelSetting.WheelBackLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[2]);
-        Model->Links[WheelSetting.WheelBackRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[3]);
+        FVector RotationAxis = GetOwner()->Links[BaseName]->GetCollision()->GetComponentQuat().GetAxisY();
+        GetOwner()->Links[WheelSetting.WheelFrontLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[0]);
+        GetOwner()->Links[WheelSetting.WheelFrontRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[1]);
+        GetOwner()->Links[WheelSetting.WheelBackLeft]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[2]);
+        GetOwner()->Links[WheelSetting.WheelBackRight]->GetCollision()->SetPhysicsAngularVelocityInRadians(RotationAxis * WheelSetting.WheelVelocities[3]);
       }
   else
   {
-    UE_LOG(LogTemp, Error, TEXT("OmniwheelController can not find omni wheels in the model"))
+    UE_LOG(LogTemp, Error, TEXT("OmniwheelController can not find omni wheels in the GetOwner()"))
   }
   
 }

@@ -2,42 +2,43 @@
 
 #pragma once
 
-#include "Physics/RModel.h"
-#include "RGraspComponent.h"
 #include "ConstructorHelpers.h"
 #include "Physics/RJoint.h"
+#include "Physics/RModel.h"
+#include "RGraspComponent.h"
 //#include "ROSCommunication/RRosComunication.h"
-#include "RGBDCamera.h"
-#include "ROSUtilities.h"
 #include "Containers/Queue.h"
 #include "Conversions.h"
+#include "RGBDCamera.h"
+#include "ROSUtilities.h"
+// clang-format off
 #include "RController.generated.h"
-
+// clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UPerceivedObject : public UObject
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-    UPROPERTY(BlueprintReadWrite,  EditAnywhere, export, noclear)
-    FString Name;
+  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
+  FString Name;
 
-    UPROPERTY(BlueprintReadWrite,  EditAnywhere, export, noclear)
-    FString Type;
+  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
+  FString Type;
 
-    UPROPERTY()
-    FTransform Pose;
+  UPROPERTY()
+  FTransform Pose;
 
-    UPROPERTY(BlueprintReadWrite,  EditAnywhere, export, noclear)
-    FTransform PoseWorld;
+  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
+  FTransform PoseWorld;
 };
 
 USTRUCT()
 struct FTFInfo
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-    FString ParentFrame;
+  FString ParentFrame;
   FTransform Pose;
   // FString ChildFrame;
   // FORCEINLINE FTransform() : ParentFrame(""), Pose(FTransform()){};
@@ -47,11 +48,11 @@ public:
 USTRUCT()
 struct FJointInfo
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-	float JointPosition;
-	float JointVelocity;
-	float JointEffort;
+  float JointPosition;
+  float JointVelocity;
+  float JointEffort;
 };
 
 USTRUCT()
@@ -73,7 +74,7 @@ public:
 
   double GetTimeAsDouble()
   {
-    return Secs + NSecs/1000000000;
+    return Secs + NSecs / 1000000000;
   };
 
   void Reset()
@@ -89,126 +90,120 @@ public:
 USTRUCT()
 struct FTrajectoryStatus
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-	TArray<FString> JointNames;
-	TArray<double> Position;
-	TArray<double> Desired;
-	TArray<double> Error;
+  TArray<FString> JointNames;
+  TArray<double> Position;
+  TArray<double> Desired;
+  TArray<double> Error;
 };
-
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URController : public UObject
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
+  virtual void Tick(float InDeltaTime){};
+  virtual void Init(){};
+  virtual void SetOwner(ARModel* Model);
+  virtual void CancelAction();
+  const ARModel* GetOwner();
 
-	virtual void Tick(float InDeltaTime){};
-	virtual void Init(ARModel* Model){};
-	virtual void CancelAction();
+  UPROPERTY()
+  bool bActive;
 
+  UPROPERTY()
+  bool bCancel = false;
 
-	UPROPERTY()
-	bool bActive;
+  UPROPERTY()
+  bool bPublishResult = false;
 
-	UPROPERTY()
-	bool bCancel = false;
+  UPROPERTY()
+  TArray<FGoalStatusInfo> GoalStatusList;
 
-	UPROPERTY()
-	bool bPublishResult = false;
+  // float CheckAngleRange(float InAngle);
 
-	UPROPERTY()
-	TArray<FGoalStatusInfo> GoalStatusList;
+  UPROPERTY()
+  float CummulatedError = 0;
 
-    // float CheckAngleRange(float InAngle);
+  UPROPERTY(EditAnywhere)
+  float HackOffset = 0;
 
-	UPROPERTY()
-    float CummulatedError = 0;
+  UPROPERTY()
+  double ActionDuration;
 
-	UPROPERTY(EditAnywhere)
-    float HackOffset = 0;
-
-        UPROPERTY()
-          double ActionDuration;
-
+private:
+  UPROPERTY()
+  ARModel* Owner;
 };
-
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URCameraController : public URController
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-	URCameraController(){};
+  URCameraController(){};
 
-	virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
 
-    virtual void PerceiveObject();
+  virtual void PerceiveObject();
 
-	virtual void Tick(float InDeltaTime) override;
+  virtual void Tick(float InDeltaTime) override;
 
-	UPROPERTY(BlueprintReadWrite, Instanced  ,EditAnywhere, export, noclear)
-	TArray<UPerceivedObject*> PerceivedObjects;
+  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  TArray<UPerceivedObject*> PerceivedObjects;
 
-    UPROPERTY()
-    FString TypeToPerceive;
+  UPROPERTY()
+  FString TypeToPerceive;
 
-	UPROPERTY()
-	ARGBDCamera* Camera;
+  UPROPERTY()
+  ARGBDCamera* Camera;
 
-	UPROPERTY()
-	UPerceivedObject* PerceivedObject;
+  UPROPERTY()
+  UPerceivedObject* PerceivedObject;
+
 protected:
+  UPROPERTY(EditAnywhere)
+  FString CameraRef;
 
-	UPROPERTY()
-	ARModel* Model;
+  UPROPERTY(EditAnywhere)
+  FString CameraName;
 
-	UPROPERTY(EditAnywhere)
-	FString CameraRef;
-
-	UPROPERTY(EditAnywhere)
-	FString CameraName;
-
-	UPROPERTY(EditAnywhere)
-	FTransform PoseOffset;
+  UPROPERTY(EditAnywhere)
+  FTransform PoseOffset;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URTFController : public URController
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 public:
-	virtual void Init(ARModel* InModel) override;
-	virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
-	virtual TMap<FString, FTFInfo> GetTFList();
+  virtual void Init() override;
+  virtual void AddTF(FString InFrameName, FTFInfo InTFInfo);
+  virtual TMap<FString, FTFInfo> GetTFList();
 
-	virtual bool UpdateFramePoses();
-	virtual void SetLinkPose(URStaticMeshComponent* InChildLink, URStaticMeshComponent* InParentLink, FTransform InPose);
+  virtual bool UpdateFramePoses();
+  virtual void SetLinkPose(URStaticMeshComponent* InChildLink, URStaticMeshComponent* InParentLink, FTransform InPose);
 
-	virtual void Tick(float InDeltaTime) override;
+  virtual void Tick(float InDeltaTime) override;
 
 protected:
+  UPROPERTY(EditAnywhere)
+  float UpdateRate;
 
-	UPROPERTY()
-	ARModel* Model;
+  UPROPERTY()
+  float Time;
 
-	UPROPERTY(EditAnywhere)
-	float UpdateRate;
-
-	UPROPERTY()
-	float Time;
-
-	UPROPERTY()
-	TMap<FString, FTFInfo> TFList;
+  UPROPERTY()
+  TMap<FString, FTFInfo> TFList;
 };
 
 USTRUCT(Blueprintable)
 struct FRControllerContainer
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
- public:
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URController*> ControllerList;
+public:
+  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  TMap<FString, URController*> ControllerList;
 };

@@ -26,7 +26,7 @@ class UROBOSIM_API URJointController : public URController
     public:
     URJointController();
 
-  virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
   virtual void Tick(float InDeltaTime);
 
   UPROPERTY(VisibleAnywhere)
@@ -81,9 +81,6 @@ class UROBOSIM_API URJointController : public URController
 
   UPROPERTY()
     FTrajectoryPoints OldTrajectoryPoints;
-
-  UPROPERTY()
-    ARModel* Model;
 
   UPROPERTY()
     uint32 TrajectoryPointIndex;

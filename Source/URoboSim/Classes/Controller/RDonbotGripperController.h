@@ -19,7 +19,7 @@ class UROBOSIM_API URDonbotGripperController : public URController
 public:
   URDonbotGripperController();
 
-  virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
   virtual void Grasp();
   virtual void Release();
   virtual void UpdateGripper();
