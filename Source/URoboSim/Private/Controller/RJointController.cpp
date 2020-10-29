@@ -32,7 +32,7 @@ void URJointController::SetJointVelocities(float InDeltaTime)
     {
       for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
         {
-          URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
+          URJoint* Joint = GetOwner()->Joints[TrajectoryStatus.JointNames[i]];
           if(Joint)
             {
               Joint->SetJointVelocity(Trajectory[TrajectoryPointIndex].Velocities[i]);
@@ -86,7 +86,7 @@ bool URJointController::CheckTrajectoryPoint()
 
   for(int i = 0; i < TrajectoryStatus.JointNames.Num(); i++)
     {
-      URJoint* Joint = Model->Joints[TrajectoryStatus.JointNames[i]];
+      URJoint* Joint = GetOwner()->Joints[TrajectoryStatus.JointNames[i]];
       if(Joint)
         {
           float CurrentJointPos = Joint->GetEncoderValue();
@@ -137,7 +137,7 @@ bool URJointController::CheckTrajectoryGoalReached()
 void URJointController::CallculateJointVelocities(float InDeltaTime)
 {
   FString Velocity = "";
-  for(auto & Joint: Model->Joints)
+  for(auto & Joint: GetOwner()->Joints)
     {
       if(DesiredJointState.Contains(Joint.Key))
         {
@@ -172,7 +172,7 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
 
 void URJointController::SetDesiredJointState(FString JointName, float InJointState)
 {
-  URJoint* Joint = Model->Joints[JointName];
+  URJoint* Joint = GetOwner()->Joints[JointName];
   if(Joint)
     {
       float& JointValue = DesiredJointState.FindOrAdd(JointName);
@@ -190,13 +190,13 @@ void URJointController::SetDesiredJointState(FString JointName, float InJointSta
 
 void URJointController::Tick(float InDeltaTime)
 {
-  if(!Model)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("Model not initialized"));
       return;
     }
 
-  for(auto& Joint : Model->Joints)
+  for(auto& Joint : GetOwner()->Joints)
     {
       Joint.Value->UpdateEncoder();
     }
@@ -250,9 +250,9 @@ void URJointController::MoveJoints(float InDeltaTime)
 
 void URJointController::MoveJointsDynamic(float InDeltaTime)
 {
-  if(Model->Links.Contains(BaseLink))
+  if(GetOwner()->Links.Contains(BaseLink))
     {
-      Model->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+      GetOwner()->Links[BaseLink]->UpdateVelocity(InDeltaTime);
     }
 }
 
@@ -260,7 +260,7 @@ void URJointController::MoveJointsKinematic()
 {
 
   FHitResult * HitResult = nullptr;
-  for(auto& Joint : Model->Joints)
+  for(auto& Joint : GetOwner()->Joints)
     {
       if(DesiredJointState.Contains(Joint.Key))
         {
@@ -269,19 +269,18 @@ void URJointController::MoveJointsKinematic()
     }
 }
 
-void URJointController::Init(ARModel* InModel)
+void URJointController::Init()
 {
   State = UJointControllerState::Normal;
   bPublishResult = false;
-  if(!InModel)
+  if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("JointController not attached to ARModel"));
     }
   else
     {
-      Model = InModel;
       SwitchMode(Mode, true);
-      for(auto & Link: Model->Links)
+      for(auto & Link: GetOwner()->Links)
         {
           Link.Value->GetCollision()->SetEnableGravity(false);
           if(bDisableCollision)
@@ -290,7 +289,7 @@ void URJointController::Init(ARModel* InModel)
           }
         }
 
-      // for(auto & Joint: Model->Joints)
+      // for(auto & Joint: GetOwner()->Joints)
       //   {
       //     if(Joint.Value->Constraint->IsA(URContinuousConstraintComponent::StaticClass()) or
       //        Joint.Value->Constraint->IsA(URRevoluteConstraintComponent::StaticClass()))
@@ -313,7 +312,7 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
     }
 
   Mode = InMode;
-  if(!Model)
+  if(!GetOwner())
     {
       return;
     }
@@ -333,7 +332,7 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 		bEnablePhysics = true;
     }
 
-  for(auto& Joint : Model->Joints)
+  for(auto& Joint : GetOwner()->Joints)
     {
       Joint.Value->Child->GetCollision()->SetSimulatePhysics(bEnablePhysics);
     }
@@ -346,7 +345,7 @@ void URJointController::FollowTrajectory()
   URJoint* Joint = nullptr;
   for(auto& JointName : TrajectoryStatus.JointNames)
     {
-      Joint = Model->Joints[JointName];
+      Joint = GetOwner()->Joints[JointName];
       if(Joint)
         {
           OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
