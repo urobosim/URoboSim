@@ -1,4 +1,6 @@
 #include "Factory/RModelBuilder.h"
+#include "Controller/RControllerComponent.h"
+#include "Controller/RBaseController.h"
 
 
 // Sets default values
@@ -14,6 +16,18 @@ URModelBuilder::~URModelBuilder()
 }
 
 // Load model
+void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation)
+{
+  ModelDescription = InModelDescription;
+  if(OutModel)
+    {
+      Model = OutModel;
+      LoadLinks(InLocation);
+      LoadJoints();
+      BuildKinematicTree();
+    }
+}
+//
 void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel)
 {
   ModelDescription = InModelDescription;
@@ -25,8 +39,26 @@ void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel)
       BuildKinematicTree();
     }
 }
-
 // Load links
+void URModelBuilder::LoadLinks(FVector InLocation)
+{
+  for(USDFLink* Link : ModelDescription->Links)
+    {
+      URLink* TempLink = LinkFactory->Load(Model, Link,InLocation);
+      if(TempLink)
+        {
+          if(!Model->BaseLink)
+            {
+              Model->BaseLink = TempLink;
+            }
+          Model->AddLink(TempLink);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Creation of Link %s failed"), *Link->GetName());
+        }
+    }
+}
 void URModelBuilder::LoadLinks()
 {
   for(USDFLink* Link : ModelDescription->Links)

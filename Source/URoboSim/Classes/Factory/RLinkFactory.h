@@ -17,11 +17,16 @@ class UROBOSIM_API URLinkBuilder : public UObject
 
 public:
 
-  virtual void Init(UObject* InOuter, USDFLink* InLinkDescription);
+  virtual void  Init(UObject* InOuter, USDFLink* InLinkDescription);
+  virtual void Init(UObject* InOuter, USDFLink* InLinkDescription,FVector InLocation);
+//  virtual URLink* NewLink(FVector InLocation);
   virtual URLink* NewLink();
 
   UPROPERTY()
     ARModel* Model;
+
+  UPROPERTY()
+  FVector LoadLocation;
 protected:
 
 
@@ -40,6 +45,7 @@ protected:
   virtual void SetVisual(USDFVisual* InVisual);
   virtual void SetCollisions();
   virtual void SetCollision(USDFCollision* InCollision);
+
   virtual void SetInertial(USDFLinkInertial* InInertial);
   virtual void SetCollisionProfile(bool InSelfColide);
   virtual void SetSimulateGravity(bool InUseGravity);
@@ -52,6 +58,7 @@ class UROBOSIM_API URLinkFactory : public UObject
  public:
 
     URLink* Load(UObject* InOuter, USDFLink* InLinkDescription);
+    URLink* Load(UObject* InOuter, USDFLink* InLinkDescription,FVector InLoaction);
 
 protected:
 
