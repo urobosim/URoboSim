@@ -47,7 +47,7 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
               URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
               NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo);
-              ModelBuilder->Load(Model, NewRobot);
+              ModelBuilder->Load(Model, NewRobot,FVector(0,0,0));
               // NewRobot->Load(Model);
               // URModelFactory::CreateModels(NewRobot, SDFAsset);
               if ( NewRobot )

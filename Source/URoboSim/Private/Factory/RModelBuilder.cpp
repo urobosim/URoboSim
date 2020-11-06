@@ -27,43 +27,13 @@ void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel,FVect
       BuildKinematicTree();
     }
 }
-//
-void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel)
-{
-  ModelDescription = InModelDescription;
-  if(OutModel)
-    {
-      Model = OutModel;
-      LoadLinks();
-      LoadJoints();
-      BuildKinematicTree();
-    }
-}
+
 // Load links
 void URModelBuilder::LoadLinks(FVector InLocation)
 {
   for(USDFLink* Link : ModelDescription->Links)
     {
       URLink* TempLink = LinkFactory->Load(Model, Link,InLocation);
-      if(TempLink)
-        {
-          if(!Model->BaseLink)
-            {
-              Model->BaseLink = TempLink;
-            }
-          Model->AddLink(TempLink);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Creation of Link %s failed"), *Link->GetName());
-        }
-    }
-}
-void URModelBuilder::LoadLinks()
-{
-  for(USDFLink* Link : ModelDescription->Links)
-    {
-      URLink* TempLink = LinkFactory->Load(Model, Link);
       if(TempLink)
         {
           if(!Model->BaseLink)
