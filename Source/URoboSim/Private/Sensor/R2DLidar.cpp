@@ -65,11 +65,8 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
   for(int i = 0; i < (int) SCSResolution; i++)
     {
       float Angle = i * FMath::RadiansToDegrees(AngularIncrement);
-      FRotator ResultRot = UKismetMathLibrary::ComposeRotators(
-                                                               FRotator(0, 180 - Angle, 0),
-                                                               LidarBodyRot
-                                                               );
-      FVector EndTrace = MaximumDistance * UKismetMathLibrary::GetForwardVector(ResultRot) + LidarBodyLoc;
+      FRotator ResultRot(0, 180 - Angle, 0);
+      FVector EndTrace = MaximumDistance * LidarBodyRot.RotateVector(ResultRot.Vector()) + LidarBodyLoc;
       FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("Laser_Trace")), true, GetOwner());
       TraceParams.bTraceComplex = true;
       TraceParams.bReturnPhysicalMaterial = false;
@@ -83,14 +80,7 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
                                            TraceParams,
                                            FCollisionResponseParams::DefaultResponseParam
                                            );
-      if((HitInfo.Distance) > MinimumDistance && (HitInfo.Distance) < MaximumDistance)
-        {
-          DistanceMeasurement[i] = HitInfo.Distance/ 100.;
-        }
-      else
-        {
-          DistanceMeasurement[i] = 0.0;
-        }
+      DistanceMeasurement[i] = HitInfo.Distance/ 100.;
     }
   bPublishResult = true;
 }
