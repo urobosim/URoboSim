@@ -37,7 +37,8 @@ public:
     URLinkFactory* LinkFactory;
 
   // Load model
-  void Load(USDFModel* InModelDescription, ARModel* OutModel);
+  void Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation);
+  void AddController(ARModel* OutModel);
 protected:
   // Called when the game starts or when spawned
 
@@ -47,7 +48,7 @@ protected:
   UPROPERTY()
   ARModel* Model;
 
-  void LoadLinks();
+  void LoadLinks(FVector InLocation);
   void LoadJoints();
   void BuildKinematicTree();
   void SetConstraintPosition(URJoint* InJoint);

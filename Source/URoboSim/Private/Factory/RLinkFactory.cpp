@@ -1,5 +1,24 @@
 #include "Factory/RLinkFactory.h"
 
+URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription, FVector InLocation)
+{
+  if(!InOuter && !InLinkDescription)
+    {
+      return nullptr;
+    }
+
+  LinkBuilder = CreateBuilder(InLinkDescription);
+  if(LinkBuilder)
+    {
+      LinkBuilder->Init(InOuter, InLinkDescription,InLocation);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("LinkFactory: LinkBuilder not created because NumCollisions = 0"));
+    }
+  return LinkBuilder->NewLink();
+}
+
 URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription)
 {
   if(!InOuter && !InLinkDescription)
@@ -31,11 +50,19 @@ URLinkBuilder* URLinkFactory::CreateBuilder(USDFLink* InLinkDescription)
     }
 }
 
+void URLinkBuilder::Init(UObject* InOuter, USDFLink* InLinkDescription,FVector InLocation)
+{
+  Model = Cast<ARModel>(InOuter);
+  LinkDescription = InLinkDescription;
+  LoadLocation=InLocation;
+}
 void URLinkBuilder::Init(UObject* InOuter, USDFLink* InLinkDescription)
 {
   Model = Cast<ARModel>(InOuter);
   LinkDescription = InLinkDescription;
+  LoadLocation=FVector(0,0,0);
 }
+
 
 URLink* URLinkBuilder::NewLink()
 {
@@ -78,13 +105,14 @@ void URLinkBuilder::SetVisuals()
     }
 }
 
+
 void URLinkBuilder::SetVisual(USDFVisual* InVisual)
 {
   URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
   LinkComponent->RegisterComponent();
 
   FVector LocationOffset = LinkPose.GetRotation().RotateVector(InVisual->Pose.GetLocation());
-  LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation());
+  LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation() + LoadLocation);
 
   //Rotations are added by multiplying the Quaternions
   FQuat RotationOffset = LinkPose.GetRotation() * InVisual->Pose.GetRotation();
@@ -111,6 +139,7 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
     }
 }
 
+
 void URLinkBuilder::SetCollisions()
 {
     for(USDFCollision* Collision : LinkDescription->Collisions)
@@ -118,6 +147,8 @@ void URLinkBuilder::SetCollisions()
         SetCollision(Collision);
     }
 }
+
+
 
 void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 {
@@ -133,7 +164,7 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   LinkComponent->BodyInstance.VelocitySolverIterationCount = 8;
 
   FVector LocationOffset = LinkPose.GetRotation().RotateVector(InCollision->Pose.GetLocation());
-  LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation());
+  LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation() + LoadLocation);
 
   //Rotations are added by multiplying the Quaternions
   FQuat RotationOffset = LinkPose.GetRotation() * InCollision->Pose.GetRotation();
