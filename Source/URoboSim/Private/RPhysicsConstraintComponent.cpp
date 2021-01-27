@@ -185,7 +185,7 @@ void URContinuousConstraintComponent::UpdateJointVelocity(float InDeltaT)
 }
 
 
-void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild)
+void URConstraintComponent::SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild)
 {
   Parent = InParent;
   Child = InChild;
@@ -193,9 +193,29 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
 
 void URContinuousConstraintComponent::BeginPlay()
 {
-  FQuat ParentOrientation = Parent->GetComponentQuat();
-  FQuat ChildOrientation = Child->GetComponentQuat();
-  QInitial = ParentOrientation.Inverse() * ChildOrientation;
+  if(ConstraintActor1)
+    {
+      Parent = Cast<UStaticMeshComponent>(ConstraintActor1->GetRootComponent());
+    }
+  else
+    {
+      Parent = Cast<UStaticMeshComponent>(GetAttachmentRootActor()->GetRootComponent());
+    }
+  if(ConstraintActor2)
+    {
+      Child = Cast<UStaticMeshComponent>(ConstraintActor2->GetRootComponent());
+    }
+  else
+    {
+      Child = Cast<UStaticMeshComponent>(GetAttachmentRootActor()->GetRootComponent());
+    }
+
+  if(Parent && Child)
+    {
+      FQuat ParentOrientation = Parent->GetComponentQuat();
+      FQuat ChildOrientation = Child->GetComponentQuat();
+      QInitial = ParentOrientation.Inverse() * ChildOrientation;
+    }
   Super::BeginPlay();
 }
 

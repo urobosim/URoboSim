@@ -49,16 +49,16 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     FQuat QInitial;
 
-  UPROPERTY()
+  UPROPERTY(EditInstanceOnly)
     float Upper;
 
-  UPROPERTY()
+  UPROPERTY(EditInstanceOnly)
     float Lower;
 
-  UPROPERTY()
+  UPROPERTY(EditInstanceOnly)
     float SoftUpper = 0;
 
-  UPROPERTY()
+  UPROPERTY(EditInstanceOnly)
     float SoftLower = 0;
 
   virtual void ConnectToComponents(){};
@@ -66,7 +66,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
-  virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
+  virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
 
 
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
@@ -98,7 +98,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     UREncoder* Encoder;
 
-  UPROPERTY(VisibleAnywhere)
+  UPROPERTY(EditInstanceOnly)
     FVector RefAxis;
 
   UPROPERTY()
@@ -113,14 +113,14 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     float TargetVelocity;
 
   UPROPERTY()
-    URStaticMeshComponent* Parent;
+    UStaticMeshComponent* Parent;
 
   UPROPERTY()
-    URStaticMeshComponent* Child;
+    UStaticMeshComponent* Child;
 
 };
 
-UCLASS()
+UCLASS(ClassGroup=Physics, meta=(BlueprintSpawnableComponent), HideCategories=(Activation,"Components|Activation", Physics, Mobility), ShowCategories=("Physics|Components|PhysicsConstraint"))
 class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
 {
   GENERATED_BODY()
@@ -130,7 +130,7 @@ class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
 
 };
 
-UCLASS()
+UCLASS(ClassGroup=Physics, meta=(BlueprintSpawnableComponent), HideCategories=(Activation,"Components|Activation", Physics, Mobility), ShowCategories=("Physics|Components|PhysicsConstraint"))
 class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComponent
 {
   GENERATED_BODY()
@@ -171,7 +171,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
 };
 
 
-UCLASS()
+UCLASS(ClassGroup=Physics, meta=(BlueprintSpawnableComponent), HideCategories=(Activation,"Components|Activation", Physics, Mobility), ShowCategories=("Physics|Components|PhysicsConstraint"))
 class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintComponent
 {
   GENERATED_BODY()
@@ -202,13 +202,13 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   virtual void UpdateJointVelocity(float InDeltaT = 0);
 };
 
-UCLASS()
+UCLASS(ClassGroup=Physics, meta=(BlueprintSpawnableComponent), HideCategories=(Activation,"Components|Activation", Physics, Mobility), ShowCategories=("Physics|Components|PhysicsConstraint"))
 class UROBOSIM_API URScrewConstraintComponent : public URContinuousConstraintComponent
 {
   GENERATED_BODY()
     };
 
-UCLASS()
+UCLASS(ClassGroup=Physics, meta=(BlueprintSpawnableComponent), HideCategories=(Activation,"Components|Activation", Physics, Mobility), ShowCategories=("Physics|Components|PhysicsConstraint"))
 class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraintComponent
 {
   GENERATED_BODY()
