@@ -21,14 +21,8 @@ protected:
     virtual void SetOwner(UObject* InOwner);
     virtual void CreatePublisher();
 
-    UPROPERTY()
-      URJointStateConfigurationClient* ConfigClient;
 
-    UPROPERTY(EditAnywhere)
-      FString JointParamTopic;
-
-    UPROPERTY()
-      ARModel* Owner;
 private:
-    TArray<double> ListJointPosition, ListJointVelocity, ListJointEffort;
+    TMap<FString, double> ListJointPosition;
+    // double ListJointPosition;
 };

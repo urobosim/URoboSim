@@ -5,7 +5,6 @@
 UREnvironmentStatePublisher::UREnvironmentStatePublisher()
 {
   Topic = TEXT("/joint_states");
-  JointParamTopic = TEXT("/hardware_interface/joints");
 }
 
 void UREnvironmentStatePublisher::SetMessageType()
@@ -15,10 +14,6 @@ void UREnvironmentStatePublisher::SetMessageType()
 
 void UREnvironmentStatePublisher::SetOwner(UObject* InOwner)
 {
-  Owner = Cast<ARModel>(InOwner);
-  ConfigClient = NewObject<URJointStateConfigurationClient>(this);
-  ConfigClient->JointParamTopic = JointParamTopic;
-  ConfigClient->URROSClient::Init(InOwner, &ListJointName, Handler);
 }
 
 void UREnvironmentStatePublisher::CreatePublisher()
@@ -28,20 +23,11 @@ void UREnvironmentStatePublisher::CreatePublisher()
 
 void UREnvironmentStatePublisher::Publish()
 {
-  ListJointPosition.Empty();
-  ListJointPosition.Reserve(ListJointName.Num());
-  ListJointVelocity.Empty();
-  ListJointVelocity.Reserve(ListJointName.Num());
-  ListJointEffort.Empty();
-  ListJointEffort.Reserve(ListJointName.Num());
-
   for (auto &JointName : ListJointName)
     {
       if(Owner->Joints.Contains(JointName))
         {
-          URJoint* Joint = Owner->Joints[JointName];
           float JointPosition = Joint->GetEncoderValue();
-          float JointVelocity = Joint->GetJointVelocity();
 
           ListJointPosition.Add(JointPosition);
           ListJointVelocity.Add(0.0);
