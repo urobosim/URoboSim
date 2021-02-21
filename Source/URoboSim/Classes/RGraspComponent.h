@@ -17,6 +17,7 @@ class UROBOSIM_API URGraspComponent : public USphereComponent
 public:
 	URGraspComponent();
 
+	virtual void Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2);
 	virtual void Init(URStaticMeshComponent* InGripper);
 	// virtual void Init();
 
@@ -32,17 +33,30 @@ public:
 	FString GripperName;
 
 	// Fixated object
+
+	UPROPERTY()
 	AStaticMeshActor* FixatedObject;
+
+	UPROPERTY()
+	bool bObjectGrasped;
+
 
 protected:
 
+	UPROPERTY(EditAnywhere)
+	float GraspRadius = 10.f;
 
 	UPROPERTY()
 	URStaticMeshComponent* Gripper;
 
-        UPROPERTY()
+	UPROPERTY()
+	URStaticMeshComponent* Gripper2;
+
+        UPROPERTY(EditAnywhere)
           UPhysicsConstraintComponent* Constraint;
 
+        UPROPERTY(EditAnywhere)
+          UPhysicsConstraintComponent* Constraint2;
 	// Function called when an item enters the fixation overlap area
 	UFUNCTION()
 	virtual void OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
@@ -59,4 +73,7 @@ protected:
 
 	// Fixate object to hand
 	virtual void FixateObject(AStaticMeshActor* InSMA);
+
+        UPROPERTY()
+          bool bGraspObjectGravity;
 };

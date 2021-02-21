@@ -2,6 +2,77 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Physics/RJoint.h"
 
+
+float URConstraintComponent::GetUpperLimit()
+{
+  if(SoftUpper != 0.0f)
+    {
+      return SoftUpper;
+    }
+  else
+    {
+      return Upper;
+    }
+}
+
+float URConstraintComponent::GetLowerLimit()
+{
+  if(SoftLower != 0.0f)
+    {
+      return SoftLower;
+    }
+  else
+    {
+      return Lower;
+    }
+}
+
+float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
+{
+  float JointValue;
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
+
+  if(InJointState > UsedUpper)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), UsedUpper);
+      JointValue =  UsedUpper;
+    }
+  else if(InJointState < UsedLower)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), UsedLower);
+      JointValue =  UsedLower;
+    }
+  else
+    {
+      JointValue = InJointState;
+    }
+  return JointValue;
+}
+
+float URRevoluteConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
+{
+  float JointValue;
+  float UsedUpper = GetUpperLimit();
+  float UsedLower = GetLowerLimit();
+  if(InJointState > UsedUpper)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), Upper);
+      JointValue =  UsedUpper;
+    }
+  else if(InJointState < UsedLower)
+    {
+      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), Lower);
+      JointValue =  UsedLower;
+    }
+  else
+    {
+      JointValue = InJointState;
+    }
+
+  return JointValue;
+}
+
 float URContinuousConstraintComponent::CheckPositionRange(float InTargetJointPos)
 {
   bool bNormalized = false;
@@ -35,7 +106,7 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
       float ChildMass = Child->GetMass();
 
       FQuat JointQuat = GetComponentTransform().GetRotation();
-      FVector TargetJointVelocity = TargetVelocity * RefAxis * 5;
+      FVector TargetJointVelocity = TargetVelocity * RefAxis;
       TargetJointVelocity = JointQuat.RotateVector(TargetJointVelocity); // Rotation Axis in Global Frame
 
       FVector COM = Child->GetBodyInstance()->GetCOMPosition();
@@ -45,11 +116,9 @@ void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
 
       FVector TargetChildLinearVelocity = ParentLinearVelocity + TargetJointVelocity;
 
-      Child->NextTickLinearVelocity = TargetChildLinearVelocity;
-      Child->NextTickAngularVelocity = ParentAngularVelocity;
-
       Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
       Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
+
     }
 }
 
@@ -67,27 +136,51 @@ void URContinuousConstraintComponent::UpdateJointVelocity(float InDeltaT)
 {
   if(Child && Parent)
     {
-      float ChildMass = Child->GetMass();
+      // float ChildMass = Child->GetMass();
+
+      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
+      FVector DistanceJointCOM = COM - GetComponentLocation();
+      FVector DistanceJointParent = GetComponentLocation() - Parent->GetBodyInstance()->GetCOMPosition();
+      FVector COMParentChild = COM - Parent->GetBodyInstance()->GetCOMPosition();
 
       FRotator JointRotation = GetComponentRotation();
       FVector TargetJointAngularVelocity = TargetVelocity * RefAxis;
       TargetJointAngularVelocity = ROSAngularVelocityToU(TargetJointAngularVelocity);
 
+      FVector ParentAngularVelocityDegrees = Parent->GetPhysicsAngularVelocityInDegrees();
+      FRotator ParentAngularVelocityRotator(-ParentAngularVelocityDegrees.Y, ParentAngularVelocityDegrees.Z, -ParentAngularVelocityDegrees.X);
+      ParentAngularVelocityRotator *= InDeltaT;
+
       FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
+      FRotator TargetJointAngularVelocityRotator(-TargetJointAngularVelocityWorld.Y, TargetJointAngularVelocityWorld.Z, -TargetJointAngularVelocityWorld.X);
+      TargetJointAngularVelocityRotator *= InDeltaT;
 
-      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
-      FVector DistanceJointCOM = COM - GetComponentLocation();
+      FVector NewDistanceJointCOM = ParentAngularVelocityRotator.Quaternion().RotateVector(DistanceJointCOM);
+      FVector COMTargetVelocity = TargetJointAngularVelocityRotator.Quaternion().RotateVector(NewDistanceJointCOM) - DistanceJointCOM;
+      COMTargetVelocity /= InDeltaT;
 
-      FVector COMTargetVelocity = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
-      COMTargetVelocity += Parent->GetPhysicsLinearVelocityAtPoint(COM);
+      FVector NewCOMParentChild = ParentAngularVelocityRotator.Quaternion().RotateVector(COMParentChild) - COMParentChild;
+      NewCOMParentChild /= InDeltaT;
 
-      FVector CurrentParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
+      // COMTargetVelocity += NewCOMParentChild;
 
-      Child->NextTickLinearVelocity = COMTargetVelocity;
-      Child->NextTickAngularVelocity = CurrentParentAngularVelocity + TargetJointAngularVelocityWorld;
+      // FVector COMTargetVelocityOld = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
 
+      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocity();
+      if(GetName().Contains("l_elbow_flex"))
+        {
+          // UE_LOG(LogTemp, Error, TEXT("COMParentChild %s NewCOMParentChild %s"), *COMParentChild.ToString(), *NewCOM.ToString());
+          // UE_LOG(LogTemp, Error, TEXT("COM %s ComponenLocation %s"), *COM.ToString(), *Child->GetComponentLocation().ToString());
+          // UE_LOG(LogTemp, Error, TEXT("ParentLinearvelocity %s NewCOMParentChild %s"), *COMTargetVelocityOld.ToString(), *COMTargetVelocity.ToString());
+        }
+
+
+      COMTargetVelocity += ParentLinearVelocity;
+
+
+      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
       Child->SetPhysicsLinearVelocity(COMTargetVelocity);
-      Child->SetPhysicsAngularVelocityInRadians(CurrentParentAngularVelocity + TargetJointAngularVelocityWorld);
+      Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity + TargetJointAngularVelocityWorld);
     }
 }
 
@@ -100,7 +193,6 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
 
 void URContinuousConstraintComponent::BeginPlay()
 {
-  JointAccuracy = 0.10;
   FQuat ParentOrientation = Parent->GetComponentQuat();
   FQuat ChildOrientation = Child->GetComponentQuat();
   QInitial = ParentOrientation.Inverse() * ChildOrientation;
@@ -109,15 +201,13 @@ void URContinuousConstraintComponent::BeginPlay()
 
 void URPrismaticConstraintComponent::BeginPlay()
 {
-  JointAccuracy = 0.01;
   Super::BeginPlay();
-
-  if(GetOuter()->GetName().Equals("torso_lift_joint"))
+  if(!GetName().Contains("gripper"))
     {
-      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FVector(0.0, 0.0, 0.0));
+      FVector FramePos = ParentChildDistance + Offset;
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
+      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
     }
-
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, -ParentChildDistance - Offset);
 }
 
 
@@ -195,9 +285,9 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   FVector ParentPosition = Parent->GetComponentLocation();
   FVector ChildPosition = Child->GetComponentLocation();
 
-  FRotator ParentRotation = Parent->GetComponentRotation();
   FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
-  float JointPosition = ((ParentPosition-ChildPosition)*JointAxis).Size()-(ParentChildDistance*RefAxis).Size();
+  float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
+
   return JointPosition;
 }
 
@@ -303,7 +393,8 @@ void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * 
 
 void URPrismaticConstraintComponent::SetJointVelocity(float Velocity)
 {
-  TargetVelocity = Velocity;
+  //Source of JointVelocity is ROS -> m/s convertet into cm/s
+  TargetVelocity = Velocity * 100;
 }
 
 void URPrismaticConstraintComponent::SetJointEffortFromROS(float InEffort)
@@ -338,7 +429,6 @@ void URContinuousConstraintComponent::SetJointVelocity(float Velocity)
 
 void URPrismaticConstraintComponent::SetJointVelocityInUUnits(float Velocity)
 {
-  //TODO wirte code
   SetJointVelocity(Velocity);
 }
 

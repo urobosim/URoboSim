@@ -1,9 +1,11 @@
 #pragma once
 
-#include "Physics/RModel.h"
+#include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
+#include "Controller/RJointController.h"
+#include "Physics/RModel.h"
 #include "RHeadController.generated.h"
-
+// clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URHeadTrajectoryController : public URController
@@ -12,7 +14,7 @@ class UROBOSIM_API URHeadTrajectoryController : public URController
 public:
 	URHeadTrajectoryController();
 
-	virtual void Init(ARModel* InModel) override;
+	virtual void Init() override;
 	virtual void Tick(float InDeltaTime);
 
 	UPROPERTY()
@@ -35,6 +37,7 @@ public:
 
     virtual void UpdateHeadDirection(){};
 protected:
+
     UPROPERTY()
       URJointController* JointController;
 

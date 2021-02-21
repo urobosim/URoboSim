@@ -85,9 +85,7 @@ void URModelBuilder::BuildKinematicTree()
       SetConstraintPosition(Joint.Value);
       Joint.Value->Constraint->ConnectToComponents();
 
-      // if(!Joint.Value->Child->Parent->FindComponentsByClass<URStaticMeshComponent>().Contains(Joint.Value->Child->GetCollision()))
-
-      if(!Joint.Value->Child->bAttachedToParent)
+      if(!Child->bAttachedToParent)
         {
           Child->GetCollision()->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
           // Child->GetCollision()->RegisterComponent();
@@ -98,13 +96,13 @@ void URModelBuilder::BuildKinematicTree()
           //   }
           // UE_LOG(LogTemp, Error, TEXT("Joint: %s Parent: %s Child: %s"), *Joint.Value->GetName(), *Joint.Value->Parent->GetCollision()->GetName(), *Joint.Value->Child->GetCollision()->GetName());
         }
-      else
-        {
-          Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-          // Parent->GetCollision()->RegisterComponent();
-          // Parent->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
-          Parent->bAttachedToParent = true;
-        }
+      // else if(!Parent->bAttachedToParent)
+      //   {
+      //     Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+      //     // Parent->GetCollision()->RegisterComponent();
+      //     // Parent->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
+      //     Parent->bAttachedToParent = true;
+      //   }
       Parent->AddJoint(Joint.Value);
     }
 }

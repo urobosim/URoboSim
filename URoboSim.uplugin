@@ -5,8 +5,8 @@
 	"FriendlyName": "URoboSim",
 	"Description": "",
 	"Category": "RobCoG",
-	"CreatedBy": "Andrei Haidu",
-	"CreatedByURL": "http://haidu.eu",
+	"CreatedBy": "Michael Neumann",
+	"CreatedByURL": "",
 	"DocsURL": "https://github.com/robcog-iai/URoboSim",
 	"MarketplaceURL": "",
 	"SupportURL": "http://robcog.org/",
@@ -16,27 +16,39 @@
 	"Modules": [
 		{
 		  "Name": "URoboSim",
-		  "Type": "Developer",
+		  "Type": "Runtime",
+		  "LoadingPhase": "Default"
+		},
+                {
+		  "Name": "URoboSimEditor",
+		  "Type": "Editor",
 		  "LoadingPhase": "Default"
 		}
 		],
-	"Plugins": [
-		{
-			"Name": "UUtils",
-			"Enabled": true
-		},
-		{
-			"Name": "URoboVision",
-			"Enabled": true
-		},
-		{
-			"Name": "UROSBridge",
-			"Enabled": true
-		},
-		{
-			"Name": "UROSWorldControl",
-			"Enabled": true
-		}
-
-	]
+  "Plugins": [
+    {
+      "Name": "UUtils",
+      "Enabled": true
+    },
+    {
+      "Name": "URoboVision",
+      "Enabled": true
+    },
+    {
+      "Name": "ProceduralMeshComponent",
+      "Enabled": true
+    },
+    {
+      "Name": "CustomMeshComponent",
+      "Enabled": true
+    },
+    {
+      "Name": "UROSBridge",
+      "Enabled": true
+    },
+    {
+      "Name": "UROSWorldControl",
+      "Enabled": true
+    }
+  ]
 }

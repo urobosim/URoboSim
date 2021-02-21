@@ -6,13 +6,14 @@ FRROSComunicationContainer::FRROSComunicationContainer()
   WebsocketIPAddr = TEXT("127.0.0.1");
   WebsocketPort = 9090;
   RobotName = TEXT("pr2");
+  ControllerComponent = nullptr;
+  bUseGlobalHandler = false;
 }
 
 
 void FRROSComunicationContainer::Init()
 {
   InitHandler();
-  // // Owner = Cast<ARRobot>(GetOwner());
   if(Handler.IsValid())
     {
       Handler->Connect();

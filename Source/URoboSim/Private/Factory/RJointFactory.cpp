@@ -12,6 +12,10 @@ URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription)
   {
     return nullptr;
   }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("JointFactory: JointBuilder not created because ConstraintType not supported"));
+    }
 
   JointBuilder->Init(InOuter, InJointDescription);
   return JointBuilder->NewJoint();
@@ -22,8 +26,8 @@ URJointBuilder* URJointFactory::CreateBuilder(USDFJoint* InJointDescription)
 {
   if(InJointDescription->Type.Equals("revolute"))
     {
-      if((InJointDescription->Axis->Upper > 360) ||
-         (InJointDescription->Axis->Lower < -360))
+      if((InJointDescription->Axis->Upper > 2 * PI) ||
+         (InJointDescription->Axis->Lower < -2 * PI))
         {
           return NewObject<URContiniousJointBuilder>(this);
         }
@@ -57,6 +61,7 @@ URJoint* URJointBuilder::NewJoint()
   if(Joint->Constraint)
     {
       SetAxis();
+      SetJointLimit();
     }
   else
     {
@@ -76,7 +81,6 @@ void URJointBuilder::CreateConstraint()
 {
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URFixedConstraintComponent>(Joint, FName(*Name));
-  // Joint->Constraint->JointInformation = JointInformation;
 }
 
 void URJointBuilder::SetAxis()
@@ -194,13 +198,13 @@ void URRevoluteJointBuilder::SetAxis()
   // RefAxis = RefAxis;
   if (Joint->Constraint->RefAxis[0] == 1)
     {
-      Joint->Constraint->ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, Joint->Constraint->Limit);
-      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Roll =  Joint->Constraint->RotationOffset;
+      Joint->Constraint->ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
+      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Roll =  FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
     }
   else if (Joint->Constraint->RefAxis[1] == 1)
     {
-      Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, Joint->Constraint->Limit);
-      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Pitch = Joint->Constraint->RotationOffset;
+      Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
+      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Pitch = FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
     }
   // else if (JointDescription->Axis->Xyz[2] == 1)
   // {
@@ -213,8 +217,8 @@ void URRevoluteJointBuilder::SetAxis()
       // FQuat BetweenQuat = FQuat::FindBetweenVectors(RefAxis, ZAxis);
       // AddLocalRotation(BetweenQuat);
       // RefAxis = FVector(0.0f, 0.0f, 1.0f);
-      Joint->Constraint->ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, Joint->Constraint->Limit);
-      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Yaw =  Joint->Constraint->RotationOffset;
+      Joint->Constraint->ConstraintInstance.SetAngularSwing1Limit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
+      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Yaw =  FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
     }
 
 }
@@ -224,18 +228,21 @@ void URRevoluteJointBuilder::CreateConstraint()
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URRevoluteConstraintComponent>(Joint, FName(*Name));
 }
+
 void URPrismaticJointBuilder::SetAxis()
 {
   Super::SetAxis();
   Joint->Constraint->Limit  =  0;
   ELinearConstraintMotion LinearConstraintMotion = ELinearConstraintMotion::LCM_Free;
+  float UpperUUnits = JointDescription->Axis->Upper * 100;
+  float LowerUUnits = JointDescription->Axis->Lower * 100;
 
-  if(FMath::Abs(JointDescription->Axis->Upper) < 10000000 && FMath::Abs(JointDescription->Axis->Lower) < 10000000)
+  if(FMath::Abs(UpperUUnits) < 10000 && FMath::Abs(LowerUUnits) < 10000)
     {
-      Joint->Constraint->Limit  =  0.5*FMath::Abs(JointDescription->Axis->Upper - JointDescription->Axis->Lower) ;
+      Joint->Constraint->Limit  =  0.5*FMath::Abs(UpperUUnits - LowerUUnits) ;
       LinearConstraintMotion = ELinearConstraintMotion::LCM_Limited;
 
-      Joint->Constraint->Offset = 0.5*(JointDescription->Axis->Lower + JointDescription->Axis->Upper) * JointDescription->Axis->Xyz;
+      Joint->Constraint->Offset = 0.5*(UpperUUnits + LowerUUnits) * JointDescription->Axis->Xyz;
     }
 
   if (FMath::Abs(JointDescription->Axis->Xyz[0])== 1)
@@ -252,7 +259,6 @@ void URPrismaticJointBuilder::SetAxis()
     {
       Joint->Constraint->ConstraintInstance.SetLinearZLimit(LinearConstraintMotion, Joint->Constraint->Limit);
     }
-
 }
 
 void URPrismaticJointBuilder::CreateConstraint()

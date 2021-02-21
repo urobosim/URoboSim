@@ -6,33 +6,16 @@
 #include "Physics/RJoint.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
-#include "ROSCommunication/RPublisher.h"
-#include "ROSCommunication/RSubscriber.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
+#include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/RROSClient.h"
 #include "ROSCommunication/RROSService.h"
-#include "ROSCommunication/RActionServer.h"
+#include "ROSCommunication/Actions/RActionServer.h"
 #include "Physics/RModel.h"
+#include "ROSUtilities.h"
 #include "RRosComunication.generated.h"
 
 class URControllerComponent;
-
-USTRUCT()
-struct FROSTopic
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere)
-	FString Topic;
-
-	UPROPERTY(EditAnywhere)
-	FString Type;
-
-	int32 ID;
-
-	FROSTopic(FString InTopic = "", FString InType = "") : Topic(InTopic), Type(InType){};
-
-};
-
 
 USTRUCT(Blueprintable)
 struct FRROSComunicationContainer
@@ -94,4 +77,3 @@ struct FRROSComunicationContainer
  protected:
 
 };
-

@@ -4,19 +4,41 @@
 
 URGraspComponent::URGraspComponent()
 {
-  InitSphereRadius(10.f);
+  InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
-  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(TEXT("Constraint"));
-  Constraint->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+  FString ConstraintName = TEXT("Constraint_") + GetName();
+  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName));
+  Constraint->SetupAttachment(this);
   Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
   Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
+  // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
+  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+
+  FString ConstraintName2 = TEXT("Constraint2_") + GetName();
+  Constraint2 = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName2));
+  Constraint2->SetupAttachment(this);
+  Constraint2->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
+  Constraint2->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
+  Constraint2->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
 }
 
 void URGraspComponent::Init(URStaticMeshComponent* InGripper)
 {
   Gripper = InGripper;
+  bObjectGrasped = false;
+
+  OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
+  OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
+
+}
+
+void URGraspComponent::Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2)
+{
+  Gripper = InGripper1;
+  Gripper2 = InGripper2;
+  bObjectGrasped = false;
 
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
@@ -38,6 +60,7 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
       ObjectsInReach.Emplace(OtherSMA);
+      // UE_LOG(LogTemp, Warning, TEXT("InReach %s"), *OtherSMA->GetName());
     }
 }
 
@@ -56,66 +79,112 @@ bool URGraspComponent::TryToFixate()
 {
   bool bSuccess = false;
 
-  if(!FixatedObject && ObjectsInReach.Num() > 0)
+  // if(bObjectGrasped)
+  if(!bObjectGrasped && ObjectsInReach.Num() > 0)
     {
       // Pop a SMA
-      AStaticMeshActor* SMA = ObjectsInReach.Pop();
+      AStaticMeshActor* SMA = ObjectsInReach[0];
 
       // Check if the actor is graspable
       FixateObject(SMA);
     }
 
-  if(FixatedObject)
-    {
-      bSuccess = true;
-    }
+  //   {
+  //     bSuccess = true;
+  //   }
 
-  return bSuccess;
+  // return bSuccess;
+  return bObjectGrasped;
 }
 
 // Fixate object to hand
 void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
 {
-  // Disable physics and overlap events
+  // AStaticMeshActor* ConstrainedActor = Cast<AStaticMeshActor>(InSMA->GetAttachParentActor());
+  AStaticMeshActor* ConstrainedActor = InSMA;
 
-  AStaticMeshActor* ConstrainedActor = Cast<AStaticMeshActor>(InSMA->GetAttachParentActor());
+  //If the grasped object is attached to another object (door handle), connecting via constraints moves
+  // the gripper to the root object
+  bool bParentFound = false;
+  while(!bParentFound)
+    {
+      AStaticMeshActor* TempActor = Cast<AStaticMeshActor>(ConstrainedActor->GetAttachParentActor());
+      if(TempActor)
+        {
+          ConstrainedActor = TempActor;
+        }
+      else
+        {
+          bParentFound = true;
+        }
+    }
+
   UStaticMeshComponent* SMC = nullptr;
-  if(ConstrainedActor)
-    {
-      SMC = Cast<UStaticMeshComponent>(ConstrainedActor->GetRootComponent());
-      if(!SMC)
-        {
-          UE_LOG(LogTemp, Error, TEXT("RootComponent of InSMA ParentActor not a StaticMesh Component"));
-          return;
-        }
-      FixatedObject = ConstrainedActor;
+  SMC = ConstrainedActor->GetStaticMeshComponent();
 
-    }
-  else
+  if(!SMC)
     {
-      SMC = InSMA->GetStaticMeshComponent();
-      if(!SMC)
-        {
-          UE_LOG(LogTemp, Error, TEXT("RootComponent of InSMA not a StaticMesh Component"));
-          return;
-        }
-      // Set the fixated object
-      FixatedObject = InSMA;
+      UE_LOG(LogTemp, Error, TEXT("RootComponent of InSMA has no static mesh"));
+      return;
     }
 
-  Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
 
-  // Clear objects in reach array
-  ObjectsInReach.Empty();
+  // if(InSMA == ConstrainedActor)
+  //   {
+  //     // Set the fixated object
+  //     FixatedObject = ConstrainedActor;
+  //     ConstrainedActor->GetStaticMeshComponent()->SetSimulatePhysics(false);
+  //     ConstrainedActor->AttachToComponent(Gripper, FAttachmentTransformRules::KeepWorldTransform);
+  //   }
+  // else
+  //   {
+  //     Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
+  //   }
+
+  FixatedObject = ConstrainedActor;
+  if(Gripper)
+  {
+    Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
+  }
+
+  if(Gripper2)
+    {
+      Constraint2->SetConstrainedComponents(Gripper2, NAME_None, SMC, NAME_None);
+    }
+  bGraspObjectGravity = SMC->IsGravityEnabled();
+  bObjectGrasped = true;
+  SMC->SetEnableGravity(false);
+
 
 }
 
 // Detach fixation
 void URGraspComponent::TryToDetach()
 {
-  if (FixatedObject)
+  // if(FixatedObject)
+  //   {
+  //     FixatedObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+  //     FixatedObject->GetStaticMeshComponent()->SetSimulatePhysics(true);
+  //     FixatedObject = nullptr;
+  //   }
+  // else
+  //   {
+  //     Constraint->BreakConstraint();
+  //   }
+  if(Gripper)
     {
       Constraint->BreakConstraint();
+    }
+
+  if(Gripper2)
+    {
+      Constraint2->BreakConstraint();
+    }
+
+  if(FixatedObject)
+  {
+      FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
       FixatedObject = nullptr;
     }
+  bObjectGrasped = false;
 }

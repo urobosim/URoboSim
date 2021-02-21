@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #pragma once
 
@@ -9,7 +9,7 @@
 #include "SDFDataAsset.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFDataAsset : public UDataAsset
@@ -23,7 +23,7 @@ public:
 	// SDF Version
 	UPROPERTY(EditAnywhere, Category = "SDF")
 	FString Version;
-	
+
 	// Array of models
 	UPROPERTY(EditAnywhere, Category = "SDF")
 	TArray<USDFModel*> Models;

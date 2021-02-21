@@ -56,14 +56,17 @@ public:
   /**
    * Maximum distance that an object can be away from the sensor and still be realized
    */
+  UPROPERTY(EditAnywhere, Category = "LiDAR|Scanning Offset")
+    FVector Offset;
+
   UPROPERTY(EditAnywhere, Category = "LiDAR|Scanning Specs",
-            meta = (ClampMin = "0.0", DisplayName="Maximum Distance in meter"))
+              meta = (ClampMin = "0.0", DisplayName = "Maximum Distance in meter"))
     float MaximumDistance;
 
-  /**
+    /**
    * Maximum distance that an object can be away from the sensor and still be realized
    */
-  UPROPERTY()
+    UPROPERTY()
     USceneComponent* Sensor;
 
   UPROPERTY()
@@ -77,6 +80,9 @@ public:
 
   UPROPERTY()
     float AngularIncrement;
+
+  UPROPERTY(EditAnywhere, Category = "LiDAR|Scanning Specs")
+  FString LidarRef;
  private:
 
   UPROPERTY()
@@ -100,4 +106,7 @@ public:
 
   UPROPERTY()
   TArray<float> DistanceMeasurement;
+
+  UPROPERTY()
+  URStaticMeshComponent* ReferenceLink = nullptr;
 };

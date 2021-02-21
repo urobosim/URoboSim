@@ -8,6 +8,7 @@
 #include "RStaticMeshComponent.h"
 #include "SDF/SDFJoint.h"
 #include "Sensor/REncoder.h"
+#include "Physics/RLink.h"
 #include "RPhysicsConstraintComponent.generated.h"
 
 USTRUCT()
@@ -42,8 +43,8 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   GENERATED_BODY()
     public:
 
-    UPROPERTY()
-    FJointInformation JointInformation;
+    // UPROPERTY()
+    // FJointInformation JointInformation;
 
   UPROPERTY()
     FQuat QInitial;
@@ -54,6 +55,12 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     float Lower;
 
+  UPROPERTY()
+    float SoftUpper = 0;
+
+  UPROPERTY()
+    float SoftLower = 0;
+
   virtual void ConnectToComponents(){};
   virtual void EnableMotor(bool InEnable){};
   virtual void SetTargetPosition(float InTargetPos){};
@@ -62,6 +69,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
 
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
   virtual float GetJointVelocity(){return 0.;};
 
@@ -77,6 +85,9 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void UpdateJointVelocity(float InDeltaT = 0){};
   virtual void UpdateEncoderValue(float InValue);
   virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
+
+  virtual float GetUpperLimit();
+  virtual float GetLowerLimit();
 
   UPROPERTY()
     float JointAccuracy;
@@ -96,6 +107,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     FVector Offset;
  protected:
+
 
   UPROPERTY()
     float TargetVelocity;
@@ -129,6 +141,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   };
 
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState) override;
   virtual void SetPosition(USDFJoint* InJoint);
   virtual void BeginPlay() override;
 
@@ -202,5 +215,6 @@ class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraint
     public:
     virtual void SetTargetPosition(float InTargetPos);
 
+  virtual float ClampJointStateToConstraintLimit(float InJointState) override;
 
 };

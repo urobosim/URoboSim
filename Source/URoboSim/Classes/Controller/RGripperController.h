@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
 #include "Controller/RJointController.h"
 #include "Physics/RModel.h"
@@ -19,14 +20,6 @@ struct FGraspComponentSetting
 
   UPROPERTY(EditAnywhere)
   FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
-
-  // Object maximum length (cm)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxLength;
-
-  // Object maximum mass (kg)
-  UPROPERTY(EditAnywhere)
-  float ObjectMaxMass;
 
 };
 
@@ -56,7 +49,7 @@ class UROBOSIM_API URGripperController : public URController
     public:
     URGripperController();
 
-  virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
   virtual bool Grasp();
   virtual void Release();
   virtual void UpdateGripper();
@@ -66,7 +59,6 @@ class UROBOSIM_API URGripperController : public URController
 
   UPROPERTY()
     URGraspComponent* GraspComponent;
-
 
   UPROPERTY(EditAnywhere)
     FGraspComponentSetting GraspCompSetting;
@@ -78,11 +70,22 @@ class UROBOSIM_API URGripperController : public URController
     float Position;
 
   UPROPERTY()
+    float OldPosition;
+
+  UPROPERTY()
     float MaxEffort;
 
   UPROPERTY()
     bool bStalled;
 
+  UPROPERTY(EditAnywhere)
+    bool bUseMultipleConstraints = true;
+
+  UPROPERTY(EditAnywhere)
+    float GripperSpeedFactor = 0.03;
+
+  UPROPERTY()
+    float PoseOffsetFromJoints = 0;
 
   UPROPERTY()
     FGraspResult Result;
@@ -111,8 +114,12 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY()
     URJoint* LeftFingerTip;
 
+  UPROPERTY(EditAnywhere)
+    bool bDisableCollision;
 
  protected:
+
+  virtual void SetGripperCollision(bool InCollisionEnabled);
 
   UPROPERTY()
     bool bSuccessGrasp = false;
@@ -132,4 +139,6 @@ class UROBOSIM_API URGripperController : public URController
   UPROPERTY(EditAnywhere)
     FString GraspComponentName;
 
+  UPROPERTY()
+    float JointValue;
 };

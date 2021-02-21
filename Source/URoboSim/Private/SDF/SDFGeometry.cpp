@@ -1,5 +1,5 @@
 // Copyright 2018, Institute for Artificial Intelligence - University of Bremen
-// Author: Andrei Haidu (http://haidu.eu)
+// Author: Michael Neumann
 
 #include "SDF/SDFGeometry.h"
 
@@ -9,5 +9,3 @@ USDFGeometry::USDFGeometry()
 	Radius = 1.0;
 	Length = 1.0;
 }
-
-

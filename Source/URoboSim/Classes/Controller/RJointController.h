@@ -26,7 +26,7 @@ class UROBOSIM_API URJointController : public URController
     public:
     URJointController();
 
-  virtual void Init(ARModel* InModel) override;
+  virtual void Init() override;
   virtual void Tick(float InDeltaTime);
 
   UPROPERTY(VisibleAnywhere)
@@ -34,6 +34,16 @@ class UROBOSIM_API URJointController : public URController
 
   UPROPERTY(EditAnywhere)
     FString BaseLink;
+
+  UPROPERTY(EditAnywhere)
+    float RevolutAccuracy;
+
+  UPROPERTY(EditAnywhere)
+    float PrismaticAccuracy;
+
+
+  UPROPERTY(EditAnywhere)
+    bool bDisableCollision;
 
   UPROPERTY()
     TArray<FTrajectoryPoints> Trajectory;
@@ -56,21 +66,28 @@ class UROBOSIM_API URJointController : public URController
   virtual void SwitchMode(UJointControllerMode InMode, bool IsInit = false);
 
   UJointControllerState GetState();
+
+  virtual void SetDesiredJointState(FString JointName, float InJointState);
+
  protected:
   UPROPERTY(EditAnywhere)
     UJointControllerMode Mode;
 
+  UPROPERTY(EditAnywhere)
+    float SpeedFactorHack = 1;
   virtual void MoveJoints(float InDeltaTime);
   virtual void MoveJointsDynamic(float InDeltaTime);
   virtual void MoveJointsKinematic();
 
   UPROPERTY()
-    ARModel* Model;
+    FTrajectoryPoints OldTrajectoryPoints;
 
   UPROPERTY()
     uint32 TrajectoryPointIndex;
 
   void UpdateDesiredJointAngle(float InDeltaTime);
-  bool CheckTrajectoryStatus();
+  virtual bool CheckTrajectoryGoalReached();
+  virtual bool CheckTrajectoryPoint();
   void CallculateJointVelocities(float InDeltaTime);
+  void SetJointVelocities(float InDeltaTime);
 };

@@ -1,5 +1,4 @@
 #include "Factory/RLinkFactory.h"
-#include "RStaticMeshEditUtils.h"
 
 URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription)
 {
@@ -9,8 +8,14 @@ URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription)
     }
 
   LinkBuilder = CreateBuilder(InLinkDescription);
-  LinkBuilder->Init(InOuter, InLinkDescription);
-
+  if(LinkBuilder)
+    {
+      LinkBuilder->Init(InOuter, InLinkDescription);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("LinkFactory: LinkBuilder not created because NumCollisions = 0"));
+    }
   return LinkBuilder->NewLink();
 }
 
@@ -23,7 +28,6 @@ URLinkBuilder* URLinkFactory::CreateBuilder(USDFLink* InLinkDescription)
   else
     {
       return nullptr;
-      // return NewObject<URVirtualLinkBuilder>(this);
     }
 }
 
@@ -66,29 +70,6 @@ void URLinkBuilder::SetPose(FVector InLocation, FQuat InRotation)
   LinkPose.SetRotation(InRotation);
 }
 
-bool URLinkBuilder::CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type)
-{
-  switch(Type)
-    {
-    case ESDFGeometryType::None :
-      return false;
-    case ESDFGeometryType::Mesh :
-      return true;
-    case ESDFGeometryType::Box :
-      RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopX10);
-      return true;
-    case ESDFGeometryType::Cylinder :
-      RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopZ10);
-      return true;
-    case ESDFGeometryType::Sphere :
-      RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopX10);
-      return true;
-    default :
-      UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet."));
-      return false;
-    }
-}
-
 void URLinkBuilder::SetVisuals()
 {
   for(USDFVisual* Visual : LinkDescription->Visuals)
@@ -109,8 +90,6 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
   FQuat RotationOffset = LinkPose.GetRotation() * InVisual->Pose.GetRotation();
   LinkComponent->SetWorldRotation(RotationOffset);
 
-  //Static Mesh creation
-  // UStaticMesh* Visual = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InVisual);
   UStaticMesh* Visual = InVisual->Geometry->Mesh;
   if(Visual)
     {
@@ -162,11 +141,8 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 
   //Static Mesh creation
   UStaticMesh* Collision = InCollision->Geometry->Mesh;
-  // UStaticMesh* Collision = RStaticMeshUtils::CreateStaticMesh(LinkComponent, InCollision);
   if(Collision)
     {
-      //Create the collision vor the visual mesh. Necessary to enable physics.
-      // CreateCollisionForMesh(Collision, InCollision->Geometry->Type);
       LinkComponent->SetStaticMesh(Collision);
 
       if(Link->Collisions.Num()==0)

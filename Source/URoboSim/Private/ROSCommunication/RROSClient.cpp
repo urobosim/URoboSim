@@ -1,7 +1,6 @@
 #include "ROSCommunication/RROSClient.h"
 #include "TimerManager.h"
 
-
 void URROSClient::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
 {
 	ROSHandler = InHandler;
@@ -35,6 +34,12 @@ void URJointStateConfigurationClient::CallService()
 
 }
 
+URJointControllerConfigurationClient::URJointControllerConfigurationClient()
+{
+  JointParamTopic = TEXT("/whole_body_controller/joints");
+  LimitParamTopic = TEXT("/robot_description");
+}
+
 void URJointControllerConfigurationClient::Init(UObject* InControllerComp)
 {
   // ARModel* Model = Cast<ARModel>(InModel);
@@ -47,17 +52,21 @@ void URJointControllerConfigurationClient::CreateClient()
 {
   URJointController* JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
   TMap<FString,float>* JointNames = &JointController->DesiredJointState;
-  Request = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
-  // Create an empty response instance
-  Response = MakeShareable(new rosapi::GetParam::Response());
-  ServiceClient = MakeShareable<FROSJointControllerConfigurationClient>(new FROSJointControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+  JointRequest = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
+  JointResponse = MakeShareable(new rosapi::GetParam::Response());
+  JointServiceClient = MakeShareable<FROSJointControllerConfigurationClient>(new FROSJointControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+
+  LimitRequest = MakeShareable(new rosapi::GetParam::Request(LimitParamTopic, ""));
+  LimitResponse = MakeShareable(new rosapi::GetParam::Response());
+  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient(JointNames, ControllerComp->GetOwner(), TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+
+
   FTimerHandle MyTimerHandle;
   ControllerComp->GetOwner()->GetWorldTimerManager().SetTimer(MyTimerHandle, this, &URJointControllerConfigurationClient::CallService, 1.0f, false);
 }
 
 void URJointControllerConfigurationClient::CallService()
 {
-
-  ROSHandler->CallService(ServiceClient, Request, Response);
-
+  ROSHandler->CallService(JointServiceClient, JointRequest, JointResponse);
+  ROSHandler->CallService(JointLimitServiceClient, LimitRequest, LimitResponse);
 }
