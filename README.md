@@ -5,7 +5,6 @@ Unreal engine based robot simulator.
 Version using `SDF` for loading robots.
 See `gzsdf` for converting `URDF` to `SDF`.
 
-
 **Plugin Dependencies**
 
 *  [UUtils](https://github.com/urobosim/UUtils)
@@ -48,7 +47,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
     *  Base Link: same as BaseController Base Name
     *  DesiredJointState: TMap of the desired joint angles, can be set manually
        or by adding a RJointControllerConfigurationClient to the
-       ROSCommunication Component 
+       ROSCommunication Component
 *  CameraController:
     *  CameraRef: Name of the Reference Link
     *  Camera Name: Name of the Camera (Placed in the world)
@@ -64,7 +63,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
 **Add ROSCommunication**
 
 * Publisher:
-    * OdometriePublisher: 
+    * OdometriePublisher:
         * Publishes the odometrie of the robot
         * FrameTransform: Position of the origin of the odometrie
         * MapFrameId: Name of the map frame
@@ -78,7 +77,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
         * Topic: Name of the topic on which is published
     * R2DLidarPublisher:
         * Publishes the lidar measurement
-        * SensorName: Name of the lidar sensor 
+        * SensorName: Name of the lidar sensor
         * Topic: Name of the topic on which is published
     * RJointTrajectoryControllerStatePublisher:
         * Publishes the state of the JointController (necessary for Giskard)
@@ -92,33 +91,33 @@ See `gzsdf` for converting `URDF` to `SDF`.
           called "BaseController")
 * Client:
     * URJointControllerConfigurationClient:
-        * Configures the DesirdJoints (actuated joints) of the JointController 
+        * Configures the DesirdJoints (actuated joints) of the JointController
         * JointParamTopic: Name of the topic inside the parameter server
           containing the actuated joints
 * Action:
     * URFollowJointTrajectoryActionServer:
-        * Actions server for the FollowJointTrajectoryAction 
-        * Type: control_msgs/FollowJointTrajectoryAction 
+        * Actions server for the FollowJointTrajectoryAction
+        * Type: control_msgs/FollowJointTrajectoryAction
         * FeedbackPublisher -> JointParamTopic: Name of the topic inside the parameter server
           containing the joints to be controlled by giskard
         * ControllerName: Name of the JointController
         * ActionName: Name of the action
     * URGripperCommandActionServer:
-        * Actions server for the GripperAction 
+        * Actions server for the GripperAction
         * Type: pr2_controllers_msgs/Pr2GripperAction
         * ControllerName: Name of the GripperController
         * ActionName: Name of the action
     * URPerceiveObjectActionServer:
-        * Actions server for the fake perception 
-        * Type: urobosim_msgs/PerceiveObjectAction 
+        * Actions server for the fake perception
+        * Type: urobosim_msgs/PerceiveObjectAction
         * ControllerName: Name of the CameraController
         * ActionName: Name of the action
     * URPointHeadActionServer:
-        * Actions server for the HeadAction 
+        * Actions server for the HeadAction
         * Type: control_msgs/PointHeadAction
         * ControllerName: Name of the HeadController
         * ActionName: Name of the action
 
 **Example Workflow**
 
-* 
+*
