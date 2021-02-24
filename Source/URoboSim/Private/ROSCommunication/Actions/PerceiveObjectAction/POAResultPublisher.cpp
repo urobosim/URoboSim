@@ -12,12 +12,17 @@ void URPerceiveObjectActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
   Owner = Cast<URCameraController>(ControllerComp->Controller.ControllerList["CameraController"]);
+  TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 }
 
 void URPerceiveObjectActionResultPublisher::Publish()
 {
   if(Owner->bPublishResult)
     {
+      TFPublisher->SetObjects(Owner->PerceivedActors);
+      TFPublisher->Publish();
+
       TSharedPtr<urobosim_msgs::PerceiveObjectActionResult> ActionResult =
         MakeShareable(new urobosim_msgs::PerceiveObjectActionResult());
 

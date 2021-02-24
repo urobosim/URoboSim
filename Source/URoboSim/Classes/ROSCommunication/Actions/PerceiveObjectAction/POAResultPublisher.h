@@ -3,6 +3,7 @@
 
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/RController.h"
+#include "ROSCommunication/Publisher/RTFPublisher.h"
 #include "POAResultPublisher.generated.h"
 
 UCLASS()
@@ -19,4 +20,7 @@ protected:
 
     UPROPERTY()
       URCameraController* Owner;
+
+    UPROPERTY()
+      URTFPublisher* TFPublisher;
 };
