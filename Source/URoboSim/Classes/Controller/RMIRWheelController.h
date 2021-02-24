@@ -13,10 +13,19 @@ struct FMIRWheelSetting
   GENERATED_BODY()
 public:
   UPROPERTY(EditAnywhere)
-	float WheelRadius = 10.f;
+	float WheelRadius = 5.f;
 
 	UPROPERTY(EditAnywhere)
-	float WheelToCenterSum = 70.65f;
+	float WheelDistanceLength = 62.f;
+
+	UPROPERTY(EditAnywhere)
+	float WheelDistanceWidth = 41.f;
+
+	UPROPERTY(EditAnywhere)
+	FString WheelLeft = FString(TEXT("left_wheel_link"));
+
+	UPROPERTY(EditAnywhere)
+	FString WheelRight = FString(TEXT("right_wheel_link"));
 
 	UPROPERTY(EditAnywhere)
 	FString WheelFrontLeftRotation = FString(TEXT("fl_caster_rotation_link"));
@@ -42,7 +51,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString WheelBackRightTranslation = FString(TEXT("br_caster_wheel_link"));
 
-  UPROPERTY(VisibleAnywhere)
+  UPROPERTY()
   TArray<double> WheelVelocities;
 };
 
