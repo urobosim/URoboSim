@@ -38,7 +38,7 @@ void URCameraController::PerceiveObject()
     {
       GoalStatusList.Last().Status = 1;
       bool bObjectFound = false;
-      TArray<AActor*> PerceivedActors;
+      // PerceivedActors.Empty();
       UGameplayStatics::GetAllActorsWithTag(GetWorld(), FName(*TypeToPerceive), PerceivedActors);
 
       if(PerceivedActors.Num()>0)
