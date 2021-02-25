@@ -123,6 +123,7 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
         }
       else
         {
+          UE_LOG(LogTemp, Error, TEXT("ConstraintActor %s iter %d"),*ConstrainedActor->GetName(), NumIter);
           bParentFound = true;
         }
     }
@@ -195,6 +196,7 @@ void URGraspComponent::TryToDetach()
 
   if(ObjectToPublish)
     {
+      UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
       TFPublisher->AddObject(ObjectToPublish);
       TFPublisher->Publish();
     }

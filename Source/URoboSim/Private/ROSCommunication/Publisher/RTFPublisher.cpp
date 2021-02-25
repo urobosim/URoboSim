@@ -25,6 +25,10 @@ void URTFPublisher::AddObject(AActor* InObject)
   {
     ObjectList.Add(InObject);
   }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Object already in list %s"), *InObject->GetName());
+    }
 }
 
 void URTFPublisher::SetObjects(TArray<AActor*> InObject)
@@ -53,6 +57,7 @@ void URTFPublisher::Publish()
       ObjectFrame.SetTransform(ObjectTransfMsg);
       TfMessage->AddTransform(ObjectFrame);
     }
+  ObjectList.Empty();
 
   // AActor* Object = ObjectList;
   Seq += 1;
