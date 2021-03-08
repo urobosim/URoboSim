@@ -6,6 +6,8 @@
 #include "ROSCommunication/Publisher/RTFPublisher.h"
 #include "POAResultPublisher.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FObjectDetection, UObject* /*PerceivedObject*/);
+
 UCLASS()
 class UROBOSIM_API URPerceiveObjectActionResultPublisher : public URPublisher
 {
@@ -14,6 +16,7 @@ class UROBOSIM_API URPerceiveObjectActionResultPublisher : public URPublisher
 public:
     virtual void Publish();
 
+  FObjectDetection OnObjectDetected;
 protected:
     virtual void SetMessageType();
     virtual void SetOwner(UObject* InOwner);

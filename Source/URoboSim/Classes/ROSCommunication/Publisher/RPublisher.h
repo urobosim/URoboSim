@@ -35,11 +35,12 @@ public:
 
     UPROPERTY()
     FString ControllerName;
-protected:
-
 
 	UPROPERTY(EditAnywhere)
     FString Topic;
+protected:
+
+
 
 	UPROPERTY()
     FString MessageType;

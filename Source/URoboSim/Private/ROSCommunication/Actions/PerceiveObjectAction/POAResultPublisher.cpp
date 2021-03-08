@@ -2,6 +2,7 @@
 #include "ROSCommunication/Actions/PerceiveObjectAction/POAResultPublisher.h"
 #include "urobosim_msgs/PerceiveObjectActionResult.h"
 #include "urobosim_msgs/PerceiveObjectResult.h"
+#include "TFPublisher.h"
 
 void URPerceiveObjectActionResultPublisher::SetMessageType()
 {
@@ -12,16 +13,30 @@ void URPerceiveObjectActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
   Owner = Cast<URCameraController>(ControllerComp->Controller.ControllerList["CameraController"]);
-  TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
-  TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
+
+  for (TObjectIterator<ATFPublisher> Itr; Itr; ++Itr)
+    {
+      // Make sure the object is in the world
+      if (GetWorld()->ContainsActor((*Itr)))
+        {
+          UE_LOG(LogTF, Warning, TEXT("Bind TFPublisher"));
+          OnObjectDetected.AddUObject(*Itr, &ATFPublisher::AddObject);
+        }
+    }
+  // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 }
 
 void URPerceiveObjectActionResultPublisher::Publish()
 {
   if(Owner->bPublishResult)
     {
-      TFPublisher->SetObjects(Owner->PerceivedActors);
-      TFPublisher->Publish();
+      // TFPublisher->SetObjects(Owner->PerceivedActors);
+      // TFPublisher->Publish();
+      for(auto &PerceivedActor : Owner->PerceivedActors)
+        {
+          OnObjectDetected.Broadcast(PerceivedActor);
+        }
 
       TSharedPtr<urobosim_msgs::PerceiveObjectActionResult> ActionResult =
         MakeShareable(new urobosim_msgs::PerceiveObjectActionResult());

@@ -33,6 +33,7 @@ public class URoboSim : ModuleRules
 				"URoboVision",
 				"UROSBridge",
                                 "XmlParser",
+                                "UTFPublisher",
                                 "UCheckpointSystem",
 			}
 			);

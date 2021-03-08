@@ -31,6 +31,7 @@ void URGraspComponent::Init(URStaticMeshComponent* InGripper)
   bObjectGrasped = false;
 
   TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  TFPublisher->Topic = TEXT("/tf_grasp_test");
   TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
@@ -45,6 +46,7 @@ void URGraspComponent::Init(URStaticMeshComponent* InGripper1, URStaticMeshCompo
   bObjectGrasped = false;
 
   TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  TFPublisher->Topic = TEXT("/tf_grasp_test");
   TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
@@ -194,12 +196,12 @@ void URGraspComponent::TryToDetach()
       Constraint2->BreakConstraint();
     }
 
-  if(ObjectToPublish)
-    {
-      UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
-      TFPublisher->AddObject(ObjectToPublish);
-      TFPublisher->Publish();
-    }
+  // if(ObjectToPublish)
+  //   {
+  //     UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
+  //     TFPublisher->AddObject(ObjectToPublish);
+  //     TFPublisher->Publish();
+  //   }
 
   if(FixatedObject)
   {

@@ -57,10 +57,10 @@ void URTFPublisher::Publish()
       ObjectFrame.SetTransform(ObjectTransfMsg);
       TfMessage->AddTransform(ObjectFrame);
     }
-  ObjectList.Empty();
 
   // AActor* Object = ObjectList;
-  Seq += 1;
+  // Seq += 1;
+
 
   Handler->PublishMsg(Topic, TfMessage);
   Handler->Process();
