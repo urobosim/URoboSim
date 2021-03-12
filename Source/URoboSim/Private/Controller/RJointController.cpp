@@ -149,7 +149,13 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
 
           float CurrentJointPos = Joint.Value->GetEncoderValue();
           float Diff = DesiredPos - CurrentJointPos;
+          
+          
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
+          if(Joint.Key.Contains("iiwa_joint_4"))
+          {
+           Diff = -Diff;
+          }
 
           float Vel = Diff / InDeltaTime;
           float VelSave = Vel;
@@ -250,9 +256,17 @@ void URJointController::MoveJoints(float InDeltaTime)
 
 void URJointController::MoveJointsDynamic(float InDeltaTime)
 {
-  if(GetOwner()->Links.Contains(BaseLink))
+  // if(GetOwner()->Links.Contains(BaseLink))
+  //   {
+  //     GetOwner()->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+  //   }
+
+    for(auto& Joint : GetOwner()->Joints)
     {
-      GetOwner()->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+      if(DesiredJointState.Contains(Joint.Key))
+        {
+          Joint.Value->SetMotorJointPosition(DesiredJointState[Joint.Key]);
+        }
     }
 }
 
@@ -326,6 +340,10 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 
     case UJointControllerMode::Dynamic:
       bEnablePhysics = true;
+      for(auto& Joint : GetOwner()->Joints)
+      {
+        Joint.Value->EnableMotor(true);
+      }
       break;
 
 	default:

@@ -225,6 +225,18 @@ void URRevoluteConstraintComponent::SetTargetPosition(float InTargetPos)
 void URContinuousConstraintComponent::EnableMotor(bool InEnable)
 {
   SetOrientationDriveTwistAndSwing(InEnable, InEnable);
+  SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
+  SetAngularDriveParams(1E8, 1E8, 1E10);
+  if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
+  {
+    SetAngularOrientationDrive(false, true);
+    SetAngularVelocityDrive(false, true);
+  }
+  else
+  {
+    SetAngularOrientationDrive(true, false);
+    SetAngularVelocityDrive(true, false);
+  }
 }
 
 void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
@@ -355,6 +367,14 @@ float URContinuousConstraintComponent::GetJointPosition()
   if (theta > PI) theta -= 2*PI;
   theta = -theta;
   return theta;
+}
+
+void URContinuousConstraintComponent::SetMotorJointPosition(float TargetAngle)
+{
+  SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetAngle)));
+  float TargetVelocity = 0.f; //TODO: Add TargetVelocity
+  SetAngularVelocityTarget(RefAxis * TargetVelocity);
+  Child->WakeRigidBody();
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
