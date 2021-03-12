@@ -11,27 +11,10 @@
 #include "Conversions.h"
 #include "RGBDCamera.h"
 #include "ROSUtilities.h"
+#include "RUtilityClasses.h"
 // clang-format off
 #include "RController.generated.h"
 // clang-format on
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UPerceivedObject : public UObject
-{
-  GENERATED_BODY()
-public:
-  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
-  FString Name;
-
-  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
-  FString Type;
-
-  UPROPERTY()
-  FTransform Pose;
-
-  UPROPERTY(BlueprintReadWrite, EditAnywhere, export, noclear)
-  FTransform PoseWorld;
-};
 
 USTRUCT()
 struct FTFInfo
@@ -152,6 +135,9 @@ public:
 
   UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
   TArray<UPerceivedObject*> PerceivedObjects;
+
+  UPROPERTY(EditAnywhere)
+  TArray<AActor*> PerceivedActors;
 
   UPROPERTY()
   FString TypeToPerceive;

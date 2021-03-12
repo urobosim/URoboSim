@@ -9,6 +9,8 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
 
+class URTFPublisher;
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URGraspComponent : public USphereComponent
 {
@@ -38,10 +40,15 @@ public:
 	AStaticMeshActor* FixatedObject;
 
 	UPROPERTY()
+	AActor* ObjectToPublish;
+
+	UPROPERTY()
 	bool bObjectGrasped;
 
 
 protected:
+        UPROPERTY()
+          URTFPublisher* TFPublisher;
 
 	UPROPERTY(EditAnywhere)
 	float GraspRadius = 10.f;

@@ -1,4 +1,6 @@
 #include "Factory/RModelBuilder.h"
+#include "Controller/RControllerComponent.h"
+#include "Controller/RBaseController.h"
 
 
 // Sets default values
@@ -14,24 +16,24 @@ URModelBuilder::~URModelBuilder()
 }
 
 // Load model
-void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel)
+void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation)
 {
   ModelDescription = InModelDescription;
   if(OutModel)
     {
       Model = OutModel;
-      LoadLinks();
+      LoadLinks(InLocation);
       LoadJoints();
       BuildKinematicTree();
     }
 }
 
 // Load links
-void URModelBuilder::LoadLinks()
+void URModelBuilder::LoadLinks(FVector InLocation)
 {
   for(USDFLink* Link : ModelDescription->Links)
     {
-      URLink* TempLink = LinkFactory->Load(Model, Link);
+      URLink* TempLink = LinkFactory->Load(Model, Link,InLocation);
       if(TempLink)
         {
           if(!Model->BaseLink)
