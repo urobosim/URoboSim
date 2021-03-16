@@ -1,3 +1,0 @@
-std_msgs/Header header
-actionlib_msgs/GoalID goal_id
-urobosim_msgs/PerceiveObjectGoal goal

@@ -1,3 +1,0 @@
-string name
-geometry_msgs/PoseStamped pose
-geometry_msgs/PoseStamped pose_world

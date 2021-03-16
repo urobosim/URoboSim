@@ -6,5 +6,5 @@
 // Constructor
 USDFVisual::USDFVisual()
 {
-	Geometry = CreateDefaultSubobject<USDFGeometry>(TEXT("Geometry"));
+  Geometry = CreateDefaultSubobject<USDFGeometry>(TEXT("Geometry"));
 }

@@ -2,133 +2,172 @@
 // Author: Michael Neumann
 
 #include "Physics/RLink.h"
-#include "Physics/RJoint.h"
-#include "Physics/RModel.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRLink, Log, All);
 
-URLink::URLink()
+// Called when the game starts or when spawned
+void URLink::BeginPlay()
 {
 }
 
-void URLink::SetPose(FTransform InPose)
+void URLink::SetEnableGravity(const bool &bGravityEnabled)
 {
-	Pose = InPose;
+  for (UStaticMeshComponent *CollisionMesh : CollisionMeshes)
+  {
+    CollisionMesh->SetEnableGravity(bGravityEnabled);
+  }
 }
 
-void URLink::SetPose(FVector InLocation, FQuat InRotation)
+void URLink::SetSimulatePhysics(const bool &bSimulate)
 {
-	Pose.SetLocation(InLocation);
-	Pose.SetRotation(InRotation);
+  for (UStaticMeshComponent *CollisionMesh : CollisionMeshes)
+  {
+    CollisionMesh->SetSimulatePhysics(bSimulate);
+  }
 }
 
-void URLink::AddJoint(URJoint* InJoint)
+void URLink::AttachToComponent(UStaticMeshComponent *Parent)
 {
-	Joints.Add(InJoint);
-}
-
-URStaticMeshComponent* URLink::GetVisual()
-{
-	if(Visuals.Num()>0)
-	{
-		return Visuals[0];
-	}
-	else
-	{
-		return nullptr;
-	}
+  if (CollisionMeshes.Num() > 0)
+  {
+    CollisionMeshes[0]->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+  }
 }
 
 void URLink::DisableCollision()
 {
-  for(auto& Collision : Collisions)
-    {
-
-      UE_LOG(LogTemp, Error, TEXT("disable collision for %s"), *Collision->GetName());
-      Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-      // Collision->SetCollisionProfileName(FName(TEXT("Spectator")));
-      // Collision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
-    }
-
-  // for(auto& Visual : Visuals)
-  //   {
-  //     // Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-  //     // Visual->SetCollisionProfileName(FName(TEXT("Spectator")));
-  //     Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-  //   }
+  if (CollisionMeshes.Num() > 0)
+  {
+    UE_LOG(LogRLink, Log, TEXT("Disable collision for %s"), *CollisionMeshes[0]->GetName())
+    CollisionMeshes[0]->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+  }
 }
 
-void URLink::EnableCollision()
-{
-  for(auto& Collision : Collisions)
-    {
-      // Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-      // Collision->SetCollisionProfileName(FName(TEXT("PhysicsActor")));
-      Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-      Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
-    }
-}
+// const FVector URLink::GetLinearVelocity() const
+// {
+//   if (CollisionMeshes.Num() > 0)
+//   {
+//     return CollisionMeshes[0]->GetPhysicsLinearVelocity();
+//   }
+//   else
+//   {
+//     return FVector(0.f);
+//   }
+// }
 
-URStaticMeshComponent* URLink::GetCollision()
-{
-        if(Collisions.Num()>0)
-	{
-		return Collisions[0];
-	}
-	else
-	{
-		return nullptr;
-	}
-}
+// const FVector URLink::GetAngularVelocity() const
+// {
+//   if (CollisionMeshes.Num() > 0)
+//   {
+//     return CollisionMeshes[0]->GetPhysicsAngularVelocity();
+//   }
+//   else
+//   {
+//     return FVector(0.f);
+//   }
+// }
 
-URStaticMeshComponent* URLink::GetCollision(FString InCollisionName, bool bExactMatch)
-{
-      if(bExactMatch)
-        {
-          // if(GetName().Equals(InCollisionName))
-          //   {
-          //     return Collisions[0];
-          //   }
+// void URLink::SetLinearVelocity(const FVector &InLinearVelocity)
+// {
+// }
 
-          for(auto& Collision : Collisions)
-            {
-              if(Collision->GetName().Equals(InCollisionName))
-                {
-                  return Collision;
-                }
-            }
-        }
-      else
-        {
-          // if(GetName().Contains(InCollisionName))
-          //   {
-          //     return Collisions[0];
-          //   }
+// void URLink::AddJoint(URJoint *InJoint)
+// {
+//   Joints.Add(InJoint);
+// }
 
-          for(auto& Collision : Collisions)
-            {
-              if(Collision->GetName().Contains(InCollisionName))
-                {
-                  return Collision;
-                }
-            }
-        }
-  return nullptr;
-}
+// URStaticMeshComponent *URLink::GetVisual()
+// {
+//   if (Visuals.Num() > 0)
+//   {
+//     return Visuals[0];
+//   }
+//   else
+//   {
+//     return nullptr;
+//   }
+// }
 
-TArray<class URJoint*> URLink::GetJoints()
-{
-  return Joints;
-}
+//   // for(auto& Visual : Visuals)
+//   //   {
+//   //     // Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//   //     // Visual->SetCollisionProfileName(FName(TEXT("Spectator")));
+//   //     Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+//   //   }
+// }
 
-float URLink::GetNumCollisions()
-{
-	return Collisions.Num();
-}
+// void URLink::EnableCollision()
+// {
+//   for (auto &Collision : Collisions)
+//   {
+//     // Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+//     // Collision->SetCollisionProfileName(FName(TEXT("PhysicsActor")));
+//     Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+//     Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+//   }
+// }
 
-void URLink::UpdateVelocity(float InDeltaTime)
-{
-  for(URJoint* Joint : Joints)
-    {
-      Joint->UpdateVelocity(InDeltaTime);
-    }
-}
+// URStaticMeshComponent *URLink::GetCollision()
+// {
+//   if (Collisions.Num() > 0)
+//   {
+//     return Collisions[0];
+//   }
+//   else
+//   {
+//     return nullptr;
+//   }
+// }
+
+// URStaticMeshComponent *URLink::GetCollision(FString InCollisionName, bool bExactMatch)
+// {
+//   if (bExactMatch)
+//   {
+//     // if(GetName().Equals(InCollisionName))
+//     //   {
+//     //     return Collisions[0];
+//     //   }
+
+//     for (auto &Collision : Collisions)
+//     {
+//       if (Collision->GetName().Equals(InCollisionName))
+//       {
+//         return Collision;
+//       }
+//     }
+//   }
+//   else
+//   {
+//     // if(GetName().Contains(InCollisionName))
+//     //   {
+//     //     return Collisions[0];
+//     //   }
+
+//     for (auto &Collision : Collisions)
+//     {
+//       if (Collision->GetName().Contains(InCollisionName))
+//       {
+//         return Collision;
+//       }
+//     }
+//   }
+//   return nullptr;
+// }
+
+// TArray<class URJoint *> URLink::GetJoints()
+// {
+//   return Joints;
+// }
+
+// float URLink::GetNumCollisions()
+// {
+//   return Collisions.Num();
+// }
+
+// void URLink::UpdateVelocity(float InDeltaTime)
+// {
+//   for (URJoint *Joint : Joints)
+//   {
+//     Joint->UpdateVelocity(InDeltaTime);
+//   }
+// }

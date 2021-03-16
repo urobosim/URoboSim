@@ -2,18 +2,16 @@
 // Author: Michael Neumann
 
 #pragma once
-
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "SDF/SDFGeometry.h"
+// clang-format off
 #include "SDFCollision.generated.h"
+// clang-format on
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Collision")
+
 class UROBOSIM_API USDFCollision : public UObject
 {
+
 	GENERATED_BODY()
 
 public:
@@ -21,11 +19,8 @@ public:
 	USDFCollision();
 
 	UPROPERTY(EditAnywhere, Category = "Collision")
-	FString Name;
-
-	UPROPERTY(EditAnywhere, Category = "Collision")
 	FTransform Pose;
 
-	UPROPERTY(EditAnywhere, Category = "Collision|Geometry")
-	USDFGeometry* Geometry;
+	UPROPERTY(EditAnywhere, Category = "Collision")
+	USDFGeometry *Geometry;
 };

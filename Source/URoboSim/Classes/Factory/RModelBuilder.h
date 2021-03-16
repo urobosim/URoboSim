@@ -3,20 +3,18 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Factory/RJointBuilder.h"
+#include "Factory/RLinkBuilder.h"
 #include "Physics/RModel.h"
-#include "SDF/SDFDataAsset.h"
-#include "Factory/RLinkFactory.h"
-#include "Factory/RJointFactory.h"
-#include "Physics/RLink.h"
-#include "RModelBuilder.generated.h"
+#include "SDF/SDFModel.h"
 
+// clang-format off
+#include "RModelBuilder.generated.h"
+// clang-format on
 
 class USDFModel;
 class USDFJoint;
 class USDFLink;
-class URJoint;
-// class URLink;
 
 UCLASS()
 class UROBOSIM_API URModelBuilder : public UObject
@@ -24,34 +22,24 @@ class UROBOSIM_API URModelBuilder : public UObject
   GENERATED_BODY()
 
 public:
-    // Sets default values for this actor's properties
-    URModelBuilder();
-
-  // Destructor
-  ~URModelBuilder();
+  // Sets default values for this actor's properties
+  URModelBuilder();
 
   UPROPERTY()
-    URJointFactory* JointFactory;
-
-  UPROPERTY()
-    URLinkFactory* LinkFactory;
+  ARModel *Model;
 
   // Load model
-  void Load(USDFModel* InModelDescription, ARModel* OutModel);
+  virtual void LoadSDF(USDFModel *&SDFModel);
+
 protected:
-  // Called when the game starts or when spawned
+  UPROPERTY()
+  URJointBuilder *JointBuilder;
 
   UPROPERTY()
-  USDFModel* ModelDescription;
+  URLinkBuilder *LinkBuilder;
 
-  UPROPERTY()
-  ARModel* Model;
-
-  void LoadLinks();
-  void LoadJoints();
-  void BuildKinematicTree();
-  void SetConstraintPosition(URJoint* InJoint);
-
-  void AddJoint(URJoint* Joint);
-  void AddLink(URLink* Link);
+  virtual void SwapBaseLinkToFirstIndex(USDFModel *&SDFModel);
+  virtual void LoadLinks(USDFModel *&SDFModel);
+  virtual void LoadJoints(USDFModel *&SDFModel);
+  virtual void LockBaseLink();
 };

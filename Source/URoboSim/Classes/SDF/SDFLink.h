@@ -3,17 +3,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "SDF/SDFVisual.h"
 #include "SDF/SDFCollision.h"
 #include "SDF/SDFLinkInertial.h"
+#include "SDF/SDFVisual.h"
+// clang-format on
 #include "SDFLink.generated.h"
+// clang-format off
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Link")
 class UROBOSIM_API USDFLink : public UObject
 {
 	GENERATED_BODY()
@@ -21,9 +18,6 @@ class UROBOSIM_API USDFLink : public UObject
 public:
 	// Constructor
 	USDFLink();
-
-	UPROPERTY(EditAnywhere, Category = "Link")
-	FString Name;
 
 	UPROPERTY(EditAnywhere, Category = "Link")
 	FTransform Pose;

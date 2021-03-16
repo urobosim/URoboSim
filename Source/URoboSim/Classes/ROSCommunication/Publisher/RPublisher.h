@@ -1,52 +1,49 @@
-
 #pragma once
 
+#include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
-#include "Physics/RModel.h"
-#include "Physics/RJoint.h"
-#include "Physics/RLink.h"
-#include "ROSCommunication/RROSClient.h"
-#include "Controller/RJointController.h"
-#include "Controller/RGripperController.h"
-#include "Controller/RHeadController.h"
-#include "Controller/RController.h"
-#include "Conversions.h"
+// clang-format off
 #include "RPublisher.generated.h"
+// clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URPublisher : public UObject
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
+
 public:
+  virtual void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic);
+  virtual void Init(UObject *InOwner, const FString &InHostIp, const uint32 &InPort);
+  virtual void DeInit();
 
+public:
+  virtual ARModel *GetOwner() const { return Owner; }
 
-    URPublisher();
-    virtual void DeInit();
-    virtual void Publish(){};
+  virtual void Publish(){};
 
-    // static URPublisher* Init(FString Type, FString RosTopic, UObject* Owner, TSharedPtr<FROSBridgeHandler> InHandler);
-
-    virtual void Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic);
-    virtual void Init(FString InHostIp, uint32 InPort, UObject* InOwner);
-
-    TSharedPtr<FROSBridgePublisher> Publisher;
-	int Seq;
-
-    UPROPERTY()
-    FString ControllerName;
 protected:
+  virtual void SetMessageType(){};
+  virtual void SetOwner(UObject *&InOwner){ Owner = Cast<ARModel>(InOwner); };
+  virtual void CreatePublisher();
 
+protected:
+  TSharedPtr<FROSBridgePublisher> Publisher;
 
-	UPROPERTY(EditAnywhere)
-    FString Topic;
+  int Seq;
 
-	UPROPERTY()
-    FString MessageType;
+  UPROPERTY()
+  FString ControllerName;
 
-        TSharedPtr<FROSBridgeHandler> Handler;
+  UPROPERTY(EditAnywhere)
+  FString Topic;
 
-	virtual void SetMessageType(){};
-	virtual void SetOwner(UObject* InOwner){};
-	virtual void CreatePublisher();
+  UPROPERTY()
+  FString MessageType;
+
+  TSharedPtr<FROSBridgeHandler> Handler;
+
+private:
+  UPROPERTY()
+  ARModel *Owner;
 };

@@ -1,128 +1,80 @@
 #include "Factory/RModelBuilder.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRModelBuilder, Log, All);
 
 // Sets default values
 URModelBuilder::URModelBuilder()
 {
-  LinkFactory = CreateDefaultSubobject<URLinkFactory>(TEXT("LinkFactory"));
-  JointFactory = CreateDefaultSubobject<URJointFactory>(TEXT("JointFactory"));
-}
-
-// Dtor
-URModelBuilder::~URModelBuilder()
-{
+  LinkBuilder = CreateDefaultSubobject<URLinkBuilder>(TEXT("LinkBuilder"));
+  JointBuilder = CreateDefaultSubobject<URJointBuilder>(TEXT("JointBuilder"));
 }
 
 // Load model
-void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel)
+void URModelBuilder::LoadSDF(USDFModel *&SDFModel)
 {
-  ModelDescription = InModelDescription;
-  if(OutModel)
+  if (Model)
+  {
+    SwapBaseLinkToFirstIndex(SDFModel);
+    LoadLinks(SDFModel);
+    LoadJoints(SDFModel);
+    LockBaseLink();
+  }
+}
+
+void URModelBuilder::SwapBaseLinkToFirstIndex(USDFModel *&SDFModel)
+{
+  // Find BaseLink
+  USDFLink *BaseLink = *SDFModel->Links.FindByPredicate([&](USDFLink *Link) {
+    for (USDFJoint *&Joint : SDFModel->Joints)
     {
-      Model = OutModel;
-      LoadLinks();
-      LoadJoints();
-      BuildKinematicTree();
+      if (Link->GetName().Equals(Joint->Child))
+      {
+        return false;
+      }
     }
+    return true;
+  });
+
+  // Swap BaseLink
+  for (int32 i = 0; i < SDFModel->Links.Num(); i++)
+  {
+    if (SDFModel->Links[i] == BaseLink)
+    {
+      UE_LOG(LogRModelBuilder, Log, TEXT("Found BaseLink %s"), *BaseLink->GetName())
+      SDFModel->Links.Swap(0, i);
+      break;
+    }
+  }
 }
 
 // Load links
-void URModelBuilder::LoadLinks()
+void URModelBuilder::LoadLinks(USDFModel *&SDFModel)
 {
-  for(USDFLink* Link : ModelDescription->Links)
+  LinkBuilder->Model = Model;
+  for (USDFLink *&SDFLink : SDFModel->Links)
+  {
+    if (!LinkBuilder->LoadSDF(SDFLink))
     {
-      URLink* TempLink = LinkFactory->Load(Model, Link);
-      if(TempLink)
-        {
-          if(!Model->BaseLink)
-            {
-              Model->BaseLink = TempLink;
-            }
-          Model->AddLink(TempLink);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Creation of Link %s failed"), *Link->GetName());
-        }
+      UE_LOG(LogRModelBuilder, Error, TEXT("Creation of Link %s failed"), *SDFLink->GetName());
     }
+  }
 }
 
 // Load joints
-void URModelBuilder::LoadJoints()
+void URModelBuilder::LoadJoints(USDFModel *&SDFModel)
 {
-  for(USDFJoint* Joint : ModelDescription->Joints)
+  JointBuilder->Model = Model;
+  for (USDFJoint *&SDFJoint : SDFModel->Joints)
+  {
+    if (!JointBuilder->LoadSDF(SDFJoint))
     {
-      URJoint* TempJoint = JointFactory->Load(Model, Joint);
-      if(TempJoint)
-        {
-          Model->AddJoint(TempJoint);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Creation of Joint %s failed"), *Joint->GetName());
-        }
+      UE_LOG(LogRModelBuilder, Error, TEXT("Creation of Joint %s failed"), *SDFJoint->GetName());
     }
+  }
 }
 
-void URModelBuilder::BuildKinematicTree()
+// Lock base link
+void URModelBuilder::LockBaseLink()
 {
-  for(auto& Joint : Model->Joints)
-    {
-      URLink* Parent = *Model->Links.Find(Joint.Value->ParentName);
-      URLink* Child = *Model->Links.Find(Joint.Value->ChildName);
-      if(!Parent)
-        {
-          UE_LOG(LogTemp, Error, TEXT("Parent %s not found"), *Joint.Value->ParentName);
-          continue;
-        }
-      if(!Child)
-        {
-          UE_LOG(LogTemp, Error, TEXT("Child %s not found"), *Joint.Value->ChildName);
-          continue;
-        }
-
-      Joint.Value->SetParentChild(Parent, Child);
-      SetConstraintPosition(Joint.Value);
-      Joint.Value->Constraint->ConnectToComponents();
-
-      if(!Child->bAttachedToParent)
-        {
-          Child->GetCollision()->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-          // Child->GetCollision()->RegisterComponent();
-          // Child->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
-          Child->bAttachedToParent = true;
-          // if(Joint.Value->Child->GetName().Equals(TEXT("fr_caster_l_wheel_link")))
-          //   {
-          //   }
-          // UE_LOG(LogTemp, Error, TEXT("Joint: %s Parent: %s Child: %s"), *Joint.Value->GetName(), *Joint.Value->Parent->GetCollision()->GetName(), *Joint.Value->Child->GetCollision()->GetName());
-        }
-      // else if(!Parent->bAttachedToParent)
-      //   {
-      //     Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      //     // Parent->GetCollision()->RegisterComponent();
-      //     // Parent->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
-      //     Parent->bAttachedToParent = true;
-      //   }
-      Parent->AddJoint(Joint.Value);
-    }
-}
-
-void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
-{
-  if(InJoint->bUseParentModelFrame)
-    {
-      InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      InJoint->Constraint->SetWorldLocation(InJoint->Child->GetCollision()->GetComponentLocation());
-      InJoint->Constraint->AddRelativeLocation(InJoint->Pose.GetLocation());
-      InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());
-    }
-  else
-    {
-      //TODO Implement and check this case
-      UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame"));
-
-      // InJoint->Constraint->SetPosition(InJoint);
-      InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepRelativeTransform);
-    }
+  Model->GetLinks()[0]->GetCollisionMeshes()[0]->SetConstraintMode(EDOFMode::XYPlane);
 }

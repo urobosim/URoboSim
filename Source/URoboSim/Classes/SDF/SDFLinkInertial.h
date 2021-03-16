@@ -4,21 +4,22 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
+// clang-format off
 #include "SDFLinkInertial.generated.h"
+// clang-format on
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Inertial")
 class UROBOSIM_API USDFLinkInertial : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Link|Inertial")
+	UPROPERTY(EditAnywhere, Category = "Inertial")
 	float Mass;
 
-	UPROPERTY(EditAnywhere, Category = "Link|Inertial")
+	UPROPERTY(EditAnywhere, Category = "Inertial")
 	FTransform Pose;
+
+	UPROPERTY(EditAnywhere, Category = "Inertial")
+	FVector Inertia;
 };

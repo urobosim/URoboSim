@@ -3,34 +3,21 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "SDF/SDFModel.h"
+// clang-format off
 #include "SDFDataAsset.generated.h"
+// clang-format on
 
-/**
- *
- */
 UCLASS(BlueprintType, Category = "SDF")
 class UROBOSIM_API USDFDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 
 public:
-	//// Constructor, set default values
-	//USDFDataAsset();
-
-	// SDF Version
 	UPROPERTY(EditAnywhere, Category = "SDF")
 	FString Version;
 
-	// Array of models
 	UPROPERTY(EditAnywhere, Category = "SDF")
-	TArray<USDFModel*> Models;
-
-//#if WITH_EDITOR
-//	//////// Begin UObject interface
-//	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-//	//////// End of UObject interface
-//#endif
+	TArray<USDFModel *> Models;
 };

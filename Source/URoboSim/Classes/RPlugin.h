@@ -1,3 +1,5 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "Components/ActorComponent.h"
@@ -9,15 +11,13 @@
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UROBOSIM_API URPluginComponent : public UActorComponent
 {
-  GENERATED_BODY()
-public:
-  virtual void OnComponentCreated() override;
+	GENERATED_BODY()
 
-  ARModel* GetOwner();
+public:
+	virtual void OnComponentCreated() override;
+
+	virtual ARModel *GetOwner() const;
 
 protected:
-  virtual void RegisterPlugin();
-
-  //Generates the name that is used to find it in the model
-  virtual FString GetPluginName();
+	virtual void RegisterPlugin();
 };

@@ -2,53 +2,52 @@
 // Author: Michael Neumann
 
 #include "Physics/RModel.h"
-#include "Physics/RJoint.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
 // Sets default values
 ARModel::ARModel()
 {
   PrimaryActorTick.bCanEverTick = true;
   PrimaryActorTick.TickGroup = TG_PrePhysics;
-}
-
-// Dtor
-ARModel::~ARModel()
-{
-}
-
-// Called when the game starts or when spawned
-void ARModel::BeginPlay()
-{
-  Super::BeginPlay();
+  bSimulatePhysics = true;
 }
 
 // Called every frame
 void ARModel::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
+  for (URJoint *&Joint : Joints)
+  {
+    Joint->Tick(DeltaTime);
+  }
 }
 
-void ARModel::AddLink(URLink* Link)
+// Called when the game starts or when spawned
+void ARModel::BeginPlay()
 {
-  Links.Add(Link->GetName(), Link);
+  Super::BeginPlay();
+
+  Links[0]->SetEnableGravity(EnableGravity.bBase);
+  for (URJoint *&Joint : Joints)
+  {
+    Joint->GetChild()->SetEnableGravity(EnableGravity.bLinks);
+    Joint->BeginPlay();
+  }
+  for (URLink *&Link : Links)
+  {
+    Link->SetSimulatePhysics(bSimulatePhysics);
+    Link->BeginPlay();
+  }
 }
 
-void ARModel::AddJoint(URJoint* Joint)
-{
-  Joints.Add(Joint->GetName(), Joint);
-}
+// const TArray<FJointState> ARModel::GetJointState() const
+// {
+//   TArray<FJointState> JointState;
+//   for (const URJoint *Joint : Joints)
+//   {
+//     JointState.Add(FJointState(Joint->GetName(), Joint->GetPosition(), Joint->GetVelocity()));
+//   }
 
-FJointState ARModel::GetJointState()
-{
-  FJointState JointState;
-
-  for(auto& Joint : Joints)
-    {
-      JointState.JointNames.Add(Joint.Key);
-      JointState.JointPositions.Add(Joint.Value->GetJointPosition());
-      JointState.JointVelocities.Add(Joint.Value->GetJointVelocity());
-    }
-
-  return JointState;
-}
+//   return JointState;
+// }

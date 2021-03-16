@@ -2,90 +2,131 @@
 // Author: Michael Neumann
 
 #include "Physics/RJoint.h"
-#include "Physics/RLink.h"
-#include "Physics/RModel.h"
-#include "RStaticMeshComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRJoint, Log, All);
 
-// Sets default values for this component's properties
-URJoint::URJoint()
+void URJoint::SetJointType(const USDFJoint *InSDFJoint)
 {
-  bBreakEnabled = false;
-  bActuate = false;
+	Type = NewObject<URJointType>(this, *InSDFJoint->Type);
+	Type->InitialPosition = InSDFJoint->Axis->InitialPosition;
+	Type->Lower = InSDFJoint->Axis->Lower;
+	Type->Upper = InSDFJoint->Axis->Upper;
 }
 
-
-float URJoint::GetEncoderValue()
+void URJoint::Tick(float DeltaTime)
 {
-  return Constraint->Encoder->GetValue();
+	Velocity = Child->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
+
+	const float CurrentPosition = GetPosition();
+	JointState.JointVelocity = (CurrentPosition - JointState.JointPosition) / DeltaTime;
+	JointState.JointPosition = CurrentPosition;
 }
 
-void URJoint::UpdateEncoder()
+// Called when the game starts or when spawned
+void URJoint::BeginPlay()
 {
-  Constraint->UpdateEncoderValue(GetJointPosition());
+	InitChildPoseInJointFrame = GetChildPoseInJointFrame();
 }
 
-void URJoint::EnableMotor(bool InEnable)
+const float URJoint::GetPosition()
 {
-  Constraint->EnableMotor(InEnable);
+	FTransform DeltaPoseInJointFrame = (InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame()).Inverse();
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
+		float RotationAngle = FRotator::NormalizeAxis(FMath::RadiansToDegrees(DeltaRotationInJointFrame.GetAngle()));
+		FVector RotationVectorInJointFrame = DeltaRotationInJointFrame.GetRotationAxis() * RotationAngle;
+		return FVector::DotProduct(RotationVectorInJointFrame, Type->Axis);
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		FVector DeltaPositionInJointFrame = DeltaPoseInJointFrame.GetLocation();
+		return FVector::DotProduct(DeltaPositionInJointFrame, Type->Axis);
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Unknown Type %s of Joint %s"), *Type->GetName(), *GetName())
+		return 0.f;
+	}
 }
 
-void URJoint::UpdateVelocity(float InDeltaTime)
+const FTransform URJoint::GetChildPoseInJointFrame() const
 {
-  if(bActuate)
-  {
-    Constraint->UpdateJointVelocity(InDeltaTime);
-  }
-
-  Child->UpdateVelocity(InDeltaTime);
+	FTransform ChildPose = Child->GetPose();
+	FTransform JointPose = Type->Constraint->GetComponentTransform();
+	return ChildPose * JointPose.Inverse();
 }
 
-void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
+void URJoint::SetTargetPosition(const float &TargetPosition)
 {
-  Child = InChild;
-  Parent = InParent;
-
-  Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
+	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
+	{
+		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
+	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
+	{
+		Type->Constraint->SetLinearPositionTarget(Type->Axis * TargetPosition);
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
+	else
+	{
+		float DeltaPosition = GetPosition() - TargetPosition;
+		FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * DeltaPosition);
+		Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
+		Child->GetCollisionMeshes()[0]->AddLocalRotation(DeltaRotation);
+	}
 }
 
-float URJoint::GetJointPosition()
+void URJoint::SetTargetVelocity(const float &TargetVelocity)
 {
-	return Constraint->GetJointPosition();
-
+	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
+	{
+		Type->Constraint->SetAngularVelocityTarget(Type->Axis * TargetVelocity);
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
+	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
+	{
+		Type->Constraint->SetLinearVelocityTarget(Type->Axis * TargetVelocity);
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
 }
 
-float URJoint::GetJointPositionInUUnits()
+void URJoint::SetDrive(const FEnableDrive &EnableDrive)
 {
-	return Constraint->GetJointPositionInUUnits();
-
-}
-
-float URJoint::GetJointVelocity()
-{
-	return Constraint->GetJointVelocity();
-}
-
-void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
-{
-	Constraint->SetJointPosition(Angle, OutSweepHitResult);
-}
-void URJoint::SetJointVelocity(float Velocity)
-{
-	Constraint->SetJointVelocity(Velocity);
-}
-
-void URJoint::SetJointVelocityInUUnits(float Velocity)
-{
-	Constraint->SetJointVelocityInUUnits(Velocity);
-}
-
-void URJoint::SetJointEffort(float Effort)
-{
-	Constraint->SetJointEffort(Effort);
-}
-
-void URJoint::SetJointEffortFromROS(float Effort)
-{
-
-	Constraint->SetJointEffort(Effort);
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		Type->Constraint->SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
+		Type->Constraint->SetAngularDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
+		if (Type->Axis.GetAbs().Equals(FVector::ForwardVector))
+		{
+			Type->Constraint->SetAngularOrientationDrive(false, EnableDrive.bPositionDrive);
+			Type->Constraint->SetAngularVelocityDrive(false, EnableDrive.bVelocityDrive);
+		}
+		else
+		{
+			Type->Constraint->SetAngularOrientationDrive(EnableDrive.bPositionDrive, false);
+			Type->Constraint->SetAngularVelocityDrive(EnableDrive.bVelocityDrive, false);
+		}
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		Type->Constraint->SetLinearDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
+		if (Type->Axis.GetAbs().Equals(FVector::ForwardVector))
+		{
+			Type->Constraint->SetLinearPositionDrive(EnableDrive.bPositionDrive, false, false);
+			Type->Constraint->SetLinearVelocityDrive(EnableDrive.bVelocityDrive, false, false);
+		}
+		else if (Type->Axis.GetAbs().Equals(FVector::RightVector))
+		{
+			Type->Constraint->SetLinearPositionDrive(false, EnableDrive.bPositionDrive, false);
+			Type->Constraint->SetLinearVelocityDrive(false, EnableDrive.bVelocityDrive, false);
+		}
+		else
+		{
+			Type->Constraint->SetLinearPositionDrive(false, false, EnableDrive.bPositionDrive);
+			Type->Constraint->SetLinearVelocityDrive(false, false, EnableDrive.bVelocityDrive);
+		}
+	}
 }

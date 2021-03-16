@@ -3,33 +3,33 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
-#include "SDF/SDFLink.h"
 #include "SDF/SDFJoint.h"
+#include "SDF/SDFLink.h"
+// clang-format off
 #include "SDFModel.generated.h"
+// clang-format on
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Model")
 class UROBOSIM_API USDFModel : public UObject
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Model")
-	FString Name;
+	FTransform Pose;
 
 	UPROPERTY(EditAnywhere, Category = "Model")
-	FTransform Pose;
+	bool bSelfColide;
 
 	UPROPERTY(EditAnywhere, Category = "Model")
 	bool bStatic;
 
 	UPROPERTY(EditAnywhere, Category = "Model")
-	TArray<USDFLink*> Links;
+	bool bGravity;
 
 	UPROPERTY(EditAnywhere, Category = "Model")
-	TArray<USDFJoint*> Joints;
+	TArray<USDFLink *> Links;
+
+	UPROPERTY(EditAnywhere, Category = "Model")
+	TArray<USDFJoint *> Joints;
 };

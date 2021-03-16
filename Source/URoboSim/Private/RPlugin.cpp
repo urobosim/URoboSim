@@ -2,30 +2,28 @@
 
 #include "RPlugin.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRPlugin, Log, All);
+
 void URPluginComponent::OnComponentCreated()
 {
-  Super::OnComponentCreated();
-  RegisterPlugin();
+	Super::OnComponentCreated();
+	RegisterPlugin();
 }
 
-ARModel* URPluginComponent::GetOwner()
+ARModel *URPluginComponent::GetOwner() const
 {
-  return Cast<ARModel>(Super::GetOwner());
+	return Cast<ARModel>(Super::GetOwner());
 }
 
 void URPluginComponent::RegisterPlugin()
 {
-  if (GetOwner())
-  {
-    GetOwner()->Plugins.Add(GetPluginName(), this);
-  }
-  else
-  {
-    UE_LOG(LogTemp, Error, TEXT("%s not Attached to a ARModel"), *GetName());
-  }
-}
-
-FString URPluginComponent::GetPluginName()
-{
-  return TEXT("DefaultPluginName");
+	if (GetOwner())
+	{
+		GetOwner()->AddPlugin(this);
+		UE_LOG(LogRPlugin, Log, TEXT("%s is attached to %s"), *GetName(), *GetOwner()->GetName())
+	}
+	else
+	{
+		UE_LOG(LogRPlugin, Error, TEXT("%s is not attached to a ARModel"), *GetName())
+	}
 }

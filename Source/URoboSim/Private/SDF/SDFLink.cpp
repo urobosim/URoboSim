@@ -6,7 +6,7 @@
 // Constructor
 USDFLink::USDFLink()
 {
-	bGravity = 1;
-	bSelfCollide = 0;
+	bGravity = true;
+	bSelfCollide = true;
 	Inertial = CreateDefaultSubobject<USDFLinkInertial>(TEXT("Inertial"));
 }

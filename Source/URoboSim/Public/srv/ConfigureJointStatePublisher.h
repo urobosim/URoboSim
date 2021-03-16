@@ -4,120 +4,121 @@
 
 namespace rosapi
 {
-	class GetParam : public FROSBridgeSrv
-	{
+  class GetParam : public FROSBridgeSrv
+  {
 
-   public:
-	   GetParam()
-	   {
-		   SrvType = TEXT("rosapi/get_param");
-	   }
+  public:
+    GetParam()
+    {
+      SrvType = TEXT("rosapi/get_param");
+    }
 
-	   class Request : public SrvRequest
-		{
-	   private:
-		   FString Name;
-		   FString Default;
-	   public:
-		   Request(){};
-		   Request(const FString& InName, const FString& InDefault) : Name(InName), Default(InDefault){};
+    class Request : public SrvRequest
+    {
+    private:
+      FString Name;
+      FString Default;
 
-		   FString GetName()
-		   {
-				return Name;
-		   }
+    public:
+      Request(){};
+      Request(const FString &InName, const FString &InDefault) : Name(InName), Default(InDefault){};
 
-		   void SetName(const FString& InName)
-		   {
-			   Name = InName;
-		   }
+      FString GetName()
+      {
+        return Name;
+      }
 
-		   FString GetDefault()
-		   {
-				return Default;
-		   }
+      void SetName(const FString &InName)
+      {
+        Name = InName;
+      }
 
-		   void SetDefault(const FString& InDefault)
-		   {
-			   Default = InDefault;
-		   }
+      FString GetDefault()
+      {
+        return Default;
+      }
 
-			virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
-			{
+      void SetDefault(const FString &InDefault)
+      {
+        Default = InDefault;
+      }
 
-				Name = JsonObject->GetStringField("name");
-				Default = JsonObject->GetStringField("default");
-			}
+      virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
+      {
 
-			static Request GetFromJson(TSharedPtr<FJsonObject> JsonObject)
-			{
-				Request Req;
-				Req.FromJson(JsonObject);
-				return Req;
-			}
+        Name = JsonObject->GetStringField("name");
+        Default = JsonObject->GetStringField("default");
+      }
 
-			virtual FString ToString() const override
-			{
-				return TEXT("not implemented");
-			}
+      static Request GetFromJson(TSharedPtr<FJsonObject> JsonObject)
+      {
+        Request Req;
+        Req.FromJson(JsonObject);
+        return Req;
+      }
 
-			virtual TSharedPtr<FJsonObject> ToJsonObject() const
-			{
-				TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
+      virtual FString ToString() const override
+      {
+        return TEXT("not implemented");
+      }
 
-				Object->SetStringField(TEXT("name"), Name);
-				Object->SetStringField(TEXT("default"), Default);
-				UE_LOG(LogTemp, Error, TEXT("send request param server"));
+      virtual TSharedPtr<FJsonObject> ToJsonObject() const
+      {
+        TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
-				return Object;
-			}
-		};
+        Object->SetStringField(TEXT("name"), Name);
+        Object->SetStringField(TEXT("default"), Default);
+        UE_LOG(LogTemp, Error, TEXT("send request param server"));
 
-	   class Response : public SrvResponse
-		{
-	   private:
-			FString Value;
+        return Object;
+      }
+    };
 
-	   public:
-			Response() {
-			}
-			Response(FString InValue) : Value(InValue) {}
+    class Response : public SrvResponse
+    {
+    private:
+      FString Value;
 
-			void SetValue(FString S)
-			{
-				Value = S;
-			}
+    public:
+      Response()
+      {
+      }
+      Response(FString InValue) : Value(InValue) {}
 
-			FString GetValue()
-			{
-				return Value;
-			}
+      void SetValue(FString S)
+      {
+        Value = S;
+      }
 
-			virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
-			{
-				Value = JsonObject->GetStringField("value");
-			}
+      FString GetValue()
+      {
+        return Value;
+      }
 
-			static Response GetFromJson(TSharedPtr<FJsonObject> JsonObject)
-			{
-				Response Res;
-				Res.FromJson(JsonObject);
-				return Res;
-			}
+      virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
+      {
+        Value = JsonObject->GetStringField("value");
+      }
 
-			virtual FString ToString() const override
-			{
-				return TEXT("");
-			}
+      static Response GetFromJson(TSharedPtr<FJsonObject> JsonObject)
+      {
+        Response Res;
+        Res.FromJson(JsonObject);
+        return Res;
+      }
 
-			virtual TSharedPtr<FJsonObject> ToJsonObject() const
-			{
-				TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
-				Object->SetStringField("value", Value);
-				UE_LOG(LogTemp, Error, TEXT("recieve response param server"));
-				return Object;
-			}
-		};
+      virtual FString ToString() const override
+      {
+        return TEXT("");
+      }
 
-	};
-} // namespace rospy_tutorials " }")
+      virtual TSharedPtr<FJsonObject> ToJsonObject() const
+      {
+        TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
+        Object->SetStringField("value", Value);
+        UE_LOG(LogTemp, Error, TEXT("recieve response param server"));
+        return Object;
+      }
+    };
+  };
+}

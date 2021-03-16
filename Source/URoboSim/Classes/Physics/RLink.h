@@ -3,66 +3,51 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "RStaticMeshComponent.h"
+#include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
+// clang-format off
 #include "RLink.generated.h"
+// clang-format on
 
-class ARModel;
-
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UROBOSIM_API URLink : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	URLink();
-
-
-protected:
-
-	UPROPERTY()
-	TArray<class URJoint*> Joints;
+	// Called when the game starts or when spawned
+	virtual void BeginPlay();
 
 public:
+	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
-	UPROPERTY()
-	ARModel* Model;
+	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
 
-	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Visuals;
-	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Collisions;
+	// virtual void SetVelocity(const FVector &InLinearVelocity, const FVector &InAngularVelocity);
 
-	virtual void SetPose(FTransform InPose);
-	virtual void SetPose(FVector InLocation, FQuat InRotation);
+	virtual const TArray<UStaticMeshComponent *> GetVisualMeshes() const { return VisualMeshes; }
+
+	virtual void AddVisualMesh(UStaticMeshComponent *&VisualMesh) { VisualMeshes.Add(VisualMesh); }
+
+	virtual const TArray<UStaticMeshComponent *> GetCollisionMeshes() const { return CollisionMeshes; }
+
+	virtual void AddCollisionMesh(UStaticMeshComponent *&CollisionMesh) { CollisionMeshes.Add(CollisionMesh); }
+
+	virtual void AttachToComponent(UStaticMeshComponent *Parent);
+
+	virtual void SetEnableGravity(const bool &bGravityEnabled);
+
+	virtual void SetSimulatePhysics(const bool &bSimulate);
 
 	virtual void DisableCollision();
-	virtual void EnableCollision();
 
-	URStaticMeshComponent* GetVisual();
-	URStaticMeshComponent* GetCollision();
-	URStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
-        TArray<class URJoint*> GetJoints();
-
-	float GetNumCollisions();
-
-	void AddJoint(class URJoint* InJoint);
-
-	virtual void UpdateVelocity(float InDeltaTime);
-	// virtual void SetNextVelocities();
+protected:
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent *PoseComponent;
 
 	UPROPERTY(EditAnywhere)
-	FTransform Pose;
+	TArray<UStaticMeshComponent *> VisualMeshes;
 
-        UPROPERTY()
-        bool bAttachedToParent = false;
-};
-
-USTRUCT()
-struct FLinkInformation
-{
-  GENERATED_BODY()
-  public:
-
-  TArray<URLink*> Childs;
+	UPROPERTY(EditAnywhere)
+	TArray<UStaticMeshComponent *> CollisionMeshes;
 };

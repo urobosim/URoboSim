@@ -19,12 +19,12 @@
 		  "Type": "Runtime",
 		  "LoadingPhase": "Default"
 		},
-                {
+    {
 		  "Name": "URoboSimEditor",
 		  "Type": "Editor",
 		  "LoadingPhase": "Default"
 		}
-		],
+  ],
   "Plugins": [
     {
       "Name": "UUtils",

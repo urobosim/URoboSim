@@ -3,50 +3,76 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Runtime/Engine/Classes/Engine/StaticMesh.h"
-#include "UObject/NoExportTypes.h"
+// clang-format off
 #include "SDFGeometry.generated.h"
+// clang-format on
 
-/**
-*
-*/
-UENUM(BlueprintType, Category = "SDF")
+UENUM()
 enum class ESDFGeometryType : uint8
 {
-	None			UMETA(DisplayName = "None"),
-	Mesh			UMETA(DisplayName = "Mesh"),
-	Box				UMETA(DisplayName = "Box"),
-	Cylinder		UMETA(DisplayName = "Cylinder"),
-	Sphere			UMETA(DisplayName = "Sphere"),
+	None UMETA(DisplayName = "None"),
+	Mesh UMETA(DisplayName = "Mesh"),
+	Box UMETA(DisplayName = "Box"),
+	Cylinder UMETA(DisplayName = "Cylinder"),
+	Sphere UMETA(DisplayName = "Sphere"),
 };
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Geometry")
 class UROBOSIM_API USDFGeometry : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	USDFGeometry();
-
-	UPROPERTY(EditAnywhere, Category = "Geometry")
+	UPROPERTY()
 	ESDFGeometryType Type;
 
-	UPROPERTY(EditAnywhere, Category = "Geometry|Mesh")
+	UPROPERTY(VisibleAnywhere, Category = "GeometryMesh")
+	UStaticMesh *Mesh;
+};
+
+UCLASS(BlueprintType, Category = "Geometry")
+class UROBOSIM_API USDFGeometryMesh : public USDFGeometry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "GeometryBox")
 	FString Uri;
 
-	UPROPERTY(EditAnywhere, Category = "Geometry|Mesh")
-	UStaticMesh* Mesh;
+	UPROPERTY(VisibleAnywhere, Category = "GeometryBox")
+	FVector Scale;
+};
 
-	UPROPERTY(EditAnywhere, Category = "Geometry|Box")
+UCLASS(BlueprintType, Category = "Geometry")
+class UROBOSIM_API USDFGeometryBox : public USDFGeometry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere)
 	FVector Size;
+};
 
-	UPROPERTY(EditAnywhere, Category = "Geometry|Cylinder or Sphere")
+UCLASS(BlueprintType, Category = "Geometry")
+class UROBOSIM_API USDFGeometryCylinder : public USDFGeometry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "GeometryCylinder")
 	float Radius;
 
-	UPROPERTY(EditAnywhere, Category = "Geometry|Cylinder")
+	UPROPERTY(VisibleAnywhere, Category = "GeometryCylinder")
 	float Length;
+};
+
+UCLASS(BlueprintType, Category = "Geometry")
+class UROBOSIM_API USDFGeometrySphere : public USDFGeometry
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(VisibleAnywhere, Category = "GeometrySphere")
+	float Radius;
 };

@@ -3,15 +3,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "SDF/SDFGeometry.h"
+// clang-format off
 #include "SDFVisual.generated.h"
+// clang-format on
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Visual")
 class UROBOSIM_API USDFVisual : public UObject
 {
 	GENERATED_BODY()
@@ -21,11 +18,8 @@ public:
 	USDFVisual();
 
 	UPROPERTY(EditAnywhere, Category = "Visual")
-	FString Name;
-
-	UPROPERTY(EditAnywhere, Category = "Visual")
 	FTransform Pose;
 
-	UPROPERTY(EditAnywhere, Category = "Visual|Geometry")
-	USDFGeometry* Geometry;
+	UPROPERTY(EditAnywhere, Category = "Visual")
+	USDFGeometry *Geometry;
 };

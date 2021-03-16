@@ -3,15 +3,12 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "SDF/SDFJointAxis.h"
+// clang-format on
 #include "SDFJoint.generated.h"
+// clang-format off
 
-/**
- *
- */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "Joint")
 class UROBOSIM_API USDFJoint : public UObject
 {
 	GENERATED_BODY()
@@ -19,9 +16,6 @@ class UROBOSIM_API USDFJoint : public UObject
 public:
 	//Constructor
 	USDFJoint();
-
-	UPROPERTY(EditAnywhere, Category = "Joint")
-	FString Name;
 
 	UPROPERTY(EditAnywhere, Category = "Joint")
 	FString Type;
@@ -36,5 +30,5 @@ public:
 	FString Child;
 
 	UPROPERTY(EditAnywhere, Category = "Joint")
-	USDFJointAxis* Axis;
+	USDFJointAxis *Axis;
 };

@@ -33,7 +33,7 @@ public class URoboSim : ModuleRules
 				"URoboVision",
 				"UROSBridge",
                                 "XmlParser",
-                                "UCheckpointSystem",
+                                //"UCheckpointSystem",
 			}
 			);
 

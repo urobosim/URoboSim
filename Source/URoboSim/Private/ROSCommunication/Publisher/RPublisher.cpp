@@ -1,24 +1,13 @@
 #include "ROSCommunication/Publisher/RPublisher.h"
-// #include "geometry_msgs/TransformStamped.h"
-// #include "geometry_msgs/PoseStamped.h"
-// #include "geometry_msgs/Pose.h"
-// #include "geometry_msgs/Point.h"
-// #include "geometry_msgs/Quaternion.h"
-// #include "control_msgs/JointTrajectoryControllerState.h"
-// #include "actionlib_msgs/GoalStatusArray.h"
 
-// #include "tf2_msgs/TFMessage.h"
-
-URPublisher::URPublisher()
-{
-}
+DEFINE_LOG_CATEGORY_STATIC(LogRPublisher, Log, All)
 
 void URPublisher::DeInit()
 {
   Handler->Disconnect();
 }
 
-void URPublisher::Init(FString InHostIp, uint32 InPort, UObject* InOwner)
+void URPublisher::Init(UObject *InOwner, const FString &InHostIp, const uint32 &InPort)
 {
   Seq = 0;
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(InHostIp, InPort));
@@ -29,14 +18,14 @@ void URPublisher::Init(FString InHostIp, uint32 InPort, UObject* InOwner)
   Handler->AddPublisher(Publisher);
 }
 
-void URPublisher::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic)
+void URPublisher::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
 {
   Seq = 0;
   Handler = InHandler;
-  if(!InRosTopic.Equals(""))
-    {
-      Topic = InRosTopic;
-    }
+  if (!InTopic.Equals(""))
+  {
+    Topic = InTopic;
+  }
   SetMessageType();
   SetOwner(InOwner);
   CreatePublisher();
@@ -45,11 +34,10 @@ void URPublisher::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler
 
 void URPublisher::CreatePublisher()
 {
-  Publisher = MakeShareable<FROSBridgePublisher>
-    (new FROSBridgePublisher(Topic, MessageType));
+  Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
 
-  if(Publisher.IsValid())
-    {
-      UE_LOG(LogTemp, Log, TEXT("Publisher connected to RosBridge"));
-    }
+  if (Publisher.IsValid())
+  {
+    UE_LOG(LogRPublisher, Log, TEXT("%s is connected to ROSBridge"), *GetName())
+  }
 }

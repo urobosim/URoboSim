@@ -3,26 +3,27 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RUtilityClasses.h"
-#include "RGraspComponent.h"
+// #include "RGraspComponent.h"
+#include "Physics/RJoint.h"
 #include "Physics/RLink.h"
+// clang-format off
 #include "RModel.generated.h"
-
-
-class USDFModel;
-class USDFJoint;
-class USDFLink;
-class URJoint;
-// class URLink;
+// clang-format on
 
 USTRUCT()
-struct FModelInformation
+struct FEnableGravity
 {
   GENERATED_BODY()
-  public:
 
+public:
+  FEnableGravity() : bBase(true), bLinks(false) {}
+
+  UPROPERTY(EditAnywhere)
+  bool bBase;
+
+  UPROPERTY(EditAnywhere)
+  bool bLinks;
 };
 
 UCLASS()
@@ -31,39 +32,56 @@ class UROBOSIM_API ARModel : public AActor
   GENERATED_BODY()
 
 public:
-// Sets default values for this actor's properties
-ARModel();
+  // Sets default values
+  ARModel();
 
-  // Destructor
-  ~ARModel();
-
-  UPROPERTY(EditAnywhere)
-    TMap<FString, URJoint*> Joints;
-
-  UPROPERTY(EditAnywhere)
-    TMap<FString, URLink*> Links;
-
-  UPROPERTY()
-  URLink* BaseLink;
-
-  UPROPERTY(VisibleAnywhere)
-    TMap<FString, UActorComponent*> Plugins;
-
-  virtual FJointState GetJointState();
+public:
+  // Called every frame
+  virtual void Tick(float DeltaTime) override;
 
 protected:
-// Called when the game starts or when spawned
-virtual void BeginPlay() override;
+  // Called when the game starts or when spawned
+  virtual void BeginPlay() override;
 
-
-UPROPERTY()
-  TArray<URGraspComponent*> Grippers;
 public:
-// Called every frame
-virtual void Tick(float DeltaTime) override;
+  virtual void AddJoint(URJoint *&Joint) { Joints.Add(Joint); }
 
-void AddJoint(URJoint* Joint);
-void AddLink(URLink* Link);
-// Load model
+  virtual void AddLink(URLink *&Link) { Links.Add(Link); }
 
+  virtual void AddPlugin(UActorComponent *Plugin) { Plugins.Add(Plugin); }
+
+  virtual TArray<URJoint *> GetJoints() const { return Joints; }
+
+  virtual URJoint *GetJoint(const FString &JointName) const
+  {
+    return *Joints.FindByPredicate([&](URJoint *Joint) { return Joint->GetName().Equals(JointName); });
+  }
+
+  virtual TArray<URLink *> GetLinks() const { return Links; }
+
+  virtual UActorComponent *GetPlugin(const FString &PluginName) const
+  {
+    return *Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
+  }
+
+  // virtual const TArray<FJointState> GetJointState() const;
+public:
+  UPROPERTY(EditAnywhere)
+  FEnableGravity EnableGravity;
+
+  UPROPERTY(EditAnywhere)
+  bool bSimulatePhysics;
+
+protected:
+  UPROPERTY(VisibleAnywhere)
+  TArray<URJoint *> Joints;
+
+  UPROPERTY(VisibleAnywhere)
+  TArray<URLink *> Links;
+
+  UPROPERTY(EditAnywhere)
+  TArray<UActorComponent *> Plugins;
+
+  // UPROPERTY()
+  // TArray<URGraspComponent *> Grippers;
 };
