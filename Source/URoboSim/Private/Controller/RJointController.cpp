@@ -149,8 +149,10 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
 
           float CurrentJointPos = Joint.Value->GetEncoderValue();
           float Diff = DesiredPos - CurrentJointPos;
+          
+          
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
-
+          
           float Vel = Diff / InDeltaTime;
           float VelSave = Vel;
           // if(Joint.Value->MaxJointVel > 0)

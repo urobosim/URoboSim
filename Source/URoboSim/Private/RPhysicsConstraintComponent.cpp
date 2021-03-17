@@ -1,7 +1,7 @@
 #include "RPhysicsConstraintComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Physics/RJoint.h"
-
+#include "Conversions.h"
 
 float URConstraintComponent::GetUpperLimit()
 {
@@ -25,6 +25,19 @@ float URConstraintComponent::GetLowerLimit()
     {
       return Lower;
     }
+}
+
+const FTransform URConstraintComponent::GetChildPoseInJointFrame() const
+{
+	FTransform ChildPose = Child->GetComponentTransform();
+	FTransform JointPose = GetComponentTransform();
+	return ChildPose * JointPose.Inverse();
+}
+
+float URConstraintComponent::GetJointPositionInUUnits()
+{
+  DeltaPoseInJointFrame = (InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame()).Inverse();
+  return 0.f;
 }
 
 float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJointState)
@@ -191,6 +204,12 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
   Child = InChild;
 }
 
+void URConstraintComponent::BeginPlay()
+{
+  Super::BeginPlay();
+  InitChildPoseInJointFrame = GetChildPoseInJointFrame();
+}
+
 void URContinuousConstraintComponent::BeginPlay()
 {
   FQuat ParentOrientation = Parent->GetComponentQuat();
@@ -282,21 +301,22 @@ void URPrismaticConstraintComponent::SetPosition(USDFJoint* InJoint)
 
 float URPrismaticConstraintComponent::GetJointPositionInUUnits()
 {
-  FVector ParentPosition = Parent->GetComponentLocation();
-  FVector ChildPosition = Child->GetComponentLocation();
+  // FVector ParentPosition = Parent->GetComponentLocation();
+  // FVector ChildPosition = Child->GetComponentLocation();
 
-  FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
-  float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
+  // FVector JointAxis = GetComponentQuat().RotateVector(RefAxis);
+  // float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
 
-  return JointPosition;
+  // return JointPosition
+  Super::GetJointPositionInUUnits();
+  FVector DeltaPositionInJointFrame = DeltaPoseInJointFrame.GetLocation();
+  return FVector::DotProduct(DeltaPositionInJointFrame, RefAxis);
 }
 
 
 float URPrismaticConstraintComponent::GetJointPosition()
 {
-  //TODO make  this a function in Conversions
-  float Pos = GetJointPositionInUUnits()/100.f;
-  return Pos;
+  return FConversions::CmToM(GetJointPositionInUUnits());
 }
 
 float URPrismaticConstraintComponent::GetJointVelocity()
@@ -335,32 +355,38 @@ float URContinuousConstraintComponent::GetConstraintPosition()
 
 float URContinuousConstraintComponent::GetJointPosition()
 {
-  float ResultAngle = 0.;
+  // float ResultAngle = 0.;
 
-  FTransform ParentTransform = Parent->GetComponentTransform();
-  FTransform ChildTransform = Child->GetComponentTransform();
-  FTransform JointTransform = GetComponentTransform();
+  // FTransform ParentTransform = Parent->GetComponentTransform();
+  // FTransform ChildTransform = Child->GetComponentTransform();
+  // FTransform JointTransform = GetComponentTransform();
 
-  FTransform RelativeTransform = JointTransform.GetRelativeTransform(ParentTransform);
+  // FTransform RelativeTransform = JointTransform.GetRelativeTransform(ParentTransform);
 
-  FVector AxisV = RelativeTransform.GetRotation().RotateVector(RefAxis);
-  FQuat QRel = ParentTransform.GetRotation().Inverse() * ChildTransform.GetRotation();
-  FQuat QRelZerod = QRel * QInitial.Inverse();
+  // FVector AxisV = RelativeTransform.GetRotation().RotateVector(RefAxis);
+  // FQuat QRel = ParentTransform.GetRotation().Inverse() * ChildTransform.GetRotation();
+  // FQuat QRelZerod = QRel * QInitial.Inverse();
 
-  FVector QRelImag(QRelZerod.X, QRelZerod.Y, QRelZerod.Z);
-  float cost2 = QRelZerod.W;
-  float sint2 = FMath::Sqrt(QRelZerod.X * QRelZerod.X + QRelZerod.Y * QRelZerod.Y + QRelZerod.Z * QRelZerod.Z);
-  float theta = (FVector::DotProduct( QRelImag, AxisV) >= 0) ? (2 * FGenericPlatformMath::Atan2(sint2, cost2)) : (2 * FGenericPlatformMath::Atan2(sint2, -cost2));
+  // FVector QRelImag(QRelZerod.X, QRelZerod.Y, QRelZerod.Z);
+  // float cost2 = QRelZerod.W;
+  // float sint2 = FMath::Sqrt(QRelZerod.X * QRelZerod.X + QRelZerod.Y * QRelZerod.Y + QRelZerod.Z * QRelZerod.Z);
+  // float theta = (FVector::DotProduct( QRelImag, AxisV) >= 0) ? (2 * FGenericPlatformMath::Atan2(sint2, cost2)) : (2 * FGenericPlatformMath::Atan2(sint2, -cost2));
 
-  if (theta > PI) theta -= 2*PI;
-  theta = -theta;
-  return theta;
+  // if (theta > PI) theta -= 2*PI;
+  // theta = -theta;
+  // return theta;
+  return FMath::DegreesToRadians(GetJointPositionInUUnits());
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
 {
-  float OutVelocity =FMath::RadiansToDegrees(GetJointPosition());
-  return OutVelocity;
+  // float OutVelocity =FMath::RadiansToDegrees(GetJointPosition());
+  // return OutVelocity;
+  Super::GetJointPositionInUUnits();
+  FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
+  float RotationAngle = FRotator::NormalizeAxis(FMath::RadiansToDegrees(DeltaRotationInJointFrame.GetAngle()));
+  FVector RotationVectorInJointFrame = DeltaRotationInJointFrame.GetRotationAxis() * RotationAngle;
+  return FVector::DotProduct(RotationVectorInJointFrame, RefAxis);
 }
 
 float URContinuousConstraintComponent::GetJointVelocity()
