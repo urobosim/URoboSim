@@ -2,6 +2,7 @@
 // Author: Michael Neumann
 
 #include "Physics/RJoint.h"
+#include "Conversions.h"
 #include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRJoint, Log, All);
@@ -31,7 +32,7 @@ void URJoint::BeginPlay()
 
 const float URJoint::GetPosition()
 {
-	FTransform DeltaPoseInJointFrame = (InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame()).Inverse();
+	FTransform DeltaPoseInJointFrame = InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame();
 	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 	{
 		FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
@@ -62,20 +63,28 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 {
 	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
 	{
-		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
+		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(-Type->Axis, TargetPosition));
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
 	{
-		Type->Constraint->SetLinearPositionTarget(Type->Axis * TargetPosition);
+		Type->Constraint->SetLinearPositionTarget(-Type->Axis * TargetPosition);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 	else
 	{
-		float DeltaPosition = GetPosition() - TargetPosition;
-		FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * DeltaPosition);
+		float DeltaPosition = TargetPosition - GetPosition();
 		Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
-		Child->GetCollisionMeshes()[0]->AddLocalRotation(DeltaRotation);
+		if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+		{
+			FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * DeltaPosition);
+			Child->GetCollisionMeshes()[0]->AddLocalRotation(DeltaRotation);
+		}
+		else if (Type->GetName().Equals("prismatic"))
+		{
+			FVector DeltaLocation = InitChildPoseInJointFrame.GetRotation().UnrotateVector(Type->Axis) * DeltaPosition;
+			Child->GetCollisionMeshes()[0]->AddLocalOffset(DeltaLocation);
+		}
 	}
 }
 
