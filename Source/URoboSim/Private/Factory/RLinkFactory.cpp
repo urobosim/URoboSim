@@ -153,6 +153,7 @@ void URLinkBuilder::SetCollisions()
 void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 {
   URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InCollision->Name).GetCharArray().GetData()));
+  LinkComponent->CreationMethod = EComponentCreationMethod::Instance;
   LinkComponent->RegisterComponent();
   if(Model->GetRootComponent() == nullptr)
     {
