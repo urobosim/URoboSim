@@ -152,11 +152,7 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
           
           
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
-          if(Joint.Key.Contains("iiwa_joint_4"))
-          {
-           Diff = -Diff;
-          }
-
+          
           float Vel = Diff / InDeltaTime;
           float VelSave = Vel;
           // if(Joint.Value->MaxJointVel > 0)
