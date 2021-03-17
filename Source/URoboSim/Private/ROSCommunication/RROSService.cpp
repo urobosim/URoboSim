@@ -9,24 +9,24 @@ void URROSService::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandle
 	ROSHandler->AddServiceServer(ServiceServer);
 }
 
-void URROSSimulationCommandsService::SetOwner(UObject* InOwner)
-{
-	Owner = Cast<URControllerComponent>(InOwner);
-	if(!Owner)
-	{
-		UE_LOG(LogTemp, Error, TEXT("Owner of SimulationCommands no ControllerComponent"));
-	}
-}
+// void URROSSimulationCommandsService::SetOwner(UObject* InOwner)
+// {
+// 	Owner = Cast<URControllerComponent>(InOwner);
+// 	if(!Owner)
+// 	{
+// 		UE_LOG(LogTemp, Error, TEXT("Owner of SimulationCommands no ControllerComponent"));
+// 	}
+// }
 
-void URROSSimulationCommandsService::CreateServiceServer()
-{
-	ServiceServer =	MakeShareable<FROSSimulationCommandsServer>(new FROSSimulationCommandsServer(Name, Type, Owner));
-}
+// void URROSSimulationCommandsService::CreateServiceServer()
+// {
+// 	ServiceServer =	MakeShareable<FROSSimulationCommandsServer>(new FROSSimulationCommandsServer(Name, Type, Owner));
+// }
 
-void URROSSimulationCommandsService::SetType()
-{
-	Type = TEXT("u_robo_sim_communication/SimulationCommands");
-}
+// void URROSSimulationCommandsService::SetType()
+// {
+// 	Type = TEXT("u_robo_sim_communication/SimulationCommands");
+// }
 
 // URROSService* URROSService::Init(FString InType, UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
 // {

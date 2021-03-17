@@ -4,7 +4,7 @@
 #include "ROSBridgePublisher.h"
 #include "ROSBridgeSrvServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
-#include "ROSCommunication/RROSServiceServer.h"
+/* #include "ROSCommunication/RROSServiceServer.h" */
 #include "Controller/RController.h"
 #include "RROSService.generated.h"
 
@@ -32,23 +32,23 @@ protected:
 	virtual void CreateServiceServer(){};
 };
 
-UCLASS()
-class UROBOSIM_API URROSSimulationCommandsService : public URROSService
-{
-GENERATED_BODY()
-public:
+/* UCLASS() */
+/* class UROBOSIM_API URROSSimulationCommandsService : public URROSService */
+/* { */
+/* GENERATED_BODY() */
+/* public: */
 
 
-protected:
-	UPROPERTY()
-	URControllerComponent* Owner;
+/* protected: */
+/* 	UPROPERTY() */
+/* 	URControllerComponent* Owner; */
 
-	virtual void SetOwner(UObject* InOwner);
-	virtual void SetType();
-	virtual void CreateServiceServer();
+/* 	virtual void SetOwner(UObject* InOwner); */
+/* 	virtual void SetType(); */
+/* 	virtual void CreateServiceServer(); */
 
 
-};
+/* }; */
 
 // UCLASS()
 // class UROBOSIM_API URROSRobotRegistrationService : public URROSService
