@@ -69,12 +69,6 @@ void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
 	Constraint->SetJointPosition(Angle, OutSweepHitResult);
 }
-
-void URJoint::SetMotorJointPosition(float Position)
-{
-	Constraint->SetMotorJointPosition(Position);
-}
-
 void URJoint::SetJointVelocity(float Velocity)
 {
 	Constraint->SetJointVelocity(Velocity);
