@@ -1,7 +1,7 @@
 #include "RPhysicsConstraintComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Physics/RJoint.h"
-
+#include "Conversions.h"
 
 float URConstraintComponent::GetUpperLimit()
 {
@@ -373,6 +373,16 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
+  if (!RefAxis.GetAbs().Equals(FVector::UpVector))
+  {
+    TargetPosition *= -1;
+    TargetJointVelocity *= -1;
+  }
+  SetMotorJointStateInUUnits(TargetPosition, TargetJointVelocity);
+}
+
+void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
+{
   SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition)));
   SetAngularVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
@@ -405,6 +415,11 @@ float URContinuousConstraintComponent::GetJointVelocityInUUnits()
 }
 
 void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
+{
+  SetMotorJointStateInUUnits(-FConversions::MToCm((float)TargetPosition), -FConversions::MToCm((float)TargetJointVelocity));
+}
+
+void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
 {
   SetLinearPositionTarget(RefAxis * TargetPosition);
   SetLinearVelocityTarget(RefAxis * TargetJointVelocity);

@@ -77,6 +77,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual float GetJointVelocityInUUnits(){return 0.;};
 
   virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity){};
+  virtual void SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity){};
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult){};
   virtual void SetJointVelocity(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
   virtual void SetJointVelocityInUUnits(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
@@ -154,6 +155,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   virtual float GetJointVelocityInUUnits() override;
 
   virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity) override;
+  virtual void SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity) override;
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
   virtual void SetJointVelocity(float Velocity);
   virtual void SetJointVelocityInUUnits(float Velocity);
@@ -193,6 +195,7 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   virtual float CheckPositionRange(float InTargetJointPos);
 
   virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity) override;
+  virtual void SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity) override;
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
   virtual void SetJointVelocity(float Velocity);
   virtual void SetJointVelocityInUUnits(float Velocity);
