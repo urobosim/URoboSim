@@ -265,7 +265,9 @@ void URJointController::MoveJointsDynamic(float InDeltaTime)
     {
       if(DesiredJointState.Contains(Joint.Key))
         {
-          Joint.Value->SetMotorJointPosition(DesiredJointState[Joint.Key]);
+          // TODO: Change TargetVelocity
+          float TargetVelocity = 0.f;
+          Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
         }
     }
 }
