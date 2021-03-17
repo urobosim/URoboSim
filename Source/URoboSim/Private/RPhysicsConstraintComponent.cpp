@@ -245,7 +245,7 @@ void URContinuousConstraintComponent::EnableMotor(bool InEnable)
 {
   SetOrientationDriveTwistAndSwing(InEnable, InEnable);
   SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
-  SetAngularDriveParams(1E8, 1E8, 1E10);
+  SetAngularDriveParams(1E6, 5E5, 1E10);
   if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
   {
     SetAngularOrientationDrive(false, true);
@@ -392,9 +392,7 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointPosition(float TargetAngle)
 {
-  SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetAngle)));
-  float TargetVelocity = 0.f; //TODO: Add TargetVelocity
-  SetAngularVelocityTarget(RefAxis * TargetVelocity);
+  SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetAngle));
   Child->WakeRigidBody();
 }
 
