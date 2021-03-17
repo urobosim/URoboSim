@@ -36,7 +36,7 @@ const FTransform URConstraintComponent::GetChildPoseInJointFrame() const
 
 float URConstraintComponent::GetJointPositionInUUnits()
 {
-  DeltaPoseInJointFrame = (InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame()).Inverse();
+  DeltaPoseInJointFrame = InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame();
   return 0.f;
 }
 
@@ -309,8 +309,7 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
 
   // return JointPosition
   Super::GetJointPositionInUUnits();
-  FVector DeltaPositionInJointFrame = DeltaPoseInJointFrame.GetLocation();
-  return FVector::DotProduct(DeltaPositionInJointFrame, RefAxis);
+  return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
 }
 
 
@@ -375,7 +374,14 @@ float URContinuousConstraintComponent::GetJointPosition()
   // if (theta > PI) theta -= 2*PI;
   // theta = -theta;
   // return theta;
-  return FMath::DegreesToRadians(GetJointPositionInUUnits());
+  if (RefAxis.GetAbs().Equals(FVector::UpVector))
+  {
+    return -FMath::DegreesToRadians(GetJointPositionInUUnits());
+  }
+  else
+  {
+    return FMath::DegreesToRadians(GetJointPositionInUUnits());
+  }   
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
