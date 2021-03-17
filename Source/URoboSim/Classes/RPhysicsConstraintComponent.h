@@ -61,6 +61,8 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     float SoftLower = 0;
 
+  virtual void BeginPlay() override;
+  virtual const FTransform GetChildPoseInJointFrame() const;
   virtual void ConnectToComponents(){};
   virtual void EnableMotor(bool InEnable){};
   virtual void SetTargetPosition(float InTargetPos){};
@@ -73,7 +75,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual float GetJointPosition(){return 0.;};
   virtual float GetJointVelocity(){return 0.;};
 
-  virtual float GetJointPositionInUUnits(){return 0.;};
+  virtual float GetJointPositionInUUnits();
   virtual float GetJointVelocityInUUnits(){return 0.;};
 
   virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity){};
@@ -107,8 +109,13 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
 
   UPROPERTY()
     FVector Offset;
- protected:
 
+  UPROPERTY()
+  FTransform DeltaPoseInJointFrame;
+
+  UPROPERTY()
+  FTransform InitChildPoseInJointFrame;
+ protected:
 
   UPROPERTY()
     float TargetVelocity;
