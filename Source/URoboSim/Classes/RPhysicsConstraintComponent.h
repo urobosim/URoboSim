@@ -78,7 +78,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual float GetJointPositionInUUnits();
   virtual float GetJointVelocityInUUnits(){return 0.;};
 
-  virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity){};
+  virtual void SetMotorJointPosition(float Angle){};
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult){};
   virtual void SetJointVelocity(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
   virtual void SetJointVelocityInUUnits(float Velocity){UE_LOG(LogTemp, Warning, TEXT("test "));};
@@ -151,7 +151,6 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
 
   virtual float ClampJointStateToConstraintLimit(float InJointState) override;
   virtual void SetPosition(USDFJoint* InJoint);
-  virtual void EnableMotor(bool InEnable);
   virtual void BeginPlay() override;
 
   virtual float GetJointPosition() override;
@@ -160,12 +159,12 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   virtual float GetJointPositionInUUnits() override;
   virtual float GetJointVelocityInUUnits() override;
 
-  virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity) override;
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
   virtual void SetJointVelocity(float Velocity);
   virtual void SetJointVelocityInUUnits(float Velocity);
   virtual void SetJointEffort(float Effort);
   virtual void SetJointEffortFromROS(float InEffort);
+  virtual void EnableMotor(bool InEnable);
   virtual void SetTargetPosition(float InTargetPos);
 
 
@@ -199,7 +198,7 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
 
   virtual float CheckPositionRange(float InTargetJointPos);
 
-  virtual void SetMotorJointState(float TargetPosition, float TargetJointVelocity) override;
+  virtual void SetMotorJointPosition(float Angle) override;
   virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
   virtual void SetJointVelocity(float Velocity);
   virtual void SetJointVelocityInUUnits(float Velocity);

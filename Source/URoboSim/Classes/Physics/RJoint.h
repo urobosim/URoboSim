@@ -45,7 +45,7 @@ public:
 	virtual float GetJointPositionInUUnits();
 	virtual float GetJointVelocity();
 
-  virtual void SetMotorJointState(float Position, float Velocity);
+  virtual void SetMotorJointPosition(float Position);
 	virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
 	virtual void SetJointVelocity(float Velocity);
 	virtual void SetJointVelocityInUUnits(float Velocity);

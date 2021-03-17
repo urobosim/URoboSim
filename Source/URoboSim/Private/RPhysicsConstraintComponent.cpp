@@ -260,7 +260,6 @@ void URContinuousConstraintComponent::EnableMotor(bool InEnable)
 
 void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
 {
-  SetLinearDriveParams(1E8, 1E8, 1E10);
   bool bEnableX = false;
   bool bEnableY = false;
   bool bEnableZ = false;
@@ -277,7 +276,6 @@ void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
       bEnableZ = InEnable;
     }
   SetLinearPositionDrive(bEnableX, bEnableY, bEnableZ);
-  SetLinearVelocityDrive(bEnableX, bEnableY, bEnableZ);
 }
 
 void URFixedConstraintComponent::ConnectToComponents()
@@ -392,10 +390,11 @@ float URContinuousConstraintComponent::GetJointPosition()
   return FMath::DegreesToRadians(GetJointPositionInUUnits());
 }
 
-void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
+void URContinuousConstraintComponent::SetMotorJointPosition(float TargetAngle)
 {
-  SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition)));
-  SetAngularVelocityTarget(RefAxis * TargetJointVelocity);
+  SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetAngle)));
+  float TargetVelocity = 0.f; //TODO: Add TargetVelocity
+  SetAngularVelocityTarget(RefAxis * TargetVelocity);
   Child->WakeRigidBody();
 }
 
@@ -428,13 +427,6 @@ float URContinuousConstraintComponent::GetJointVelocityInUUnits()
   float OutVelocity =FMath::RadiansToDegrees(GetJointVelocity());
 
   return OutVelocity;
-}
-
-void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
-{
-  SetLinearPositionTarget(RefAxis * TargetPosition);
-  SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
-  Child->WakeRigidBody();
 }
 
 void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
