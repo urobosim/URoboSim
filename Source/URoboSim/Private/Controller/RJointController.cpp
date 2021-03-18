@@ -252,9 +252,18 @@ void URJointController::MoveJoints(float InDeltaTime)
 
 void URJointController::MoveJointsDynamic(float InDeltaTime)
 {
-  if(GetOwner()->Links.Contains(BaseLink))
+  // if(GetOwner()->Links.Contains(BaseLink))
+  //   {
+  //     GetOwner()->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+  //   }
+  for(auto &Joint : GetOwner()->Joints)
     {
-      GetOwner()->Links[BaseLink]->UpdateVelocity(InDeltaTime);
+      if(DesiredJointState.Contains(Joint.Key))
+        {
+          // TODO: Change TargetVelocity
+          float TargetVelocity = 0.f;
+          Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
+        }
     }
 }
 
@@ -328,6 +337,10 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 
     case UJointControllerMode::Dynamic:
       bEnablePhysics = true;
+      for(auto& Joint : GetOwner()->Joints)
+      {
+        Joint.Value->EnableMotor(true);
+      }
       break;
 
 	default:
