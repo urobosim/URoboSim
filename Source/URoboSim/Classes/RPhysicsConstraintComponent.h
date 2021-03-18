@@ -167,7 +167,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   virtual void SetJointVelocityInUUnits(float Velocity);
   virtual void SetJointEffort(float Effort);
   virtual void SetJointEffortFromROS(float InEffort);
-  virtual void EnableMotor(bool InEnable);
+  virtual void EnableMotor(bool InEnable) override;
   virtual void SetTargetPosition(float InTargetPos);
 
 
@@ -192,7 +192,7 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   };
 
   virtual void SetTargetPosition(float InTargetPos);
-  virtual void EnableMotor(bool InEnable);
+  virtual void EnableMotor(bool InEnable) override;
   virtual float GetConstraintPosition() override;
   virtual float GetJointPosition() override;
   virtual float GetJointVelocity() override;

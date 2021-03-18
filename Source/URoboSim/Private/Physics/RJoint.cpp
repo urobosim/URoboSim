@@ -48,6 +48,11 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
   Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
 
+void URJoint::SetMotorJointState(float Position, float Velocity)
+{
+	Constraint->SetMotorJointState(Position, Velocity);
+}
+
 float URJoint::GetJointPosition()
 {
 	return Constraint->GetJointPosition();
