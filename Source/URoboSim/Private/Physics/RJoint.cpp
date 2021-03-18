@@ -36,9 +36,7 @@ const float URJoint::GetPosition()
 	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 	{
 		FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
-		float RotationAngle = FRotator::NormalizeAxis(FMath::RadiansToDegrees(DeltaRotationInJointFrame.GetAngle()));
-		FVector RotationVectorInJointFrame = DeltaRotationInJointFrame.GetRotationAxis() * RotationAngle;
-		return FVector::DotProduct(RotationVectorInJointFrame, Type->Axis);
+		return FVector::DotProduct(DeltaRotationInJointFrame.Euler(), Type->Axis * FVector(1.f, 1.f, -1.f));
 	}
 	else if (Type->GetName().Equals("prismatic"))
 	{
@@ -63,12 +61,12 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 {
 	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
 	{
-		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(-Type->Axis, TargetPosition));
+		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
 	{
-		Type->Constraint->SetLinearPositionTarget(-Type->Axis * TargetPosition);
+		Type->Constraint->SetLinearPositionTarget(Type->Axis * -TargetPosition);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 	else
@@ -77,7 +75,7 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 		Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
 		if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 		{
-			FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * DeltaPosition);
+			FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * -DeltaPosition);
 			Child->GetCollisionMeshes()[0]->AddLocalRotation(DeltaRotation);
 		}
 		else if (Type->GetName().Equals("prismatic"))
