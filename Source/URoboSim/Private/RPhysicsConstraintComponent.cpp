@@ -381,7 +381,24 @@ float URContinuousConstraintComponent::GetJointPosition()
   else
   {
     return FMath::DegreesToRadians(GetJointPositionInUUnits());
-  }   
+  }
+}
+
+void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
+{
+  if (!RefAxis.GetAbs().Equals(FVector::UpVector))
+  {
+    TargetPosition *= -1;
+    TargetJointVelocity *= -1;
+  }
+  SetMotorJointStateInUUnits(TargetPosition, TargetJointVelocity);
+}
+
+void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
+{
+  SetAngularOrientationTarget(FMath::RadiansToDegrees(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition)));
+  SetAngularVelocityTarget(RefAxis * TargetJointVelocity);
+  Child->WakeRigidBody();
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
@@ -413,6 +430,18 @@ float URContinuousConstraintComponent::GetJointVelocityInUUnits()
   float OutVelocity =FMath::RadiansToDegrees(GetJointVelocity());
 
   return OutVelocity;
+}
+
+void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
+{
+  SetMotorJointStateInUUnits(-FConversions::MToCm((float)TargetPosition), -FConversions::MToCm((float)TargetJointVelocity));
+}
+
+void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
+{
+  SetLinearPositionTarget(RefAxis * TargetPosition);
+  SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
+  Child->WakeRigidBody();
 }
 
 void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
