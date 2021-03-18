@@ -75,13 +75,15 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 		Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
 		if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 		{
-			FRotator DeltaRotation = FRotator::MakeFromEuler(Type->Axis * -DeltaPosition);
-			Child->GetCollisionMeshes()[0]->AddLocalRotation(DeltaRotation);
+			FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+			FQuat DeltaRotationInWorldFrame = FQuat::MakeFromEuler(AxisInWorldFrame * FVector(1.f, 1.f, -1.f) * DeltaPosition);
+			Child->GetCollisionMeshes()[0]->AddWorldRotation(DeltaRotationInWorldFrame);
 		}
 		else if (Type->GetName().Equals("prismatic"))
 		{
-			FVector DeltaLocation = InitChildPoseInJointFrame.GetRotation().UnrotateVector(Type->Axis) * DeltaPosition;
-			Child->GetCollisionMeshes()[0]->AddLocalOffset(DeltaLocation);
+			FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+			FVector DeltaLocationInWorldFrame = AxisInWorldFrame * DeltaPosition;
+			Child->GetCollisionMeshes()[0]->AddWorldOffset(DeltaLocationInWorldFrame);
 		}
 	}
 }
