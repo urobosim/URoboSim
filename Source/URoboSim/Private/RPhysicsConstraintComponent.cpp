@@ -264,15 +264,15 @@ void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
   bool bEnableX = false;
   bool bEnableY = false;
   bool bEnableZ = false;
-  if(RefAxis[0] == 1)
+  if(RefAxis.GetAbs().Equals(FVector::ForwardVector))
     {
       bEnableX = InEnable;
     }
-  if(RefAxis[1] == 1)
+  else if(RefAxis.GetAbs().Equals(FVector::RightVector))
     {
       bEnableY = InEnable;
     }
-  if(RefAxis[2] == 1)
+  else
     {
       bEnableZ = InEnable;
     }
