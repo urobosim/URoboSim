@@ -415,8 +415,7 @@ float URContinuousConstraintComponent::GetJointPositionInUUnits()
   // float OutVelocity =FMath::RadiansToDegrees(GetJointPosition());
   // return OutVelocity;
   Super::GetJointPositionInUUnits();
-  FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
-  return FVector::DotProduct(DeltaRotationInJointFrame.Euler(), RefAxis);
+  return FVector::DotProduct(DeltaPoseInJointFrame.GetRotation().Euler(), RefAxis);
 }
 
 float URContinuousConstraintComponent::GetJointVelocity()
