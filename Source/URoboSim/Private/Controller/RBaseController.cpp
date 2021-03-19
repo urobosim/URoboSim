@@ -29,20 +29,20 @@ void URBaseController::Init()
 void URBaseController::MoveLinear(FVector InVelocity)
 {
   LinearVelocity = InVelocity;
-  if(MaxLinearVelocity < InVelocity.Size())
-    {
-      MaxLinearVelocity = InVelocity.Size();
-    }
+  // if(MaxLinearVelocity < InVelocity.Size())
+  //   {
+  //     MaxLinearVelocity = InVelocity.Size();
+  //   }
 }
 
 void URBaseController::Turn(float InVelocity)
 {
   AngularVelocity = -InVelocity;
 
-  if(MaxAngularVelocity < FMath::Abs(AngularVelocity))
-    {
-      MaxAngularVelocity = FMath::Abs(AngularVelocity);
-    }
+  // if(MaxAngularVelocity < FMath::Abs(AngularVelocity))
+  //   {
+  //     MaxAngularVelocity = FMath::Abs(AngularVelocity);
+  //   }
 }
 
 void URBaseController::Tick(float InDeltaTime)
@@ -282,7 +282,6 @@ void URBaseControllerKinematic::MoveLinearTick(float InDeltaTime)
       URLink* Base = GetOwner()->Links[BaseName];
       FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
       FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
-      UE_LOG(LogTemp, Log, TEXT("LinearVelocity %s, DistanceTraveld %s"), *LinearVelocity.ToString(), *DistanceTraveld.ToString());
 
       for(auto& Link : GetOwner()->Links)
         {
