@@ -237,7 +237,20 @@ void URContinuousConstraintComponent::SetTargetPosition(float InTargetPos)
 
 void URRevoluteConstraintComponent::SetTargetPosition(float InTargetPos)
 {
-  FRotator Temp =UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, InTargetPos-RotationOffset);
+  FRotator Temp;
+  if (RefAxis[0]== 1)
+    {
+      Temp=UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, InTargetPos+FMath::RadiansToDegrees(RotationOffset));
+    }
+  else if (RefAxis[1]== 1)
+    {
+      Temp=UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, InTargetPos-FMath::RadiansToDegrees(RotationOffset));
+    }
+  else if (RefAxis[2]==1)
+    {
+      Temp=UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, InTargetPos-FMath::RadiansToDegrees(RotationOffset));
+    }
+  // Temp=UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, InTargetPos-FMath::RadiansToDegrees(RotationOffset));
   SetAngularOrientationTarget(Temp);
 }
 
@@ -405,7 +418,8 @@ void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, f
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
 {
-  SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition));
+  SetTargetPosition(TargetPosition);
+  // SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition));
   SetAngularVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
 }
@@ -445,7 +459,7 @@ void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, fl
 
 void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
 {
-  SetLinearPositionTarget(RefAxis * TargetPosition);
+  SetLinearPositionTarget(RefAxis * TargetPosition + Offset);
   SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
 }
