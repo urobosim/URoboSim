@@ -69,6 +69,8 @@ class UROBOSIM_API URJointController : public URController
 
   virtual void SetDesiredJointState(FString JointName, float InJointState);
 
+  virtual void EnableMotor(bool bEnableTrue);
+
  protected:
   UPROPERTY(EditAnywhere)
     UJointControllerMode Mode;

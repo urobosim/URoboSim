@@ -3,7 +3,7 @@
 #include "ROSCommunication/RRosComunication.h"
 // #include "ROSCommunication/RPublisher.h"
 #include "ROSCommunication/RROSClient.h"
-// #include "Controller/RController.h"
+#include "Controller/RJointController.h"
 // #include "ROSCommunication/RRosCommunicationComponent.h"
 #include "XmlFile.h"
 
@@ -49,12 +49,14 @@ void FROSJointControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv:
           float& JointState = JointNames->FindOrAdd(st);
           JointState = 0.f;
 	}
+        JointController->EnableMotor(true);
 }
 
-FROSJointControllerConfigurationClient::FROSJointControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType):
+FROSJointControllerConfigurationClient::FROSJointControllerConfigurationClient(URJointController* InJointController, TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType):
 	FROSBridgeSrvClient(InName, InType)
 {
 	JointNames = OutJointNames;
+        JointController = InJointController;
 }
 
 void FROSJointLimitControllerConfigurationClient::Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse)

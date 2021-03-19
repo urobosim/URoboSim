@@ -54,11 +54,11 @@ void URJointControllerConfigurationClient::CreateClient()
   TMap<FString,float>* JointNames = &JointController->DesiredJointState;
   JointRequest = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
   JointResponse = MakeShareable(new rosapi::GetParam::Response());
-  JointServiceClient = MakeShareable<FROSJointControllerConfigurationClient>(new FROSJointControllerConfigurationClient(JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+  JointServiceClient = MakeShareable<FROSJointControllerConfigurationClient>(new FROSJointControllerConfigurationClient(JointController,JointNames,TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
 
   LimitRequest = MakeShareable(new rosapi::GetParam::Request(LimitParamTopic, ""));
   LimitResponse = MakeShareable(new rosapi::GetParam::Response());
-  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient(JointNames, ControllerComp->GetOwner(), TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
+  JointLimitServiceClient = MakeShareable<FROSJointLimitControllerConfigurationClient>(new FROSJointLimitControllerConfigurationClient( JointNames, ControllerComp->GetOwner(), TEXT("rosapi/get_param"), TEXT("rosapi/GetParam")));
 
 
   FTimerHandle MyTimerHandle;

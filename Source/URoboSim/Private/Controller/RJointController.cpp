@@ -149,10 +149,10 @@ void URJointController::CallculateJointVelocities(float InDeltaTime)
 
           float CurrentJointPos = Joint.Value->GetEncoderValue();
           float Diff = DesiredPos - CurrentJointPos;
-          
-          
+
+
           Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
-          
+
           float Vel = Diff / InDeltaTime;
           float VelSave = Vel;
           // if(Joint.Value->MaxJointVel > 0)
@@ -315,6 +315,19 @@ void URJointController::Init()
     }
 }
 
+void URJointController::EnableMotor(bool bEnableTrue)
+{
+  //Enable motor only for joints with are to be controlled not passive ones
+  for(auto& JointState : DesiredJointState)
+    {
+      URJoint* Joint = GetOwner()->Joints[JointState.Key];
+      if(Joint)
+        {
+          Joint->EnableMotor(bEnableTrue);
+        }
+    }
+}
+
 void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 {
   if(Mode == InMode && !IsInit)
@@ -337,10 +350,8 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 
     case UJointControllerMode::Dynamic:
       bEnablePhysics = true;
-      for(auto& Joint : GetOwner()->Joints)
-      {
-        Joint.Value->EnableMotor(true);
-      }
+
+      EnableMotor(true);
       break;
 
 	default:

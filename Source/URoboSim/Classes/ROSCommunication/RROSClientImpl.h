@@ -6,6 +6,7 @@
 #include "Physics/RModel.h"
 #include "ROSBridgeSrvClient.h"
 
+class URJointController;
 
 class FROSJointStateConfigurationClient final : public FROSBridgeSrvClient
 {
@@ -20,11 +21,12 @@ private:
 class FROSJointControllerConfigurationClient final : public FROSBridgeSrvClient
 {
 public:
-  FROSJointControllerConfigurationClient(TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType);
+  FROSJointControllerConfigurationClient(URJointController* InJointController, TMap<FString, float>* OutJointNames, const FString& InName, const FString& InType);
 
 	void Callback( TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 private:
   TMap<FString, float>* JointNames;
+  URJointController* JointController;
 };
 
 class FROSJointLimitControllerConfigurationClient final : public FROSBridgeSrvClient
