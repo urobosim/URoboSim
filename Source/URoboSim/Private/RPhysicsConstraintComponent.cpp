@@ -400,14 +400,7 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  if (RefAxis.GetAbs().Equals(FVector::UpVector))
-  {
-    SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
-  }
-  else
-  {
-    SetMotorJointStateInUUnits(-FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
-  }
+  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
 }
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
@@ -423,9 +416,7 @@ float URContinuousConstraintComponent::GetJointPositionInUUnits()
   // return OutVelocity;
   Super::GetJointPositionInUUnits();
   FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
-  float RotationAngle = FRotator::NormalizeAxis(FMath::RadiansToDegrees(DeltaRotationInJointFrame.GetAngle()));
-  FVector RotationVectorInJointFrame = DeltaRotationInJointFrame.GetRotationAxis() * RotationAngle;
-  return FVector::DotProduct(RotationVectorInJointFrame, RefAxis);
+  return FVector::DotProduct(DeltaRotationInJointFrame.Euler(), RefAxis);
 }
 
 float URContinuousConstraintComponent::GetJointVelocity()
