@@ -76,7 +76,7 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 		if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 		{
 			FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
-			FQuat DeltaRotationInWorldFrame = FQuat::MakeFromEuler(AxisInWorldFrame * FVector(1.f, 1.f, -1.f) * DeltaPosition);
+			FRotator DeltaRotationInWorldFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(AxisInWorldFrame, -DeltaPosition);
 			Child->GetCollisionMeshes()[0]->AddWorldRotation(DeltaRotationInWorldFrame);
 		}
 		else if (Type->GetName().Equals("prismatic"))

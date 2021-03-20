@@ -30,15 +30,15 @@ static void SetPrismaticConstraint(UPhysicsConstraintComponent *&Constraint, USD
     JointLimit = FMath::Abs(Upper) > FMath::Abs(Lower) ? FMath::Abs(Upper) : FMath::Abs(Lower);
     LinearConstraintMotion = ELinearConstraintMotion::LCM_Limited;
   }
-  if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::ForwardVector))
+  if (SDFJointAxis->Xyz.Equals(FVector::ForwardVector))
   {
     Constraint->ConstraintInstance.SetLinearXLimit(LinearConstraintMotion, JointLimit);
   }
-  else if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::RightVector))
+  else if (SDFJointAxis->Xyz.Equals(FVector::RightVector))
   {
     Constraint->ConstraintInstance.SetLinearYLimit(LinearConstraintMotion, JointLimit);
   }
-  else if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::UpVector))
+  else
   {
     Constraint->ConstraintInstance.SetLinearZLimit(LinearConstraintMotion, JointLimit);
   }
@@ -52,12 +52,12 @@ static void SetRevoluteConstraint(UPhysicsConstraintComponent *&Constraint, USDF
   //Because the limit is symetrical the Rotation center has to be offseted so that upper and lower limit corespond to the sdf values
   float RotationOffset = CalculateRotationOffset(JointLimit, SDFJointAxis);
 
-  if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::ForwardVector))
+  if (SDFJointAxis->Xyz.Equals(FVector::ForwardVector))
   {
     Constraint->ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, FMath::RadiansToDegrees(JointLimit));
     Constraint->ConstraintInstance.AngularRotationOffset.Roll = FMath::RadiansToDegrees(RotationOffset);
   }
-  else if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::RightVector))
+  else if (SDFJointAxis->Xyz.Equals(FVector::RightVector))
   {
     Constraint->ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, FMath::RadiansToDegrees(JointLimit));
     Constraint->ConstraintInstance.AngularRotationOffset.Pitch = FMath::RadiansToDegrees(RotationOffset);
@@ -160,17 +160,15 @@ void URJointBuilder::RotateConstraintToRefAxis(UPhysicsConstraintComponent *&Con
 {
   if (Constraint)
   {
-    if (SDFJointAxis->Xyz.GetAbs().Equals(FVector::ForwardVector) || SDFJointAxis->Xyz.GetAbs().Equals(FVector::RightVector) || SDFJointAxis->Xyz.GetAbs().Equals(FVector::UpVector))
+    if (SDFJointAxis->Xyz.Equals(FVector::ForwardVector) || SDFJointAxis->Xyz.Equals(FVector::RightVector) || SDFJointAxis->Xyz.Equals(FVector::UpVector))
     {
-      Joint->SetJointAxis(SDFJointAxis->Xyz.GetAbs());
-      FQuat BetweenQuat = FQuat::FindBetweenVectors(SDFJointAxis->Xyz.GetAbs(), SDFJointAxis->Xyz);
-      Constraint->SetWorldRotation(BetweenQuat);
+      Joint->SetJointAxis(SDFJointAxis->Xyz);
     }
     else
     {
       Joint->SetJointAxis(FVector::UpVector);
       FQuat BetweenQuat = FQuat::FindBetweenVectors(FVector::UpVector, SDFJointAxis->Xyz);
-      Constraint->SetWorldRotation(BetweenQuat);
+      Constraint->SetRelativeRotationExact(Constraint->GetRelativeRotationFromWorld(BetweenQuat).Rotator());
     }
   }
   else
