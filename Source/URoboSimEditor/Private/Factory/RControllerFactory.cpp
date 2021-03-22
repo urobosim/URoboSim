@@ -9,6 +9,7 @@ URControllerFactory::URControllerFactory(const FObjectInitializer& ObjectInitial
     // AActor subclass this ActorFactory creates.
     NewActorClassName = FString("ARModel");
     NewActorClass = ARModel::StaticClass();
+    bDrag = false;
 }
 
 bool URControllerFactory::CanCreateActorFrom(const FAssetData & AssetData, FText & OutErrorMsg)
@@ -25,72 +26,56 @@ AActor* URControllerFactory::GetDefaultActor(const FAssetData & AssetData)
 
 AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
 {
-  URControllerDataAsset* ControllerAsset = CastChecked<URControllerDataAsset>(Asset);
-  if(ControllerAsset)
+
+  if(bDrag)
     {
-      ARModel* NewRobot = nullptr;
-      TArray<AActor*> WorldActors;
-      UGameplayStatics::GetAllActorsOfClass(InLevel->OwningWorld, ARModel::StaticClass(), WorldActors);
-
-
-      TArray<ARModel*> TargetModel;
-      for (auto & Robot : WorldActors)
+      URControllerDataAsset* ControllerAsset = CastChecked<URControllerDataAsset>(Asset);
+      if(ControllerAsset)
         {
-          if (ControllerAsset->RobotNames.Contains(Robot->GetName()))
+          ARModel* NewRobot = nullptr;
+          TArray<AActor*> WorldActors;
+          UGameplayStatics::GetAllActorsOfClass(InLevel->OwningWorld, ARModel::StaticClass(), WorldActors);
+
+
+          TArray<ARModel*> TargetModel;
+          for (auto & Robot : WorldActors)
             {
-              UE_LOG(LogTemp, Error, TEXT("Robot found"));
-              TargetModel.Add(Cast<ARModel>(Robot));
-
-
-
-
-              /* FActorSpawnParameters SpawnInfo; */
-              /* SpawnInfo.OverrideLevel = InLevel; */
-              /* SpawnInfo.ObjectFlags = InObjectFlags; */
-              /* // SpawnInfo.Name = Name; */
-
-              /* //TODO fix name of spawned model */
-              /* SpawnInfo.Name = FName(*Model->Name); */
-              /* UE_LOG(LogTemp, Error, TEXT("Create Model %s"), *SpawnInfo.Name.ToString()); */
-
-              /* // Creates RRobot Actor. */
-
-              /* URControllerDataAsset* ModelBuilder = NewObject<URModelBuilder>(this); */
-              /* ModelBuilder->Load(Model, NewRobot,FVector(0,0,0)); */
-              /* // NewRobot->Load(Model); */
-              /* // URControllerFactory::CreateModels(NewRobot, SDFAsset); */
-              /* if ( NewRobot ) */
-              /*   { */
-
-              /*     // Only do this if the actor wasn't already given a name */
-              /*     // if (Name == NAME_None && Asset) */
-              /*     //   { */
-              /*     //change postion according to transform afer drag and drop */
-              /*     NewRobot->SetActorTransform(Transform); */
-              /*     FActorLabelUtilities::SetActorLabelUnique(NewRobot, Model->Name); */
-                  /* PostSpawnActor(Asset, NewRobot); */
-                    // }
+              UE_LOG(LogTemp, Error, TEXT("Found Model %s"), *Robot->GetName());
+              if (ControllerAsset->RobotNames.Contains(Robot->GetName()))
+                {
+                  UE_LOG(LogTemp, Error, TEXT("Robot found"));
+                  TargetModel.Add(Cast<ARModel>(Robot));
+                }
             }
-        }
+          if(TargetModel.Num() != 0)
+            {
+              URControllerBuilderFactory* ControllerFacotry = NewObject<URControllerBuilderFactory>(this);
+              for(auto & Configuration : ControllerAsset->ControllerConfigurations)
+                {
+                  UE_LOG(LogTemp, Error, TEXT("Create Builder"));
+                  URControllerBuilder* ControllerBuilder = ControllerFacotry->CreateBuilder(TargetModel, Configuration);
+                  ControllerBuilder->Build();
+                }
 
-      URControllerBuilderFactory* ControllerFacotry = NewObject<URControllerBuilderFactory>(this);
-      for(auto & Configuration : ControllerAsset->ControllerConfigurations)
+            }
+
+
+          return NewRobot;
+        }
+      else
         {
-          UE_LOG(LogTemp, Error, TEXT("Create Builder"));
-          URControllerBuilder* ControllerBuilder = ControllerFacotry->CreateBuilder(TargetModel, Configuration);
-          ControllerBuilder->Build();
+          UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
+
         }
 
-      return NewRobot;
+      UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
-
+      bDrag = true;
     }
 
   // Creates RRobot Actor.
-  UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
   return nullptr;
 
 }

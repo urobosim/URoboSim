@@ -16,12 +16,15 @@ class UROBOSIM_API URControllerBuilder : public UObject
 
 public:
 
-  virtual void Init(TArray<URControllerComponent*> InControllerComponents, const URControllerConfiguration* InControllerConfiguration);
+  virtual void Init(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration);
 
 
   virtual void Build();
 
 protected:
+
+  UPROPERTY()
+  TArray<ARModel*> Models;
 
   UPROPERTY()
   TArray<URControllerComponent*> ControllerComponents;
@@ -46,12 +49,12 @@ class UROBOSIM_API URGripperControllerBuilder : public URControllerBuilder
 };
 
 UCLASS()
-class UROBOSIM_API URControllerFactory : public UObject
+class UROBOSIM_API URControllerBuilderFactory : public UObject
 {
   GENERATED_BODY()
  public:
 
-  URControllerBuilder* CreateBuilder(TArray<URControllerComponent*> InControllerComponents, const URControllerConfiguration* InControllerConfiguration);
+  URControllerBuilder* CreateBuilder(TArray<ARModel*> InModel, const URControllerConfiguration* InControllerConfiguration);
 
 protected:
 

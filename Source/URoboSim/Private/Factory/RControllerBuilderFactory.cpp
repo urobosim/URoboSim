@@ -1,8 +1,9 @@
 #include "Factory/RControllerBuilderFactory.h"
+#include "Components/ActorComponent.h"
 
-void URControllerBuilder::Init(TArray<URControllerComponent*> InControllerComponents, const URControllerConfiguration* InControllerConfiguration)
+void URControllerBuilder::Init(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)
 {
-  if(InControllerComponents.Num() == 0)
+  if(InModels.Num() == 0)
     {
       return;
     }
@@ -12,14 +13,41 @@ void URControllerBuilder::Init(TArray<URControllerComponent*> InControllerCompon
       return;
     }
 
-  ControllerComponents = InControllerComponents;
+  Models = InModels;
+  ControllerComponents.Empty();
   ControllerConfiguration = InControllerConfiguration;
 }
 
 void URControllerBuilder::Build()
 {
+  for(auto& Model : Models)
+    {
+      URControllerComponent* ControllerComponent = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
+      if(ControllerComponent)
+        {
+          ControllerComponents.Add(ControllerComponent);
+          UE_LOG(LogTemp, Error, TEXT("Controller Comp found"));
+        }
+      else
+        {
+          // ControllerComponent = NewObject<URControllerComponent*>(Model);
+          UE_LOG(LogTemp, Error, TEXT("Create Controller Comp"));
+          ControllerComponent = Cast<URControllerComponent>(Model->AddComponent(FName(*URControllerComponent::StaticClass()->GetName()), true, FTransform(), nullptr));
+          if(ControllerComponent)
+            {
+              ControllerComponents.Add(ControllerComponent);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("ControllerComponent could not be created"));
+            }
+
+        }
+    }
+
   for(auto& ControllerComp : ControllerComponents)
     {
+      UE_LOG(LogTemp, Error, TEXT("Create Controller"));
       URController* Controller = CreateController(ControllerComp);
       ControllerComp->Controller.ControllerList.Add(ControllerConfiguration->ControllerName, Controller);
     }
@@ -30,9 +58,9 @@ URController* URGripperControllerBuilder::CreateController(UObject* InOwner)
   return NewObject<URGripperController>(InOwner);
 }
 
-URControllerBuilder* URControllerFactory::CreateBuilder(TArray<URControllerComponent*> InControllerComponents, const URControllerConfiguration* InControllerConfiguration)
+URControllerBuilder* URControllerBuilderFactory::CreateBuilder(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)
 {
-  if(InControllerComponents.Num() == 0)
+  if(InModels.Num() == 0)
     {
       UE_LOG(LogTemp, Error, TEXT("No Robot Specified"));
       return nullptr;
@@ -56,11 +84,11 @@ URControllerBuilder* URControllerFactory::CreateBuilder(TArray<URControllerCompo
 
   CreateBuilder();
 
-  ControllerBuilder->Init(InControllerComponents, ControllerConfiguration);
+  ControllerBuilder->Init(InModels, ControllerConfiguration);
   return ControllerBuilder;
 }
 
-void URControllerFactory::CreateBuilder()
+void URControllerBuilderFactory::CreateBuilder()
 {
   if(ControllerConfiguration->ControllerType == URGripperController::StaticClass())
     {

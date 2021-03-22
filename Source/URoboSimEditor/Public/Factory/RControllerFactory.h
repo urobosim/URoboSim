@@ -37,5 +37,8 @@ private:
 
     virtual void CreateModels(ARModel* OutModel, USDFDataAsset* InSDFData);
 
+    UPROPERTY()
+      bool bDrag;
+
 
 };
