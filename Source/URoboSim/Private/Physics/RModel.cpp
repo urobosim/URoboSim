@@ -2,6 +2,7 @@
 // Author: Michael Neumann
 
 #include "Physics/RModel.h"
+#include "Controller/RControllerComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
@@ -27,18 +28,37 @@ void ARModel::Tick(float DeltaTime)
 void ARModel::BeginPlay()
 {
   Super::BeginPlay();
+  Init();
+}
 
-  Links[0]->SetEnableGravity(EnableGravity.bBase);
+void ARModel::Init()
+{
+  if (Links.Num() > 0)
+  {
+    Links[0]->SetEnableGravity(EnableGravity.bBase);
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("Model %s has no links"), *GetName())
+  }
   for (URJoint *&Joint : Joints)
   {
     Joint->GetChild()->SetEnableGravity(EnableGravity.bLinks);
-    Joint->BeginPlay();
+    Joint->Init();
   }
   for (URLink *&Link : Links)
   {
     Link->SetSimulatePhysics(bSimulatePhysics);
-    Link->BeginPlay();
+    Link->Init();
   }
+  for (UActorComponent *&Plugin : Plugins)
+  {
+    URControllerComponent *Controllers = Cast<URControllerComponent>(Plugin);
+    if (Controllers)
+    {
+      Controllers->Init();
+    }
+  }  
 }
 
 // const TArray<FJointState> ARModel::GetJointState() const

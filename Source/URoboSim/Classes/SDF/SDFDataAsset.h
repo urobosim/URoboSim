@@ -19,5 +19,5 @@ public:
 	FString Version;
 
 	UPROPERTY(EditAnywhere, Category = "SDF")
-	TArray<USDFModel *> Models;
+	USDFModel *Model;
 };

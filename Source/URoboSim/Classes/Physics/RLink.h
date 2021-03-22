@@ -15,10 +15,8 @@ class UROBOSIM_API URLink : public UObject
 	GENERATED_BODY()
 
 public:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay();
+	virtual void Init();
 
-public:
 	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
 	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
@@ -33,7 +31,7 @@ public:
 
 	virtual void AddCollisionMesh(UStaticMeshComponent *&CollisionMesh) { CollisionMeshes.Add(CollisionMesh); }
 
-	virtual void AttachToComponent(UStaticMeshComponent *Parent);
+	virtual void AttachToComponent(USceneComponent *Parent);
 
 	virtual void SetEnableGravity(const bool &bGravityEnabled);
 

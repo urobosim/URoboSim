@@ -13,9 +13,9 @@ void URROSCommunicationComponent::BeginPlay()
 {
   Super::BeginPlay();
 
-  ROSCommunication.ControllerComponent = GetOwner()->FindComponentByClass<URControllerComponent>();
-  if (ROSCommunication.ControllerComponent)
+  if (GetOwner()->FindComponentByClass<URControllerComponent>())
   {
+    ROSCommunication.ControllerComponent = GetOwner()->FindComponentByClass<URControllerComponent>();
     UE_LOG(LogRROSCommunication, Log, TEXT("Found controller component"));
     ROSCommunication.Init();
   }

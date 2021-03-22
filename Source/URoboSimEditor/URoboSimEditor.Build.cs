@@ -16,8 +16,8 @@ public class URoboSimEditor : ModuleRules
         PublicDependencyModuleNames.AddRange(
 			new string[]
                         {
-                            "Core"
-                            ,"MeshDescription",
+                            "Core",
+														"MeshDescription",
                             "RenderCore",
                             "Json",
                         }

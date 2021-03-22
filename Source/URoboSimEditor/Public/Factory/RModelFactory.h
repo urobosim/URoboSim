@@ -15,22 +15,20 @@
 UCLASS()
 class UROBOSIMEDITOR_API URModelFactory : public UActorFactory
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 private:
-    URModelFactory(const FObjectInitializer &ObjectInitializer);
+	URModelFactory(const FObjectInitializer &ObjectInitializer);
 
-    /**
-     * Checks if AssetData is intended for the factory.
-     * Checks if an RRobot can be built by AssetData.
-     */
-    virtual bool CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg) override;
+	/**
+	 * Checks if AssetData is intended for the factory.
+	 * Checks if an RRobot can be built by AssetData.
+	 */
+	virtual bool CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg) override;
 
-    /** Initialize NewActorClass if necessary, and return default actor for that class. */
-    virtual AActor *GetDefaultActor(const FAssetData &AssetData) override;
+	/** Initialize NewActorClass if necessary, and return default actor for that class. */
+	virtual AActor *GetDefaultActor(const FAssetData &AssetData) override;
 
-    /** Spawns the robot */
-    virtual AActor *SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags ObjectFlags, const FName Name) override;
-
-    // virtual void CreateModels(ARModel *OutModel, USDFDataAsset *InSDFData);
+	/** Spawns the robot */
+	virtual AActor *SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags ObjectFlags, const FName Name) override;
 };

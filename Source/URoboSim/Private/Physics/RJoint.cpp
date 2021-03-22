@@ -24,8 +24,7 @@ void URJoint::Tick(float DeltaTime)
 	JointState.JointPosition = CurrentPosition;
 }
 
-// Called when the game starts or when spawned
-void URJoint::BeginPlay()
+void URJoint::Init()
 {
 	InitChildPoseInJointFrame = GetChildPoseInJointFrame();
 }
@@ -35,8 +34,9 @@ const float URJoint::GetPosition()
 	FTransform DeltaPoseInJointFrame = InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame();
 	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 	{
-		FQuat DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation();
-		return FVector::DotProduct(DeltaRotationInJointFrame.Euler(), Type->Axis * FVector(1.f, 1.f, -1.f));
+		FRotator DeltaRotationInJointFrame = DeltaPoseInJointFrame.GetRotation().Rotator();
+		DeltaRotationInJointFrame.Yaw *= -1;
+		return FVector::DotProduct(DeltaRotationInJointFrame.Euler(), Type->Axis);
 	}
 	else if (Type->GetName().Equals("prismatic"))
 	{

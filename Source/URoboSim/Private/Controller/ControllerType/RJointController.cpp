@@ -4,9 +4,10 @@ URJointController::URJointController()
 {
   State = UJointControllerState::Normal;
   Mode = UJointControllerMode::Dynamic;
+  bDisableCollision = true;
 }
 
-void URJointController::BeginPlay()
+void URJointController::Init()
 {
   State = UJointControllerState::Normal;
   bPublishResult = false;

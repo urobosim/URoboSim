@@ -60,10 +60,9 @@ public:
   // Called every frame
   virtual void Tick(float DeltaTime);
 
-  // Called when the game starts or when spawned
-  virtual void BeginPlay();
-
 public:
+  virtual void Init();
+
   virtual const FJointState GetJointState() const { return JointState; }
 
   virtual void SetJointType(const USDFJoint *InSDFJoint);

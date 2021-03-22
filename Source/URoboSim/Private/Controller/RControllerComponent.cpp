@@ -22,10 +22,15 @@ void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();
+  Init();
+}
+
+void URControllerComponent::Init()
+{
   for (URController *&Controller : Controllers)
   {
     Controller->SetOwner(GetOwner());
-    Controller->BeginPlay();
+    Controller->Init();
   }
 }
 

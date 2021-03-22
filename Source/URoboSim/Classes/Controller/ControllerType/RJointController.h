@@ -76,7 +76,7 @@ public:
 public:
   virtual void Tick(float DeltaTime) override;
 
-  virtual void BeginPlay() override;
+  virtual void Init() override;
 
 public:
   UPROPERTY(VisibleAnywhere)

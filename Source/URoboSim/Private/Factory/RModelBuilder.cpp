@@ -21,6 +21,12 @@ void URModelBuilder::LoadSDF(USDFModel *&SDFModel)
   }
 }
 
+void URModelBuilder::LoadSDF(USDFModel *&SDFModel, const FVector &WorldPosition)
+{
+  LinkBuilder->SetWorldPosition(WorldPosition);
+  LoadSDF(SDFModel);
+}
+
 void URModelBuilder::SwapBaseLinkToFirstIndex(USDFModel *&SDFModel)
 {
   // Find BaseLink

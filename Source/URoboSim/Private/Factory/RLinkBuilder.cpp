@@ -34,7 +34,8 @@ void URLinkBuilder::SetNewLink(USDFLink *&SDFLink)
   SetVisualMeshes(SDFLink);
 
   // Setup self-collision
-  SetCollisionProfile(SDFLink->bSelfCollide);
+  // SetCollisionProfile(SDFLink->bSelfCollide);
+  SetCollisionProfile(false);
 
   // Set inertial
   SetInertial(SDFLink->Inertial);
@@ -51,9 +52,9 @@ void URLinkBuilder::SetVisualMeshes(USDFLink *&SDFLink)
   {
     UStaticMeshComponent *LinkMeshComponent = NewObject<UStaticMeshComponent>(Link, *SDFVisual->GetName());
     LinkMeshComponent->RegisterComponent();
-
+    
     FVector LocationOffset = SDFLink->Pose.GetRotation().RotateVector(SDFVisual->Pose.GetLocation());
-    LinkMeshComponent->SetWorldLocation(SDFLink->Pose.GetLocation() + LocationOffset);
+    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPosition);
 
     // Rotations are added by multiplying the rotations
     FQuat RotationOffset = SDFLink->Pose.GetRotation() * SDFVisual->Pose.GetRotation();
@@ -81,6 +82,7 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
   for (USDFCollision *&SDFCollision : SDFLink->Collisions)
   {
     UStaticMeshComponent *LinkMeshComponent = NewObject<UStaticMeshComponent>(Link, *SDFCollision->GetName());
+
     LinkMeshComponent->RegisterComponent();
     if (Model->GetRootComponent() == nullptr)
     {
@@ -91,7 +93,7 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
     LinkMeshComponent->BodyInstance.VelocitySolverIterationCount = 8;
 
     FVector LocationOffset = SDFLink->Pose.GetRotation().RotateVector(SDFCollision->Pose.GetLocation());
-    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation());
+    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPosition);
 
     // Rotations are added by multiplying the Quaternions
     FQuat RotationOffset = SDFLink->Pose.GetRotation() * SDFCollision->Pose.GetRotation();
@@ -105,7 +107,6 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
       if (Link->GetCollisionMeshes().Num() == 0)
       {
         LinkMeshComponent->SetSimulatePhysics(true);
-        LinkMeshComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
       }
       else
       {
@@ -153,7 +154,8 @@ void URLinkBuilder::SetCollisionProfile(const bool &bSelfColide)
 void URLinkBuilder::SetPose(const FTransform &Pose)
 {
   USceneComponent *PoseComponent = NewObject<USceneComponent>(Link, *Link->GetName());
-  PoseComponent->AttachToComponent(Link->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepRelativeTransform);
-  PoseComponent->SetWorldTransform(Pose);
+  PoseComponent->SetupAttachment(Link->GetCollisionMeshes()[0]);
+  PoseComponent->SetWorldLocation(WorldPosition);
+  PoseComponent->AddWorldTransform(Pose);
   Link->SetPoseComponent(PoseComponent);
 }

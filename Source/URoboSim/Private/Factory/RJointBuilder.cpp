@@ -18,7 +18,7 @@ static const float CalculateRotationOffset(float &JointLimit, USDFJointAxis *&SD
   }
 }
 
-static void SetPrismaticConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
+static void SetupPrismaticConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
 {
   float JointLimit = 0;
   ELinearConstraintMotion LinearConstraintMotion = ELinearConstraintMotion::LCM_Free;
@@ -44,7 +44,7 @@ static void SetPrismaticConstraint(UPhysicsConstraintComponent *&Constraint, USD
   }
 }
 
-static void SetRevoluteConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
+static void SetupRevoluteConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
 {
   float JointLimit = 0.5 * FMath::Abs(SDFJointAxis->Upper - SDFJointAxis->Lower);
   EAngularConstraintMotion AngularConstraintMotion = EAngularConstraintMotion::ACM_Limited;
@@ -69,24 +69,24 @@ static void SetRevoluteConstraint(UPhysicsConstraintComponent *&Constraint, USDF
   }
 }
 
-static void SetScrewConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
+static void SetupScrewConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis)
 {
-  SetRevoluteConstraint(Constraint, SDFJointAxis);
+  SetupRevoluteConstraint(Constraint, SDFJointAxis);
 }
 
-static void SetConstraint(UPhysicsConstraintComponent *&Constraint, USDFJoint *&SDFJoint)
+static void SetupConstraint(UPhysicsConstraintComponent *&Constraint, USDFJoint *&SDFJoint)
 {
   if (SDFJoint->Type.Equals("revolute"))
   {
-    SetRevoluteConstraint(Constraint, SDFJoint->Axis);
+    SetupRevoluteConstraint(Constraint, SDFJoint->Axis);
   }
   else if (SDFJoint->Type.Equals("prismatic"))
   {
-    SetPrismaticConstraint(Constraint, SDFJoint->Axis);
+    SetupPrismaticConstraint(Constraint, SDFJoint->Axis);
   }
   else if (SDFJoint->Type.Equals("screw"))
   {
-    SetScrewConstraint(Constraint, SDFJoint->Axis);
+    SetupScrewConstraint(Constraint, SDFJoint->Axis);
   }
   else
   {
@@ -136,18 +136,18 @@ void URJointBuilder::CreateConstraint(USDFJoint *&SDFJoint)
   UPhysicsConstraintComponent *Constraint;
   Constraint = NewObject<UPhysicsConstraintComponent>(Joint, *(SDFJoint->GetName() + TEXT("_constraint")));
   Constraint->ConstraintInstance.SetDisableCollision(true);
-  Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
-  Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
-  Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.AngularRotationOffset = FRotator(0);
+  Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0.f);
+  Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0.f);
+  Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0.f);
+  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0.f);
+  Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0.f);
+  Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0.f);
+  Constraint->ConstraintInstance.AngularRotationOffset = FRotator(0.f);
   Constraint->ConstraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = false;
   Constraint->ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = false;
+  
+  SetupConstraint(Constraint, SDFJoint);
   ConnectToComponents(Constraint, SDFJoint);
-  RotateConstraintToRefAxis(Constraint, SDFJoint->Axis);
-  SetConstraint(Constraint, SDFJoint);
   Joint->SetConstraint(Constraint);
 }
 
@@ -182,9 +182,7 @@ void URJointBuilder::ConnectToComponents(UPhysicsConstraintComponent *&Constrain
   if (Constraint)
   {
     Constraint->RegisterComponent();
-    Constraint->ConstraintActor1 = Joint->GetParent()->GetCollisionMeshes()[0]->GetOwner();
-    Constraint->ConstraintActor2 = Joint->GetChild()->GetCollisionMeshes()[0]->GetOwner();
-    Constraint->AttachToComponent(Joint->GetParent()->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepRelativeTransform);
+    Constraint->AttachToComponent(Joint->GetParent()->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
     if (SDFJoint->Axis->bUseParentModelFrame)
     {
       Constraint->SetWorldLocation(Joint->GetChild()->GetPose().GetLocation());
@@ -194,6 +192,9 @@ void URJointBuilder::ConnectToComponents(UPhysicsConstraintComponent *&Constrain
     {
       Constraint->SetWorldLocation(SDFJoint->Pose.GetLocation());
     }
+    RotateConstraintToRefAxis(Constraint, SDFJoint->Axis);
+    Constraint->ConstraintActor1 = Joint->GetParent()->GetCollisionMeshes()[0]->GetOwner();
+    Constraint->ConstraintActor2 = Joint->GetChild()->GetCollisionMeshes()[0]->GetOwner();
     Constraint->SetConstrainedComponents(Cast<UPrimitiveComponent>(Joint->GetParent()->GetCollisionMeshes()[0]), NAME_None, Cast<UPrimitiveComponent>(Joint->GetChild()->GetCollisionMeshes()[0]), NAME_None);
   }
   else

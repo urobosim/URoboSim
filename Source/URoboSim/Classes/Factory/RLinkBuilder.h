@@ -16,19 +16,25 @@ class UROBOSIM_API URLinkBuilder : public UObject
   GENERATED_BODY()
 
 public:
+  virtual void SetWorldPosition(const FVector &InWorldPosition) { WorldPosition = InWorldPosition; }
+  virtual bool LoadSDF(USDFLink *&SDFLink);
+
+public:
   UPROPERTY()
   ARModel *Model;
 
-  virtual bool LoadSDF(USDFLink *&SDFLink);
-
 protected:
-  UPROPERTY()
-  URLink *Link;
-
   virtual void SetNewLink(USDFLink *&SDFLink);
   virtual void SetVisualMeshes(USDFLink *&SDFLink);
   virtual void SetCollisionMeshes(USDFLink *&SDFLink);
   virtual void SetInertial(USDFLinkInertial *&InInertial);
   virtual void SetCollisionProfile(const bool &bSelfColide);
   virtual void SetPose(const FTransform &Pose);
+
+protected:
+  UPROPERTY()
+  URLink *Link;
+
+  UPROPERTY()
+  FVector WorldPosition;
 };

@@ -30,6 +30,7 @@ public:
 
   // Load model
   virtual void LoadSDF(USDFModel *&SDFModel);
+  virtual void LoadSDF(USDFModel *&SDFModel, const FVector &WorldPosition);
 
 protected:
   UPROPERTY()

@@ -99,7 +99,7 @@ void ISDFParserInterface::ParseModel(const FXmlNode *InNode)
   }
 
   // Add model to the data asset
-  DataAsset->Models.Add(NewModel);
+  DataAsset->Model = NewModel;
 }
 
 // Parse <link> node

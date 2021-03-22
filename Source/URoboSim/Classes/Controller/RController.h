@@ -16,8 +16,7 @@ public:
   // Called every frame
   virtual void Tick(float DeltaTime){};
 
-  // Called when the game starts or when spawned
-  virtual void BeginPlay(){};
+  virtual void Init(){};
 
 public:
   virtual void SetOwner(ARModel *InOwner) { Owner = InOwner; }

@@ -1,4 +1,4 @@
-#include "ROSCommunication/Service/Client/RServiceClient.h"
+#include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
 #include "XmlFile.h"
 
 FRJointStateConfigurationClient::FRJointStateConfigurationClient(TArray<FString> *OutJointNames, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)

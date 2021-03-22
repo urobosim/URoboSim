@@ -5,8 +5,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRLink, Log, All);
 
-// Called when the game starts or when spawned
-void URLink::BeginPlay()
+void URLink::Init()
 {
 }
 
@@ -26,7 +25,7 @@ void URLink::SetSimulatePhysics(const bool &bSimulate)
   }
 }
 
-void URLink::AttachToComponent(UStaticMeshComponent *Parent)
+void URLink::AttachToComponent(USceneComponent *Parent)
 {
   if (CollisionMeshes.Num() > 0)
   {

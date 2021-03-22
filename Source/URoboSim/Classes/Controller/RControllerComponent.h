@@ -23,6 +23,10 @@ protected:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 public:
+  virtual void Init();
+
+  virtual void AddController(URController *Controller) { Controllers.Add(Controller); }
+
   virtual URController *GetController(const FString &ControllerName);
 
 protected:

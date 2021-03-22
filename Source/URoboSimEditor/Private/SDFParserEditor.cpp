@@ -121,19 +121,16 @@ void FSDFParserEditor::SetDirectoryPath(const FString &InFilename)
 // Create mesh
 void FSDFParserEditor::CreateMeshes()
 {
-	for (const auto &Model : DataAsset->Models)
+	for (const auto &Link : DataAsset->Model->Links)
 	{
-		for (const auto &Link : Model->Links)
+		for (const auto &Visual : Link->Visuals)
 		{
-			for (const auto &Visual : Link->Visuals)
-			{
-				CreateMesh(Visual->GetName(), Link->GetName(), Visual->Geometry);
-			}
-			for (const auto &Collision : Link->Collisions)
-			{
-				CreateMesh(Collision->GetName(), Link->GetName(), Collision->Geometry);
-				CreateCollisionForMesh(Collision->Geometry->Mesh, Collision->Geometry->Type);
-			}
+			CreateMesh(Visual->GetName(), Link->GetName(), Visual->Geometry);
+		}
+		for (const auto &Collision : Link->Collisions)
+		{
+			CreateMesh(Collision->GetName(), Link->GetName(), Collision->Geometry);
+			CreateCollisionForMesh(Collision->Geometry->Mesh, Collision->Geometry->Type);
 		}
 	}
 }

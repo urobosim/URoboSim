@@ -44,6 +44,8 @@ protected:
   virtual void BeginPlay() override;
 
 public:
+  virtual void Init();
+
   virtual void AddJoint(URJoint *&Joint) { Joints.Add(Joint); }
 
   virtual void AddLink(URLink *&Link) { Links.Add(Link); }
