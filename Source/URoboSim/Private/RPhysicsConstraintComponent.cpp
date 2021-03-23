@@ -459,7 +459,7 @@ void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, fl
 
 void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
 {
-  SetLinearPositionTarget(RefAxis * TargetPosition + Offset);
+  SetLinearPositionTarget(RefAxis * TargetPosition);
   SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
 }

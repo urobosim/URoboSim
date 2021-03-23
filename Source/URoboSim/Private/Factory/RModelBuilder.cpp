@@ -113,11 +113,12 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 {
   if(InJoint->bUseParentModelFrame)
     {
-      InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+      // InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
       InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
       InJoint->Constraint->SetWorldLocation(InJoint->Child->GetCollision()->GetComponentLocation());
-      InJoint->Constraint->AddRelativeLocation(InJoint->Pose.GetLocation());
-      InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());
+      InJoint->Constraint->AddLocalOffset(InJoint->Pose.GetLocation());
+      RotateConstraintToRefAxis(InJoint);
+      // InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());
     }
   else
     {
@@ -126,5 +127,15 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 
       // InJoint->Constraint->SetPosition(InJoint);
       InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepRelativeTransform);
+    }
+}
+
+void URModelBuilder::RotateConstraintToRefAxis(URJoint* Joint)
+{
+  if(!Joint->Constraint->RefAxis.Equals(FVector::ForwardVector) && !Joint->Constraint->RefAxis.Equals(FVector::RightVector) && !Joint->Constraint->RefAxis.Equals(FVector::UpVector))
+    {
+      FQuat BetweenQuat = FQuat::FindBetweenVectors(FVector::UpVector, Joint->Constraint->RefAxis);
+      Joint->Constraint->SetRelativeRotationExact(Joint->Constraint->GetRelativeRotationFromWorld(BetweenQuat).Rotator());
+      Joint->Constraint->RefAxis = FVector::UpVector;
     }
 }
