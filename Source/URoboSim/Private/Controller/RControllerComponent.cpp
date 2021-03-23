@@ -10,15 +10,6 @@ URControllerComponent::URControllerComponent()
   }
 }
 
-void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
-{
-  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-  for (URController *&Controller : Controllers)
-  {
-    Controller->Tick(DeltaTime);
-  }
-}
-
 void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();

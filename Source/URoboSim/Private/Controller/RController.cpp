@@ -2,6 +2,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRController, Log, All);
 
+void URController::Init()
+{
+  UE_LOG(LogRController, Log, TEXT("Initialize %s"), *GetName())
+}
+
 ARModel *URController::GetOwner()
 {
   if (!Owner)

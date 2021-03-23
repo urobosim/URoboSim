@@ -22,6 +22,17 @@ void ARModel::Tick(float DeltaTime)
   {
     Joint->Tick(DeltaTime);
   }
+  for (UActorComponent *&Plugin : Plugins)
+  {
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin);
+    if (ControllerComponent)
+    {
+      for (URController *&Controller : ControllerComponent->GetControllers())
+      {
+        Controller->Tick(DeltaTime);
+      }
+    }
+  }
 }
 
 // Called when the game starts or when spawned
@@ -33,6 +44,14 @@ void ARModel::BeginPlay()
 
 void ARModel::Init()
 {
+  for (UActorComponent *&Plugin : Plugins)
+  {
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin);
+    if (ControllerComponent)
+    {
+      ControllerComponent->Init();
+    }
+  }
   if (Links.Num() > 0)
   {
     Links[0]->SetEnableGravity(EnableGravity.bBase);
@@ -51,14 +70,49 @@ void ARModel::Init()
     Link->SetSimulatePhysics(bSimulatePhysics);
     Link->Init();
   }
-  for (UActorComponent *&Plugin : Plugins)
+}
+
+URJoint *ARModel::GetJoint(const FString &JointName) const
+{
+  URJoint *const *Joint = Joints.FindByPredicate([&](URJoint *Joint) { return Joint->GetName().Equals(JointName); });
+  if (Joint)
   {
-    URControllerComponent *Controllers = Cast<URControllerComponent>(Plugin);
-    if (Controllers)
-    {
-      Controllers->Init();
-    }
-  }  
+    return *Joint;
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("Joint %s not found in %s"), *JointName, *GetName())
+    return nullptr;
+  }
+}
+
+bool ARModel::AddPlugin(UActorComponent *InPlugin)
+{
+  UActorComponent *Plugin = GetPlugin(InPlugin->GetName());
+  if (Plugin)
+  {
+    UE_LOG(LogRModel, Warning, TEXT("Plugin %s was found in %s, replace..."), *InPlugin->GetName(), *GetName())
+    Plugin = InPlugin;
+    return false;
+  }
+  else
+  {
+    Plugins.Add(InPlugin);
+    return true;
+  }
+}
+
+UActorComponent *ARModel::GetPlugin(const FString &PluginName) const
+{
+  UActorComponent *const *Plugin = Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
+  if (Plugin)
+  {
+    return *Plugin;
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 // const TArray<FJointState> ARModel::GetJointState() const

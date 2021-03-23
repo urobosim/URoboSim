@@ -34,8 +34,7 @@ void URLinkBuilder::SetNewLink(USDFLink *&SDFLink)
   SetVisualMeshes(SDFLink);
 
   // Setup self-collision
-  // SetCollisionProfile(SDFLink->bSelfCollide);
-  SetCollisionProfile(false);
+  SetCollisionProfile(SDFLink->bSelfCollide);
 
   // Set inertial
   SetInertial(SDFLink->Inertial);

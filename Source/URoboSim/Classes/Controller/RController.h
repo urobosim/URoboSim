@@ -16,7 +16,7 @@ public:
   // Called every frame
   virtual void Tick(float DeltaTime){};
 
-  virtual void Init(){};
+  virtual void Init();
 
 public:
   virtual void SetOwner(ARModel *InOwner) { Owner = InOwner; }

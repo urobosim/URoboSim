@@ -1,8 +1,8 @@
 #include "Factory/RModelFactory.h"
-#include "Editor/EditorEngine.h"
-#include "Factory/RModelBuilder.h"
 #include "Controller/ControllerType/RJointController.h"
 #include "Controller/RControllerComponent.h"
+#include "Editor/EditorEngine.h"
+#include "Factory/RModelBuilder.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRModelFactory, Log, All);
 
@@ -32,23 +32,49 @@ AActor *URModelFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTrans
     UE_LOG(LogRModelFactory, Log, TEXT("Model Factory created %s"), *SDFAsset->Model->GetName());
 
     URModelBuilder *ModelBuilder = NewObject<URModelBuilder>(this);
-    ARModel *NewRobot = Cast<ARModel>(Super::SpawnActor(Asset, InLevel, Transform, InObjectFlags, Name));
-    ModelBuilder->Model = NewRobot;
-    ModelBuilder->LoadSDF(SDFAsset->Model, Transform.GetLocation());
-    if (NewRobot)
+    AActor *DefaultActor = GetDefaultActor(FAssetData(Asset));
+    if (DefaultActor)
     {
-      URControllerComponent *Controllers = NewObject<URControllerComponent>(NewRobot);
-      Controllers->AddController(NewObject<URJointController>(Controllers));
-      NewRobot->AddPlugin(Controllers);
-      NewRobot->Init();
-      NewRobot->SetActorTransform(Transform);
-      FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
+      FActorSpawnParameters SpawnInfo;
+      SpawnInfo.OverrideLevel = InLevel;
+      SpawnInfo.ObjectFlags = InObjectFlags;
+      SpawnInfo.Name = Name;
+
+      ARModel *NewRobot = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo));
+      ModelBuilder->Model = NewRobot;
+      ModelBuilder->LoadSDF(SDFAsset->Model, Transform.GetLocation());
+      if (NewRobot)
+      {
+        NewRobot->SetActorTransform(Transform);
+        FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
+        PostSpawnActor(Asset, NewRobot);
+      }
+      return NewRobot;
     }
-    return NewRobot;
+    else
+    {
+      return nullptr;
+    }
   }
   else
   {
     UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
     return nullptr;
   }
+}
+
+void URModelFactory::PostSpawnActor(UObject *Asset, AActor *NewActor)
+{
+  ARModel *NewRobot = CastChecked<ARModel>(NewActor);
+  if (NewRobot)
+  {
+    URControllerComponent *Controllers = NewObject<URControllerComponent>(NewRobot, TEXT("Controllers"));
+    Controllers->AddController(NewObject<URJointController>(Controllers, TEXT("JointController")));
+    NewRobot->AddPlugin(Controllers);
+    NewRobot->Init();
+  }
+}
+
+void URModelFactory::PostCreateBlueprint(UObject *Asset, AActor *CDO)
+{
 }

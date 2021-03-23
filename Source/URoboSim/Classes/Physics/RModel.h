@@ -50,21 +50,15 @@ public:
 
   virtual void AddLink(URLink *&Link) { Links.Add(Link); }
 
-  virtual void AddPlugin(UActorComponent *Plugin) { Plugins.Add(Plugin); }
+  virtual bool AddPlugin(UActorComponent *Plugin);
 
   virtual TArray<URJoint *> GetJoints() const { return Joints; }
 
-  virtual URJoint *GetJoint(const FString &JointName) const
-  {
-    return *Joints.FindByPredicate([&](URJoint *Joint) { return Joint->GetName().Equals(JointName); });
-  }
+  virtual URJoint *GetJoint(const FString &JointName) const;
 
   virtual TArray<URLink *> GetLinks() const { return Links; }
 
-  virtual UActorComponent *GetPlugin(const FString &PluginName) const
-  {
-    return *Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
-  }
+  virtual UActorComponent *GetPlugin(const FString &PluginName) const;
 
   // virtual const TArray<FJointState> GetJointState() const;
 public:

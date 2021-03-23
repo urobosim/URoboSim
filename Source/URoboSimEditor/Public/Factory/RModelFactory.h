@@ -31,4 +31,13 @@ private:
 
 	/** Spawns the robot */
 	virtual AActor *SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags ObjectFlags, const FName Name) override;
+
+	/** Subclasses may implement this to modify the actor after it has been spawned 
+	    IMPORTANT: If you override this, you should usually also override PostCreateBlueprint()! */
+	virtual void PostSpawnActor( UObject* Asset, AActor* NewActor ) override;
+
+	/** Override this in derived factory classes if needed.  This is called after a blueprint is created by this factory to
+	    update the blueprint's CDO properties with state from the asset for this factory.
+		IMPORTANT: If you override this, you should usually also override PostSpawnActor()! */
+	virtual void PostCreateBlueprint( UObject* Asset, AActor* CDO ) override;
 };

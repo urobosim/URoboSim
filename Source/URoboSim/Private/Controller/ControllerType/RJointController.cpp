@@ -1,5 +1,7 @@
 #include "Controller/ControllerType/RJointController.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRJointController, Log, All);
+
 URJointController::URJointController()
 {
   State = UJointControllerState::Normal;
@@ -9,6 +11,8 @@ URJointController::URJointController()
 
 void URJointController::Init()
 {
+  Super::Init();
+
   State = UJointControllerState::Normal;
   bPublishResult = false;
   if (!GetOwner())
