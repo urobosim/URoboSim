@@ -1,4 +1,9 @@
 #include "Factory/RControllerBuilderFactory.h"
+#include "Controller/RBaseController.h"
+#include "Controller/RJointController.h"
+#include "Controller/RHeadController.h"
+#include "Controller/RGripperController.h"
+#include "Controller/RController.h"
 #include "Components/ActorComponent.h"
 
 void URControllerBuilder::Init(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)
@@ -56,6 +61,51 @@ void URControllerBuilder::Build()
 URController* URGripperControllerBuilder::CreateController(UObject* InOwner)
 {
   return NewObject<URGripperController>(InOwner);
+}
+
+void URGripperControllerBuilder::ConfigureController()
+{
+
+}
+
+URController* URBaseControllerBuilder::CreateController(UObject* InOwner)
+{
+  return NewObject<URBaseController>(InOwner);
+}
+
+void URBaseControllerBuilder::ConfigureController()
+{
+
+}
+
+URController* URJointControllerBuilder::CreateController(UObject* InOwner)
+{
+  return NewObject<URJointController>(InOwner);
+}
+
+void URJointControllerBuilder::ConfigureController()
+{
+
+}
+
+URController* URHeadControllerBuilder::CreateController(UObject* InOwner)
+{
+  return NewObject<URHeadTrajectoryController>(InOwner);
+}
+
+void URHeadControllerBuilder::ConfigureController()
+{
+
+}
+
+URController* URCameraControllerBuilder::CreateController(UObject* InOwner)
+{
+  return NewObject<URCameraController>(InOwner);
+}
+
+void URCameraControllerBuilder::ConfigureController()
+{
+
 }
 
 URControllerBuilder* URControllerBuilderFactory::CreateBuilder(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)
