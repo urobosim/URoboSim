@@ -23,9 +23,6 @@ protected:
   void SetOwner(UObject *&InOwner) override;
 
 protected:
-  UPROPERTY()
-  URJointStateConfigurationClient *ConfigClient;
-
   UPROPERTY(EditAnywhere)
   FString FrameId;
 

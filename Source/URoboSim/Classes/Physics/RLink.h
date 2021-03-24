@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "Components/SceneComponent.h"
 #include "Components/StaticMeshComponent.h"
 // clang-format off
 #include "RLink.generated.h"
@@ -15,13 +14,16 @@ class UROBOSIM_API URLink : public UObject
 	GENERATED_BODY()
 
 public:
+	URLink();
+
+public:
 	virtual void Init();
 
 	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
-	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
+	virtual void SetPose(const FTransform &Pose);
 
-	// virtual void SetVelocity(const FVector &InLinearVelocity, const FVector &InAngularVelocity);
+	virtual const USceneComponent *GetPoseComponent() const { return PoseComponent; }
 
 	virtual const TArray<UStaticMeshComponent *> GetVisualMeshes() const { return VisualMeshes; }
 

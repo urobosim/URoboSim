@@ -17,7 +17,7 @@ void FRROSCommunicationContainer::Init()
   {
     Handler->Connect();
     InitPublishers();
-    // InitAllSubscriber();
+    InitSubscribers();
     // InitAllServiceProvider();
     InitServiceClients();
     // InitAllActionServer();
@@ -36,13 +36,13 @@ void FRROSCommunicationContainer::InitPublishers()
   }
 }
 
-// void FRROSCommunicationContainer::InitAllSubscriber()
-// {
-//   for (auto &Subscriber : SubscriberList)
-//   {
-//     Subscriber.Value->Init(ControllerComponent->GetOwner(), Handler);
-//   }
-// }
+void FRROSCommunicationContainer::InitSubscribers()
+{
+  for (URSubscriber *&Subscriber : Subscribers)
+  {
+    Subscriber->Init(ControllerComponent->GetOwner(), Handler);
+  }
+}
 
 // void FRROSCommunicationContainer::InitAllServiceProvider()
 // {

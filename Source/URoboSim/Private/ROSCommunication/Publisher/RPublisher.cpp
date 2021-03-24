@@ -9,35 +9,31 @@ void URPublisher::DeInit()
 
 void URPublisher::Init(UObject *InOwner, const FString &InHostIp, const uint32 &InPort)
 {
-  Seq = 0;
+  SetOwner(InOwner);
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(InHostIp, InPort));
   Handler->Connect();
   SetMessageType();
-  SetOwner(InOwner);
   CreatePublisher();
-  Handler->AddPublisher(Publisher);
 }
 
 void URPublisher::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
 {
-  Seq = 0;
+  SetOwner(InOwner);
   Handler = InHandler;
   if (!InTopic.Equals(""))
   {
     Topic = InTopic;
   }
   SetMessageType();
-  SetOwner(InOwner);
   CreatePublisher();
-  Handler->AddPublisher(Publisher);
 }
 
 void URPublisher::CreatePublisher()
 {
   Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
-
   if (Publisher.IsValid())
   {
     UE_LOG(LogRPublisher, Log, TEXT("%s is connected to ROSBridge"), *GetName())
+    Handler->AddPublisher(Publisher);
   }
 }

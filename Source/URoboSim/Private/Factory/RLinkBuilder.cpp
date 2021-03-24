@@ -152,9 +152,8 @@ void URLinkBuilder::SetCollisionProfile(const bool &bSelfColide)
 
 void URLinkBuilder::SetPose(const FTransform &Pose)
 {
-  USceneComponent *PoseComponent = NewObject<USceneComponent>(Link, *Link->GetName());
-  PoseComponent->SetupAttachment(Link->GetCollisionMeshes()[0]);
-  PoseComponent->SetWorldLocation(WorldPosition);
-  PoseComponent->AddWorldTransform(Pose);
-  Link->SetPoseComponent(PoseComponent);
+  FTransform LinkPose;
+  LinkPose.SetTranslation(WorldPosition);
+  LinkPose += Pose;
+  Link->SetPose(LinkPose);
 }

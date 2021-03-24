@@ -10,12 +10,6 @@ URControllerComponent::URControllerComponent()
   }
 }
 
-void URControllerComponent::BeginPlay()
-{
-  Super::BeginPlay();
-  Init();
-}
-
 void URControllerComponent::Init()
 {
   for (URController *&Controller : Controllers)

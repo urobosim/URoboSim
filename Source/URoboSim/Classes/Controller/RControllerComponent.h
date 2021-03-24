@@ -15,9 +15,6 @@ class UROBOSIM_API URControllerComponent : public URPluginComponent
 
 public:
   URControllerComponent();
-
-public:
-  virtual void BeginPlay() override;
   
 public:
   virtual void Init();

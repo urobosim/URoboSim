@@ -17,11 +17,8 @@ void URJoint::SetJointType(const USDFJoint *InSDFJoint)
 
 void URJoint::Tick(float DeltaTime)
 {
-	Velocity = Child->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
-
-	const float CurrentPosition = GetPosition();
-	JointState.JointVelocity = (CurrentPosition - JointState.JointPosition) / DeltaTime;
-	JointState.JointPosition = CurrentPosition;
+	JointState.JointVelocity = GetVelocity();
+	JointState.JointPosition = GetPosition();
 }
 
 void URJoint::Init()
@@ -29,7 +26,32 @@ void URJoint::Init()
 	InitChildPoseInJointFrame = GetChildPoseInJointFrame();
 }
 
-const float URJoint::GetPosition()
+const float URJoint::GetVelocity() const
+{
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		FVector ParentVelocity = Parent->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
+		FVector ChildVelocity = Child->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
+		FVector JointVelocity = Child->GetCollisionMeshes()[0]->GetComponentRotation().UnrotateVector(ChildVelocity - ParentVelocity);
+		JointVelocity.Z *= -1;
+		return FVector::DotProduct(JointVelocity, Type->Axis);
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		FVector ParentVelocity = Parent->GetCollisionMeshes()[0]->GetPhysicsLinearVelocity();
+		FVector ChildVelocity = Child->GetCollisionMeshes()[0]->GetPhysicsLinearVelocity();
+		FVector JointVelocity = Child->GetCollisionMeshes()[0]->GetComponentRotation().UnrotateVector(ChildVelocity - ParentVelocity);
+		JointVelocity.Z *= -1;
+		return FVector::DotProduct(JointVelocity, Type->Axis);
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Unknown Type %s of Joint %s"), *Type->GetName(), *GetName())
+		return 0.f;
+	}
+}
+
+const float URJoint::GetPosition() const
 {
 	FTransform DeltaPoseInJointFrame = InitChildPoseInJointFrame.Inverse() * GetChildPoseInJointFrame();
 	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
@@ -59,7 +81,7 @@ const FTransform URJoint::GetChildPoseInJointFrame() const
 
 void URJoint::SetTargetPosition(const float &TargetPosition)
 {
-	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
+	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.IsOrientationDriveEnabled())
 	{
 		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
@@ -69,35 +91,36 @@ void URJoint::SetTargetPosition(const float &TargetPosition)
 		Type->Constraint->SetLinearPositionTarget(Type->Axis * -TargetPosition);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
-	else
+}
+
+void URJoint::SetPosition(const float &Position)
+{
+	float DeltaPosition = Position - GetPosition();
+	Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 	{
-		float DeltaPosition = TargetPosition - GetPosition();
-		Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
-		if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
-		{
-			FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
-			FRotator DeltaRotationInWorldFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(AxisInWorldFrame, -DeltaPosition);
-			Child->GetCollisionMeshes()[0]->AddWorldRotation(DeltaRotationInWorldFrame);
-		}
-		else if (Type->GetName().Equals("prismatic"))
-		{
-			FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
-			FVector DeltaLocationInWorldFrame = AxisInWorldFrame * DeltaPosition;
-			Child->GetCollisionMeshes()[0]->AddWorldOffset(DeltaLocationInWorldFrame);
-		}
+		FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+		FRotator DeltaRotationInWorldFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(AxisInWorldFrame, -DeltaPosition);
+		Child->GetCollisionMeshes()[0]->AddWorldRotation(DeltaRotationInWorldFrame);
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+		FVector DeltaLocationInWorldFrame = AxisInWorldFrame * DeltaPosition;
+		Child->GetCollisionMeshes()[0]->AddWorldOffset(DeltaLocationInWorldFrame);
 	}
 }
 
 void URJoint::SetTargetVelocity(const float &TargetVelocity)
 {
-	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.AngularDriveMode == EAngularDriveMode::TwistAndSwing)
+	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.IsVelocityDriveEnabled())
 	{
-		Type->Constraint->SetAngularVelocityTarget(Type->Axis * TargetVelocity);
+		Type->Constraint->SetAngularVelocityTarget(Type->Axis * TargetVelocity / 360.f);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
-	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
+	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsVelocityDriveEnabled())
 	{
-		Type->Constraint->SetLinearVelocityTarget(Type->Axis * TargetVelocity);
+		Type->Constraint->SetLinearVelocityTarget(Type->Axis * TargetVelocity / 360.f);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 }

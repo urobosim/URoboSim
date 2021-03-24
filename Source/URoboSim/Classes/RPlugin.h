@@ -16,8 +16,10 @@ class UROBOSIM_API URPluginComponent : public UActorComponent
 public:
 	virtual void OnComponentCreated() override;
 
+public:
 	virtual ARModel *GetOwner() const;
 
 protected:
 	virtual void RegisterPlugin();
+	
 };

@@ -32,23 +32,18 @@ AActor *URModelFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTrans
     UE_LOG(LogRModelFactory, Log, TEXT("Model Factory created %s"), *SDFAsset->Model->GetName());
 
     URModelBuilder *ModelBuilder = NewObject<URModelBuilder>(this);
-    AActor *DefaultActor = GetDefaultActor(FAssetData(Asset));
-    if (DefaultActor)
-    {
-      FActorSpawnParameters SpawnInfo;
-      SpawnInfo.OverrideLevel = InLevel;
-      SpawnInfo.ObjectFlags = InObjectFlags;
-      SpawnInfo.Name = Name;
+    FActorSpawnParameters SpawnInfo;
+    SpawnInfo.OverrideLevel = InLevel;
+    SpawnInfo.ObjectFlags = InObjectFlags;
+    SpawnInfo.Name = Name;
 
-      ARModel *NewRobot = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo));
-      ModelBuilder->Model = NewRobot;
-      ModelBuilder->LoadSDF(SDFAsset->Model, Transform.GetLocation());
-      if (NewRobot)
-      {
-        NewRobot->SetActorTransform(Transform);
-        FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
-        PostSpawnActor(Asset, NewRobot);
-      }
+    ARModel *NewRobot = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(NewActorClass, &Transform, SpawnInfo));
+    ModelBuilder->Model = NewRobot;
+    ModelBuilder->LoadSDF(SDFAsset->Model, Transform.GetLocation());
+    if (NewRobot)
+    {
+      NewRobot->SetActorTransform(Transform);
+      FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
       return NewRobot;
     }
     else
@@ -69,8 +64,8 @@ void URModelFactory::PostSpawnActor(UObject *Asset, AActor *NewActor)
   if (NewRobot)
   {
     URControllerComponent *Controllers = NewObject<URControllerComponent>(NewRobot, TEXT("Controllers"));
-    Controllers->AddController(NewObject<URJointController>(Controllers, TEXT("JointController")));
-    NewRobot->AddPlugin(Controllers);
+    Controllers->AddController(NewObject<URJointController>(NewRobot, TEXT("JointController")));
+    Controllers->OnComponentCreated();
     NewRobot->Init();
   }
 }

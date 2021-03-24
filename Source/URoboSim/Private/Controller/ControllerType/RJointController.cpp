@@ -7,6 +7,9 @@ URJointController::URJointController()
   State = UJointControllerState::Normal;
   Mode = UJointControllerMode::Dynamic;
   bDisableCollision = true;
+  EnableDrive.PositionStrength = 1E5;
+  EnableDrive.VelocityStrength = 5E3;
+  EnableDrive.MaxForce = 1E10;
 }
 
 void URJointController::Init()
@@ -41,6 +44,8 @@ void URJointController::SetMode()
     {
     case UJointControllerMode::Kinematic:
       GetOwner()->bSimulatePhysics = false;
+      EnableDrive.bPositionDrive = false;
+      EnableDrive.bVelocityDrive = false;
       for (URLink *&Link : GetOwner()->GetLinks())
       {
         Link->DisableCollision();
@@ -50,10 +55,8 @@ void URJointController::SetMode()
     case UJointControllerMode::Dynamic:
       GetOwner()->bSimulatePhysics = true;
       GetOwner()->EnableGravity.bLinks = false;
-      for (URJoint *&Joint : GetOwner()->GetJoints())
-      {
-        Joint->SetDrive(EnableDrive);
-      }
+      EnableDrive.bPositionDrive = true;
+      EnableDrive.bVelocityDrive = true;
       if (bDisableCollision)
       {
         for (URLink *&Link : GetOwner()->GetLinks())
@@ -62,6 +65,10 @@ void URJointController::SetMode()
         }
       }
       break;
+    }
+    for (URJoint *&Joint : GetOwner()->GetJoints())
+    {
+      Joint->SetDrive(EnableDrive);
     }
   }
 }
@@ -107,13 +114,28 @@ void URJointController::Tick(float DeltaTime)
 
 void URJointController::SetJointState(float DeltaTime)
 {
-  for (URJoint *&Joint : GetOwner()->GetJoints())
+  switch (Mode)
   {
-    if (DesiredJointStates.Contains(Joint->GetName()))
-    {
-      Joint->SetTargetPosition(DesiredJointStates[Joint->GetName()].JointPosition);
-      Joint->SetTargetVelocity(DesiredJointStates[Joint->GetName()].JointVelocity);
-    }
+    case UJointControllerMode::Dynamic:
+      for (URJoint *&Joint : GetOwner()->GetJoints())
+      {
+        if (DesiredJointStates.Contains(Joint->GetName()))
+        {
+          Joint->SetTargetPosition(DesiredJointStates[Joint->GetName()].JointPosition);
+          Joint->SetTargetVelocity(DesiredJointStates[Joint->GetName()].JointVelocity);
+        }
+      }
+      break;
+
+    case UJointControllerMode::Kinematic:
+      for (URJoint *&Joint : GetOwner()->GetJoints())
+      {
+        if (DesiredJointStates.Contains(Joint->GetName()))
+        {
+          Joint->SetPosition(DesiredJointStates[Joint->GetName()].JointPosition);
+        }
+      }
+      break;
   }
 }
 

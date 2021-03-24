@@ -38,12 +38,14 @@ void ARModel::Tick(float DeltaTime)
 // Called when the game starts or when spawned
 void ARModel::BeginPlay()
 {
+  UE_LOG(LogRModel, Log, TEXT("Model %s is spawned"), *GetName())
   Super::BeginPlay();
   Init();
 }
 
 void ARModel::Init()
 {
+  UE_LOG(LogRModel, Log, TEXT("Model %s initializes with %i plugins"), *GetName(), Plugins.Num())
   for (UActorComponent *&Plugin : Plugins)
   {
     URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin);
@@ -58,7 +60,7 @@ void ARModel::Init()
   }
   else
   {
-    UE_LOG(LogRModel, Error, TEXT("Model %s has no links"), *GetName())
+    UE_LOG(LogRModel, Warning, TEXT("Model %s has no links"), *GetName())
   }
   for (URJoint *&Joint : Joints)
   {

@@ -27,14 +27,6 @@ void URJointStatePublisher::SetMessageType()
 void URJointStatePublisher::SetOwner(UObject *&InOwner)
 {
   URPublisher::SetOwner(InOwner);
-  ConfigClient = NewObject<URJointStateConfigurationClient>(this);
-  TArray<FString> JointNames;
-  ConfigClient->URServiceClient::Init(InOwner, &JointNames, Handler);
-  UE_LOG(LogRJointStatePublisher, Error, TEXT("JointName:"))
-  for (const FString &JointName : JointNames)
-  {
-    UE_LOG(LogRJointStatePublisher, Warning, TEXT("%s"), *JointName)
-  }
   for (const URJoint *Joint : GetOwner()->GetJoints())
   {
     JointStates.Add(Joint->GetName());
@@ -56,9 +48,10 @@ void URJointStatePublisher::Publish()
     }
   }
 
+  static int Seq = 0;
   TSharedPtr<sensor_msgs::JointState> JointStateMsg =
       MakeShareable(new sensor_msgs::JointState());
-  JointStateMsg->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
+  JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), FrameId));
   TArray<FString> JointNames;
   TArray<double> JointPositions;
   TArray<double> JointVelocities;
@@ -70,5 +63,4 @@ void URJointStatePublisher::Publish()
   Handler->PublishMsg(Topic, JointStateMsg);
 
   Handler->Process();
-  Seq++;
 }

@@ -12,7 +12,7 @@
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
 // #include "ROSCommunication/RROSService.h"
-// #include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
 #include "RROSCommunication.generated.h"
 // clang-format on
@@ -39,7 +39,7 @@ public:
 
 protected:
   virtual void InitPublishers();
-  // virtual void InitSubscribers();
+  virtual void InitSubscribers();
   // virtual void InitServiceServers();
   virtual void InitServiceClients();
   // virtual void InitActionServers();
@@ -56,8 +56,8 @@ protected:
   UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
   TArray<URPublisher *> Publishers;
 
-  // UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-  // TArray<URSubscriber *> SubscriberList;
+  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  TArray<URSubscriber *> Subscribers;
 
   UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
   TArray<URServiceClient *> ServerClients;

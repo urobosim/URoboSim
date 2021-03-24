@@ -1,38 +1,35 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
-#include "ROSBridgePublisher.h"
 // clang-format off
-#include "RPublisher.generated.h"
+#include "RSubscriber.generated.h"
 // clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URPublisher : public UObject
+class UROBOSIM_API URSubscriber : public UObject
 {
   GENERATED_BODY()
 
 public:
-  virtual void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic);
+  virtual void Init(UObject *InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic = "");
 
-  virtual void Init(UObject *InOwner, const FString &InHostIp, const uint32 &InPort);
-
-  virtual void DeInit();
+  virtual void Init(UObject *InModel){};
 
 public:
   virtual ARModel *GetOwner() const { return Owner; }
-
-  virtual void Publish(){};
 
 protected:
   virtual void SetMessageType(){};
 
   virtual void SetOwner(UObject *&InOwner){ Owner = Cast<ARModel>(InOwner); };
 
-  virtual void CreatePublisher();
+  virtual void CreateSubscriber();
 
 protected:
-  TSharedPtr<FROSBridgePublisher> Publisher;
+  TSharedPtr<FROSBridgeSubscriber> Subscriber;
 
   UPROPERTY(EditAnywhere)
   FString Topic;

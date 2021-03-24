@@ -16,9 +16,6 @@ struct FEnableDrive
   GENERATED_BODY()
 
 public:
-  FEnableDrive() : FEnableDrive(true, true) {}
-  FEnableDrive(const bool &bPositionDrive, const bool &bVelocityDrive) : bPositionDrive(bPositionDrive), bVelocityDrive(bVelocityDrive), PositionStrength(1E5), VelocityStrength(5E3), MaxForce(1E10) {}
-
   UPROPERTY(EditAnywhere)
   bool bPositionDrive;
 
@@ -85,12 +82,16 @@ public:
 
   virtual void SetDrive(const FEnableDrive &EnableDrive);
 
+  virtual void SetPosition(const float &Position);
+
   virtual void SetTargetPosition(const float &TargetPosition);
 
   virtual void SetTargetVelocity(const float &TargetVelocity);
 
 protected:
-  virtual const float GetPosition();
+  virtual const float GetPosition() const;
+
+  virtual const float GetVelocity() const;
 
   virtual const FTransform GetChildPoseInJointFrame() const;
 
@@ -110,11 +111,5 @@ protected:
   FTransform InitChildPoseInJointFrame;
 
   UPROPERTY(VisibleAnywhere)
-  FVector Position;
-
-  UPROPERTY(VisibleAnywhere)
   FJointState JointState;
-
-  UPROPERTY(VisibleAnywhere)
-  FVector Velocity;
 };
