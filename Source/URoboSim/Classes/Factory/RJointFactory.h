@@ -24,6 +24,7 @@ protected:
     virtual void SetJointParameters();
     virtual void CreateConstraint();
     virtual void SetJointLimit();
+    virtual void RotateConstraintToRefAxis();
     virtual float CalculateRotationOffset();
 
   UPROPERTY()
