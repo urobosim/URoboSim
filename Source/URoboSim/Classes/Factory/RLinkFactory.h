@@ -39,7 +39,7 @@ protected:
   FTransform LinkPose;
 
   void SetPose(FTransform InPose);
-  void SetPose(FVector InLocation, FQuat InRotation);
+  void SetPoseComponent();
 
   virtual void SetVisuals();
   virtual void SetVisual(USDFVisual* InVisual);

@@ -10,17 +10,6 @@ URLink::URLink()
 {
 }
 
-void URLink::SetPose(FTransform InPose)
-{
-	Pose = InPose;
-}
-
-void URLink::SetPose(FVector InLocation, FQuat InRotation)
-{
-	Pose.SetLocation(InLocation);
-	Pose.SetRotation(InRotation);
-}
-
 void URLink::AddJoint(URJoint* InJoint)
 {
 	Joints.Add(InJoint);

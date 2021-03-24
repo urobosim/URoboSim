@@ -115,7 +115,7 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
     {
       // InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
       InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      InJoint->Constraint->SetWorldLocation(InJoint->Child->GetCollision()->GetComponentLocation());
+      InJoint->Constraint->SetWorldLocation(InJoint->Child->GetPose().GetLocation());
       InJoint->Constraint->AddLocalOffset(InJoint->Pose.GetLocation());
       RotateConstraintToRefAxis(InJoint);
       // InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());

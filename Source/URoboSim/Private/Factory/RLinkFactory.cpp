@@ -83,18 +83,14 @@ URLink* URLinkBuilder::NewLink()
   //Enable or disable gravity for the Link
   SetSimulateGravity(LinkDescription->bGravity);
 
+  SetPoseComponent();
+
   return Link;
 }
 
 void URLinkBuilder::SetPose(FTransform InPose)
 {
   LinkPose = InPose;
-}
-
-void URLinkBuilder::SetPose(FVector InLocation, FQuat InRotation)
-{
-  LinkPose.SetLocation(InLocation);
-  LinkPose.SetRotation(InRotation);
 }
 
 void URLinkBuilder::SetVisuals()
@@ -254,4 +250,13 @@ void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
     {
       Visual->SetEnableGravity(false);
     }
+}
+
+void URLinkBuilder::SetPoseComponent()
+{
+  USceneComponent *PoseComponent = NewObject<USceneComponent>(Link, *(Link->GetName() + TEXT("Pose")));
+  PoseComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
+  PoseComponent->SetWorldLocation(LoadLocation);
+  PoseComponent->AddWorldTransform(LinkPose);
+  Link->SetPoseComponent(PoseComponent);
 }
