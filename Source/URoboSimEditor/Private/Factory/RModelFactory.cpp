@@ -1,5 +1,6 @@
 #include "Factory/RModelFactory.h"
 #include "Controller/ControllerType/RJointController.h"
+#include "Controller/ControllerType/RBaseController.h"
 #include "Controller/RControllerComponent.h"
 #include "Editor/EditorEngine.h"
 #include "Factory/RModelBuilder.h"
@@ -65,6 +66,7 @@ void URModelFactory::PostSpawnActor(UObject *Asset, AActor *NewActor)
   {
     URControllerComponent *Controllers = NewObject<URControllerComponent>(NewRobot, TEXT("Controllers"));
     Controllers->AddController(NewObject<URJointController>(NewRobot, TEXT("JointController")));
+    Controllers->AddController(NewObject<URBaseController>(NewRobot, TEXT("BaseController")));
     Controllers->OnComponentCreated();
     NewRobot->Init();
   }

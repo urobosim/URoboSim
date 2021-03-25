@@ -18,17 +18,17 @@ void URJointController::Init()
 
   State = UJointControllerState::Normal;
   bPublishResult = false;
-  if (!GetOwner())
-  {
-    UE_LOG(LogTemp, Error, TEXT("JointController is not attached to ARModel"));
-  }
-  else
+  if (GetOwner())
   {
     SetMode();
     for (URJoint *&Joint : GetOwner()->GetJoints())
     {
       DesiredJointStates.Add(Joint->GetName(), FJointState());
     }
+  }
+  else
+  {
+    UE_LOG(LogTemp, Error, TEXT("%s is not attached to ARModel"), *GetName())
   }
 }
 

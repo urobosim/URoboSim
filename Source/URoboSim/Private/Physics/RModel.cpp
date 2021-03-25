@@ -88,6 +88,19 @@ URJoint *ARModel::GetJoint(const FString &JointName) const
   }
 }
 
+URLink *ARModel::GetBaseLink() const
+{
+  if (Links.Num() > 0)
+  {
+    return Links[0];
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("Model %s doesn't have any links"), *GetName())
+    return nullptr;
+  }
+}
+
 bool ARModel::AddPlugin(UActorComponent *InPlugin)
 {
   UActorComponent *Plugin = GetPlugin(InPlugin->GetName());

@@ -58,6 +58,8 @@ public:
 
   virtual TArray<URLink *> GetLinks() const { return Links; }
 
+  virtual URLink *GetBaseLink() const;
+
   virtual UActorComponent *GetPlugin(const FString &PluginName) const;
 
   // virtual const TArray<FJointState> GetJointState() const;
