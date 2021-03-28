@@ -16,6 +16,7 @@ class UROBOSIM_API URROSCommunicationComponent : public URPluginComponent
 public:
   URROSCommunicationComponent();
 
+public:
   virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 protected:

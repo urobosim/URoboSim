@@ -76,10 +76,10 @@ void ARModel::Init()
 
 URJoint *ARModel::GetJoint(const FString &JointName) const
 {
-  URJoint *const *Joint = Joints.FindByPredicate([&](URJoint *Joint) { return Joint->GetName().Equals(JointName); });
-  if (Joint)
+  URJoint *const *JointPtr = Joints.FindByPredicate([&](URJoint *Joint) { return Joint->GetName().Equals(JointName); });
+  if (JointPtr)
   {
-    return *Joint;
+    return *JointPtr;
   }
   else
   {
@@ -119,24 +119,13 @@ bool ARModel::AddPlugin(UActorComponent *InPlugin)
 
 UActorComponent *ARModel::GetPlugin(const FString &PluginName) const
 {
-  UActorComponent *const *Plugin = Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
-  if (Plugin)
+  UActorComponent *const *PluginPtr = Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
+  if (PluginPtr)
   {
-    return *Plugin;
+    return *PluginPtr;
   }
   else
   {
     return nullptr;
   }
 }
-
-// const TArray<FJointState> ARModel::GetJointState() const
-// {
-//   TArray<FJointState> JointState;
-//   for (const URJoint *Joint : Joints)
-//   {
-//     JointState.Add(FJointState(Joint->GetName(), Joint->GetPosition(), Joint->GetVelocity()));
-//   }
-
-//   return JointState;
-// }

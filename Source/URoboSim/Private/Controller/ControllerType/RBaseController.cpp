@@ -3,12 +3,6 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRBaseController, Log, All)
 
-URBaseController::URBaseController()
-{
-  OdomPosition.Init(0.f, 3);
-  OdomVelocity.Init(0.f, 3);
-}
-
 void URBaseController::Init()
 {
   Super::Init();
@@ -46,7 +40,6 @@ void URBaseController::Tick(float DeltaTime)
   }
   MoveLinearTick(DeltaTime);
   MoveAngularTick(DeltaTime);
-  // CalculateOdomStates(DeltaTime);
 }
 
 void URBaseController::MoveLinearTick(float DeltaTime)
@@ -80,31 +73,6 @@ void URBaseController::MoveAngularTick(float DeltaTime)
   float CurrentAngle = FRotator::NormalizeAxis(BasePose.GetRotation().Rotator().Yaw);
 
   BaseLink->GetCollisionMeshes()[0]->SetPhysicsAngularVelocityInDegrees(FVector::UpVector * FRotator::NormalizeAxis(TargetAngle - CurrentAngle) / DeltaTime);
-}
-
-void URBaseController::CalculateOdomStates(float InDeltaTime)
-{
-  FVector BasePosition = BasePose.GetLocation();
-  FQuat BaseQuaternion = BasePose.GetRotation();
-  FVector BaseVelocity = BaseLink->GetPoseComponent()->GetComponentVelocity();
-
-  OdomVelocity[0] = BaseVelocity.X;
-  OdomVelocity[1] = BaseVelocity.Y;
-  OdomVelocity[2] = (FMath::DegreesToRadians(BaseQuaternion.Rotator().Yaw) - OdomPosition[2]) / InDeltaTime;
-
-  OdomPosition[0] = BasePosition.X;
-  OdomPosition[1] = BasePosition.Y;
-  OdomPosition[2] = FMath::DegreesToRadians(BaseQuaternion.Rotator().Yaw);
-}
-
-TArray<float> URBaseController::GetOdomPosition() const
-{
-  return OdomPosition;
-}
-
-TArray<float> URBaseController::GetOdomVelocity() const
-{
-  return OdomVelocity;
 }
 
 // void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)

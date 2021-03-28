@@ -3,21 +3,15 @@
 
 #pragma once
 
-#include "Components/ActorComponent.h"
-#include "Physics/RJoint.h"
-#include "Physics/RModel.h"
-#include "ROSBridgeHandler.h"
-#include "ROSBridgePublisher.h"
-// #include "ROSCommunication/Actions/RActionServer.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/Service/Client/RServiceClient.h"
-// #include "ROSCommunication/RROSService.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
+#include "Controller/RControllerComponent.h"
+// #include "ROSCommunication/RROSService.h"
 // clang-format off
 #include "RROSCommunication.generated.h"
 // clang-format on
-
-class URControllerComponent;
 
 USTRUCT(Blueprintable)
 struct FRROSCommunicationContainer
@@ -26,11 +20,14 @@ struct FRROSCommunicationContainer
 
 public:
   FRROSCommunicationContainer();
+
   virtual ~FRROSCommunicationContainer(){};
 
 public:
   virtual void Init();
+
   virtual void DeInit();
+  
   virtual void Tick();
 
 public:
@@ -40,9 +37,8 @@ public:
 protected:
   virtual void InitPublishers();
   virtual void InitSubscribers();
-  // virtual void InitServiceServers();
   virtual void InitServiceClients();
-  // virtual void InitActionServers();
+  virtual void InitActionServers();
 
 protected:
   TSharedPtr<FROSBridgeHandler> Handler;
@@ -60,11 +56,8 @@ protected:
   TArray<URSubscriber *> Subscribers;
 
   UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-  TArray<URServiceClient *> ServerClients;
+  TArray<URServiceClient *> ServiceClients;
 
-  // UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-  // TArray<URROSService *> ServiceProviderList;
-
-  // UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-  // TArray<URActionServer *> ActionServerList;
+  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  TArray<URActionServer *> ActionServers;
 };

@@ -22,8 +22,4 @@ void URPluginComponent::RegisterPlugin()
 		GetOwner()->AddPlugin(this);
 		UE_LOG(LogRPlugin, Log, TEXT("%s is attached to %s"), *GetName(), *GetOwner()->GetName())
 	}
-	else
-	{
-		UE_LOG(LogRPlugin, Error, TEXT("%s is not attached to a ARModel"), *GetName())
-	}
 }

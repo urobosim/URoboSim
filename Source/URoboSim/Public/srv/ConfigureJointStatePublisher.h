@@ -68,7 +68,6 @@ namespace rosapi
 
         Object->SetStringField(TEXT("name"), Name);
         Object->SetStringField(TEXT("default"), Default);
-        UE_LOG(LogTemp, Error, TEXT("send request param server"));
 
         return Object;
       }
@@ -116,7 +115,6 @@ namespace rosapi
       {
         TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
         Object->SetStringField("value", Value);
-        UE_LOG(LogTemp, Error, TEXT("recieve response param server"));
         return Object;
       }
     };

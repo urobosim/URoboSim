@@ -11,25 +11,23 @@ static void GenerateMsg(const TMap<FString, FJointState> &JointStates, TArray<FS
     JointNames.Add(JointState.Key);
     JointPositions.Add(JointState.Value.JointPosition);
     JointVelocities.Add(JointState.Value.JointVelocity);
-  }  
+  }
 }
 
 URJointStatePublisher::URJointStatePublisher()
 {
-  Topic = TEXT("/joint_states");
-}
-
-void URJointStatePublisher::SetMessageType()
-{
+  Topic = TEXT("/body/joint_states");
   MessageType = TEXT("sensor_msgs/JointState");
 }
 
-void URJointStatePublisher::SetOwner(UObject *&InOwner)
+void URJointStatePublisher::Init()
 {
-  URPublisher::SetOwner(InOwner);
-  for (const URJoint *Joint : GetOwner()->GetJoints())
+  if (GetOwner())
   {
-    JointStates.Add(Joint->GetName());
+    for (const URJoint *Joint : GetOwner()->GetJoints())
+    {
+      JointStates.Add(Joint->GetName());
+    }
   }
 }
 
@@ -40,7 +38,7 @@ void URJointStatePublisher::Publish()
     URJoint *Joint = GetOwner()->GetJoint(JointState.Key);
     if (Joint)
     {
-      JointState.Value = Joint->GetJointState();
+      JointState.Value = Joint->GetJointStateInROSUnit();
     }
     else
     {

@@ -2,30 +2,50 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRPublisher, Log, All)
 
-void URPublisher::DeInit()
-{
-  Handler->Disconnect();
-}
-
-void URPublisher::Init(UObject *InOwner, const FString &InHostIp, const uint32 &InPort)
-{
-  SetOwner(InOwner);
-  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(InHostIp, InPort));
-  Handler->Connect();
-  SetMessageType();
-  CreatePublisher();
-}
-
 void URPublisher::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
 {
-  SetOwner(InOwner);
   Handler = InHandler;
+  if (Handler.IsValid())
+  {
+    Init(InOwner, InTopic);
+  }
+  else
+  {
+    UE_LOG(LogRPublisher, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+}
+
+void URPublisher::Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic)
+{
+  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
+  if (Handler.IsValid())
+  {
+    Handler->Connect();
+    Init(InOwner, InTopic);
+  }
+  else
+  {
+    UE_LOG(LogRPublisher, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+}
+
+void URPublisher::Init(UObject *InOwner, const FString &InTopic)
+{
+  SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
     Topic = InTopic;
   }
-  SetMessageType();
+  Init();
   CreatePublisher();
+}
+
+void URPublisher::Tick()
+{
+  if (Handler.IsValid())
+  {
+    Publish();
+  }
 }
 
 void URPublisher::CreatePublisher()

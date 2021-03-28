@@ -6,25 +6,22 @@ DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationContainer, Log, All);
 FRROSCommunicationContainer::FRROSCommunicationContainer()
 {
   WebsocketIPAddr = TEXT("127.0.0.1");
-  WebsocketPort = 9090;
+  WebsocketPort = 9393;
   ControllerComponent = nullptr;
 }
 
 void FRROSCommunicationContainer::Init()
 {
-  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
-  if (Handler.IsValid())
+  if (ControllerComponent)
   {
-    Handler->Connect();
     InitPublishers();
     InitSubscribers();
-    // InitAllServiceProvider();
     InitServiceClients();
-    // InitAllActionServer();
+    InitActionServers();
   }
   else
   {
-    UE_LOG(LogRROSCommunicationContainer, Error, TEXT("No FROSBridgeHandler created."))
+    UE_LOG(LogRROSCommunicationContainer, Error, TEXT("ControllerComponent not found"))
   }
 }
 
@@ -40,52 +37,43 @@ void FRROSCommunicationContainer::InitSubscribers()
 {
   for (URSubscriber *&Subscriber : Subscribers)
   {
-    Subscriber->Init(ControllerComponent->GetOwner(), Handler);
+    Subscriber->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
   }
 }
-
-// void FRROSCommunicationContainer::InitAllServiceProvider()
-// {
-//   for (auto &ServiceProvider : ServiceProviderList)
-//   {
-//     ServiceProvider.Value->Init(ControllerComponent, Handler, ServiceProvider.Key);
-//   }
-// }
 
 void FRROSCommunicationContainer::InitServiceClients()
 {
-  for (URServiceClient *&ServerClient : ServerClients)
+  for (URServiceClient *&ServiceClient : ServiceClients)
   {
-    ServerClient->Init(ControllerComponent, Handler);
+    ServiceClient->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
   }
 }
 
-// void FRROSCommunicationContainer::InitAllActionServer()
-// {
-//   for (auto &ActionServer : ActionServerList)
-//   {
-//     ActionServer.Value->Init(WebsocketIPAddr, WebsocketPort, ControllerComponent->GetOwner());
-//   }
-// }
+void FRROSCommunicationContainer::InitActionServers()
+{
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
+  }
+}
 
 void FRROSCommunicationContainer::Tick()
 {
-  if (Handler.IsValid())
+  for (URPublisher *&Publisher : Publishers)
   {
-    for (URPublisher *&Publisher : Publishers)
-    {
-      Publisher->Publish();
-    }
-
-    // for (auto &ActionServer : ActionServerList)
-    // {
-    //   ActionServer->Tick();
-    // }
-    Handler->Process();
+    Publisher->Tick();
   }
-  else
+  for (URSubscriber *&Subscriber : Subscribers)
   {
-    UE_LOG(LogTemp, Error, TEXT("Handler Invalid"));
+    Subscriber->Tick();
+  }
+  for (URServiceClient *&ServiceClient : ServiceClients)
+  {
+    ServiceClient->Tick();
+  }
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->Tick();
   }
 }
 
@@ -94,6 +82,18 @@ void FRROSCommunicationContainer::DeInit()
   for (URPublisher *&Publisher : Publishers)
   {
     Publisher->DeInit();
+  }
+  for (URSubscriber *&Subscriber : Subscribers)
+  {
+    Subscriber->DeInit();
+  }
+  for (URServiceClient *&ServiceClient : ServiceClients)
+  {
+    ServiceClient->DeInit();
+  }
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->DeInit();
   }
   if (Handler.IsValid())
   {

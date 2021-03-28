@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
+#include "ROSCommunication/Service/Client/RGetParamClient.h"
 // clang-format off
 #include "RJointStatePublisher.generated.h"
 // clang-format on
@@ -12,15 +12,13 @@ class UROBOSIM_API URJointStatePublisher : public URPublisher
   GENERATED_BODY()
 
 public:
-  // Sets default values for this component's properties
   URJointStatePublisher();
 
+public:
   virtual void Publish();
 
 protected:
-  virtual void SetMessageType();
-
-  void SetOwner(UObject *&InOwner) override;
+  virtual void Init() override;
 
 protected:
   UPROPERTY(EditAnywhere)

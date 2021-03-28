@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Physics/RModel.h"
+#include "ROSUtilities.h"
 // clang-format off
 #include "RController.generated.h"
 // clang-format on
@@ -23,20 +24,27 @@ public:
 
   ARModel *GetOwner();
 
-  // virtual void CancelAction();
+  virtual void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
+
+  virtual const FGoalStatusInfo GetGoalStatus() { return GoalStatusList.Last(); }
+
+  virtual const TArray<FGoalStatusInfo> GetGoalStatusList() { return GoalStatusList; }
 
 public:
-  // UPROPERTY()
-  // bool bActive;
-
-  // UPROPERTY()
-  // bool bCancel = false;
+  UPROPERTY()
+  bool bCancel = false;
 
   UPROPERTY()
   bool bPublishResult = false;
 
-  // UPROPERTY()
-  // // TArray<FGoalStatusInfo> GoalStatusList;
+protected:
+  UPROPERTY()
+  TArray<FGoalStatusInfo> GoalStatusList;
+
+  virtual void CancelAction();
+
+  UPROPERTY()
+  bool bActive;
 
   // // float CheckAngleRange(float InAngle);
 

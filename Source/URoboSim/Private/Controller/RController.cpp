@@ -16,20 +16,11 @@ ARModel *URController::GetOwner()
   return Owner;
 }
 
-// void URController::CancelAction()
-// {
-//   if (bCancel)
-//   {
-//     if (bActive)
-//     {
-//       GoalStatusList.Last().Status = 6;
-//       bActive = false;
-//     }
-//     else
-//     {
-//       GoalStatusList.Last().Status = 2;
-//       bActive = false;
-//     }
-//     bPublishResult = true;
-//   }
-// }
+void URController::CancelAction()
+{
+  if (bCancel)
+  {
+    GoalStatusList.Last().Status = 2;
+    bPublishResult = true;
+  }
+}

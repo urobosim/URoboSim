@@ -14,9 +14,6 @@ class UROBOSIM_API URBaseController : public URController
 	GENERATED_BODY()
 
 public:
-	URBaseController();
-
-public:
   virtual void Tick(float DeltaTime) override;
 
 	virtual void Init() override;
@@ -25,10 +22,6 @@ public:
 	virtual void MoveLinear(const FVector &InVelocity);
 
   virtual void MoveAngular(const float &InVelocity);
-
-  virtual TArray<float> GetOdomPosition() const;
-
-	virtual TArray<float> GetOdomVelocity() const;
 	
 	// virtual void SetLocation(FVector InPosition);
 	// virtual void SetRotation(FRotator InRotator);
@@ -42,8 +35,6 @@ protected:
 	virtual void MoveAngularTick(float InDeltaTime);
 
 	virtual void MoveLinearTick(float InDeltaTime);
-
-	virtual void CalculateOdomStates(float InDeltaTime);
 
 protected:
   UPROPERTY()
@@ -60,12 +51,6 @@ protected:
 
   UPROPERTY(EditAnywhere)
 	float AngularVelocity;
-
-  UPROPERTY()
-	TArray<float> OdomPosition;
-
-	UPROPERTY()
-	TArray<float> OdomVelocity;
 
 	// UPROPERTY(EditAnywhere)
 	// bool bIsKinematic;

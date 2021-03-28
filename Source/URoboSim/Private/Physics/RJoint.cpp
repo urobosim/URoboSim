@@ -26,6 +26,22 @@ void URJoint::Init()
 	InitChildPoseInJointFrame = GetChildPoseInJointFrame();
 }
 
+const FJointState URJoint::GetJointStateInROSUnit() const
+{
+	FJointState JointStateInROSUnit;
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		JointStateInROSUnit.JointPosition = FMath::DegreesToRadians(JointState.JointPosition);
+		JointStateInROSUnit.JointVelocity = FMath::DegreesToRadians(JointState.JointVelocity);
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		JointStateInROSUnit.JointPosition = FConversions::CmToM((float)JointState.JointPosition);
+		JointStateInROSUnit.JointVelocity = FConversions::CmToM((float)JointState.JointVelocity);
+	}
+	return JointStateInROSUnit;
+}
+
 const float URJoint::GetVelocity() const
 {
 	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
@@ -34,7 +50,7 @@ const float URJoint::GetVelocity() const
 		FVector ChildVelocity = Child->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
 		FVector JointVelocity = Child->GetCollisionMeshes()[0]->GetComponentRotation().UnrotateVector(ChildVelocity - ParentVelocity);
 		JointVelocity.Z *= -1;
-		return FVector::DotProduct(JointVelocity, Type->Axis);
+		return FMath::RadiansToDegrees(FVector::DotProduct(JointVelocity, Type->Axis));
 	}
 	else if (Type->GetName().Equals("prismatic"))
 	{
@@ -79,17 +95,39 @@ const FTransform URJoint::GetChildPoseInJointFrame() const
 	return ChildPose * JointPose.Inverse();
 }
 
-void URJoint::SetTargetPosition(const float &TargetPosition)
+void URJoint::SetPositionInROSUnit(const float &Position)
 {
-	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.IsOrientationDriveEnabled())
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
 	{
-		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
-		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+		SetPosition(FMath::RadiansToDegrees(Position));
 	}
-	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
+	else if (Type->GetName().Equals("prismatic"))
 	{
-		Type->Constraint->SetLinearPositionTarget(Type->Axis * -TargetPosition);
-		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+		SetPosition(FConversions::MToCm(Position));
+	}
+}
+
+void URJoint::SetTargetPositionInROSUnit(const float &TargetPosition)
+{
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		SetTargetPosition(FMath::RadiansToDegrees(TargetPosition));
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		SetTargetPosition(FConversions::MToCm(TargetPosition));
+	}
+}
+
+void URJoint::SetTargetVelocityInROSUnit(const float &TargetVelocity)
+{
+	if (Type->GetName().Equals("revolute") || Type->GetName().Equals("continuous"))
+	{
+		SetTargetVelocity(FMath::RadiansToDegrees(TargetVelocity));
+	}
+	else if (Type->GetName().Equals("prismatic"))
+	{
+		SetTargetVelocity(FConversions::MToCm(TargetVelocity));
 	}
 }
 
@@ -111,6 +149,20 @@ void URJoint::SetPosition(const float &Position)
 	}
 }
 
+void URJoint::SetTargetPosition(const float &TargetPosition)
+{
+	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.IsOrientationDriveEnabled())
+	{
+		Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
+	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsPositionDriveEnabled())
+	{
+		Type->Constraint->SetLinearPositionTarget(Type->Axis * -TargetPosition);
+		Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	}
+}
+
 void URJoint::SetTargetVelocity(const float &TargetVelocity)
 {
 	if (Type->Constraint->ConstraintInstance.ProfileInstance.AngularDrive.IsVelocityDriveEnabled())
@@ -120,7 +172,7 @@ void URJoint::SetTargetVelocity(const float &TargetVelocity)
 	}
 	else if (Type->Constraint->ConstraintInstance.ProfileInstance.LinearDrive.IsVelocityDriveEnabled())
 	{
-		Type->Constraint->SetLinearVelocityTarget(Type->Axis * TargetVelocity / 360.f);
+		Type->Constraint->SetLinearVelocityTarget(Type->Axis * TargetVelocity);
 		Child->GetCollisionMeshes()[0]->WakeRigidBody();
 	}
 }

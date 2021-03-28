@@ -1,13 +1,11 @@
 #include "Controller/RControllerComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRControllerComponent, Log, All);
+
 URControllerComponent::URControllerComponent()
 {
   PrimaryComponentTick.bCanEverTick = true;
   PrimaryComponentTick.TickGroup = TG_PrePhysics;
-  if (!GetOwner())
-  {
-    UE_LOG(LogTemp, Error, TEXT("Owner of %s is not RModel."), *GetName());
-  }
 }
 
 void URControllerComponent::Init()
@@ -21,7 +19,16 @@ void URControllerComponent::Init()
 
 URController *URControllerComponent::GetController(const FString &ControllerName)
 {
-  return *Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
+  URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
+  if (ControllerPtr)
+  {
+    return *ControllerPtr;
+  }
+  else
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("Controller %s not found in %s"), *ControllerName, *GetName())
+    return nullptr;
+  }
 }
 
 // void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)

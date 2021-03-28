@@ -16,10 +16,11 @@ public class URoboSim : ModuleRules
         PublicDependencyModuleNames.AddRange(
 			new string[]
                         {
-                            "Core"
-                            ,"MeshDescription",
+                            "Core",
+                            "MeshDescription",
                             "RenderCore",
                             "Json",
+														"UROSBridge"
                         }
 			);
 

@@ -26,30 +26,47 @@ struct FTrajectoryPoints
   GENERATED_BODY()
 
 public:
-  double StartTime;
-  TArray<double> Points;
-  TArray<double> Velocities;
-  double NSecs;
-  double Secs;
+  FTrajectoryPoints() {}
 
-  void SetTimeStep(double InSecs, double InNSecs)
+  FTrajectoryPoints(const float &InSecs, const float &InNSecs, const TArray<FString> &InJointNames, const TArray<double> &InPositions, const TArray<double> &InVelocities)
+  {
+    SetTimeStep(InSecs, InNSecs);
+    for (int32 i = 0; i < InJointNames.Num(); i++)
+    {
+      JointStates.Add(InJointNames[i], FJointState(InPositions[i], InVelocities[i]));
+    }
+  }
+
+  UPROPERTY(VisibleAnywhere)
+  float StartTime;
+
+  UPROPERTY(VisibleAnywhere)
+  float Secs;
+
+  UPROPERTY(VisibleAnywhere)
+  float NSecs;
+
+  UPROPERTY(VisibleAnywhere)
+  TMap<FString, FJointState> JointStates;
+
+public:
+  void SetTimeStep(const float &InSecs, const float &InNSecs)
   {
     Secs = InSecs;
     NSecs = InNSecs;
   };
 
-  double GetTimeAsDouble()
+  const float GetTimeAsFloat() const
   {
     return Secs + NSecs / 1000000000;
   };
 
   void Reset()
   {
-    StartTime = 0.0;
-    Points.Empty();
-    Velocities.Empty();
-    NSecs = 0;
+    StartTime = 0.f;
     Secs = 0;
+    NSecs = 0;
+    JointStates.Empty();
   };
 };
 
@@ -59,10 +76,14 @@ struct FTrajectoryStatus
   GENERATED_BODY()
 
 public:
-  TArray<FString> JointNames;
-  TArray<double> Position;
-  TArray<double> Desired;
-  TArray<double> Error;
+  FTrajectoryStatus() {}
+
+  FTrajectoryStatus(const FString &InJointName) : JointName(InJointName), CurrentPosition(0.f), DesiredPosition(0.f), ErrorPosition(0.f) {}
+
+  FString JointName;
+  float CurrentPosition;
+  float DesiredPosition;
+  float ErrorPosition;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -79,65 +100,53 @@ public:
   virtual void Init() override;
 
 public:
+  virtual void SetJointNames(const TArray<FString> &InNames);
+
+  virtual void SetMode();
+
+  virtual const TArray<FTrajectoryStatus> GetTrajectoryStatusArray() const { return TrajectoryStatusArray; }
+
+  virtual void FollowJointTrajectory();
+
+public:
   UPROPERTY(VisibleAnywhere)
   UJointControllerState State;
 
   UPROPERTY(EditAnywhere)
   FEnableDrive EnableDrive;
 
-  //   UPROPERTY(EditAnywhere)
-  //   float RevolutAccuracy;
-
-  //   UPROPERTY(EditAnywhere)
-  //   float PrismaticAccuracy;
-
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;
-
-  //   UPROPERTY()
-  //   TArray<FTrajectoryPoints> Trajectory;
 
   UPROPERTY(EditAnywhere)
   TMap<FString, FJointState> DesiredJointStates;
 
-  //   UPROPERTY()
-  //   TArray<bool> bTrajectoryPointsReached;
-
-  //   UPROPERTY(EditAnywhere)
-  //   float MaxJointAngularVel;
-
-  //   UPROPERTY()
-  //   FTrajectoryStatus TrajectoryStatus;
-
-  //   virtual void FollowTrajectory();
-  //   virtual void SetJointNames(TArray<FString> InNames);
-  virtual void SetMode();
-
-  //   UJointControllerState GetState();
-
-  //   virtual void SetDesiredJointState(FString JointName, float InJointState);
+  UPROPERTY()
+  TArray<FTrajectoryPoints> DesiredTrajectory;
 
 protected:
   UPROPERTY(EditAnywhere)
   UJointControllerMode Mode;
 
-  void SetJointState(float DeltaTime);
+  UPROPERTY()
+  TArray<FTrajectoryStatus> TrajectoryStatusArray;
 
-  //   UPROPERTY(EditAnywhere)
-  //   float SpeedFactorHack = 1;
-  //   virtual void MoveJoints(float InDeltaTime);
-  //   virtual void MoveJointsDynamic(float InDeltaTime);
-  //   virtual void MoveJointsKinematic();
+  UPROPERTY()
+  uint32 TrajectoryPointIndex;
 
-  //   UPROPERTY()
-  //   FTrajectoryPoints OldTrajectoryPoints;
+  UPROPERTY()
+  float ActionDuration;
 
-  //   UPROPERTY()
-  //   uint32 TrajectoryPointIndex;
+protected:
+  virtual void SetJointState(float DeltaTime);
 
-  //   void UpdateDesiredJointAngle(float InDeltaTime);
-  //   virtual bool CheckTrajectoryGoalReached();
-  //   virtual bool CheckTrajectoryPoint();
+  virtual bool CheckTrajectoryPoint();
 
-  //   void SetJointVelocities(float InDeltaTime);
+  virtual bool CheckTrajectoryGoalReached();
+
+  virtual void SetDesiredJointState(float DeltaTime);
+
+private:
+  UPROPERTY()
+  FTrajectoryPoints LastTrajectoryPoints;
 };

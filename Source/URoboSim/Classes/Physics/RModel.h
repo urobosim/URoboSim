@@ -62,7 +62,6 @@ public:
 
   virtual UActorComponent *GetPlugin(const FString &PluginName) const;
 
-  // virtual const TArray<FJointState> GetJointState() const;
 public:
   UPROPERTY(EditAnywhere)
   FEnableGravity EnableGravity;

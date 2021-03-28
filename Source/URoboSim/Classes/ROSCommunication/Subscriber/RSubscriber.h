@@ -14,19 +14,33 @@ class UROBOSIM_API URSubscriber : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void Init(UObject *InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic = "");
+  virtual void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic = TEXT(""));
 
-  virtual void Init(UObject *InModel){};
+  virtual void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic = TEXT(""));
+
+  virtual void Tick();
+
+  virtual void DeInit() 
+  { 
+    if (Handler.IsValid())
+    {
+      Handler->Disconnect(); 
+    }
+  }
 
 public:
   virtual ARModel *GetOwner() const { return Owner; }
 
 protected:
-  virtual void SetMessageType(){};
+  virtual void Init(UObject *InOwner, const FString &InTopic);
 
-  virtual void SetOwner(UObject *&InOwner){ Owner = Cast<ARModel>(InOwner); };
+  virtual void Init(){};
+  
+  virtual void SetOwner(UObject *&InOwner){ Owner = Cast<ARModel>(InOwner); }
+  
+  virtual void CreateSubscriber(){}
 
-  virtual void CreateSubscriber();
+  virtual void AddSubscriber();
 
 protected:
   TSharedPtr<FROSBridgeSubscriber> Subscriber;

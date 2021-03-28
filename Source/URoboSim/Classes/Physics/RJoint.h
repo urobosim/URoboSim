@@ -60,6 +60,8 @@ public:
 public:
   virtual void Init();
 
+  virtual const FJointState GetJointStateInROSUnit() const;
+
   virtual const FJointState GetJointState() const { return JointState; }
 
   virtual void SetJointType(const USDFJoint *InSDFJoint);
@@ -83,6 +85,12 @@ public:
   virtual void SetDrive(const FEnableDrive &EnableDrive);
 
   virtual void SetPosition(const float &Position);
+
+  virtual void SetTargetPositionInROSUnit(const float &TargetPosition);
+
+  virtual void SetTargetVelocityInROSUnit(const float &TargetVelocity);
+
+  virtual void SetPositionInROSUnit(const float &Position);
 
   virtual void SetTargetPosition(const float &TargetPosition);
 
