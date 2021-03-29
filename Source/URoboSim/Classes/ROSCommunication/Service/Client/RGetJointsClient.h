@@ -6,7 +6,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URGetJointsClient : public URGetParamClient
+class UROBOSIM_API URGetJointsClient final : public URGetParamClient
 {
   GENERATED_BODY()
 
@@ -17,11 +17,11 @@ protected:
   void Init() override;
 };
 
-class FRGetJointsClientCallback : public FRGetParamClientCallback
+class FRGetJointsClientCallback final : public FRGetParamClientCallback
 {
 public:
   FRGetJointsClientCallback(const FString &InServiceName, const FString &InServiceType, UObject *InController);
 
 protected:
-  virtual void Callback() override;
+  void Callback() override;
 };

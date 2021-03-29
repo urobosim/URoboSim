@@ -7,21 +7,22 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URJointTrajectoryControllerStatePublisher : public URPublisher
+class UROBOSIM_API URJointTrajectoryControllerStatePublisher final : public URPublisher
 {
   GENERATED_BODY()
 
 public:
   URJointTrajectoryControllerStatePublisher();
 
-  virtual void Publish() override;
+  void Publish() override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId;
 
 protected:
-  virtual void Init() override;
+  void Init() override;
 
 private:
   URJointController *JointController;
-
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 };

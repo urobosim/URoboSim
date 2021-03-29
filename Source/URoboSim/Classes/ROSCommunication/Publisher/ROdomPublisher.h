@@ -6,7 +6,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API UROdomPublisher : public URPublisher
+class UROBOSIM_API UROdomPublisher final : public URPublisher
 {
   GENERATED_BODY()
 
@@ -14,18 +14,19 @@ public:
   UROdomPublisher();
 
 public:
-  virtual void Publish() override;
+  void Publish() override;
 
-protected:
-  virtual void Init() override;
-
-private:
-	virtual void CalculateOdomStates();
-
-protected:
+public:
   UPROPERTY(EditAnywhere)
   FString FrameId;
 
+protected:
+  void Init() override;
+
+private:
+	void CalculateOdomStates();
+
+protected:
   UPROPERTY(EditAnywhere)
 	TArray<FString> FrameNames;
 

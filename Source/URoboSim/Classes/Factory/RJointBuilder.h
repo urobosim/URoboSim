@@ -25,11 +25,49 @@ protected:
   URJoint *Joint;
 
   virtual void SetNewJoint(USDFJoint *&SDFJoint);
-  virtual void SetJointParameters(USDFJoint *&SDFJoint);
-  virtual void CreateConstraint(USDFJoint *&SDFJoint);
-  virtual void RotateConstraintToRefAxis(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis);
-  virtual void ConnectToComponents(UPhysicsConstraintComponent *&Constraint, USDFJoint *&SDFJoint);
 
-  // virtual void RotateConstraintToRefAxis();
-  // virtual float CalculateRotationOffset();
+  virtual void SetJointParameters(USDFJoint *&SDFJoint);
+
+  virtual void CreateConstraint(USDFJoint *&SDFJoint);
+
+  virtual void SetupConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis) {}
+
+  virtual void RotateConstraintToRefAxis(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis);
+
+  virtual void ConnectToComponents(UPhysicsConstraintComponent *&Constraint, USDFJoint *&SDFJoint);
+};
+
+UCLASS()
+class UROBOSIM_API URContinuousJointBuilder : public URJointBuilder
+{
+  GENERATED_BODY()
+
+protected:
+  virtual void SetNewJoint(USDFJoint *&SDFJoint) override;
+
+  virtual void SetupConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis) override;
+};
+
+UCLASS()
+class UROBOSIM_API URRevoluteJointBuilder : public URContinuousJointBuilder
+{
+  GENERATED_BODY()
+
+protected:
+  virtual void SetNewJoint(USDFJoint *&SDFJoint) override;
+
+  virtual void SetupConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis) override;
+
+  virtual const float CalculateRotationOffset(float &JointLimit, USDFJointAxis *&SDFJointAxis);
+};
+
+UCLASS()
+class UROBOSIM_API URPrismaticJointBuilder : public URJointBuilder
+{
+  GENERATED_BODY()
+
+protected:
+  virtual void SetNewJoint(USDFJoint *&SDFJoint) override;
+
+  virtual void SetupConstraint(UPhysicsConstraintComponent *&Constraint, USDFJointAxis *&SDFJointAxis) override;
 };

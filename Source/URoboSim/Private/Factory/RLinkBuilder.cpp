@@ -53,7 +53,7 @@ void URLinkBuilder::SetVisualMeshes(USDFLink *&SDFLink)
     LinkMeshComponent->RegisterComponent();
     
     FVector LocationOffset = SDFLink->Pose.GetRotation().RotateVector(SDFVisual->Pose.GetLocation());
-    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPosition);
+    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPose.GetLocation());
 
     // Rotations are added by multiplying the rotations
     FQuat RotationOffset = SDFLink->Pose.GetRotation() * SDFVisual->Pose.GetRotation();
@@ -92,7 +92,7 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
     LinkMeshComponent->BodyInstance.VelocitySolverIterationCount = 8;
 
     FVector LocationOffset = SDFLink->Pose.GetRotation().RotateVector(SDFCollision->Pose.GetLocation());
-    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPosition);
+    LinkMeshComponent->SetWorldLocation(LocationOffset + SDFLink->Pose.GetLocation() + WorldPose.GetLocation());
 
     // Rotations are added by multiplying the Quaternions
     FQuat RotationOffset = SDFLink->Pose.GetRotation() * SDFCollision->Pose.GetRotation();
@@ -153,7 +153,7 @@ void URLinkBuilder::SetCollisionProfile(const bool &bSelfColide)
 void URLinkBuilder::SetPose(const FTransform &Pose)
 {
   FTransform LinkPose;
-  LinkPose.SetTranslation(WorldPosition);
-  LinkPose += Pose;
+  LinkPose.SetLocation(WorldPose.GetLocation() + Pose.GetLocation());
+  LinkPose.SetRotation(Pose.GetRotation());
   Link->SetPose(LinkPose);
 }

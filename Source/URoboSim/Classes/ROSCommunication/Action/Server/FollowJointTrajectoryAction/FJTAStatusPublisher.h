@@ -6,10 +6,10 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTAStatusPublisher : public URActionStatusPublisher
+class UROBOSIM_API URFJTAStatusPublisher final : public URActionStatusPublisher
 {
   GENERATED_BODY()
 
 protected:
-  virtual void Init() override;
+  void Init() override;
 };

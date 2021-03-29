@@ -7,7 +7,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTAResultPublisher : public URPublisher
+class UROBOSIM_API URFJTAResultPublisher final : public URPublisher
 {
   GENERATED_BODY()
 
@@ -15,14 +15,15 @@ public:
   URFJTAResultPublisher();
 
 public:
-  virtual void Publish() override;
+  void Publish() override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId;
 
 protected:
-  virtual void Init() override;
+  void Init() override;
 
 private:
   URJointController *JointController;
-
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 };

@@ -14,7 +14,7 @@ class UROBOSIM_API URBaseController : public URController
 	GENERATED_BODY()
 
 public:
-  virtual void Tick(float DeltaTime) override;
+  virtual void Tick(const float &InDeltaTime) override;
 
 	virtual void Init() override;
 
@@ -22,19 +22,11 @@ public:
 	virtual void MoveLinear(const FVector &InVelocity);
 
   virtual void MoveAngular(const float &InVelocity);
-	
-	// virtual void SetLocation(FVector InPosition);
-	// virtual void SetRotation(FRotator InRotator);
-	// virtual void SetTransform(FTransform InTransform);
-	// virtual void AddRelativeLocation(URLink* InLink, FVector InPosition);
-	// virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
-	// virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
-	// virtual void MoveLinearToWorld(FVector InVelocity, float InDeltaTime);
 
 protected:
-	virtual void MoveAngularTick(float InDeltaTime);
+	virtual void MoveAngularTick(const float &InDeltaTime);
 
-	virtual void MoveLinearTick(float InDeltaTime);
+	virtual void MoveLinearTick(const float &InDeltaTime);
 
 protected:
   UPROPERTY()
@@ -51,25 +43,4 @@ protected:
 
   UPROPERTY(EditAnywhere)
 	float AngularVelocity;
-
-	// UPROPERTY(EditAnywhere)
-	// bool bIsKinematic;
-
-	// UPROPERTY(EditAnywhere)
-	// float HackRotationFactor = 1;
-
-	// UPROPERTY(EditAnywhere)
-	// float HackLinearFactor = 1;
 };
-
-// UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-// class UROBOSIM_API URBaseControllerKinematic : public URBaseController
-// {
-//     GENERATED_BODY()
-// public:
-
-//   virtual void TurnTick(float InDeltaTime) override;
-//   virtual void MoveLinearTick(float InDeltaTime) override;
-//   virtual void SetLocation(FVector InPosition) override;
-//   virtual void SetRotation(FRotator InRotator) override;
-// };

@@ -16,11 +16,11 @@ public:
   URActionServer(){};
 
 public:
-  virtual void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName = "");
+  void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName = "");
 
-  virtual void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
+  void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
 
-  virtual void DeInit() 
+  void DeInit() 
   { 
     if (Handler.IsValid())
     {
@@ -28,17 +28,18 @@ public:
     }
   }
 
-  virtual void Tick();
+  void Tick();
 
-protected:
-  virtual void Init(UObject *InOwner, const FString &InActionName);
-  
-  virtual void Init(UObject *&InOwner);
-
-protected:
+public:
   UPROPERTY(EditAnywhere)
   FString ActionName;
 
+protected:
+  void Init(UObject *InOwner, const FString &InActionName);
+  
+  void Init(UObject *&InOwner);
+
+protected:
   UPROPERTY(EditAnywhere)
   URSubscriber *GoalSubscriber;
 

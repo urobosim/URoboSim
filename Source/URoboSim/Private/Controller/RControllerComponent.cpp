@@ -17,6 +17,14 @@ void URControllerComponent::Init()
   }
 }
 
+void URControllerComponent::TickPlugin(const float &InDeltaTime)
+{
+  for (URController *&Controller : Controllers)
+  {
+    Controller->Tick(InDeltaTime);
+  }
+}
+
 URController *URControllerComponent::GetController(const FString &ControllerName)
 {
   URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
@@ -30,20 +38,3 @@ URController *URControllerComponent::GetController(const FString &ControllerName
     return nullptr;
   }
 }
-
-// void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
-// {
-//   for (int i = 0; i < InJointNames.Num(); i++)
-//   {
-//     GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
-//   }
-// }
-
-// URController *URControllerComponent::ControllerList(FString ControllerName)
-// {
-//   if (Controller.ControllerList.Contains(ControllerName))
-//   {
-//     return Controller.ControllerList[ControllerName];
-//   }
-//   return nullptr;
-// }

@@ -37,16 +37,9 @@ public:
     }
   }
 
-  UPROPERTY(VisibleAnywhere)
   float StartTime;
-
-  UPROPERTY(VisibleAnywhere)
   float Secs;
-
-  UPROPERTY(VisibleAnywhere)
   float NSecs;
-
-  UPROPERTY(VisibleAnywhere)
   TMap<FString, FJointState> JointStates;
 
 public:
@@ -87,7 +80,7 @@ public:
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URJointController : public URController
+class UROBOSIM_API URJointController final : public URController
 {
   GENERATED_BODY()
 
@@ -95,18 +88,18 @@ public:
   URJointController();
 
 public:
-  virtual void Tick(float DeltaTime) override;
+  void Tick(const float &InDeltaTime) override;
 
-  virtual void Init() override;
+  void Init() override;
 
 public:
-  virtual void SetJointNames(const TArray<FString> &InNames);
+  void SetJointNames(const TArray<FString> &InNames);
 
-  virtual void SetMode();
+  void SetMode();
 
-  virtual const TArray<FTrajectoryStatus> GetTrajectoryStatusArray() const { return TrajectoryStatusArray; }
+  const TArray<FTrajectoryStatus> GetTrajectoryStatusArray() const { return TrajectoryStatusArray; }
 
-  virtual void FollowJointTrajectory();
+  void FollowJointTrajectory();
 
 public:
   UPROPERTY(VisibleAnywhere)
@@ -135,16 +128,19 @@ protected:
   uint32 TrajectoryPointIndex;
 
   UPROPERTY()
+  float ActionStartTime;
+
+  UPROPERTY()
   float ActionDuration;
 
 protected:
-  virtual void SetJointState(float DeltaTime);
+  void SetJointState();
 
-  virtual bool CheckTrajectoryPoint();
+  bool CheckTrajectoryPoint();
 
-  virtual bool CheckTrajectoryGoalReached();
+  bool CheckTrajectoryGoalReached();
 
-  virtual void SetDesiredJointState(float DeltaTime);
+  void SetDesiredJointState();
 
 private:
   UPROPERTY()

@@ -7,15 +7,15 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTACancelSubscriber : public URActionCancelSubscriber
+class UROBOSIM_API URFJTACancelSubscriber final : public URActionCancelSubscriber
 {
 	GENERATED_BODY()
 
 public:
-	virtual void CreateSubscriber() override;
+	void CreateSubscriber() override;
 };
 
-class UROBOSIM_API FRFJTACancelSubscriberCallback : public FROSBridgeSubscriber
+class UROBOSIM_API FRFJTACancelSubscriberCallback final : public FROSBridgeSubscriber
 {
 public:
 	FRFJTACancelSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController);

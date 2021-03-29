@@ -11,6 +11,8 @@
 #include "RModel.generated.h"
 // clang-format on
 
+class URPluginComponent;
+
 USTRUCT()
 struct FEnableGravity
 {
@@ -50,7 +52,7 @@ public:
 
   virtual void AddLink(URLink *&Link) { Links.Add(Link); }
 
-  virtual bool AddPlugin(UActorComponent *Plugin);
+  virtual bool AddPlugin(URPluginComponent *Plugin);
 
   virtual TArray<URJoint *> GetJoints() const { return Joints; }
 
@@ -60,7 +62,7 @@ public:
 
   virtual URLink *GetBaseLink() const;
 
-  virtual UActorComponent *GetPlugin(const FString &PluginName) const;
+  virtual URPluginComponent *GetPlugin(const FString &PluginName) const;
 
 public:
   UPROPERTY(EditAnywhere)
@@ -77,7 +79,7 @@ protected:
   TArray<URLink *> Links;
 
   UPROPERTY(EditAnywhere)
-  TArray<UActorComponent *> Plugins;
+  TArray<URPluginComponent *> Plugins;
 
   // UPROPERTY()
   // TArray<URGraspComponent *> Grippers;

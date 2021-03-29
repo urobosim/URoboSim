@@ -48,7 +48,7 @@ public:
   float JointVelocity;
 };
 
-UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = (Abstract), meta = (BlueprintSpawnableComponent))
 class UROBOSIM_API URJoint : public UObject
 {
   GENERATED_BODY()
@@ -60,7 +60,7 @@ public:
 public:
   virtual void Init();
 
-  virtual const FJointState GetJointStateInROSUnit() const;
+  virtual const FJointState GetJointStateInROSUnit() const { return FJointState(); }
 
   virtual const FJointState GetJointState() const { return JointState; }
 
@@ -82,24 +82,24 @@ public:
 
   virtual const URJointType *GetType() const { return Type; }
 
-  virtual void SetDrive(const FEnableDrive &EnableDrive);
+  virtual void SetDrive(const FEnableDrive &EnableDrive) {}
 
-  virtual void SetPosition(const float &Position);
+  virtual void SetPosition(const float &Position) {}
 
-  virtual void SetTargetPositionInROSUnit(const float &TargetPosition);
+  virtual void SetTargetPositionInROSUnit(const float &TargetPosition) {}
 
-  virtual void SetTargetVelocityInROSUnit(const float &TargetVelocity);
+  virtual void SetTargetVelocityInROSUnit(const float &TargetVelocity) {}
 
-  virtual void SetPositionInROSUnit(const float &Position);
+  virtual void SetPositionInROSUnit(const float &Position) {}
 
-  virtual void SetTargetPosition(const float &TargetPosition);
+  virtual void SetTargetPosition(const float &TargetPosition) {}
 
-  virtual void SetTargetVelocity(const float &TargetVelocity);
+  virtual void SetTargetVelocity(const float &TargetVelocity) {}
 
 protected:
-  virtual const float GetPosition() const;
+  virtual const float GetPosition() const { return 0.f; }
 
-  virtual const float GetVelocity() const;
+  virtual const float GetVelocity() const { return 0.f; }
 
   virtual const FTransform GetChildPoseInJointFrame() const;
 
@@ -120,4 +120,67 @@ protected:
 
   UPROPERTY(VisibleAnywhere)
   FJointState JointState;
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class UROBOSIM_API URContinuousJoint : public URJoint
+{
+  GENERATED_BODY()
+
+public:
+  virtual const FJointState GetJointStateInROSUnit() const override;
+
+  virtual void SetDrive(const FEnableDrive &EnableDrive) override;
+
+  virtual void SetPosition(const float &Position) override;
+
+  virtual void SetTargetPositionInROSUnit(const float &TargetPosition) override;
+
+  virtual void SetTargetVelocityInROSUnit(const float &TargetVelocity) override;
+
+  virtual void SetPositionInROSUnit(const float &Position) override;
+
+  virtual void SetTargetPosition(const float &TargetPosition) override;
+
+  virtual void SetTargetVelocity(const float &TargetVelocity) override;
+
+protected:
+  virtual const float GetPosition() const override;
+
+  virtual const float GetVelocity() const override;
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class UROBOSIM_API URRevoluteJoint : public URContinuousJoint
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class UROBOSIM_API URPrismaticJoint : public URJoint
+{
+  GENERATED_BODY()
+
+public:
+  virtual const FJointState GetJointStateInROSUnit() const override;
+
+  virtual void SetDrive(const FEnableDrive &EnableDrive) override;
+
+  virtual void SetPosition(const float &Position) override;
+
+  virtual void SetTargetPositionInROSUnit(const float &TargetPosition) override;
+
+  virtual void SetTargetVelocityInROSUnit(const float &TargetVelocity) override;
+
+  virtual void SetPositionInROSUnit(const float &Position) override;
+
+  virtual void SetTargetPosition(const float &TargetPosition) override;
+
+  virtual void SetTargetVelocity(const float &TargetVelocity) override;
+
+protected:
+  virtual const float GetPosition() const override;
+
+  virtual const float GetVelocity() const override;
 };

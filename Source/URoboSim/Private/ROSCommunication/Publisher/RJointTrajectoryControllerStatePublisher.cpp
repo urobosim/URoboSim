@@ -14,14 +14,14 @@ void URJointTrajectoryControllerStatePublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
     if (ControllerComponent)
     {
       JointController = Cast<URJointController>(ControllerComponent->GetController(TEXT("JointController")));
     }
     else
     {
-      UE_LOG(LogRJointTrajectoryControllerStatePublisher, Error, TEXT("Controllers not found in %s"), *GetName())
+      UE_LOG(LogRJointTrajectoryControllerStatePublisher, Error, TEXT("ControllerComponent not found in %s"), *GetName())
     }
   }
 }

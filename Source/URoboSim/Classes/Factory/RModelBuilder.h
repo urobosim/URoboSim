@@ -30,7 +30,7 @@ public:
 
   // Load model
   virtual void LoadSDF(USDFModel *&SDFModel);
-  virtual void LoadSDF(USDFModel *&SDFModel, const FVector &WorldPosition);
+  virtual void LoadSDF(USDFModel *&SDFModel, const FTransform &WorldPose);
 
 protected:
   UPROPERTY()
@@ -42,5 +42,4 @@ protected:
   virtual void SwapBaseLinkToFirstIndex(USDFModel *&SDFModel);
   virtual void LoadLinks(USDFModel *&SDFModel);
   virtual void LoadJoints(USDFModel *&SDFModel);
-  virtual void LockBaseLink();
 };

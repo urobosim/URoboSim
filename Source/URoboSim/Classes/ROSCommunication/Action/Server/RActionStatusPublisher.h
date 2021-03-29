@@ -15,7 +15,7 @@ public:
   URActionStatusPublisher();
 
 public:
-  virtual void Publish() override;
+  void Publish() override;
 
 protected:
   URController *Controller;

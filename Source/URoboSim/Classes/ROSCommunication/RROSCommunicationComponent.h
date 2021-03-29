@@ -9,20 +9,30 @@
 // clang-format on
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class UROBOSIM_API URROSCommunicationComponent : public URPluginComponent
+class UROBOSIM_API URROSCommunicationComponent final : public URPluginComponent
 {
   GENERATED_BODY()
 
 public:
+  URROSCommunicationComponent(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort);
+
   URROSCommunicationComponent();
 
-public:
-  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-
 protected:
-  virtual void BeginPlay() override;
-  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-  
+  void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+public:
+  void TickPlugin(const float &InDeltaTime) override;
+
+  void Init() override;
+
+public:
+  void AddPublisher(URPublisher *&InPublisher) { ROSCommunication.AddPublisher(InPublisher); }
+
+  void AddSubscriber(URSubscriber *&InSubscriber) { ROSCommunication.AddSubscriber(InSubscriber); }
+
+  void AddActionServer(URActionServer *&InActionServer) { ROSCommunication.AddActionServer(InActionServer); }
+
 protected:
   UPROPERTY(EditAnywhere)
   FRROSCommunicationContainer ROSCommunication;

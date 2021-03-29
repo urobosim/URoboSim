@@ -12,7 +12,7 @@ void URFJTACancelSubscriber::CreateSubscriber()
   }
   else
   {
-    UE_LOG(LogRFJTACancelSubscriber, Error, TEXT("Controllers not found in %s"), *GetName())
+    UE_LOG(LogRFJTACancelSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
   }
 }
 

@@ -15,14 +15,14 @@ void URFJTAFeedbackPublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
     if (ControllerComponent)
     {
       JointController = Cast<URJointController>(ControllerComponent->GetController(TEXT("JointController")));
     }
     else
     {
-      UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("Controllers not found in %s"), *GetName())
+      UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("ControllerComponent not found in %s"), *GetName())
     }
     GetJointsClient = NewObject<URGetJointsClient>();
     GetJointsClient->GetParamArgument.Name = JointParamPath;

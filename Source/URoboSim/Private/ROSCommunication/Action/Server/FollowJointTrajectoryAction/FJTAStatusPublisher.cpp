@@ -7,7 +7,7 @@ void URFJTAStatusPublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
     if (ControllerComponent)
     {
       Controller = ControllerComponent->GetController(TEXT("JointController"));

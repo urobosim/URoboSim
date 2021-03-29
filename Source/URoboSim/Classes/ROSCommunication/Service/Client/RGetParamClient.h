@@ -31,7 +31,7 @@ public:
   URGetParamClient();
 
 public:
-  virtual void CallService() override;
+  void CallService() override;
 
 protected:
   virtual void Init() override;
@@ -54,7 +54,7 @@ class FRGetParamClientCallback : public FROSBridgeSrvClient
 public:
   FRGetParamClientCallback(const FString &InServiceName, const FString &InServiceType, UObject *InController);
 
-  virtual void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
+  void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
 protected:
   virtual void Callback(){}

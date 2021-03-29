@@ -14,7 +14,7 @@ void URVelocityCommandSubscriber::Init()
 {
   if (GetOwner())
   {
-    ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
   }
 }
 
@@ -27,7 +27,7 @@ void URVelocityCommandSubscriber::CreateSubscriber()
   }
   else
   {
-    UE_LOG(LogRVelocityCommandSubscriber, Error, TEXT("Controllers not found in %s"), *GetName())
+    UE_LOG(LogRVelocityCommandSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
   }
 }
 

@@ -13,11 +13,11 @@ class UROBOSIM_API URPublisher : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic = TEXT(""));
+  void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic = TEXT(""));
 
-  virtual void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic = TEXT(""));
+  void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic = TEXT(""));
 
-  virtual void DeInit()
+  void DeInit()
   {
     if (Handler.IsValid())
     {
@@ -25,15 +25,19 @@ public:
     }
   }
 
-  virtual void Tick();
+  void Tick();
 
 public:
-  virtual ARModel *GetOwner() const { return Owner; }
+  ARModel *GetOwner() const { return Owner; }
 
   virtual void Publish() {}
 
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
 protected:
-  virtual void Init(UObject *InOwner, const FString &InTopic);
+  void Init(UObject *InOwner, const FString &InTopic);
 
   virtual void Init() {}
 
@@ -43,9 +47,6 @@ protected:
 
 protected:
   TSharedPtr<FROSBridgePublisher> Publisher;
-
-  UPROPERTY(EditAnywhere)
-  FString Topic;
 
   UPROPERTY()
   FString MessageType;

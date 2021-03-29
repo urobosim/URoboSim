@@ -1,5 +1,6 @@
 #include "Controller/ControllerType/RJointController.h"
 #include "Conversions.h"
+#include "Kismet/KismetMathLibrary.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRJointController, Log, All);
 
@@ -20,7 +21,6 @@ void URJointController::SetJointNames(const TArray<FString> &InNames)
   {
     TrajectoryStatusArray.Add(FTrajectoryStatus(InName));
   }
-  ActionDuration = 0.f;
   TrajectoryPointIndex = 0;
   DesiredTrajectory.Empty();
 }
@@ -86,7 +86,7 @@ void URJointController::SetMode()
   }
 }
 
-void URJointController::Tick(float DeltaTime)
+void URJointController::Tick(const float &InDeltaTime)
 {
   if (!GetOwner())
   {
@@ -97,23 +97,23 @@ void URJointController::Tick(float DeltaTime)
     switch (State)
     {
     case UJointControllerState::FollowJointTrajectory:
-      ActionDuration += DeltaTime;
+      ActionDuration = GetOwner()->GetGameTimeSinceCreation() - ActionStartTime;
       if (!CheckTrajectoryPoint())
       {
-        SetDesiredJointState(DeltaTime);
+        SetDesiredJointState();
       }
       else
       {
         if (!CheckTrajectoryGoalReached())
         {
-          SetDesiredJointState(DeltaTime);
+          SetDesiredJointState();
         }
       }
-      SetJointState(DeltaTime);
+      SetJointState();
       break;
 
     case UJointControllerState::Normal:
-      SetJointState(DeltaTime);
+      SetJointState();
       break;
 
     case UJointControllerState::Off:
@@ -122,7 +122,7 @@ void URJointController::Tick(float DeltaTime)
   }
 }
 
-void URJointController::SetJointState(float DeltaTime)
+void URJointController::SetJointState()
 {
   switch (Mode)
   {
@@ -186,7 +186,7 @@ bool URJointController::CheckTrajectoryPoint()
   }
 }
 
-void URJointController::SetDesiredJointState(float DeltaTime)
+void URJointController::SetDesiredJointState()
 {
   if (State == UJointControllerState::FollowJointTrajectory)
   {
@@ -238,7 +238,6 @@ bool URJointController::CheckTrajectoryGoalReached()
     GoalStatusList.Last().Status = 3;
     DesiredTrajectory.Empty();
     TrajectoryPointIndex = 0;
-    ActionDuration = 0.f;
     return true;
   }
   else
@@ -260,5 +259,6 @@ void URJointController::FollowJointTrajectory()
       LastTrajectoryPoints.JointStates.Add(TrajectoryStatus.JointName, Joint->GetJointStateInROSUnit());
     }
   }
+  ActionStartTime = GetOwner()->GetGameTimeSinceCreation();
   State = UJointControllerState::FollowJointTrajectory;
 }

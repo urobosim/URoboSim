@@ -14,7 +14,7 @@ void URFJTAResultPublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
     if (ControllerComponent)
     {
       JointController = Cast<URJointController>(ControllerComponent->GetController(TEXT("JointController")));

@@ -8,26 +8,27 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTAFeedbackPublisher : public URPublisher
+class UROBOSIM_API URFJTAFeedbackPublisher final : public URPublisher
 {
   GENERATED_BODY()
 
 public:
   URFJTAFeedbackPublisher();
 
-  virtual void Publish() override;
+  void Publish() override;
 
-protected:
-  virtual void Init() override;
-
-private:
-  URJointController *JointController;
-
-  URGetJointsClient *GetJointsClient;
-
+public:
   UPROPERTY(EditAnywhere)
   FString JointParamPath;
 
   UPROPERTY(EditAnywhere)
   FString FrameId;
+
+protected:
+  void Init() override;
+
+private:
+  URJointController *JointController;
+
+  URGetJointsClient *GetJointsClient;
 };

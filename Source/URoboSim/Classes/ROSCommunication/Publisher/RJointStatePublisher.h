@@ -7,7 +7,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URJointStatePublisher : public URPublisher
+class UROBOSIM_API URJointStatePublisher final : public URPublisher
 {
   GENERATED_BODY()
 
@@ -15,14 +15,14 @@ public:
   URJointStatePublisher();
 
 public:
-  virtual void Publish();
+  void Publish();
 
-protected:
-  virtual void Init() override;
-
-protected:
+public:
   UPROPERTY(EditAnywhere)
   FString FrameId;
+
+protected:
+  void Init() override;
 
 private:
   UPROPERTY()

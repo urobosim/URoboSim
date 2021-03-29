@@ -16,7 +16,7 @@ class UROBOSIM_API URLinkBuilder : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void SetWorldPosition(const FVector &InWorldPosition) { WorldPosition = InWorldPosition; }
+  virtual void SetWorldPose(const FTransform &InWorldPose) { WorldPose = InWorldPose; }
   virtual bool LoadSDF(USDFLink *&SDFLink);
 
 public:
@@ -36,5 +36,5 @@ protected:
   URLink *Link;
 
   UPROPERTY()
-  FVector WorldPosition;
+  FTransform WorldPose;
 };

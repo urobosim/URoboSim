@@ -9,7 +9,7 @@
 // clang-format on
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class UROBOSIM_API URControllerComponent : public URPluginComponent
+class UROBOSIM_API URControllerComponent final : public URPluginComponent
 {
   GENERATED_BODY()
 
@@ -17,19 +17,17 @@ public:
   URControllerComponent();
   
 public:
-  virtual void Init();
+  void TickPlugin(const float &InDeltaTime) override;
 
-  virtual void AddController(URController *Controller) { Controllers.Add(Controller); }
+  void Init() override;
 
-  virtual URController *GetController(const FString &ControllerName);
+  void AddController(URController *Controller) { Controllers.Add(Controller); }
 
-  virtual TArray<URController *> GetControllers() const { return Controllers; }
+  URController *GetController(const FString &ControllerName);
+
+  TArray<URController *> GetControllers() const { return Controllers; }
 
 protected:
-  // virtual URController *ControllerList(FString ControllerName);
-
-  // virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
-
   UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
   TArray<URController *> Controllers;
 };

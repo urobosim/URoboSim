@@ -2,7 +2,7 @@
 // Author: Michael Neumann
 
 #include "Physics/RModel.h"
-#include "Controller/RControllerComponent.h"
+#include "RPlugin.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
@@ -18,20 +18,13 @@ ARModel::ARModel()
 void ARModel::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
+  for (URPluginComponent *&Plugin : Plugins)
+  {
+    Plugin->TickPlugin(DeltaTime);
+  }
   for (URJoint *&Joint : Joints)
   {
     Joint->Tick(DeltaTime);
-  }
-  for (UActorComponent *&Plugin : Plugins)
-  {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin);
-    if (ControllerComponent)
-    {
-      for (URController *&Controller : ControllerComponent->GetControllers())
-      {
-        Controller->Tick(DeltaTime);
-      }
-    }
   }
 }
 
@@ -46,14 +39,6 @@ void ARModel::BeginPlay()
 void ARModel::Init()
 {
   UE_LOG(LogRModel, Log, TEXT("Model %s initializes with %i plugins"), *GetName(), Plugins.Num())
-  for (UActorComponent *&Plugin : Plugins)
-  {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin);
-    if (ControllerComponent)
-    {
-      ControllerComponent->Init();
-    }
-  }
   if (Links.Num() > 0)
   {
     Links[0]->SetEnableGravity(EnableGravity.bBase);
@@ -71,6 +56,10 @@ void ARModel::Init()
   {
     Link->SetSimulatePhysics(bSimulatePhysics);
     Link->Init();
+  }
+  for (URPluginComponent *&Plugin : Plugins)
+  {
+    Plugin->Init();
   }
 }
 
@@ -101,9 +90,9 @@ URLink *ARModel::GetBaseLink() const
   }
 }
 
-bool ARModel::AddPlugin(UActorComponent *InPlugin)
+bool ARModel::AddPlugin(URPluginComponent *InPlugin)
 {
-  UActorComponent *Plugin = GetPlugin(InPlugin->GetName());
+  URPluginComponent *Plugin = GetPlugin(InPlugin->GetName());
   if (Plugin)
   {
     UE_LOG(LogRModel, Warning, TEXT("Plugin %s was found in %s, replace..."), *InPlugin->GetName(), *GetName())
@@ -117,9 +106,9 @@ bool ARModel::AddPlugin(UActorComponent *InPlugin)
   }
 }
 
-UActorComponent *ARModel::GetPlugin(const FString &PluginName) const
+URPluginComponent *ARModel::GetPlugin(const FString &PluginName) const
 {
-  UActorComponent *const *PluginPtr = Plugins.FindByPredicate([&](UActorComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
+  URPluginComponent *const *PluginPtr = Plugins.FindByPredicate([&](URPluginComponent *Plugin) { return Plugin->GetName().Equals(PluginName); });
   if (PluginPtr)
   {
     return *PluginPtr;

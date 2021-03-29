@@ -12,7 +12,7 @@ void URGetJointsClient::Init()
 {
   if (GetOwner())
   {
-    ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("Controllers")));
+    ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
 
     if (ControllerComponent)
     {

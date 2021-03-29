@@ -21,24 +21,33 @@ struct FRROSCommunicationContainer
 public:
   FRROSCommunicationContainer();
 
-  virtual ~FRROSCommunicationContainer(){};
+  FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort);
+
+  ~FRROSCommunicationContainer(){};
 
 public:
-  virtual void Init();
+  void Init();
 
-  virtual void DeInit();
+  void DeInit();
   
-  virtual void Tick();
+  void Tick();
+
+public:
+  void AddPublisher(URPublisher *&InPublisher) { Publishers.Add(InPublisher); }
+
+  void AddSubscriber(URSubscriber *&InSubscriber) { Subscribers.Add(InSubscriber); }
+
+  void AddActionServer(URActionServer *&InActionServer) { ActionServers.Add(InActionServer); }
 
 public:
   UPROPERTY()
   URControllerComponent *ControllerComponent;
 
 protected:
-  virtual void InitPublishers();
-  virtual void InitSubscribers();
-  virtual void InitServiceClients();
-  virtual void InitActionServers();
+  void InitPublishers();
+  void InitSubscribers();
+  void InitServiceClients();
+  void InitActionServers();
 
 protected:
   TSharedPtr<FROSBridgeHandler> Handler;

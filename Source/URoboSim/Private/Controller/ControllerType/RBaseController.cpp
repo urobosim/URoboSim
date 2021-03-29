@@ -32,7 +32,7 @@ void URBaseController::MoveAngular(const float &InVelocity)
   AngularVelocity = InVelocity;
 }
 
-void URBaseController::Tick(float DeltaTime)
+void URBaseController::Tick(const float &DeltaTime)
 {
   if (BaseLink)
   {
@@ -42,7 +42,7 @@ void URBaseController::Tick(float DeltaTime)
   MoveAngularTick(DeltaTime);
 }
 
-void URBaseController::MoveLinearTick(float DeltaTime)
+void URBaseController::MoveLinearTick(const float &DeltaTime)
 {
   // Check if AngularVelocity is 0 to avoid division by 0
   if (FMath::Abs(AngularVelocity) > 1E-6f)
@@ -65,7 +65,7 @@ void URBaseController::MoveLinearTick(float DeltaTime)
   BaseLink->GetCollisionMeshes()[0]->SetPhysicsLinearVelocity((TargetPose.GetLocation() - BasePose.GetLocation()) / DeltaTime);
 }
 
-void URBaseController::MoveAngularTick(float DeltaTime)
+void URBaseController::MoveAngularTick(const float &DeltaTime)
 {
   FRotator DeltaRotation = UKismetMathLibrary::RotatorFromAxisAndAngle(BasePose.GetRotation().GetAxisZ(), AngularVelocity * DeltaTime);
   TargetPose.ConcatenateRotation(DeltaRotation.Quaternion());

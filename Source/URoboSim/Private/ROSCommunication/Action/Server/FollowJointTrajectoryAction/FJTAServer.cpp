@@ -14,3 +14,14 @@ URFJTAServer::URFJTAServer()
   GoalSubscriber = CreateDefaultSubobject<URFJTAGoalSubscriber>(TEXT("FJTAGoalSubscriber"));
   FeedbackPublisher = CreateDefaultSubobject<URFJTAFeedbackPublisher>(TEXT("FJTAFeedbackPublisher"));
 }
+
+void URFJTAServer::SetFrameId(const FString &InFrameId)
+{
+  Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->FrameId = InFrameId;
+  Cast<URFJTAResultPublisher>(ResultPublisher)->FrameId = InFrameId;
+}
+
+void URFJTAServer::SetJointParamPath(const FString &InJointParamPath)
+{
+  Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->JointParamPath = InJointParamPath;
+}

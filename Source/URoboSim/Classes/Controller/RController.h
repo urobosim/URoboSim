@@ -15,20 +15,20 @@ class UROBOSIM_API URController : public UObject
 
 public:
   // Called every frame
-  virtual void Tick(float DeltaTime){};
+  virtual void Tick(const float &InDeltaTime){};
 
   virtual void Init();
 
 public:
-  virtual void SetOwner(ARModel *InOwner) { Owner = InOwner; }
+  void SetOwner(ARModel *InOwner) { Owner = InOwner; }
 
   ARModel *GetOwner();
 
-  virtual void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
+  void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
 
-  virtual const FGoalStatusInfo GetGoalStatus() { return GoalStatusList.Last(); }
+  const FGoalStatusInfo GetGoalStatus() { return GoalStatusList.Last(); }
 
-  virtual const TArray<FGoalStatusInfo> GetGoalStatusList() { return GoalStatusList; }
+  const TArray<FGoalStatusInfo> GetGoalStatusList() { return GoalStatusList; }
 
 public:
   UPROPERTY()
@@ -45,17 +45,6 @@ protected:
 
   UPROPERTY()
   bool bActive;
-
-  // // float CheckAngleRange(float InAngle);
-
-  // UPROPERTY()
-  // float CummulatedError = 0;
-
-  // UPROPERTY(EditAnywhere)
-  // float HackOffset = 0;
-
-  // UPROPERTY()
-  // double ActionDuration;
 
 private:
   UPROPERTY()

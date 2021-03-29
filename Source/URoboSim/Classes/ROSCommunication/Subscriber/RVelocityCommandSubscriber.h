@@ -8,7 +8,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URVelocityCommandSubscriber : public URSubscriber
+class UROBOSIM_API URVelocityCommandSubscriber final : public URSubscriber
 {
   GENERATED_BODY()
 
@@ -16,17 +16,17 @@ public:
   URVelocityCommandSubscriber();
 
 public:
-  virtual void CreateSubscriber() override;
+  void CreateSubscriber() override;
 
 protected:
-  virtual void Init() override;
+  void Init() override;
 
 protected:
   UPROPERTY()
   URControllerComponent *ControllerComponent;
 };
 
-class UROBOSIM_API FRVelocityCommandSubscriberCallback : public FROSBridgeSubscriber
+class UROBOSIM_API FRVelocityCommandSubscriberCallback final : public FROSBridgeSubscriber
 {
 public:
   FRVelocityCommandSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController);

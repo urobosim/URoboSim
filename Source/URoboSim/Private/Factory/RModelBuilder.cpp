@@ -6,7 +6,6 @@ DEFINE_LOG_CATEGORY_STATIC(LogRModelBuilder, Log, All);
 URModelBuilder::URModelBuilder()
 {
   LinkBuilder = CreateDefaultSubobject<URLinkBuilder>(TEXT("LinkBuilder"));
-  JointBuilder = CreateDefaultSubobject<URJointBuilder>(TEXT("JointBuilder"));
 }
 
 // Load model
@@ -17,13 +16,12 @@ void URModelBuilder::LoadSDF(USDFModel *&SDFModel)
     SwapBaseLinkToFirstIndex(SDFModel);
     LoadLinks(SDFModel);
     LoadJoints(SDFModel);
-    LockBaseLink();
   }
 }
 
-void URModelBuilder::LoadSDF(USDFModel *&SDFModel, const FVector &WorldPosition)
+void URModelBuilder::LoadSDF(USDFModel *&SDFModel, const FTransform &WorldPose)
 {
-  LinkBuilder->SetWorldPosition(WorldPosition);
+  LinkBuilder->SetWorldPose(WorldPose);
   LoadSDF(SDFModel);
 }
 
@@ -69,18 +67,30 @@ void URModelBuilder::LoadLinks(USDFModel *&SDFModel)
 // Load joints
 void URModelBuilder::LoadJoints(USDFModel *&SDFModel)
 {
-  JointBuilder->Model = Model;
+  
   for (USDFJoint *&SDFJoint : SDFModel->Joints)
   {
+    if (SDFJoint->Type.Equals("continuous"))
+    {
+      JointBuilder = NewObject<URContinuousJointBuilder>(this, TEXT("ContinousJointBuilder"));
+    }
+    else if (SDFJoint->Type.Equals("revolute"))
+    {
+      JointBuilder = NewObject<URRevoluteJointBuilder>(this, TEXT("RevoluteJointBuilder"));
+    }
+    else if (SDFJoint->Type.Equals("prismatic"))
+    {
+      JointBuilder = NewObject<URPrismaticJointBuilder>(this, TEXT("PrismaticJointBuilder"));
+    }
+    else
+    {
+      UE_LOG(LogRModelBuilder, Error, TEXT("Type %s of Joint %s not implemented"), *SDFJoint->Type, *SDFJoint->GetName())
+      return;
+    }
+    JointBuilder->Model = Model;
     if (!JointBuilder->LoadSDF(SDFJoint))
     {
       UE_LOG(LogRModelBuilder, Error, TEXT("Creation of Joint %s failed"), *SDFJoint->GetName());
     }
   }
-}
-
-// Lock base link
-void URModelBuilder::LockBaseLink()
-{
-  Model->GetLinks()[0]->GetCollisionMeshes()[0]->SetConstraintMode(EDOFMode::XYPlane);
 }
