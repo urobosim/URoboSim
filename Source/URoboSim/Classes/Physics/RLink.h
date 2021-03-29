@@ -33,8 +33,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<class URStaticMeshComponent*> Collisions;
 
-	virtual void SetPose(FTransform InPose);
-	virtual void SetPose(FVector InLocation, FQuat InRotation);
+	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
+	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
 	virtual void DisableCollision();
 	virtual void EnableCollision();
@@ -51,8 +51,8 @@ public:
 	virtual void UpdateVelocity(float InDeltaTime);
 	// virtual void SetNextVelocities();
 
-	UPROPERTY(EditAnywhere)
-	FTransform Pose;
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent *PoseComponent;
 
         UPROPERTY()
         bool bAttachedToParent = false;
