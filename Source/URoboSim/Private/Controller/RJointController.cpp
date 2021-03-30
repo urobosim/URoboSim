@@ -290,10 +290,6 @@ void URJointController::Init()
     }
   else
     {
-      for(auto &Joint : GetOwner()->Joints)
-      {
-        DesiredJointState.Add(Joint.Key, 0.f);
-      }
       SwitchMode(Mode, true);
       for(auto & Link: GetOwner()->Links)
         {
