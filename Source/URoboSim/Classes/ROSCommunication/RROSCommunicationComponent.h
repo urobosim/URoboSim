@@ -22,7 +22,7 @@ protected:
   void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-  void TickPlugin(const float &InDeltaTime) override;
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
   void Init() override;
 

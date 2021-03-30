@@ -14,7 +14,7 @@ URROSCommunicationComponent::URROSCommunicationComponent()
   PrimaryComponentTick.TickGroup = TG_PrePhysics;
 }
 
-void URROSCommunicationComponent::TickPlugin(const float &InDeltaTime)
+void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
   ROSCommunication.Tick();
 }

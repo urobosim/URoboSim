@@ -17,11 +17,11 @@ void URControllerComponent::Init()
   }
 }
 
-void URControllerComponent::TickPlugin(const float &InDeltaTime)
+void URControllerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
   for (URController *&Controller : Controllers)
   {
-    Controller->Tick(InDeltaTime);
+    Controller->Tick(DeltaTime);
   }
 }
 

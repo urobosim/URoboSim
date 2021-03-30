@@ -17,7 +17,7 @@ public:
   URControllerComponent();
   
 public:
-  void TickPlugin(const float &InDeltaTime) override;
+  void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
   void Init() override;
 

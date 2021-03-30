@@ -17,8 +17,6 @@ public:
 	virtual void OnComponentCreated() override;
 
 public:
-	virtual void TickPlugin(const float &InDeltaTime) {}
-
 	virtual void Init() {}
 
 	virtual ARModel *GetOwner() const;

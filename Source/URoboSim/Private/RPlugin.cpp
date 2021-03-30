@@ -19,6 +19,7 @@ void URPluginComponent::RegisterPlugin()
 {
 	if (GetOwner())
 	{
+		RegisterComponent();
 		GetOwner()->AddPlugin(this);
 		UE_LOG(LogRPlugin, Log, TEXT("%s is attached to %s"), *GetName(), *GetOwner()->GetName())
 	}

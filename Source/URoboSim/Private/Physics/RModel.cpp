@@ -18,10 +18,6 @@ ARModel::ARModel()
 void ARModel::Tick(float DeltaTime)
 {
   Super::Tick(DeltaTime);
-  for (URPluginComponent *&Plugin : Plugins)
-  {
-    Plugin->TickPlugin(DeltaTime);
-  }
   for (URJoint *&Joint : Joints)
   {
     Joint->Tick(DeltaTime);
