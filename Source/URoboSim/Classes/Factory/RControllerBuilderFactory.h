@@ -49,6 +49,18 @@ class UROBOSIM_API URGripperControllerBuilder : public URControllerBuilder
 };
 
 UCLASS()
+class UROBOSIM_API URJointControllerBuilder : public URControllerBuilder
+{
+  GENERATED_BODY()
+
+public:
+
+protected:
+
+  virtual URController* CreateController(UObject* InOwner) override;
+};
+
+UCLASS()
 class UROBOSIM_API URControllerBuilderFactory : public UObject
 {
   GENERATED_BODY()
