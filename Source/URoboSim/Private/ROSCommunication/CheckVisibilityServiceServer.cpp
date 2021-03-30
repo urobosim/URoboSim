@@ -8,27 +8,20 @@
 
 TSharedPtr<FROSBridgeSrv::SrvRequest> FROSCheckVisebilityServer::FromJson(TSharedPtr<FJsonObject> JsonObject) const
 {
-	TSharedPtr<urobosim_msgs::CheckVisibility::Request> Request =
-          MakeShareable(new urobosim_msgs::CheckVisibility::Request());
+	TSharedPtr<urobosim_msgs::CheckVisibilitySrv::Request> Request =
+          MakeShareable(new urobosim_msgs::CheckVisibilitySrv::Request());
 	Request->FromJson(JsonObject);
 	return TSharedPtr<FROSBridgeSrv::SrvRequest>(Request);
 }
 
 TSharedPtr<FROSBridgeSrv::SrvResponse> FROSCheckVisebilityServer::Callback(TSharedPtr<FROSBridgeSrv::SrvRequest> Request)
 {
-  TSharedPtr<urobosim_msgs::CheckVisibility::Request> CheckVisibilityRequest =
-    StaticCastSharedPtr<urobosim_msgs::CheckVisibility::Request>(Request);
+  TSharedPtr<urobosim_msgs::CheckVisibilitySrv::Request> CheckVisibilityRequest =
+    StaticCastSharedPtr<urobosim_msgs::CheckVisibilitySrv::Request>(Request);
 
 
         FString ObjectName = CheckVisibilityRequest->GetObjectName();
-        FVector BasePosition = CheckVisibilityRequest->GetBasePose().GetPosition().GetVector();
-        FQuat BaseOrientation = CheckVisibilityRequest->GetBasePose().GetOrientation().GetQuat();
-        FVector LookAtPosition = CheckVisibilityRequest->GetLookAtPosition().GetVector();
-        // TArray<FString> Names = CheckVisibilityRequest->GetRobotPoses().GetJointNames();
-
-
-
-        bool ServiceSuccess = true;
+        bool ServiceSuccess = false;
         if(!World)
           {
             UE_LOG(LogTemp, Error, TEXT("World not found"));
@@ -42,17 +35,19 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FROSCheckVisebilityServer::Callback(TShar
               TActorIterator< AStaticMeshActor >(World);
               while(ActorItr)
                 {
-                  UE_LOG(LogTemp, Error, TEXT("Name %s"), *ActorItr->GetName());
                   if(ActorItr->GetName().Equals(ObjectName))
                     {
-                      //Move robot to target position
-                      BaseController->SetLocationAndRotation(FConversions::ROSToU(BasePosition),
-                                                     FConversions::ROSToU(BaseOrientation).Rotator());
-                      //Move robot into target configuration
-
-                      //Look at target location
-
-
+                      APlayerController* PlayerController = UGameplayStatics::GetPlayerController(World, PlayerIndex);
+                      FVector2D ScreenPosition;
+                      ActorItr->GetStaticMeshComponent()->SetCastShadow(false);
+                      bool ProjectionSuccess = PlayerController->ProjectWorldLocationToScreen(ActorItr->GetActorLocation(), ScreenPosition);
+                      bool RenderSuccess = ActorItr->WasRecentlyRendered(0.1);
+                      ActorItr->GetStaticMeshComponent()->SetCastShadow(true);
+                      if(RenderSuccess && ProjectionSuccess)
+                        {
+                          ServiceSuccess = true;
+                        }
+                      break;
                     }
                   ++ActorItr;
                 }
@@ -60,13 +55,8 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FROSCheckVisebilityServer::Callback(TShar
 
             //wait code above to complete
             FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);
-
-            //Was target rendered
-            // FTimerHandle MyTimerHandle;
-            // Owner->GetWorldTimerManager().SetTimer(MyTimerHandle, JointController, &URJointController::FollowTrajectory, ActionTimeDiff, false);
-
           }
 
 	return MakeShareable<FROSBridgeSrv::SrvResponse>
-		(new urobosim_msgs::CheckVisibility::Response(ServiceSuccess));
+		(new urobosim_msgs::CheckVisibilitySrv::Response(ServiceSuccess));
 }

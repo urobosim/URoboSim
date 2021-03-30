@@ -5,6 +5,8 @@
 #include "Physics/RModel.h"
 #include "ROSBridgeSrvServer.h"
 #include "ROSBridgeHandler.h"
+#include "RGBDCamera.h"
+#include "Controller/RControllerComponent.h"
 #include "srv/CheckVisibility.h"
 
 
@@ -18,16 +20,33 @@ protected:
 
   UWorld* World;
   ARModel* Owner;
+  int32 PlayerIndex;
   FThreadSafeBool bAllSuccessfull;
 private:
 
 public:
 
-  FROSCheckVisebilityServer(FString Namespace, FString Name, UWorld* InWorld, UObject* InOwner) :
-		FROSBridgeSrvServer(Namespace + TEXT("/") + Name, TEXT("urobosim_msgs/CheckVisibility"))
+  FROSCheckVisebilityServer(FString Name, FString Type, UWorld* InWorld, UObject* InOwner) :
+		FROSBridgeSrvServer(Name, Type)
 	{
           World = InWorld;
           Owner = Cast<ARModel>(InOwner);
+          if(Owner)
+            {
+              URControllerComponent* ControllerComp = Cast<URControllerComponent>(Owner->Plugins["ControllerComponent"]);
+              if(ControllerComp)
+                {
+                  URCameraController* CameraController = Cast<URCameraController>(ControllerComp->ControllerList("CameraController"));
+                  if(CameraController)
+                    {
+                      ARGBDCamera* Camera = CameraController->Camera;
+                      if(Camera)
+                        {
+                          PlayerIndex = Camera->GetAutoActivatePlayerIndex();
+                        }
+                    }
+                }
+            }
 	}
 
 

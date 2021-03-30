@@ -4,11 +4,11 @@
 
 namespace urobosim_msgs
 {
-	class CheckVisibility : public FROSBridgeSrv
+	class CheckVisibilitySrv : public FROSBridgeSrv
 	{
 
    public:
-	   CheckVisibility()
+	   CheckVisibilitySrv()
 	   {
 		   SrvType = TEXT("urobosim_msgs/check_visibility");
 	   }
@@ -17,16 +17,17 @@ namespace urobosim_msgs
 		{
 	   private:
                    FString ObjectName;
-                   geometry_msgs::Point LookAtPosition;
-                   geometry_msgs::Pose BasePose;
-                   TArray<trajectory_msgs::JointTrajectoryPoint> RobotPoses;
+                   // geometry_msgs::Point LookAtPosition;
+                   // geometry_msgs::Pose BasePose;
+                   // TArray<trajectory_msgs::JointTrajectoryPoint> RobotPoses;
            public:
 		   Request(){};
-                  Request(const FString& InObjectName, const geometry_msgs::Point& InLookAtPosition,
-                          const geometry_msgs::Point& InBasePose, TArray<trajectory_msgs::JointTrajectoryPoint> InRobotPoses) : ObjectName(InObjectName),
-                                                                                                                                LookAtPosition(InLookAtPosition),
-                                                                                                                                BasePose(InBasePose),
-                                                                                                                                RobotPoses(InRobotPoses){};
+                  // Request(const FString& InObjectName, const geometry_msgs::Point& InLookAtPosition,
+                  //         const geometry_msgs::Point& InBasePose, TArray<trajectory_msgs::JointTrajectoryPoint> InRobotPoses) : ObjectName(InObjectName),
+                  //                                                                                                               LookAtPosition(InLookAtPosition),
+                  //                                                                                                               BasePose(InBasePose),
+                  //                                                                                                               RobotPoses(InRobotPoses){};
+                  Request(const FString& InObjectName) : ObjectName(InObjectName){};
 
 		   FString GetObjectName()
 		   {
@@ -38,44 +39,44 @@ namespace urobosim_msgs
 			   ObjectName= InName;
 		   }
 
-		   geometry_msgs::Pose GetBasePose()
-		   {
-			   return BasePose;
-		   }
+		  //  geometry_msgs::Pose GetBasePose()
+		  //  {
+		  //          return BasePose;
+		  //  }
 
-		   void SetBasePose(const geometry_msgs::Pose& InBasePose)
-		   {
-			   BasePose = InBasePose;
-		   }
+		  //  void SetBasePose(const geometry_msgs::Pose& InBasePose)
+		  //  {
+		  //          BasePose = InBasePose;
+		  //  }
 
-		   geometry_msgs::Point GetLookAtPosition()
-		   {
-			   return BasePose;
-		   }
+		  //  geometry_msgs::Point GetLookAtPosition()
+		  //  {
+		  //          return BasePose;
+		  //  }
 
-		   void SetLookAtPosition(const geometry_msgs::Point& InLookAtPosition)
-		   {
-			   LookAtPosition = InLookAtPosition;
-		   }
+		  //  void SetLookAtPosition(const geometry_msgs::Point& InLookAtPosition)
+		  //  {
+		  //          LookAtPosition = InLookAtPosition;
+		  //  }
 
-                  TArray<trajectory_msgs::JointTrajectoryPoint> GetRobotPoses() const
-                  {
-                    return RobotPoses;
-                  }
+                  // TArray<trajectory_msgs::JointTrajectoryPoint> GetRobotPoses() const
+                  // {
+                  //   return RobotPoses;
+                  // }
 
 
                   virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
                   {
 
                     ObjectName = JsonObject->GetStringField("object_name");
-                    BasePose = geometry_msgs::Pose::GetFromJson(JsonObject->GetObjectField(TEXT("base_pose")));
-                    LookAtPosition = geometry_msgs::Point::GetFromJson(JsonObject->GetObjectField(TEXT("look_at_position")));
+                    // BasePose = geometry_msgs::Pose::GetFromJson(JsonObject->GetObjectField(TEXT("base_pose")));
+                    // LookAtPosition = geometry_msgs::Point::GetFromJson(JsonObject->GetObjectField(TEXT("look_at_position")));
 
-                    TArray<TSharedPtr<FJsonValue>> ValuesPtrArr;
-                    RobotPoses.Empty();
-                    ValuesPtrArr = JsonObject->GetArrayField(TEXT("robot_poses"));
-                    for (auto &ptr : ValuesPtrArr)
-                      RobotPoses.Add(trajectory_msgs::JointTrajectoryPoint::GetFromJson(ptr->AsObject()));
+                    // TArray<TSharedPtr<FJsonValue>> ValuesPtrArr;
+                    // RobotPoses.Empty();
+                    // ValuesPtrArr = JsonObject->GetArrayField(TEXT("robot_poses"));
+                    // for (auto &ptr : ValuesPtrArr)
+                    //   RobotPoses.Add(trajectory_msgs::JointTrajectoryPoint::GetFromJson(ptr->AsObject()));
                   }
 
                   static Request GetFromJson(TSharedPtr<FJsonObject> JsonObject)
@@ -95,13 +96,13 @@ namespace urobosim_msgs
                     TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
                     Object->SetStringField(TEXT("object_name"), ObjectName);
-                    Object->SetObjectField(TEXT("base_pose"), BasePose.ToJsonObject());
-                    Object->SetObjectField(TEXT("look_at_position"), LookAtPosition.ToJsonObject());
+                    // Object->SetObjectField(TEXT("base_pose"), BasePose.ToJsonObject());
+                    // Object->SetObjectField(TEXT("look_at_position"), LookAtPosition.ToJsonObject());
 
-                    TArray<TSharedPtr<FJsonValue>> PointsArray;
-                    for (auto &val : RobotPoses)
-                      PointsArray.Add(MakeShareable(new FJsonValueObject(val.ToJsonObject())));
-                    Object->SetArrayField(TEXT("robot_poses"), PointsArray);
+                    // TArray<TSharedPtr<FJsonValue>> PointsArray;
+                    // for (auto &val : RobotPoses)
+                    //   PointsArray.Add(MakeShareable(new FJsonValueObject(val.ToJsonObject())));
+                    // Object->SetArrayField(TEXT("robot_poses"), PointsArray);
 
                     return Object;
                   }

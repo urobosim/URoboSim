@@ -1,33 +1,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
-#include "Components/SceneComponent.h"
-#include "ROSBridgeHandler.h"
-#include "ROSBridgeSrvServer.h"
+#include "Physics/RModel.h"
+#include "ROSCommunication/RROSService.h"
 #include "CheckVisibilityService.generated.h"
 
 UCLASS()
-class UROBOSIM_API UCheckVisibilityService : public UObject
+class UROBOSIM_API UCheckVisibilityService : public URROSService
 {
     GENERATED_BODY()
 
-public:
-    virtual void Init();
+protected:
 
-    UCheckVisibilityService()
-      {
-        WebsocketIPAddr = TEXT("127.0.0.1");
-	WebsocketPort = 9090;
-      };
-    TSharedPtr<FROSBridgeHandler> Handler;
+    virtual void SetOwner(UObject* InOwner) override;
+    virtual void SetType() override;
+    virtual void CreateServiceServer() override;
 
-    TSharedPtr<FROSBridgeSrvServer> Server;
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-    FString WebsocketIPAddr;
-
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-    uint32 WebsocketPort;
+    UPROPERTY()
+      ARModel* Owner;
 
 };
