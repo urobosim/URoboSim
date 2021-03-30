@@ -20,6 +20,7 @@ public:
 
 
   virtual void Build();
+  virtual void ConfigureController(){};
 
 protected:
 
@@ -42,6 +43,59 @@ class UROBOSIM_API URGripperControllerBuilder : public URControllerBuilder
   GENERATED_BODY()
 
   public:
+  virtual void ConfigureController() override;
+
+  protected:
+
+  virtual URController* CreateController(UObject* InOwner) override;
+};
+
+UCLASS()
+class UROBOSIM_API URBaseControllerBuilder : public URControllerBuilder
+{
+  GENERATED_BODY()
+
+  public:
+  virtual void ConfigureController() override;
+
+  protected:
+
+  virtual URController* CreateController(UObject* InOwner) override;
+};
+
+UCLASS()
+class UROBOSIM_API URJointControllerBuilder : public URControllerBuilder
+{
+  GENERATED_BODY()
+
+  public:
+  virtual void ConfigureController() override;
+
+  protected:
+
+  virtual URController* CreateController(UObject* InOwner) override;
+};
+
+UCLASS()
+class UROBOSIM_API URHeadControllerBuilder : public URControllerBuilder
+{
+  GENERATED_BODY()
+
+  public:
+  virtual void ConfigureController() override;
+
+  protected:
+
+  virtual URController* CreateController(UObject* InOwner) override;
+};
+
+UCLASS()
+class UROBOSIM_API URCameraControllerBuilder : public URControllerBuilder
+{
+  GENERATED_BODY()
+
+  public:
+  virtual void ConfigureController() override;
 
   protected:
 

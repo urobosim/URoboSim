@@ -34,7 +34,7 @@ void FRROSComunicationContainer::InitAllServiceProvider()
 {
   for(auto& ServiceProvider : ServiceProviderList)
     {
-      ServiceProvider.Value->Init(ControllerComponent, Handler, ServiceProvider.Key);
+      ServiceProvider.Value->Init(ControllerComponent->GetOwner(), Handler, ServiceProvider.Key);
     }
 }
 

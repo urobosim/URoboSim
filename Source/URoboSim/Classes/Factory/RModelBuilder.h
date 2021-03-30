@@ -52,7 +52,7 @@ protected:
   void LoadJoints();
   void BuildKinematicTree();
   void SetConstraintPosition(URJoint* InJoint);
-  void RotateConstraintToRefAxis(URJoint* Joint);
+
   void AddJoint(URJoint* Joint);
   void AddLink(URLink* Link);
 };

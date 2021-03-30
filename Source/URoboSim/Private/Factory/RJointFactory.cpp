@@ -104,6 +104,46 @@ void URJointBuilder::SetJointLimit()
   Joint->Constraint->Lower = JointDescription->Axis->Lower;
 }
 
+void URJointBuilder::RotateConstraintToRefAxis()
+{
+  FVector CurrentRefAxis;
+  FVector RefAxisInJointFrame;
+  FQuat Rotation;
+
+  if(JointDescription->Axis->bUseParentModelFrame)
+    {
+      Rotation = Joint->Constraint->GetComponentQuat();
+      RefAxisInJointFrame = Rotation.Inverse().RotateVector(Joint->Constraint->RefAxis);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("model frame not used"));
+      RefAxisInJointFrame = Joint->Constraint->RefAxis;
+    }
+
+  RefAxisInJointFrame /= RefAxisInJointFrame.Size();
+
+  if(RefAxisInJointFrame[0] == 1 || RefAxisInJointFrame[1] == 1 || RefAxisInJointFrame[2]==1)
+    {
+      Joint->Constraint->RefAxis = RefAxisInJointFrame;
+    }
+  else
+    {
+      if(JointDescription->Axis->bUseParentModelFrame)
+        {
+          CurrentRefAxis = Joint->Constraint->GetComponentQuat().GetAxisZ();
+          FQuat BetweenQuat = FQuat::FindBetweenVectors(CurrentRefAxis, Joint->Constraint->RefAxis);
+          Joint->Constraint->AddLocalRotation(BetweenQuat);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Usage of JointFrame for axis not implemented"));
+        }
+
+      Joint->Constraint->RefAxis = FVector(0.0f, 0.0f, 1.0f);
+    }
+}
+
 float URJointBuilder::CalculateRotationOffset()
 {
   Joint->Constraint->RotationOffset = 0.5 * (JointDescription->Axis->Upper + JointDescription->Axis->Lower);
@@ -118,18 +158,20 @@ void URContiniousJointBuilder::SetAxis()
 {
   Super::SetAxis();
 
+  RotateConstraintToRefAxis();
+
   // Joint->Constraint->SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
   // Joint->Constraint->SetAngularDriveParams(190000.0f, 100.0f, 900000.0f);
 
-  if (Joint->Constraint->RefAxis.Equals(FVector::ForwardVector))
+  if (Joint->Constraint->RefAxis[0]== 1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
     }
-  else if (Joint->Constraint->RefAxis.Equals(FVector::RightVector))
+  else if (Joint->Constraint->RefAxis[1]== 1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
-  else
+  else if (Joint->Constraint->RefAxis[2]==1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 0);
     }
@@ -154,12 +196,12 @@ void URRevoluteJointBuilder::SetAxis()
   CalculateRotationOffset();
 
   // RefAxis = RefAxis;
-  if (Joint->Constraint->RefAxis.Equals(FVector::ForwardVector))
+  if (Joint->Constraint->RefAxis[0] == 1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularTwistLimit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
       Joint->Constraint->ConstraintInstance.AngularRotationOffset.Roll =  FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
     }
-  else if (Joint->Constraint->RefAxis.Equals(FVector::RightVector))
+  else if (Joint->Constraint->RefAxis[1] == 1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
       Joint->Constraint->ConstraintInstance.AngularRotationOffset.Pitch = FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
@@ -190,7 +232,6 @@ void URRevoluteJointBuilder::CreateConstraint()
 void URPrismaticJointBuilder::SetAxis()
 {
   Super::SetAxis();
-  
   Joint->Constraint->Limit  =  0;
   ELinearConstraintMotion LinearConstraintMotion = ELinearConstraintMotion::LCM_Free;
   float UpperUUnits = JointDescription->Axis->Upper * 100;
@@ -198,23 +239,23 @@ void URPrismaticJointBuilder::SetAxis()
 
   if(FMath::Abs(UpperUUnits) < 10000 && FMath::Abs(LowerUUnits) < 10000)
     {
-      Joint->Constraint->Limit  = FMath::Abs(UpperUUnits) > FMath::Abs(LowerUUnits) ? FMath::Abs(UpperUUnits) : FMath::Abs(LowerUUnits);
+      Joint->Constraint->Limit  =  0.5*FMath::Abs(UpperUUnits - LowerUUnits) ;
       LinearConstraintMotion = ELinearConstraintMotion::LCM_Limited;
 
       Joint->Constraint->Offset = 0.5*(UpperUUnits + LowerUUnits) * JointDescription->Axis->Xyz;
     }
 
-  if (Joint->Constraint->RefAxis.Equals(FVector::ForwardVector))
+  if (FMath::Abs(JointDescription->Axis->Xyz[0])== 1)
     {
       Joint->Constraint->ConstraintInstance.SetLinearXLimit(LinearConstraintMotion, Joint->Constraint->Limit);
     }
 
-  else if (Joint->Constraint->RefAxis.Equals(FVector::RightVector))
+  else if (FMath::Abs(JointDescription->Axis->Xyz[1])== 1)
     {
       Joint->Constraint->ConstraintInstance.SetLinearYLimit(LinearConstraintMotion, Joint->Constraint->Limit);
     }
 
-  else
+  else if (FMath::Abs(JointDescription->Axis->Xyz[2])== 1)
     {
       Joint->Constraint->ConstraintInstance.SetLinearZLimit(LinearConstraintMotion, Joint->Constraint->Limit);
     }

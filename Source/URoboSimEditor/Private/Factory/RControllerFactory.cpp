@@ -26,7 +26,6 @@ AActor* URControllerFactory::GetDefaultActor(const FAssetData & AssetData)
 
 AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
 {
-
   if(bDrag)
     {
       URControllerDataAsset* ControllerAsset = CastChecked<URControllerDataAsset>(Asset);
@@ -55,6 +54,7 @@ AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const F
                   UE_LOG(LogTemp, Error, TEXT("Create Builder"));
                   URControllerBuilder* ControllerBuilder = ControllerFacotry->CreateBuilder(TargetModel, Configuration);
                   ControllerBuilder->Build();
+                  ControllerBuilder->ConfigureController();
                 }
 
             }
