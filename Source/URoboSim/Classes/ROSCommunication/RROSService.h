@@ -5,7 +5,7 @@
 #include "ROSBridgeSrvServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
 #include "ROSCommunication/RROSServiceServer.h"
-#include "Controller/RController.h"
+#include "Controller/RControllerComponent.h"
 #include "RROSService.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
