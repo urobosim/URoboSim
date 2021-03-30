@@ -27,9 +27,10 @@ void URControllerBuilder::Build()
 {
   for(auto& Model : Models)
     {
-      URControllerComponent* ControllerComponent = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
-      if(ControllerComponent)
+      
+      if(Model->Plugins.Contains(TEXT("ControllerComponent")))
         {
+          URControllerComponent* ControllerComponent = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
           ControllerComponents.Add(ControllerComponent);
           UE_LOG(LogTemp, Error, TEXT("Controller Comp found"));
         }
@@ -37,10 +38,11 @@ void URControllerBuilder::Build()
         {
           // ControllerComponent = NewObject<URControllerComponent*>(Model);
           UE_LOG(LogTemp, Error, TEXT("Create Controller Comp"));
-          ControllerComponent = Cast<URControllerComponent>(Model->AddComponent(FName(*URControllerComponent::StaticClass()->GetName()), true, FTransform(), nullptr));
+          UActorComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
+          Model->Plugins.Add(TEXT("ControllerComponent"), ControllerComponent);
           if(ControllerComponent)
             {
-              ControllerComponents.Add(ControllerComponent);
+              ControllerComponents.Add(Cast<URControllerComponent>(ControllerComponent));
             }
           else
             {
@@ -55,6 +57,7 @@ void URControllerBuilder::Build()
       UE_LOG(LogTemp, Error, TEXT("Create Controller"));
       URController* Controller = CreateController(ControllerComp);
       ControllerComp->Controller.ControllerList.Add(ControllerConfiguration->ControllerName, Controller);
+      ControllerComp->Init();
     }
 }
 
@@ -143,6 +146,12 @@ void URControllerBuilderFactory::CreateBuilder()
   if(ControllerConfiguration->ControllerType == URGripperController::StaticClass())
     {
       ControllerBuilder = NewObject<URGripperControllerBuilder>(this);
+      return;
+    }
+
+  if(ControllerConfiguration->ControllerType == URJointController::StaticClass())
+    {
+      ControllerBuilder = NewObject<URJointControllerBuilder>(this);
       return;
     }
 }
