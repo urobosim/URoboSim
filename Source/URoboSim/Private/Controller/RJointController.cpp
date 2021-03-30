@@ -220,7 +220,7 @@ void URJointController::Tick(float InDeltaTime)
               UpdateDesiredJointAngle(InDeltaTime);
             }
         }
-      CallculateJointVelocities(InDeltaTime);
+      // CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
       break;
 
@@ -290,6 +290,10 @@ void URJointController::Init()
     }
   else
     {
+      for(auto &Joint : GetOwner()->Joints)
+      {
+        DesiredJointState.Add(Joint.Key, 0.f);
+      }
       SwitchMode(Mode, true);
       for(auto & Link: GetOwner()->Links)
         {
@@ -312,6 +316,7 @@ void URJointController::Init()
       //         Joint.Value->Constraint->JointAccuracy = PrismaticAccuracy;
       //       }
         // }
+      
     }
 }
 
@@ -340,7 +345,6 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
     {
       return;
     }
-
   bool bEnablePhysics;
   switch(Mode)
     {
@@ -350,7 +354,6 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 
     case UJointControllerMode::Dynamic:
       bEnablePhysics = true;
-
       EnableMotor(true);
       break;
 

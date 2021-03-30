@@ -28,6 +28,12 @@ void URControllerComponent::BeginPlay()
 {
   Super::BeginPlay();
 
+  Init();
+}
+
+void URControllerComponent::Init()
+{
+  RegisterComponent(); // Remove this will cause the TickComponent not fire in Play
   if(!GetOwner())
     {
       UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
@@ -41,6 +47,7 @@ void URControllerComponent::BeginPlay()
         }
     }
 }
+
 
 void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
 {

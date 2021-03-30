@@ -14,6 +14,8 @@ public:
 	URControllerComponent();
 	~URControllerComponent();
 
+	virtual void Init();
+
 	virtual URController* ControllerList(FString ControllerName);
 
 	virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
