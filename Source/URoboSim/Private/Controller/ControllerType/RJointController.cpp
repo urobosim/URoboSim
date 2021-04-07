@@ -77,6 +77,13 @@ void URJointController::SetMode()
           Link->DisableCollision();
         }
       }
+      else
+      {
+        for (URLink *&Link : GetOwner()->GetLinks())
+        {
+          Link->EnableCollision();
+        }
+      }
       break;
     }
     for (URJoint *&Joint : GetOwner()->GetJoints())

@@ -41,6 +41,8 @@ public:
 
 	virtual void DisableCollision();
 
+	virtual void EnableCollision();
+
 protected:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent *PoseComponent;

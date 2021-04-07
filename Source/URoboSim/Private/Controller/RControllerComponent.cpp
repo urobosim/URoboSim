@@ -11,7 +11,7 @@ URControllerComponent::URControllerComponent()
 void URControllerComponent::Init()
 {
   for (URController *&Controller : Controllers)
-  {
+  {   
     Controller->SetOwner(GetOwner());
     Controller->Init();
   }

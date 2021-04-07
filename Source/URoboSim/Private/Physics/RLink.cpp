@@ -67,3 +67,16 @@ void URLink::DisableCollision()
     UE_LOG(LogRLink, Error, TEXT("Link %s doesn't have any collision meshes, DisableCollision failed"), *GetName())
   }
 }
+
+void URLink::EnableCollision()
+{
+  if (CollisionMeshes.Num() > 0)
+  {
+    UE_LOG(LogRLink, Log, TEXT("Enable collision for %s"), *CollisionMeshes[0]->GetName())
+    CollisionMeshes[0]->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+  }
+  else
+  {
+    UE_LOG(LogRLink, Error, TEXT("Link %s doesn't have any collision meshes, EnableCollision failed"), *GetName())
+  }
+}

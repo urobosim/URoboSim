@@ -5,6 +5,10 @@ DEFINE_LOG_CATEGORY_STATIC(LogRController, Log, All);
 void URController::Init()
 {
   UE_LOG(LogRController, Log, TEXT("Initialize %s"), *GetName())
+  if (!Owner && Cast<ARModel>(GetOuter()))
+  {
+    Owner = Cast<ARModel>(GetOuter());
+  }
 }
 
 ARModel *URController::GetOwner()

@@ -22,7 +22,7 @@ private:
 
 	/**
 	 * Checks if AssetData is intended for the factory.
-	 * Checks if an RRobot can be built by AssetData.
+	 * Checks if a ARModel can be built by AssetData.
 	 */
 	virtual bool CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg) override;
 

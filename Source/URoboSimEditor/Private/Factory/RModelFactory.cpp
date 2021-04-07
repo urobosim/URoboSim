@@ -36,13 +36,13 @@ AActor *URModelFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTrans
   USDFDataAsset *SDFAsset = CastChecked<USDFDataAsset>(Asset);
   if (SDFAsset && SDFAsset->Model)
   {
-    UE_LOG(LogRModelFactory, Log, TEXT("Model Factory created %s"), *SDFAsset->Model->GetName());
+    UE_LOG(LogRModelFactory, Log, TEXT("Create %s"), *SDFAsset->Model->GetName());
 
     URModelBuilder *ModelBuilder = NewObject<URModelBuilder>(this);
     FActorSpawnParameters SpawnInfo;
     SpawnInfo.OverrideLevel = InLevel;
     SpawnInfo.ObjectFlags = InObjectFlags;
-    SpawnInfo.Name = Name;
+    SpawnInfo.Name = *SDFAsset->Model->GetName();
 
     ARModel *NewRobot = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(NewActorClass, &Transform, SpawnInfo));
     ModelBuilder->Model = NewRobot;
@@ -70,38 +70,33 @@ void URModelFactory::PostSpawnActor(UObject *Asset, AActor *NewActor)
   ARModel *NewRobot = CastChecked<ARModel>(NewActor);
   if (NewRobot)
   {
-    URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(NewRobot, TEXT("ControllerComponent"));
-    ControllerComponent->AddController(NewObject<URJointController>(NewRobot, TEXT("JointController")));
-    ControllerComponent->AddController(NewObject<URBaseController>(NewRobot, TEXT("BaseController")));
-    ControllerComponent->OnComponentCreated();
+    // URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(NewRobot, TEXT("ROSCommunicationComponent"));
 
-    URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(NewRobot, TEXT("ROSCommunicationComponent"));
+    // URPublisher *JointStatePublisher = NewObject<URJointStatePublisher>(NewRobot, TEXT("JointStatePublisher"));
+    // JointStatePublisher->Topic = TEXT("iai_donbot/body/joint_states");
+    // Cast<URJointStatePublisher>(JointStatePublisher)->FrameId = TEXT("odom");
+    // ROSCommunicationComponent->AddPublisher(JointStatePublisher);
 
-    URPublisher *JointStatePublisher = NewObject<URJointStatePublisher>(NewRobot, TEXT("JointStatePublisher"));
-    JointStatePublisher->Topic = TEXT("iai_donbot/body/joint_states");
-    Cast<URJointStatePublisher>(JointStatePublisher)->FrameId = TEXT("odom");
-    ROSCommunicationComponent->AddPublisher(JointStatePublisher);
+    // URPublisher *OdomPublisher = NewObject<UROdomPublisher>(NewRobot, TEXT("OdomPublisher"));
+    // OdomPublisher->Topic = TEXT("iai_donbot/base/joint_states");
+    // Cast<UROdomPublisher>(OdomPublisher)->FrameId = TEXT("odom");
+    // ROSCommunicationComponent->AddPublisher(OdomPublisher);
 
-    URPublisher *OdomPublisher = NewObject<UROdomPublisher>(NewRobot, TEXT("OdomPublisher"));
-    OdomPublisher->Topic = TEXT("iai_donbot/base/joint_states");
-    Cast<UROdomPublisher>(OdomPublisher)->FrameId = TEXT("odom");
-    ROSCommunicationComponent->AddPublisher(OdomPublisher);
+    // URPublisher *JointTrajectoryControllerStatePublisher = NewObject<URJointTrajectoryControllerStatePublisher>(NewRobot, TEXT("JointTrajectoryControllerStatePublisher"));
+    // JointTrajectoryControllerStatePublisher->Topic = TEXT("iai_donbot/whole_body_controller/body/state");
+    // Cast<URJointTrajectoryControllerStatePublisher>(JointTrajectoryControllerStatePublisher)->FrameId = TEXT("odom");
+    // ROSCommunicationComponent->AddPublisher(JointTrajectoryControllerStatePublisher);
 
-    URPublisher *JointTrajectoryControllerStatePublisher = NewObject<URJointTrajectoryControllerStatePublisher>(NewRobot, TEXT("JointTrajectoryControllerStatePublisher"));
-    JointTrajectoryControllerStatePublisher->Topic = TEXT("iai_donbot/whole_body_controller/body/state");
-    Cast<URJointTrajectoryControllerStatePublisher>(JointTrajectoryControllerStatePublisher)->FrameId = TEXT("odom");
-    ROSCommunicationComponent->AddPublisher(JointTrajectoryControllerStatePublisher);
+    // URSubscriber *VelocityCommandSubscriber = NewObject<URVelocityCommandSubscriber>(NewRobot, TEXT("VelocityCommandSubscriber"));
+    // ROSCommunicationComponent->AddSubscriber(VelocityCommandSubscriber);
 
-    URSubscriber *VelocityCommandSubscriber = NewObject<URVelocityCommandSubscriber>(NewRobot, TEXT("VelocityCommandSubscriber"));
-    ROSCommunicationComponent->AddSubscriber(VelocityCommandSubscriber);
+    // URActionServer *FJTAServer = NewObject<URFJTAServer>(NewRobot, TEXT("FJTAServer"));
+    // FJTAServer->ActionName = TEXT("iai_donbot/whole_body_controller/body/follow_joint_trajectory");
+    // Cast<URFJTAServer>(FJTAServer)->SetFrameId(TEXT("odom"));
+    // Cast<URFJTAServer>(FJTAServer)->SetJointParamPath(TEXT("iai_donbot/whole_body_controller/body/joints"));
+    // ROSCommunicationComponent->AddActionServer(FJTAServer);
 
-    URActionServer *FJTAServer = NewObject<URFJTAServer>(NewRobot, TEXT("FJTAServer"));
-    FJTAServer->ActionName = TEXT("iai_donbot/whole_body_controller/body/follow_joint_trajectory");
-    Cast<URFJTAServer>(FJTAServer)->SetFrameId(TEXT("odom"));
-    Cast<URFJTAServer>(FJTAServer)->SetJointParamPath(TEXT("iai_donbot/whole_body_controller/body/joints"));
-    ROSCommunicationComponent->AddActionServer(FJTAServer);
-
-    ROSCommunicationComponent->OnComponentCreated();
+    // ROSCommunicationComponent->OnComponentCreated();
     
     NewRobot->Init();
   }
