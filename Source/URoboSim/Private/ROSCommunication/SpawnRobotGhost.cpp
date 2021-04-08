@@ -23,10 +23,8 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FSpawnRobotGhostServer::Callback(TSharedP
 
         World = Owner->GetWorld();
 
-        FString MyName = MoveRequest->GetName();
-        FVector Location = MoveRequest->GetPose().GetPosition().GetVector();
-        FQuat Quat = MoveRequest->GetPose().GetOrientation().GetQuat();
-        bool ServiceSuccess = true;
+
+        bool ServiceSuccess = false;
         if(!World)
           {
             UE_LOG(LogTemp, Error, TEXT("World not found"));
@@ -36,16 +34,12 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FSpawnRobotGhostServer::Callback(TSharedP
             // Execute on game thread
             FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]()
             {
-              TActorIterator< AStaticMeshActor > ActorItr =
-              TActorIterator< AStaticMeshActor >(World);
-              while(ActorItr)
-                {
-                  if(ActorItr->GetName().Equals(MyName))
-                    {
-                      ActorItr->SetActorLocationAndRotation(Location, Quat);
-                    }
-                  ++ActorItr;
-                }
+              FActorSpawnParameters Parameters;
+              Parameters.Template = Owner;
+
+              class ARModel* Model = World->SpawnActor<class ARModel>(Owner->GetClass(), Parameters);
+              Model->SetOwner(World);
+
             }, TStatId(), nullptr, ENamedThreads::GameThread);
 
             //wait code above to complete
