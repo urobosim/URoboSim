@@ -46,23 +46,23 @@ protected:
   virtual void BeginPlay() override;
 
 public:
-  virtual void Init();
+  void Init();
 
-  virtual void AddJoint(URJoint *&Joint) { Joints.Add(Joint); }
+  void AddJoint(URJoint *&Joint) { Joints.Add(Joint); }
 
-  virtual void AddLink(URLink *&Link) { Links.Add(Link); }
+  void AddLink(URLink *&Link) { Links.Add(Link); }
 
-  virtual bool AddPlugin(URPluginComponent *Plugin);
+  bool AddPlugin(URPluginComponent *Plugin);
 
-  virtual TArray<URJoint *> GetJoints() const { return Joints; }
+  TArray<URJoint *> GetJoints() const { return Joints; }
 
-  virtual URJoint *GetJoint(const FString &JointName) const;
+  URJoint *GetJoint(const FString &JointName) const;
 
-  virtual TArray<URLink *> GetLinks() const { return Links; }
+  TArray<URLink *> GetLinks() const { return Links; }
 
-  virtual URLink *GetBaseLink() const;
+  URLink *GetBaseLink() const;
 
-  virtual URPluginComponent *GetPlugin(const FString &PluginName) const;
+  URPluginComponent *GetPlugin(const FString &PluginName) const;
 
 public:
   UPROPERTY(EditAnywhere)
@@ -83,4 +83,7 @@ protected:
 
   // UPROPERTY()
   // TArray<URGraspComponent *> Grippers;
+private:
+  UPROPERTY()
+  bool bModelInitialized = false;
 };

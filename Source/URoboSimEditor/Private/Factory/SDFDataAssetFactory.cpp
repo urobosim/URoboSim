@@ -16,14 +16,8 @@ USDFDataAssetFactory::USDFDataAssetFactory(const FObjectInitializer &ObjectIniti
 	// List of formats supported by the factory. Each entry is of the form "ext;Description" where ext is the file extension
 	Formats.Add(TEXT("sdf;Simulation Description Format"));
 
-	//// Factory can create a new object from scratch
-	//bCreateNew = false;
-	//// Factory imports objects from text
-	//bText = true;
 	// Factory imports objects from files
 	bEditorImport = true;
-	// Associated editor should be opened after creating a new object
-	//bEditAfterNew = true;
 
 	// Required to allow other re importers do their CanReimport checks first
 	ImportPriority = DefaultImportPriority - 1;

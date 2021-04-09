@@ -1,36 +1,41 @@
 #include "ROSCommunication/Publisher/ROdomPublisher.h"
-#include "sensor_msgs/JointState.h"
 #include "Conversions.h"
-
-UROdomPublisher::UROdomPublisher()
-{
-  Topic = TEXT("/base/joint_states");
-  MessageType = TEXT("sensor_msgs/JointState");
-  FrameNames.Add(TEXT("odom_x_joint"));
-  FrameNames.Add(TEXT("odom_y_joint"));
-  FrameNames.Add(TEXT("odom_z_joint"));
-}
+#include "sensor_msgs/JointState.h"
 
 void UROdomPublisher::Init()
 {
-  OdomPosition.Init(0., FrameNames.Num());
-  OdomVelocity.Init(0., FrameNames.Num());
+  if (!PublisherParameters)
+  {
+    PublisherParameters = CreateDefaultSubobject<UROdomPublisherParameter>(TEXT("OdomPublisherParameters"));
+  }
+  
+  const UROdomPublisherParameter *OdomPublisherParameters = GetOdomPublisherParameters();
+  if (OdomPublisherParameters)
+  {
+    OdomPosition.Init(0., OdomPublisherParameters->FrameNames.Num());
+    OdomVelocity.Init(0., OdomPublisherParameters->FrameNames.Num());
+  }
 }
 
 void UROdomPublisher::Publish()
 {
   static int Seq = 0;
-  TSharedPtr<sensor_msgs::JointState> JointStateMsg =
-      MakeShareable(new sensor_msgs::JointState());
+  const UROdomPublisherParameter *OdomPublisherParameters = GetOdomPublisherParameters();
+  if (OdomPublisherParameters)
+  {
+    static TSharedPtr<sensor_msgs::JointState> JointStateMsg =
+        MakeShareable(new sensor_msgs::JointState());
 
-  JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), FrameId));
-  JointStateMsg->SetName(FrameNames);
-  CalculateOdomStates();
-  JointStateMsg->SetPosition(OdomPosition);
-  JointStateMsg->SetVelocity(OdomVelocity);
+    JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), OdomPublisherParameters->FrameId));
+    JointStateMsg->SetName(OdomPublisherParameters->FrameNames);
+    CalculateOdomStates();
+    JointStateMsg->SetPosition(OdomPosition);
+    JointStateMsg->SetVelocity(OdomVelocity);
 
-  Handler->PublishMsg(Topic, JointStateMsg);
-  Handler->Process();
+    Handler->PublishMsg(OdomPublisherParameters->Topic, JointStateMsg);
+
+    Handler->Process();
+  }
 }
 
 void UROdomPublisher::CalculateOdomStates()

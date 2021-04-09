@@ -11,21 +11,15 @@ UCLASS()
 class UROBOSIM_API URFJTAFeedbackPublisher final : public URPublisher
 {
   GENERATED_BODY()
-
+  
 public:
-  URFJTAFeedbackPublisher();
-
   void Publish() override;
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString JointParamPath;
-
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 
 protected:
   void Init() override;
+
+public:
+  const URFJTAFeedbackPublisherParameter *GetFJTAFeedbackPublisherParameters() const { return Cast<URFJTAFeedbackPublisherParameter>(PublisherParameters); }
 
 private:
   URJointController *JointController;

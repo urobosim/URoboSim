@@ -6,6 +6,7 @@
 #include "Engine/DataAsset.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
+#include "ROSCommunication/Publisher/RPublisherParameter.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
@@ -26,26 +27,6 @@ public:
 };
 
 // Configuratation for spezific Controller
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URPublisherParameter : public UObject
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-};
-
-UCLASS()
-class UROBOSIM_API URJointStatePublisherParameter : public URPublisherParameter
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
-};
-
 USTRUCT()
 struct FRPublisherConfiguration
 {

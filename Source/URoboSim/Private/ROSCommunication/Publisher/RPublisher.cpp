@@ -31,10 +31,15 @@ void URPublisher::Init(UObject *InOwner, const FString &WebsocketIPAddr, const u
 
 void URPublisher::Init(UObject *InOwner, const FString &InTopic)
 {
+  if (!PublisherParameters)
+  {
+    PublisherParameters = CreateDefaultSubobject<URPublisherParameter>(TEXT("PublisherParameters"));
+  }
+  
   SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
-    Topic = InTopic;
+    PublisherParameters->Topic = InTopic;
   }
   Init();
   CreatePublisher();
@@ -50,10 +55,9 @@ void URPublisher::Tick()
 
 void URPublisher::CreatePublisher()
 {
-  Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
+  Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(PublisherParameters->Topic, PublisherParameters->MessageType));
   if (Publisher.IsValid())
   {
-    UE_LOG(LogRPublisher, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Handler->AddPublisher(Publisher);
   }
 }

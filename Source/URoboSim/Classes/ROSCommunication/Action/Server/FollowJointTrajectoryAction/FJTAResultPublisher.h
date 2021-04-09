@@ -12,17 +12,13 @@ class UROBOSIM_API URFJTAResultPublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
-  URFJTAResultPublisher();
-
-public:
   void Publish() override;
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 
 protected:
   void Init() override;
+
+public:
+  const URFJTAResultPublisherParameter *GetFJTAResultPublisherParameters() const { return Cast<URFJTAResultPublisherParameter>(PublisherParameters); }
 
 private:
   URJointController *JointController;

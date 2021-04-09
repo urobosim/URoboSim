@@ -3,34 +3,33 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRActionStatusPublisher, Log, All)
 
-URActionStatusPublisher::URActionStatusPublisher()
-{
-  MessageType = TEXT("actionlib_msgs/GoalStatusArray");
-}
-
 void URActionStatusPublisher::Publish()
 {
   if (Controller)
   {
     static int Seq = 0;
-    TSharedPtr<actionlib_msgs::GoalStatusArray> GoalStatusArrayMsg =
-        MakeShareable(new actionlib_msgs::GoalStatusArray());
-
-    GoalStatusArrayMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), FrameId));
-
-    TArray<actionlib_msgs::GoalStatus> GoalStatusArray;
-    for (const FGoalStatusInfo &GoalStatusInfo : Controller->GetGoalStatusList())
+    const URActionStatusPublisherParameter *ActionStatusPublisherParameters = GetActionStatusPublisherParameters();
+    if (ActionStatusPublisherParameters)
     {
-      actionlib_msgs::GoalStatus GoalStatus(actionlib_msgs::GoalID(FROSTime(GoalStatusInfo.Secs, GoalStatusInfo.NSecs), GoalStatusInfo.Id), GoalStatusInfo.Status, TEXT(""));
-      GoalStatusArray.Add(GoalStatus);
-    }
-    GoalStatusArrayMsg->SetStatusList(GoalStatusArray);
+      TSharedPtr<actionlib_msgs::GoalStatusArray> GoalStatusArrayMsg =
+          MakeShareable(new actionlib_msgs::GoalStatusArray());
 
-    Handler->PublishMsg(Topic, GoalStatusArrayMsg);
-    Handler->Process();
-  }
-  else
-  {
-    UE_LOG(LogRActionStatusPublisher, Error, TEXT("Controller not found in %s"), *GetName())
+      GoalStatusArrayMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), ActionStatusPublisherParameters->FrameId));
+
+      TArray<actionlib_msgs::GoalStatus> GoalStatusArray;
+      for (const FGoalStatusInfo &GoalStatusInfo : Controller->GetGoalStatusList())
+      {
+        actionlib_msgs::GoalStatus GoalStatus(actionlib_msgs::GoalID(FROSTime(GoalStatusInfo.Secs, GoalStatusInfo.NSecs), GoalStatusInfo.Id), GoalStatusInfo.Status, TEXT(""));
+        GoalStatusArray.Add(GoalStatus);
+      }
+      GoalStatusArrayMsg->SetStatusList(GoalStatusArray);
+
+      Handler->PublishMsg(ActionStatusPublisherParameters->Topic, GoalStatusArrayMsg);
+      Handler->Process();
+    }
+    else
+    {
+      UE_LOG(LogRActionStatusPublisher, Error, TEXT("Controller not found in %s"), *GetName())
+    }
   }
 }

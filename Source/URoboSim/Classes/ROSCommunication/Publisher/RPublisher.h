@@ -3,6 +3,7 @@
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
+#include "RPublisherParameter.h"
 // clang-format off
 #include "RPublisher.generated.h"
 // clang-format on
@@ -33,8 +34,8 @@ public:
   virtual void Publish() {}
 
 public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
+  UPROPERTY()
+  URPublisherParameter *PublisherParameters;
 
 protected:
   void Init(UObject *InOwner, const FString &InTopic);
@@ -47,9 +48,6 @@ protected:
 
 protected:
   TSharedPtr<FROSBridgePublisher> Publisher;
-
-  UPROPERTY()
-  FString MessageType;
 
   TSharedPtr<FROSBridgeHandler> Handler;
 

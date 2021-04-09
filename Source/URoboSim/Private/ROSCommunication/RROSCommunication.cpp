@@ -81,6 +81,7 @@ void FRROSCommunicationContainer::Tick()
 
 void FRROSCommunicationContainer::DeInit()
 {
+  UE_LOG(LogRROSCommunicationContainer, Log, TEXT("Deinitilize ROSCommunication"))
   for (URPublisher *&Publisher : Publishers)
   {
     Publisher->DeInit();

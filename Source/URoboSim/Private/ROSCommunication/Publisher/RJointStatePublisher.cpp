@@ -14,14 +14,13 @@ static void GenerateMsg(const TMap<FString, FJointState> &JointStates, TArray<FS
   }
 }
 
-URJointStatePublisher::URJointStatePublisher()
-{
-  Topic = TEXT("/body/joint_states");
-  MessageType = TEXT("sensor_msgs/JointState");
-}
-
 void URJointStatePublisher::Init()
 {
+  if (!PublisherParameters)
+  {
+    PublisherParameters = CreateDefaultSubobject<URJointStatePublisherParameter>(TEXT("JointStatePublisherParameters"));
+  }
+  
   if (GetOwner())
   {
     for (const URJoint *Joint : GetOwner()->GetJoints())
@@ -47,18 +46,22 @@ void URJointStatePublisher::Publish()
   }
 
   static int Seq = 0;
-  TSharedPtr<sensor_msgs::JointState> JointStateMsg =
-      MakeShareable(new sensor_msgs::JointState());
-  JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), FrameId));
-  TArray<FString> JointNames;
-  TArray<double> JointPositions;
-  TArray<double> JointVelocities;
-  GenerateMsg(JointStates, JointNames, JointPositions, JointVelocities);
-  JointStateMsg->SetName(JointNames);
-  JointStateMsg->SetPosition(JointPositions);
-  JointStateMsg->SetVelocity(JointVelocities);
+  const URJointStatePublisherParameter *JointStatePublisherParameters = GetJointStatePublisherParameters();
+  if (JointStatePublisherParameters)
+  {
+    static TSharedPtr<sensor_msgs::JointState> JointStateMsg = MakeShareable(new sensor_msgs::JointState());
+    JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), JointStatePublisherParameters->FrameId));
 
-  Handler->PublishMsg(Topic, JointStateMsg);
+    TArray<FString> JointNames;
+    TArray<double> JointPositions;
+    TArray<double> JointVelocities;
+    GenerateMsg(JointStates, JointNames, JointPositions, JointVelocities);
+    JointStateMsg->SetName(JointNames);
+    JointStateMsg->SetPosition(JointPositions);
+    JointStateMsg->SetVelocity(JointVelocities);
 
-  Handler->Process();
+    Handler->PublishMsg(JointStatePublisherParameters->Topic, JointStateMsg);
+
+    Handler->Process();
+  }
 }

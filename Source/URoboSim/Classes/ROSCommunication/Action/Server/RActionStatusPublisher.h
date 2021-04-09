@@ -12,14 +12,11 @@ class UROBOSIM_API URActionStatusPublisher : public URPublisher
   GENERATED_BODY()
 
 public:
-  URActionStatusPublisher();
+  void Publish() override;
 
 public:
-  void Publish() override;
+  const URActionStatusPublisherParameter *GetActionStatusPublisherParameters() const { return Cast<URActionStatusPublisherParameter>(PublisherParameters); }
 
 protected:
   URController *Controller;
-
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 };

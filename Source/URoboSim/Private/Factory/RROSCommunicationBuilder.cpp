@@ -1,5 +1,7 @@
 #include "Factory/RROSCommunicationBuilder.h"
 #include "ROSCommunication/Publisher/RJointStatePublisher.h"
+#include "ROSCommunication/Publisher/RJointTrajectoryControllerStatePublisher.h"
+#include "ROSCommunication/Publisher/ROdomPublisher.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 
@@ -22,65 +24,37 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
 {
   for (ARModel *&Model : Models)
   {
-    URPluginComponent *ROSCommunicationComponent = Model->GetPlugin(TEXT("ROSCommunicationComponent"));
-    if (ROSCommunicationComponent)
-    {
-      UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("ROSCommunicationComponent of %s found"), *Model->GetName())
-    }
-    else
-    {
-      UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("ROSCommunicationComponent of %s not found, create one"), *Model->GetName())
-      ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Model, TEXT("ROSCommunicationComponent"));
-      if (!Cast<URROSCommunicationComponent>(ROSCommunicationComponent))
-      {
-        UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("ControllerComponent of %s could not be created"), *Model->GetName())
-        return;
-      }
-      else
-      {
-        ROSCommunicationComponent->RegisterComponent();
-      }
-    }
+    URPluginComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Model, TEXT("ROSCommunicationComponent"));
+    ROSCommunicationComponent->RegisterComponent();
 
     if (PublisherConfigurations.Num() > 0)
     {
-      URPublisherBuilder *PublisherBuilder = NewObject<URPublisherBuilder>();
       for (const FRPublisherConfiguration &PublisherConfiguration : PublisherConfigurations)
       {
-        // UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *PublisherConfiguration .GetName(), *Model->GetName());
-        if (Cast<URJointStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
+        URPublisher *Publisher = CreatePublisher(Model, PublisherConfiguration);
+        if (Publisher)
         {
-          PublisherBuilder = NewObject<URJointStatePublisherBuilder>();
+          UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Publisher->GetName(), *Model->GetName());
+          Publisher->PublisherParameters = PublisherConfiguration.PublisherParameters;
+          Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddPublisher(Publisher);
         }
-        URPublisher *Publisher = PublisherBuilder->CreatePublisher(Model, PublisherConfiguration);
-        Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddPublisher(Publisher);
       }
     }
   }
 }
 
-URPublisher *URPublisherBuilder::CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration)
-{
-  Publisher = NewObject<URPublisher>(InOwner, TEXT("Publisher"));
-  Configure(PublisherConfiguration);
-  return Publisher;
-}
-
-URPublisher *URJointStatePublisherBuilder::CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration)
-{
-  Publisher = NewObject<URJointStatePublisher>(InOwner, TEXT("JointStatePublisher"));
-  Configure(PublisherConfiguration);
-  return Publisher;
-}
-
-void URJointStatePublisherBuilder::Configure(const FRPublisherConfiguration &PublisherConfiguration)
+URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration)
 {
   if (Cast<URJointStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
-    if (!PublisherConfiguration.PublisherParameters->Topic.Equals(TEXT("")))
-    {
-      Publisher->Topic = PublisherConfiguration.PublisherParameters->Topic;
-    }
-    Cast<URJointStatePublisher>(Publisher)->FrameId = Cast<URJointStatePublisherParameter>(PublisherConfiguration.PublisherParameters)->FrameId;    
+    return NewObject<URJointStatePublisher>(InOwner, TEXT("JointStatePublisher"));
+  }
+  else if (Cast<UROdomPublisherParameter>(PublisherConfiguration.PublisherParameters))
+  {
+    return NewObject<UROdomPublisher>(InOwner, TEXT("OdomPublisher"));
+  }
+  else
+  {
+    return NewObject<URPublisher>(InOwner, TEXT("Publisher"));
   }
 }

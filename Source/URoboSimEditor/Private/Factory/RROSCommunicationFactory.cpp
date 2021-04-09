@@ -7,8 +7,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationFactory, Log, All);
 URROSCommunicationFactory::URROSCommunicationFactory(const FObjectInitializer &ObjectInitializer) : Super(ObjectInitializer)
 {
   // AActor subclass this ActorFactory creates.
-  NewActorClassName = FString("ARModel");
-  NewActorClass = ARModel::StaticClass();
+  NewActorClassName = FString("AActor");
+  NewActorClass = AActor::StaticClass();
 }
 
 bool URROSCommunicationFactory::CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg)
@@ -19,7 +19,7 @@ bool URROSCommunicationFactory::CanCreateActorFrom(const FAssetData &AssetData, 
 
 AActor *URROSCommunicationFactory::GetDefaultActor(const FAssetData &AssetData)
 {
-  return NewActorClass->GetDefaultObject<ARModel>();
+  return NewActorClass->GetDefaultObject<AActor>();
 }
 
 AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
@@ -50,11 +50,6 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
                                       ROSCommunicationDataAsset->SubscriberConfiguration,
                                       ROSCommunicationDataAsset->ServiceClientConfiguration,
                                       ROSCommunicationDataAsset->ActionServerConfiguration);
-        UE_LOG(LogRROSCommunicationFactory, Log, TEXT("Initialize robots after creating ROSCommunicationBuilder"))
-        for (ARModel *&Robot : Robots)
-        {
-          Robot->Init();
-        }
       }
     }
     else

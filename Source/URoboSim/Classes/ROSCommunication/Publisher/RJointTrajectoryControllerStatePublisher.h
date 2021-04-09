@@ -12,13 +12,10 @@ class UROBOSIM_API URJointTrajectoryControllerStatePublisher final : public URPu
   GENERATED_BODY()
 
 public:
-  URJointTrajectoryControllerStatePublisher();
-
   void Publish() override;
 
 public:
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
+  const URJointTrajectoryControllerStatePublisherParameter *GetJointTrajectoryControllerStatePublisherParameters() const { return Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherParameters); }
 
 protected:
   void Init() override;

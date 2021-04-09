@@ -5,6 +5,11 @@ DEFINE_LOG_CATEGORY_STATIC(LogRFJTAStatusPublisher, Log, All);
 
 void URFJTAStatusPublisher::Init()
 {
+  if (!PublisherParameters)
+  {
+    PublisherParameters = CreateDefaultSubobject<URActionStatusPublisherParameter>(TEXT("FJTAStatusPublisherParameters"));
+  }
+  
   if (GetOwner())
   {
     URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));

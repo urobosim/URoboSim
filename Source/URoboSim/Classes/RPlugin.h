@@ -24,4 +24,7 @@ public:
 protected:
 	virtual void RegisterPlugin();
 	
+protected:
+  UPROPERTY()
+  bool bComponentInitialized = false;
 };

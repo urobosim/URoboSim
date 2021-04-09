@@ -7,8 +7,8 @@ DEFINE_LOG_CATEGORY_STATIC(LogRControllerFactory, Log, All);
 URControllerFactory::URControllerFactory(const FObjectInitializer &ObjectInitializer) : Super(ObjectInitializer)
 {
   // AActor subclass this ActorFactory creates.
-  NewActorClassName = FString("ARModel");
-  NewActorClass = ARModel::StaticClass();
+  NewActorClassName = FString("AActor");
+  NewActorClass = AActor::StaticClass();
 }
 
 bool URControllerFactory::CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg)
@@ -19,7 +19,7 @@ bool URControllerFactory::CanCreateActorFrom(const FAssetData &AssetData, FText 
 
 AActor *URControllerFactory::GetDefaultActor(const FAssetData &AssetData)
 {
-  return NewActorClass->GetDefaultObject<ARModel>();
+  return NewActorClass->GetDefaultObject<AActor>();
 }
 
 AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
@@ -55,12 +55,7 @@ AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const F
           {
             UE_LOG(LogRControllerFactory, Error, TEXT("ControllerBuilder failed to be created"))
           }
-        }
-        UE_LOG(LogRControllerFactory, Log, TEXT("Initialize robots after creating ControllerBuilders"))
-        for (ARModel *&Robot : Robots)
-        {
-          Robot->Init();
-        }        
+        }     
       }
     }
     else

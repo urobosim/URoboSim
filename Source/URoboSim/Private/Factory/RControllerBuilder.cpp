@@ -35,15 +35,7 @@ void URControllerBuilder::Build()
     {
       UE_LOG(LogRControllerBuilder, Log, TEXT("ControllerComponent of %s not found, create one"), *Model->GetName())
       ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
-      if (!Cast<URControllerComponent>(ControllerComponent))
-      {
-        UE_LOG(LogRControllerBuilder, Log, TEXT("ControllerComponent of %s could not be created"), *Model->GetName())
-        return;
-      }
-      else
-      {
-        ControllerComponent->RegisterComponent();
-      }
+      ControllerComponent->RegisterComponent();
     }
     UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerConfiguration->ControllerName, *Model->GetName());
     URController *Controller = CreateController(Model);

@@ -17,11 +17,11 @@ URFJTAServer::URFJTAServer()
 
 void URFJTAServer::SetFrameId(const FString &InFrameId)
 {
-  Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->FrameId = InFrameId;
-  Cast<URFJTAResultPublisher>(ResultPublisher)->FrameId = InFrameId;
+  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->FrameId = InFrameId;
+  Cast<URFJTAResultPublisherParameter>(Cast<URFJTAResultPublisher>(ResultPublisher)->PublisherParameters)->FrameId = InFrameId;
 }
 
 void URFJTAServer::SetJointParamPath(const FString &InJointParamPath)
 {
-  Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->JointParamPath = InJointParamPath;
+  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->JointParamPath = InJointParamPath;
 }

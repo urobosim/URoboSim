@@ -16,6 +16,11 @@ URROSCommunicationComponent::URROSCommunicationComponent()
 
 void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+  if (!bComponentInitialized)
+  {
+    Init();
+  }
+  
   ROSCommunication.Tick();
 }
 
@@ -23,9 +28,10 @@ void URROSCommunicationComponent::Init()
 {
   if (GetOwner()->FindComponentByClass<URControllerComponent>())
   {
-    ROSCommunication.ControllerComponent = GetOwner()->FindComponentByClass<URControllerComponent>();
     UE_LOG(LogRROSCommunication, Log, TEXT("Found ControllerComponent"));
+    ROSCommunication.ControllerComponent = GetOwner()->FindComponentByClass<URControllerComponent>();
     ROSCommunication.Init();
+    bComponentInitialized = true;
   }
   else
   {
@@ -36,5 +42,6 @@ void URROSCommunicationComponent::Init()
 void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
   ROSCommunication.DeInit();
+  bComponentInitialized = false;
   Super::EndPlay(EndPlayReason);
 }

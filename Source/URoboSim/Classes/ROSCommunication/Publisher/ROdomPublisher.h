@@ -11,28 +11,18 @@ class UROBOSIM_API UROdomPublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
-  UROdomPublisher();
-
-public:
   void Publish() override;
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 
 protected:
   void Init() override;
+
+public:
+  const UROdomPublisherParameter *GetOdomPublisherParameters() const { return Cast<UROdomPublisherParameter>(PublisherParameters); }
 
 private:
 	void CalculateOdomStates();
 
 protected:
-  UPROPERTY(EditAnywhere)
-	TArray<FString> FrameNames;
-
-  UPROPERTY(EditAnywhere)
-  bool bProjectToGround = true;
-
   UPROPERTY()
 	TArray<double> OdomPosition;
 
