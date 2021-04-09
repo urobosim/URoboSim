@@ -5,11 +5,16 @@ DEFINE_LOG_CATEGORY_STATIC(LogRFJTAGoalSubscriber, Log, All)
 
 URFJTAGoalSubscriber::URFJTAGoalSubscriber()
 {
-  MessageType = TEXT("control_msgs/FollowJointTrajectoryActionGoal");
+  SubscriberParameters = CreateDefaultSubobject<URFJTAGoalSubscriberParameter>(TEXT("FJTAGoalSubscriberParameters"));
 }
 
 void URFJTAGoalSubscriber::Init()
 {
+  if (!SubscriberParameters)
+  {
+    SubscriberParameters = CreateDefaultSubobject<URFJTAGoalSubscriberParameter>(TEXT("FJTAGoalSubscriberParameters"));
+  }
+  
   if (GetOwner())
   {
     ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
@@ -18,8 +23,11 @@ void URFJTAGoalSubscriber::Init()
 
 void URFJTAGoalSubscriber::CreateSubscriber()
 {
-  Subscriber = MakeShareable<FRFJTAGoalSubscriberCallback>(
-      new FRFJTAGoalSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("JointController"))));
+  if (Cast<URFJTAGoalSubscriberParameter>(SubscriberParameters))
+  {
+    Subscriber = MakeShareable<FRFJTAGoalSubscriberCallback>(
+        new FRFJTAGoalSubscriberCallback(SubscriberParameters->Topic, SubscriberParameters->MessageType, ControllerComponent->GetController(TEXT("JointController"))));
+  }
 }
 
 FRFJTAGoalSubscriberCallback::FRFJTAGoalSubscriberCallback(

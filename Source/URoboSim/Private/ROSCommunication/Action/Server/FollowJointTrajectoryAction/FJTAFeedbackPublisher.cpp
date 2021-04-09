@@ -5,6 +5,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRFJTAFeedbackPublisher, Log, All)
 
+URFJTAFeedbackPublisher::URFJTAFeedbackPublisher()
+{
+  PublisherParameters = CreateDefaultSubobject<URFJTAFeedbackPublisherParameter>(TEXT("FJTAFeedbackPublisherParameters"));
+}
+
 void URFJTAFeedbackPublisher::Init()
 {
   if (!PublisherParameters)
@@ -23,7 +28,7 @@ void URFJTAFeedbackPublisher::Init()
     {
       UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("ControllerComponent not found in %s"), *GetName())
     }
-    
+
     const URFJTAFeedbackPublisherParameter *FJTAFeedbackPublisherParameters = GetFJTAFeedbackPublisherParameters();
     if (FJTAFeedbackPublisherParameters)
     {
@@ -57,29 +62,39 @@ void URFJTAFeedbackPublisher::Publish()
         TArray<double> DesiredPositions;
         TArray<double> CurrentPositions;
         TArray<double> ErrorPositions;
+        TArray<double> DesiredVelocities;
+        TArray<double> CurrentVelocities;
+        TArray<double> ErrorVelocities;
         for (const FTrajectoryStatus &TrajectoryStatus : JointController->GetTrajectoryStatusArray())
         {
           JointNames.Add(TrajectoryStatus.JointName);
-          DesiredPositions.Add(TrajectoryStatus.DesiredPosition);
-          CurrentPositions.Add(TrajectoryStatus.CurrentPosition);
-          ErrorPositions.Add(TrajectoryStatus.ErrorPosition);
+          DesiredPositions.Add(TrajectoryStatus.DesiredState.JointPosition);
+          CurrentPositions.Add(TrajectoryStatus.CurrentState.JointPosition);
+          ErrorPositions.Add(TrajectoryStatus.ErrorState.JointPosition);
+          DesiredVelocities.Add(TrajectoryStatus.DesiredState.JointVelocity);
+          CurrentVelocities.Add(TrajectoryStatus.CurrentState.JointVelocity);
+          ErrorVelocities.Add(TrajectoryStatus.ErrorState.JointVelocity);
         }
 
         control_msgs::FollowJointTrajectoryFeedback FeedbackMsg;
         FeedbackMsg.SetHeader(std_msgs::Header(Seq, FROSTime(), FJTAFeedbackPublisherParameters->FrameId));
         FeedbackMsg.SetJointNames(JointNames);
 
-        trajectory_msgs::JointTrajectoryPoint DesiredPositionsMsg;
-        DesiredPositionsMsg.SetPositions(DesiredPositions);
-        FeedbackMsg.SetDesired(DesiredPositionsMsg);
+        trajectory_msgs::JointTrajectoryPoint DesiredStatesMsg;
+        DesiredStatesMsg.SetPositions(DesiredPositions);
+        DesiredStatesMsg.SetVelocities(DesiredVelocities);
+        FeedbackMsg.SetDesired(DesiredStatesMsg);
 
-        trajectory_msgs::JointTrajectoryPoint CurrentPositionsMsg;
-        CurrentPositionsMsg.SetPositions(CurrentPositions);
-        FeedbackMsg.SetActual(CurrentPositionsMsg);
+        trajectory_msgs::JointTrajectoryPoint CurrentStatesMsg;
+        CurrentStatesMsg.SetPositions(CurrentPositions);
+        CurrentStatesMsg.SetVelocities(CurrentVelocities);
+        FeedbackMsg.SetActual(CurrentStatesMsg);
 
-        trajectory_msgs::JointTrajectoryPoint ErrorPositionsMsg;
-        ErrorPositionsMsg.SetPositions(ErrorPositions);
-        FeedbackMsg.SetError(ErrorPositionsMsg);
+        trajectory_msgs::JointTrajectoryPoint ErrorStatesMsg;
+        ErrorStatesMsg.SetPositions(ErrorPositions);
+        ErrorStatesMsg.SetVelocities(ErrorVelocities);
+        FeedbackMsg.SetError(ErrorStatesMsg);
+
         Feedback->SetFeedback(FeedbackMsg);
 
         Handler->PublishMsg(FJTAFeedbackPublisherParameters->Topic, Feedback);

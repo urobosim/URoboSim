@@ -7,7 +7,6 @@
 
 URFJTAServer::URFJTAServer()
 {
-  ActionName = TEXT("/whole_body_controller/body/follow_joint_trajectory");
   CancelSubscriber = CreateDefaultSubobject<URFJTACancelSubscriber>(TEXT("FJTACancelSubscriber"));
   StatusPublisher = CreateDefaultSubobject<URFJTAStatusPublisher>(TEXT("FJTAStatusPublisher"));
   ResultPublisher = CreateDefaultSubobject<URFJTAResultPublisher>(TEXT("FJTAResultPublisher"));
@@ -15,13 +14,16 @@ URFJTAServer::URFJTAServer()
   FeedbackPublisher = CreateDefaultSubobject<URFJTAFeedbackPublisher>(TEXT("FJTAFeedbackPublisher"));
 }
 
-void URFJTAServer::SetFrameId(const FString &InFrameId)
+void URFJTAServer::Init()
 {
-  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->FrameId = InFrameId;
-  Cast<URFJTAResultPublisherParameter>(Cast<URFJTAResultPublisher>(ResultPublisher)->PublisherParameters)->FrameId = InFrameId;
-}
+  if (!Cast<URFJTAServerParameter>(ActionServerParameters))
+  {
+    ActionServerParameters = CreateDefaultSubobject<URFJTAServerParameter>(TEXT("FJTAServerParameters"));
+  }
+  
+  URFJTAServerParameter *FJTAServerParameter = Cast<URFJTAServerParameter>(ActionServerParameters);
+  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->FrameId = FJTAServerParameter->FrameId;
+  Cast<URFJTAResultPublisherParameter>(Cast<URFJTAResultPublisher>(ResultPublisher)->PublisherParameters)->FrameId = FJTAServerParameter->FrameId;
 
-void URFJTAServer::SetJointParamPath(const FString &InJointParamPath)
-{
-  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->JointParamPath = InJointParamPath;
+  Cast<URFJTAFeedbackPublisherParameter>(Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->PublisherParameters)->JointParamPath = FJTAServerParameter->JointParamPath;
 }

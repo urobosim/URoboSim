@@ -3,13 +3,13 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRActionCancelSubscriber, Log, All)
 
-URActionCancelSubscriber::URActionCancelSubscriber()
-{
-  MessageType = TEXT("actionlib_msgs/GoalID");
-}
-
 void URActionCancelSubscriber::Init()
 {
+  if (!SubscriberParameters)
+  {
+    SubscriberParameters = CreateDefaultSubobject<URActionCancelSubscriberParameter>(TEXT("VelocityCommandSubscriberParameters"));
+  }
+
   if (GetOwner())
   {
     ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));

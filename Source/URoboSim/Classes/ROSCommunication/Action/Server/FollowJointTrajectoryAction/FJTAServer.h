@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSCommunication/Action/Server/RActionServer.h"
+#include "FJTAServerParameter.h"
 // clang-format off
 #include "FJTAServer.generated.h"
 // clang-format on
@@ -13,8 +14,6 @@ class UROBOSIM_API URFJTAServer final : public URActionServer
 public:
   URFJTAServer();
 
-public:
-  void SetFrameId(const FString &InFrameId);
-
-  void SetJointParamPath(const FString &InJointParamPath);
+protected:
+  void Init() override;
 };

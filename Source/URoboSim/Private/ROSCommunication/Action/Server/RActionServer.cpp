@@ -31,11 +31,41 @@ void URActionServer::Init(UObject *InOwner, const FString &WebsocketIPAddr, cons
 
 void URActionServer::Init(UObject *InOwner, const FString &InActionName)
 {
+  if (!ActionServerParameters)
+  {
+    ActionServerParameters = CreateDefaultSubobject<URActionServerParameter>(TEXT("ActionServerParameters"));
+  }
+  
   if (!InActionName.Equals(TEXT("")))
   {
-    ActionName = InActionName;
+    ActionServerParameters->ActionName = InActionName;
   }
   Init(InOwner);
+}
+
+void URActionServer::Init(UObject *&InOwner)
+{
+  Init();
+  if (GoalSubscriber)
+  {
+    GoalSubscriber->Init(InOwner, Handler, ActionServerParameters->ActionName + TEXT("/goal"));
+  }
+  if (CancelSubscriber)
+  {
+    CancelSubscriber->Init(InOwner, Handler, ActionServerParameters->ActionName + TEXT("/cancel"));
+  }
+  if (StatusPublisher)
+  {
+    StatusPublisher->Init(InOwner, Handler, ActionServerParameters->ActionName + TEXT("/status"));
+  }
+  if (FeedbackPublisher)
+  {
+    FeedbackPublisher->Init(InOwner, Handler, ActionServerParameters->ActionName + TEXT("/feedback"));
+  }
+  if (ResultPublisher)
+  {
+    ResultPublisher->Init(InOwner, Handler, ActionServerParameters->ActionName + TEXT("/result"));
+  }
 }
 
 void URActionServer::Tick()
@@ -55,29 +85,5 @@ void URActionServer::Tick()
   if (ResultPublisher)
   {
     ResultPublisher->Publish();
-  }
-}
-
-void URActionServer::Init(UObject *&InOwner)
-{
-  if (GoalSubscriber)
-  {
-    GoalSubscriber->Init(InOwner, Handler, ActionName + TEXT("/goal"));
-  }
-  if (CancelSubscriber)
-  {
-    CancelSubscriber->Init(InOwner, Handler, ActionName + TEXT("/cancel"));
-  }
-  if (StatusPublisher)
-  {
-    StatusPublisher->Init(InOwner, Handler, ActionName + TEXT("/status"));
-  }
-  if (FeedbackPublisher)
-  {
-    FeedbackPublisher->Init(InOwner, Handler, ActionName + TEXT("/feedback"));
-  }
-  if (ResultPublisher)
-  {
-    ResultPublisher->Init(InOwner, Handler, ActionName + TEXT("/result"));
   }
 }

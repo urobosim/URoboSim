@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSBridgeHandler.h"
+#include "RActionServerParameter.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
@@ -32,12 +33,14 @@ public:
 
 public:
   UPROPERTY(EditAnywhere)
-  FString ActionName;
+  URActionServerParameter *ActionServerParameters;
 
 protected:
   void Init(UObject *InOwner, const FString &InActionName);
   
   void Init(UObject *&InOwner);
+
+  virtual void Init() {}
 
 protected:
   UPROPERTY(EditAnywhere)

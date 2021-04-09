@@ -14,6 +14,9 @@ class UROBOSIM_API URFJTAFeedbackPublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
+  URFJTAFeedbackPublisher();
+
+public:
   void Publish() override;
 
 protected:

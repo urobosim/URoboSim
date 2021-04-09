@@ -2,6 +2,7 @@
 
 #include "Controller/ControllerType/RJointController.h"
 #include "Controller/RControllerComponent.h"
+#include "FJTAServerParameter.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
 #include "FJTAGoalSubscriber.generated.h"

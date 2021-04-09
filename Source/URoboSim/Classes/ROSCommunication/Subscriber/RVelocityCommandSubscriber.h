@@ -2,7 +2,8 @@
 
 #include "Controller/ControllerType/RBaseController.h"
 #include "Controller/RControllerComponent.h"
-#include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "RSubscriber.h"
+#include "RVelocityCommandSubscriberParameter.h"
 // clang-format off
 #include "RVelocityCommandSubscriber.generated.h"
 // clang-format on
@@ -11,9 +12,6 @@ UCLASS()
 class UROBOSIM_API URVelocityCommandSubscriber final : public URSubscriber
 {
   GENERATED_BODY()
-
-public:
-  URVelocityCommandSubscriber();
 
 public:
   void CreateSubscriber() override;

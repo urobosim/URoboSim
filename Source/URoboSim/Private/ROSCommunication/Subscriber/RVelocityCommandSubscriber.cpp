@@ -4,14 +4,13 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRVelocityCommandSubscriber, Log, All)
 
-URVelocityCommandSubscriber::URVelocityCommandSubscriber()
-{
-  Topic = TEXT("/base_controller/command");
-  MessageType = TEXT("geometry_msgs/Twist");
-}
-
 void URVelocityCommandSubscriber::Init()
 {
+  if (!SubscriberParameters)
+  {
+    SubscriberParameters = CreateDefaultSubobject<URVelocityCommandSubscriberParameter>(TEXT("VelocityCommandSubscriberParameters"));
+  }
+
   if (GetOwner())
   {
     ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
@@ -22,8 +21,11 @@ void URVelocityCommandSubscriber::CreateSubscriber()
 {
   if (ControllerComponent)
   {
-    Subscriber = MakeShareable<FRVelocityCommandSubscriberCallback>(
-        new FRVelocityCommandSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("BaseController"))));
+    if (Cast<URVelocityCommandSubscriberParameter>(SubscriberParameters))
+    {
+      Subscriber = MakeShareable<FRVelocityCommandSubscriberCallback>(
+          new FRVelocityCommandSubscriberCallback(SubscriberParameters->Topic, SubscriberParameters->MessageType, ControllerComponent->GetController(TEXT("BaseController"))));
+    }
   }
   else
   {

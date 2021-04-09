@@ -6,7 +6,6 @@
 #include "Engine/DataAsset.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/Publisher/RPublisherParameter.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
@@ -35,16 +34,6 @@ struct FRPublisherConfiguration
 public:
   UPROPERTY(EditAnywhere)
   URPublisherParameter *PublisherParameters;
-};
-
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URSubscriberParameter : public UObject
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
 };
 
 USTRUCT()
@@ -77,16 +66,6 @@ public:
   URServiceClientParameter *ServiceClientParameters;
 };
 
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URActionServerParameter : public UObject
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-};
-
 USTRUCT()
 struct FRActionServerConfiguration
 {
@@ -105,7 +84,7 @@ class UROBOSIM_API URROSCommunicationDataAsset : public UDataAsset
 public:
   // Names of the robots for which this configration asset is used
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Basic Information")
-  TArray<FString> RobotNames;
+  FString RobotName;
 
   // Basic ROS infos such as ip, port ...
   UPROPERTY(EditAnywhere, export, noclear, Category = "Basic Information")

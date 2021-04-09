@@ -4,6 +4,7 @@
 
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
+#include "RSubscriberParameter.h"
 // clang-format off
 #include "RSubscriber.generated.h"
 // clang-format on
@@ -31,6 +32,10 @@ public:
 public:
   virtual ARModel *GetOwner() const { return Owner; }
 
+public:
+  UPROPERTY(VisibleAnywhere)
+  URSubscriberParameter *SubscriberParameters;
+
 protected:
   virtual void Init(UObject *InOwner, const FString &InTopic);
 
@@ -44,12 +49,6 @@ protected:
 
 protected:
   TSharedPtr<FROSBridgeSubscriber> Subscriber;
-
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-
-  UPROPERTY()
-  FString MessageType;
 
   TSharedPtr<FROSBridgeHandler> Handler;
 

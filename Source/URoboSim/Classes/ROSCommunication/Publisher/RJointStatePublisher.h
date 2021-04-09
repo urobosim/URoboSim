@@ -12,13 +12,13 @@ class UROBOSIM_API URJointStatePublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
-  void Publish();
-
-public:
-  const URJointStatePublisherParameter *GetJointStatePublisherParameters() const { return Cast<URJointStatePublisherParameter>(PublisherParameters); }
+  void Publish() override;
 
 protected:
   void Init() override;
+
+public:
+  const URJointStatePublisherParameter *GetJointStatePublisherParameters() const { return Cast<URJointStatePublisherParameter>(PublisherParameters); }
 
 private:
   UPROPERTY()

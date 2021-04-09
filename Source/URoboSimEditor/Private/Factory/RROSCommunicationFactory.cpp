@@ -33,23 +33,20 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
       TArray<AActor *> WorldActors;
       UGameplayStatics::GetAllActorsOfClass(InLevel->OwningWorld, ARModel::StaticClass(), WorldActors);
 
-      TArray<ARModel *> Robots;
       for (AActor *&Actor : WorldActors)
       {
-        if (ROSCommunicationDataAsset->RobotNames.ContainsByPredicate([&](FString RobotName) { return Actor->GetName().Contains(RobotName); }))
+        if (Actor->GetName().Contains(ROSCommunicationDataAsset->RobotName))
         {
           UE_LOG(LogRROSCommunicationFactory, Log, TEXT("Found ARModel %s in ROSCommunicationDataAsset %s"), *Actor->GetName(), *ROSCommunicationDataAsset->GetName())
-          Robots.Add(Cast<ARModel>(Actor));
+          URROSCommunicationBuilder *ROSCommunicationBuiler = NewObject<URROSCommunicationBuilder>();
+          ARModel *Robot = Cast<ARModel>(Actor);
+          ROSCommunicationBuiler->Init(Robot, ROSCommunicationDataAsset->ROSCommunicationConfiguration);
+          ROSCommunicationBuiler->Build(ROSCommunicationDataAsset->PublisherConfiguration,
+                                        ROSCommunicationDataAsset->SubscriberConfiguration,
+                                        ROSCommunicationDataAsset->ServiceClientConfiguration,
+                                        ROSCommunicationDataAsset->ActionServerConfiguration);
+          return nullptr;
         }
-      }
-      if (Robots.Num() != 0)
-      {
-        URROSCommunicationBuilder *ROSCommunicationBuiler = NewObject<URROSCommunicationBuilder>();
-        ROSCommunicationBuiler->Init(Robots, ROSCommunicationDataAsset->ROSCommunicationConfiguration);
-        ROSCommunicationBuiler->Build(ROSCommunicationDataAsset->PublisherConfiguration,
-                                      ROSCommunicationDataAsset->SubscriberConfiguration,
-                                      ROSCommunicationDataAsset->ServiceClientConfiguration,
-                                      ROSCommunicationDataAsset->ActionServerConfiguration);
       }
     }
     else

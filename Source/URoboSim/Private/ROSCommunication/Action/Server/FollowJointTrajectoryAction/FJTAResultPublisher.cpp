@@ -5,6 +5,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRFJTAResultPublisher, Log, All);
 
+URFJTAResultPublisher::URFJTAResultPublisher()
+{
+  PublisherParameters = CreateDefaultSubobject<URFJTAResultPublisherParameter>(TEXT("FJTAResultPublisherParameters"));
+}
+
 void URFJTAResultPublisher::Init()
 {
   if (!PublisherParameters)

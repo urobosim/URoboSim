@@ -10,7 +10,7 @@ void URJointTrajectoryControllerStatePublisher::Init()
   {
     PublisherParameters = CreateDefaultSubobject<URJointTrajectoryControllerStatePublisherParameter>(TEXT("JointStatePublisherParameters"));
   }
-  
+
   if (GetOwner())
   {
     URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
@@ -42,32 +42,45 @@ void URJointTrajectoryControllerStatePublisher::Publish()
       TArray<double> DesiredPositions;
       TArray<double> CurrentPositions;
       TArray<double> ErrorPositions;
+      TArray<double> DesiredVelocities;
+      TArray<double> CurrentVelocities;
+      TArray<double> ErrorVelocities;
       for (const FTrajectoryStatus &TrajectoryStatus : JointController->GetTrajectoryStatusArray())
       {
         JointNames.Add(TrajectoryStatus.JointName);
-        DesiredPositions.Add(TrajectoryStatus.DesiredPosition);
-        CurrentPositions.Add(TrajectoryStatus.CurrentPosition);
-        ErrorPositions.Add(TrajectoryStatus.ErrorPosition);
+        DesiredPositions.Add(TrajectoryStatus.DesiredState.JointPosition);
+        CurrentPositions.Add(TrajectoryStatus.CurrentState.JointPosition);
+        ErrorPositions.Add(TrajectoryStatus.ErrorState.JointPosition);
+        DesiredVelocities.Add(TrajectoryStatus.DesiredState.JointVelocity);
+        CurrentVelocities.Add(TrajectoryStatus.CurrentState.JointVelocity);
+        ErrorVelocities.Add(TrajectoryStatus.ErrorState.JointVelocity);
       }
 
       State->SetJointNames(JointNames);
 
-      trajectory_msgs::JointTrajectoryPoint DesiredPositionsMsg;
-      DesiredPositionsMsg.SetPositions(DesiredPositions);
-      State->SetDesired(DesiredPositionsMsg);
+      trajectory_msgs::JointTrajectoryPoint DesiredStatesMsg;
+      DesiredStatesMsg.SetPositions(DesiredPositions);
+      DesiredStatesMsg.SetVelocities(DesiredVelocities);
+      State->SetDesired(DesiredStatesMsg);
 
-      trajectory_msgs::JointTrajectoryPoint CurrentPositionMsg;
-      CurrentPositionMsg.SetPositions(CurrentPositions);
-      State->SetActual(CurrentPositionMsg);
+      trajectory_msgs::JointTrajectoryPoint CurrentStatesMsg;
+      CurrentStatesMsg.SetPositions(CurrentPositions);
+      CurrentStatesMsg.SetVelocities(CurrentVelocities);
+      State->SetActual(CurrentStatesMsg);
 
-      trajectory_msgs::JointTrajectoryPoint ErrorPositionMsg;
-      ErrorPositionMsg.SetPositions(ErrorPositions);
-      State->SetError(ErrorPositionMsg);
+      trajectory_msgs::JointTrajectoryPoint ErrorStatesMsg;
+      ErrorStatesMsg.SetPositions(ErrorPositions);
+      ErrorStatesMsg.SetVelocities(ErrorVelocities);
+      State->SetError(ErrorStatesMsg);
 
       Handler->PublishMsg(JointTrajectoryControllerStatePublisherParameters->Topic, State);
       Handler->Process();
 
       Seq++;
     }
+  }
+  else
+  {
+    UE_LOG(LogRJointTrajectoryControllerStatePublisher, Error, TEXT("JointController not found in %s"), *GetName())
   }
 }

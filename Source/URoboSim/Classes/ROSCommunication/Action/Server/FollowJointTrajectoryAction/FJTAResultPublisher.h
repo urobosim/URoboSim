@@ -13,6 +13,9 @@ class UROBOSIM_API URFJTAResultPublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
+  URFJTAResultPublisher();
+
+public:
   void Publish() override;
 
 protected:

@@ -3,6 +3,11 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRFJTAStatusPublisher, Log, All);
 
+URFJTAStatusPublisher::URFJTAStatusPublisher()
+{
+  PublisherParameters = CreateDefaultSubobject<URActionStatusPublisherParameter>(TEXT("FJTAStatusPublisherParameters"));
+}
+
 void URFJTAStatusPublisher::Init()
 {
   if (!PublisherParameters)

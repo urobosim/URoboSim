@@ -15,11 +15,11 @@ class UROBOSIM_API URJointTrajectoryControllerStatePublisher final : public URPu
 public:
   void Publish() override;
 
-public:
-  const URJointTrajectoryControllerStatePublisherParameter *GetJointTrajectoryControllerStatePublisherParameters() const { return Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherParameters); }
-
 protected:
   void Init() override;
+
+public:
+  const URJointTrajectoryControllerStatePublisherParameter *GetJointTrajectoryControllerStatePublisherParameters() const { return Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherParameters); }
 
 private:
   URJointController *JointController;

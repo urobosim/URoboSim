@@ -1,9 +1,30 @@
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisherParameter.h"
+#include "ROSCommunication/Action/Server/RActionServerParameter.h"
 // clang-format off
 #include "FJTAServerParameter.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URFJTAServerParameter : public URActionServerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URFJTAServerParameter()
+  {
+    ActionName = TEXT("/whole_body_controller/body/follow_joint_trajectory");
+    FrameId = TEXT("odom");
+    JointParamPath = TEXT("whole_body_controller/body/joints");
+  }
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId; 
+
+  UPROPERTY(EditAnywhere)
+  FString JointParamPath; 
+};
 
 UCLASS()
 class UROBOSIM_API URFJTAFeedbackPublisherParameter : public URPublisherParameter
@@ -27,6 +48,18 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URFJTAGoalSubscriberParameter : public URSubscriberParameter
+{
+  GENERATED_BODY()
+
+public:
+  URFJTAGoalSubscriberParameter()
+  {
+    MessageType = TEXT("control_msgs/FollowJointTrajectoryActionGoal");
+  }
+};
+
+UCLASS()
 class UROBOSIM_API URFJTAResultPublisherParameter : public URPublisherParameter
 {
   GENERATED_BODY()
@@ -42,3 +75,4 @@ public:
   UPROPERTY(EditAnywhere)
   FString FrameId; 
 };
+

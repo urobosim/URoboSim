@@ -31,10 +31,15 @@ void URSubscriber::Init(UObject *InOwner, const FString &WebsocketIPAddr, const 
 
 void URSubscriber::Init(UObject *InOwner, const FString &InTopic)
 {
+  if (!SubscriberParameters)
+  {
+    SubscriberParameters = CreateDefaultSubobject<URSubscriberParameter>(TEXT("SubscriberParameters"));
+  }
+
   SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
-    Topic = InTopic;
+    SubscriberParameters->Topic = InTopic;
   }
   Init();
   CreateSubscriber();

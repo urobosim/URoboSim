@@ -12,7 +12,7 @@ class UROBOSIM_API URROSCommunicationBuilder : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void Init(const TArray<ARModel *> &InModels, const FRROSCommunicationConfiguration &InROSCommunicationConfiguration);
+  virtual void Init(ARModel *&InOwner, const FRROSCommunicationConfiguration &InROSCommunicationConfiguration);
 
   virtual void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
                      const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
@@ -21,9 +21,13 @@ public:
 
   virtual URPublisher *CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration);
 
+  virtual URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);
+
+  virtual URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
+
 protected:
   UPROPERTY()
-  TArray<ARModel *> Models;
+  ARModel * Owner;
 
   UPROPERTY()
   FRROSCommunicationConfiguration ROSCommunicationConfiguration;

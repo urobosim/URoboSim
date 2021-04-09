@@ -169,9 +169,10 @@ bool URJointController::CheckTrajectoryPoint()
     URJoint *Joint = GetOwner()->GetJoint(TrajectoryStatus.JointName);
     if (Joint)
     {
-      TrajectoryStatus.CurrentPosition = Joint->GetJointStateInROSUnit().JointPosition;
-      TrajectoryStatus.DesiredPosition = DesiredTrajectory[TrajectoryPointIndex].JointStates[TrajectoryStatus.JointName].JointPosition;
-      TrajectoryStatus.ErrorPosition = TrajectoryStatus.DesiredPosition - TrajectoryStatus.CurrentPosition;
+      TrajectoryStatus.CurrentState = Joint->GetJointStateInROSUnit();
+      TrajectoryStatus.DesiredState = DesiredTrajectory[TrajectoryPointIndex].JointStates[TrajectoryStatus.JointName];
+      TrajectoryStatus.ErrorState.JointPosition = TrajectoryStatus.DesiredState.JointPosition - TrajectoryStatus.CurrentState.JointPosition;
+      TrajectoryStatus.ErrorState.JointVelocity = TrajectoryStatus.DesiredState.JointVelocity - TrajectoryStatus.CurrentState.JointVelocity;
     }
     else
     {

@@ -71,12 +71,12 @@ struct FTrajectoryStatus
 public:
   FTrajectoryStatus() {}
 
-  FTrajectoryStatus(const FString &InJointName) : JointName(InJointName), CurrentPosition(0.f), DesiredPosition(0.f), ErrorPosition(0.f) {}
+  FTrajectoryStatus(const FString &InJointName) : JointName(InJointName), CurrentState(FJointState()), DesiredState(FJointState()), ErrorState(FJointState()) {}
 
   FString JointName;
-  float CurrentPosition;
-  float DesiredPosition;
-  float ErrorPosition;
+  FJointState CurrentState;
+  FJointState DesiredState;
+  FJointState ErrorState;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
