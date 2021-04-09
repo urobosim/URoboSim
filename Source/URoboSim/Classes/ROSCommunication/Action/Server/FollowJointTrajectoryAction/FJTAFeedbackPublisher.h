@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Controller/ControllerType/RJointController.h"
+#include "FJTAServerParameter.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Service/Client/RGetJointsClient.h"
 // clang-format off
@@ -11,7 +12,7 @@ UCLASS()
 class UROBOSIM_API URFJTAFeedbackPublisher final : public URPublisher
 {
   GENERATED_BODY()
-  
+
 public:
   void Publish() override;
 

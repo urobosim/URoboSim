@@ -1,6 +1,7 @@
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
+#include "RPublisher.h"
+#include "RJointTrajectoryControllerStatePublisherParameter.h"
 #include "Controller/ControllerType/RJointController.h"
 // clang-format off
 #include "RJointTrajectoryControllerStatePublisher.generated.h"

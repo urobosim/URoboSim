@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Controller/ControllerType/RJointController.h"
+#include "FJTAServerParameter.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 // clang-format off
 #include "FJTAResultPublisher.generated.h"

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/Service/Client/RGetParamClient.h"
+#include "RPublisher.h"
+#include "RJointStatePublisherParameter.h"
 // clang-format off
 #include "RJointStatePublisher.generated.h"
 // clang-format on

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
+#include "RActionServerParameter.h"
 #include "Controller/RController.h"
 // clang-format off
 #include "RActionStatusPublisher.generated.h"

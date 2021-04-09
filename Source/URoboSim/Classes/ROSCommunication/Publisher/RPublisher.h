@@ -34,7 +34,7 @@ public:
   virtual void Publish() {}
 
 public:
-  UPROPERTY()
+  UPROPERTY(VisibleAnywhere)
   URPublisherParameter *PublisherParameters;
 
 protected:
