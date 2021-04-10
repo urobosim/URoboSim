@@ -15,43 +15,17 @@ class UROBOSIM_API URControllerBuilder : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void Init(const TArray<ARModel *> &InModels, const URControllerConfiguration *&InControllerConfiguration);
+  virtual void Init(const TArray<ARModel *> &InModels, const FRControllerConfiguration &InControllerConfiguration);
 
   virtual void Build();
 
 protected:
-  virtual URController *CreateController(ARModel *&InOwner) { return nullptr; }
-
-  virtual void Configure(){}
+  virtual URController *CreateController(ARModel *&InOwner, const TPair<FString, URControllerParameter *> ControllerParameters);
 
 protected:
   UPROPERTY()
   TArray<ARModel *> Models;
 
   UPROPERTY()
-  const URControllerConfiguration *ControllerConfiguration;
+  FRControllerConfiguration ControllerConfiguration;
 };
-
-UCLASS()
-class UROBOSIM_API URBaseControllerBuilder : public URControllerBuilder
-{
-  GENERATED_BODY()
-
-protected:
-  virtual URController *CreateController(ARModel *&InOwner) override;
-
-  virtual void Configure() override;
-};
-
-UCLASS()
-class UROBOSIM_API URJointControllerBuilder : public URControllerBuilder
-{
-  GENERATED_BODY()
-
-protected:
-  virtual URController *CreateController(ARModel *&InOwner) override;
-
-  virtual void Configure() override;
-};
-
-URControllerBuilder *CreateBuilder(const TArray<ARModel *> InModels, const URControllerConfiguration *&InControllerConfiguration);

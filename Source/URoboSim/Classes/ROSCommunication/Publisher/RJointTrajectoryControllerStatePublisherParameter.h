@@ -16,9 +16,13 @@ public:
     Topic = TEXT("/whole_body_controller/body/state");
     MessageType = TEXT("control_msgs/JointTrajectoryControllerState");
     FrameId = TEXT("odom");
+    JointControllerName = TEXT("JointController");
   }
 
 public:
   UPROPERTY(EditAnywhere)
   FString FrameId;
+
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName;
 };

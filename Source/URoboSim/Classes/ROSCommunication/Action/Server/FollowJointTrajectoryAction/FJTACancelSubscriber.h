@@ -16,6 +16,7 @@ public:
 
 public:
 	void CreateSubscriber() override;
+
 };
 
 class UROBOSIM_API FRFJTACancelSubscriberCallback final : public FROSBridgeSubscriber

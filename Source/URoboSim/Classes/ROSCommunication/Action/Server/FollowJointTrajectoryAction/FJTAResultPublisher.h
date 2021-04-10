@@ -18,11 +18,19 @@ public:
 public:
   void Publish() override;
 
+public:
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName;
+
 protected:
   void Init() override;
 
 public:
-  const URFJTAResultPublisherParameter *GetFJTAResultPublisherParameters() const { return Cast<URFJTAResultPublisherParameter>(PublisherParameters); }
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId; 
 
 private:
   URJointController *JointController;

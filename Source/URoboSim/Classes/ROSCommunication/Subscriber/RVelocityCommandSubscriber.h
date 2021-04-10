@@ -14,14 +14,16 @@ class UROBOSIM_API URVelocityCommandSubscriber final : public URSubscriber
   GENERATED_BODY()
 
 public:
+  URVelocityCommandSubscriber();
+
+public:
   void CreateSubscriber() override;
 
-protected:
-  void Init() override;
+  void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters) override;
 
-protected:
-  UPROPERTY()
-  URControllerComponent *ControllerComponent;
+public:
+  UPROPERTY(EditAnywhere)
+  FString BaseControllerName;
 };
 
 class UROBOSIM_API FRVelocityCommandSubscriberCallback final : public FROSBridgeSubscriber

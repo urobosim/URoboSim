@@ -4,22 +4,20 @@
 #pragma once
 
 #include "Engine/DataAsset.h"
-#include "Controller/RController.h"
+#include "Controller/RControllerParameter.h"
+#include "Containers/Map.h"
 // clang-format off
 #include "RControllerDataAsset.generated.h"
 // clang-format on
 
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew, Category = "Controller")
-class UROBOSIM_API URControllerConfiguration : public UObject
+USTRUCT()
+struct FRControllerConfiguration
 {
   GENERATED_BODY()
 
 public:
-  UPROPERTY(EditAnywhere, Category = "Basic Information")
-  FString ControllerName = TEXT("None");
-
-  UPROPERTY(EditAnywhere, Category = "Basic Information")
-  TSubclassOf<URController> ControllerType;
+  UPROPERTY(EditAnywhere, Instanced)
+  TMap<FString, URControllerParameter*> ControllerParameters;
 };
 
 UCLASS(BlueprintType, Category = "Controller")
@@ -32,6 +30,6 @@ public:
   UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Basic Information")
   TArray<FString> RobotNames;
 
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear, Category = "Basic Information")
-  TArray<URControllerConfiguration *> ControllerConfigurations;
+  UPROPERTY(EditAnywhere, Category = "Basic Information")
+  FRControllerConfiguration ControllerConfiguration;
 };

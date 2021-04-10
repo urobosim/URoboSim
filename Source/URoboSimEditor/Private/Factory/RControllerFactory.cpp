@@ -44,23 +44,14 @@ AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const F
       }
       if (Robots.Num() != 0)
       {
-        for (const URControllerConfiguration *ControllerConfiguration : ControllerDataAsset->ControllerConfigurations)
-        {
-          URControllerBuilder *ControllerBuilder = CreateBuilder(Robots, ControllerConfiguration);
-          if (ControllerBuilder)
-          {
-            ControllerBuilder->Build();
-          }
-          else
-          {
-            UE_LOG(LogRControllerFactory, Error, TEXT("ControllerBuilder failed to be created"))
-          }
-        }     
+        URControllerBuilder *ControllerBuilder = NewObject<URControllerBuilder>();
+        ControllerBuilder->Init(Robots, ControllerDataAsset->ControllerConfiguration);
+        ControllerBuilder->Build();
       }
     }
     else
     {
-      UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"))
+      UE_LOG(LogRControllerFactory, Error, TEXT("Asset cast to USDFDataAsset failed"))
     }
   }
   bDrag = !bDrag;

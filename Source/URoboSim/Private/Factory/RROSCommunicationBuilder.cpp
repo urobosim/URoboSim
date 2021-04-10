@@ -29,13 +29,13 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
 
   if (PublisherConfigurations.Num() > 0)
   {
-    for (const FRPublisherConfiguration &PublisherConfiguration : PublisherConfigurations)
+    for (FRPublisherConfiguration PublisherConfiguration : PublisherConfigurations)
     {
       URPublisher *Publisher = CreatePublisher(Owner, PublisherConfiguration);
       if (Publisher)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Publisher->GetName(), *Owner->GetName());
-        Publisher->PublisherParameters = PublisherConfiguration.PublisherParameters;
+        Publisher->SetPublishParameters(PublisherConfiguration.PublisherParameters);
         Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddPublisher(Publisher);
       }
     }
@@ -43,13 +43,13 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
 
   if (SubscriberConfigurations.Num() > 0)
   {
-    for (const FRSubscriberConfiguration &SubscriberConfiguration : SubscriberConfigurations)
+    for (FRSubscriberConfiguration SubscriberConfiguration : SubscriberConfigurations)
     {
       URSubscriber *Subscriber = CreateSubscriber(Owner, SubscriberConfiguration);
       if (Subscriber)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Subscriber->GetName(), *Owner->GetName());
-        Subscriber->SubscriberParameters = SubscriberConfiguration.SubscriberParameters;
+        Subscriber->SetSubscriberParameters(SubscriberConfiguration.SubscriberParameters);
         Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddSubscriber(Subscriber);
       }
     }
@@ -57,13 +57,13 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
 
   if (ActionServerConfigurations.Num() > 0)
   {
-    for (const FRActionServerConfiguration &ActionServerConfiguration : ActionServerConfigurations)
+    for (FRActionServerConfiguration ActionServerConfiguration : ActionServerConfigurations)
     {
       URActionServer *ActionServer = CreateActionServer(Owner, ActionServerConfiguration);
       if (ActionServer)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ActionServer->GetName(), *Owner->GetName());
-        ActionServer->ActionServerParameters = ActionServerConfiguration.ActionServerParameters;
+        ActionServer->SetActionServerParameters(ActionServerConfiguration.ActionServerParameters);
         Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddActionServer(ActionServer);
       }
     }

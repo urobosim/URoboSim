@@ -12,15 +12,22 @@ class UROBOSIM_API URJointStatePublisher final : public URPublisher
   GENERATED_BODY()
 
 public:
+  URJointStatePublisher();
+
+public:
   void Publish() override;
 
 protected:
   void Init() override;
 
 public:
-  const URJointStatePublisherParameter *GetJointStatePublisherParameters() const { return Cast<URJointStatePublisherParameter>(PublisherParameters); }
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
-private:
+public:
   UPROPERTY()
   TMap<FString, FJointState> JointStates;
+
+private:
+  UPROPERTY(EditAnywhere)
+  FString FrameId; 
 };

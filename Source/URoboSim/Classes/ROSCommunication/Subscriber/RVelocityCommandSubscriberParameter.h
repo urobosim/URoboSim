@@ -15,5 +15,10 @@ public:
   {
     Topic = TEXT("/base_controller/command");
     MessageType = TEXT("geometry_msgs/Twist");
+    BaseControllerName = TEXT("BaseController");
   }
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString BaseControllerName;
 };

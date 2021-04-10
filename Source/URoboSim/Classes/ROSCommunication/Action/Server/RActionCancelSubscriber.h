@@ -12,10 +12,16 @@ class UROBOSIM_API URActionCancelSubscriber : public URSubscriber
 {
 	GENERATED_BODY()
 
+public:
+	URActionCancelSubscriber();
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString ControllerName; 
+
 protected:
 	virtual void Init() override;
 
 protected:
-	UPROPERTY()
-	URControllerComponent *ControllerComponent;
+  URController *Controller;
 };

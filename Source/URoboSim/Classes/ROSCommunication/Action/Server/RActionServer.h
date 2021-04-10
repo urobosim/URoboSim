@@ -31,9 +31,7 @@ public:
 
   void Tick();
 
-public:
-  UPROPERTY(EditAnywhere)
-  URActionServerParameter *ActionServerParameters;
+  virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
 protected:
   void Init(UObject *InOwner, const FString &InActionName);
@@ -44,18 +42,21 @@ protected:
 
 protected:
   UPROPERTY(EditAnywhere)
+  FString ActionName;
+
+  UPROPERTY(VisibleAnywhere)
   URSubscriber *GoalSubscriber;
 
-  UPROPERTY(EditAnywhere)
+  UPROPERTY(VisibleAnywhere)
   URSubscriber *CancelSubscriber;
 
-  UPROPERTY(EditAnywhere)
+  UPROPERTY(VisibleAnywhere)
   URPublisher *StatusPublisher;
 
-  UPROPERTY(EditAnywhere)
+  UPROPERTY(VisibleAnywhere)
   URPublisher *ResultPublisher;
 
-  UPROPERTY(EditAnywhere)
+  UPROPERTY(VisibleAnywhere)
   URPublisher *FeedbackPublisher;
 
   TSharedPtr<FROSBridgeHandler> Handler;

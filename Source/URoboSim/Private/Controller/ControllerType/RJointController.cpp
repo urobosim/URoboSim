@@ -25,6 +25,17 @@ void URJointController::SetJointNames(const TArray<FString> &InNames)
   DesiredTrajectory.Empty();
 }
 
+void URJointController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URJointControllerParameter *JointControllerParameters = Cast<URJointControllerParameter>(ControllerParameters);
+  if (JointControllerParameters)
+  {
+    Mode = JointControllerParameters->Mode;
+    EnableDrive = JointControllerParameters->EnableDrive;
+    bDisableCollision = JointControllerParameters->bDisableCollision;
+  }
+}
+
 void URJointController::Init()
 {
   Super::Init();

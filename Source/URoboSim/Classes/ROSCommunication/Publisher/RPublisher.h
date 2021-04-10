@@ -33,9 +33,7 @@ public:
 
   virtual void Publish() {}
 
-public:
-  UPROPERTY(VisibleAnywhere)
-  URPublisherParameter *PublisherParameters;
+  virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters);
 
 protected:
   void Init(UObject *InOwner, const FString &InTopic);
@@ -45,6 +43,13 @@ protected:
   virtual void SetOwner(UObject *&InOwner) { Owner = Cast<ARModel>(InOwner); }
 
   virtual void CreatePublisher();
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
 
 protected:
   TSharedPtr<FROSBridgePublisher> Publisher;

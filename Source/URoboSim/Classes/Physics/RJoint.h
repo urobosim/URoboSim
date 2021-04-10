@@ -17,19 +17,19 @@ struct FEnableDrive
 
 public:
   UPROPERTY(EditAnywhere)
-  bool bPositionDrive;
+  bool bPositionDrive = true;
 
   UPROPERTY(EditAnywhere)
-  bool bVelocityDrive;
+  bool bVelocityDrive = true;
 
   UPROPERTY(EditAnywhere)
-  float PositionStrength;
+  float PositionStrength = 1E5;
 
   UPROPERTY(EditAnywhere)
-  float VelocityStrength;
+  float VelocityStrength = 1E5;
 
   UPROPERTY(EditAnywhere)
-  float MaxForce;
+  float MaxForce = 1E10;
 };
 
 USTRUCT()
@@ -154,7 +154,6 @@ UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UROBOSIM_API URRevoluteJoint : public URContinuousJoint
 {
   GENERATED_BODY()
-
 };
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))

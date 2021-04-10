@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Controller/RController.h"
+#include "RJointControllerParameter.h"
 // clang-format off
 #include "RJointController.generated.h"
 // clang-format on
@@ -11,13 +12,6 @@ enum class UJointControllerState : uint8
   Normal,
   FollowJointTrajectory,
   Off
-};
-
-UENUM()
-enum class UJointControllerMode : uint8
-{
-  Dynamic,
-  Kinematic
 };
 
 USTRUCT()
@@ -96,6 +90,8 @@ public:
   void SetJointNames(const TArray<FString> &InNames);
 
   void SetMode();
+
+  void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   const TArray<FTrajectoryStatus> GetTrajectoryStatusArray() const { return TrajectoryStatusArray; }
 

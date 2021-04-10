@@ -4,7 +4,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRControllerBuilder, Log, All);
 
-void URControllerBuilder::Init(const TArray<ARModel *> &InModels, const URControllerConfiguration *&InControllerConfiguration)
+void URControllerBuilder::Init(const TArray<ARModel *> &InModels, const FRControllerConfiguration &InControllerConfiguration)
 {
   if (InModels.Num() == 0)
   {
@@ -12,7 +12,7 @@ void URControllerBuilder::Init(const TArray<ARModel *> &InModels, const URContro
     return;
   }
 
-  if (!InControllerConfiguration)
+  if (InControllerConfiguration.ControllerParameters.Num() == 0)
   {
     UE_LOG(LogRControllerBuilder, Error, TEXT("No ControllerConfiguration found"))
     return;
@@ -26,58 +26,31 @@ void URControllerBuilder::Build()
 {
   for (ARModel *&Model : Models)
   {
-    URPluginComponent *ControllerComponent = Model->GetPlugin(TEXT("ControllerComponent"));
-    if (ControllerComponent)
+    URPluginComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
+    ControllerComponent->RegisterComponent();
+
+    for (TPair<FString, URControllerParameter *> ControllerParameters : ControllerConfiguration.ControllerParameters)
     {
-      UE_LOG(LogRControllerBuilder, Log, TEXT("ControllerComponent of %s found"), *Model->GetName())
+      UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerParameters.Key, *Model->GetName());
+      URController *Controller = CreateController(Model, ControllerParameters);
+      Controller->SetControllerParameters(ControllerParameters.Value);
+      Cast<URControllerComponent>(ControllerComponent)->AddController(Controller);
     }
-    else
-    {
-      UE_LOG(LogRControllerBuilder, Log, TEXT("ControllerComponent of %s not found, create one"), *Model->GetName())
-      ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
-      ControllerComponent->RegisterComponent();
-    }
-    UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerConfiguration->ControllerName, *Model->GetName());
-    URController *Controller = CreateController(Model);
-    Configure();
-    Cast<URControllerComponent>(ControllerComponent)->AddController(Controller);
   }
 }
 
-URController *URBaseControllerBuilder::CreateController(ARModel *&InOwner)
+URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPair<FString, URControllerParameter *> ControllerParameters)
 {
-  return NewObject<URBaseController>(InOwner, *ControllerConfiguration->ControllerName);
-}
-
-void URBaseControllerBuilder::Configure()
-{
-}
-
-URController *URJointControllerBuilder::CreateController(ARModel *&InOwner)
-{
-  return NewObject<URJointController>(InOwner, *ControllerConfiguration->ControllerName);
-}
-
-void URJointControllerBuilder::Configure()
-{
-}
-
-URControllerBuilder *CreateBuilder(const TArray<ARModel *> InModels, const URControllerConfiguration *&InControllerConfiguration)
-{
-  URControllerBuilder *ControllerBuilder = nullptr;
-  if (!InControllerConfiguration->ControllerType)
+  if (Cast<URJointControllerParameter>(ControllerParameters.Value))
   {
-    UE_LOG(LogRControllerBuilder, Error, TEXT("ControllerType is not set"));
+    return NewObject<URJointController>(InOwner, *ControllerParameters.Key);
   }
-  else if (InControllerConfiguration->ControllerType == URJointController::StaticClass())
+  else if (Cast<URBaseControllerParameter>(ControllerParameters.Value))
   {
-    ControllerBuilder = NewObject<URJointControllerBuilder>();
-    ControllerBuilder->Init(InModels, InControllerConfiguration);
+    return NewObject<URBaseController>(InOwner, *ControllerParameters.Key);
   }
-  else if (InControllerConfiguration->ControllerType == URBaseController::StaticClass())
+  else
   {
-    ControllerBuilder = NewObject<URBaseControllerBuilder>();
-    ControllerBuilder->Init(InModels, InControllerConfiguration);
+    return NewObject<URController>(InOwner, *ControllerParameters.Key);
   }
-  return ControllerBuilder;
 }

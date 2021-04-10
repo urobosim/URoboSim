@@ -2,40 +2,48 @@
 #include "Conversions.h"
 #include "sensor_msgs/JointState.h"
 
+UROdomPublisher::UROdomPublisher()
+{
+  Topic = TEXT("/base/joint_states");
+  MessageType = TEXT("sensor_msgs/JointState");
+  FrameId = TEXT("odom");
+  FrameNames.Add(TEXT("odom_x_joint"));
+  FrameNames.Add(TEXT("odom_y_joint"));
+  FrameNames.Add(TEXT("odom_z_joint"));
+}
+
 void UROdomPublisher::Init()
 {
-  if (!PublisherParameters)
-  {
-    PublisherParameters = CreateDefaultSubobject<UROdomPublisherParameter>(TEXT("OdomPublisherParameters"));
-  }
-  
-  const UROdomPublisherParameter *OdomPublisherParameters = GetOdomPublisherParameters();
+  OdomPosition.Init(0., FrameNames.Num());
+  OdomVelocity.Init(0., FrameNames.Num());
+}
+
+void UROdomPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
+{
+  UROdomPublisherParameter *OdomPublisherParameters = Cast<UROdomPublisherParameter>(PublisherParameters);
   if (OdomPublisherParameters)
   {
-    OdomPosition.Init(0., OdomPublisherParameters->FrameNames.Num());
-    OdomVelocity.Init(0., OdomPublisherParameters->FrameNames.Num());
+    Super::SetPublishParameters(PublisherParameters);
+    FrameId = OdomPublisherParameters->FrameId;
+    FrameNames = OdomPublisherParameters->FrameNames;
   }
 }
 
 void UROdomPublisher::Publish()
 {
   static int Seq = 0;
-  const UROdomPublisherParameter *OdomPublisherParameters = GetOdomPublisherParameters();
-  if (OdomPublisherParameters)
-  {
-    static TSharedPtr<sensor_msgs::JointState> JointStateMsg =
-        MakeShareable(new sensor_msgs::JointState());
+  static TSharedPtr<sensor_msgs::JointState> JointStateMsg =
+      MakeShareable(new sensor_msgs::JointState());
 
-    JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), OdomPublisherParameters->FrameId));
-    JointStateMsg->SetName(OdomPublisherParameters->FrameNames);
-    CalculateOdomStates();
-    JointStateMsg->SetPosition(OdomPosition);
-    JointStateMsg->SetVelocity(OdomVelocity);
+  JointStateMsg->SetHeader(std_msgs::Header(Seq++, FROSTime(), FrameId));
+  JointStateMsg->SetName(FrameNames);
+  CalculateOdomStates();
+  JointStateMsg->SetPosition(OdomPosition);
+  JointStateMsg->SetVelocity(OdomVelocity);
 
-    Handler->PublishMsg(OdomPublisherParameters->Topic, JointStateMsg);
+  Handler->PublishMsg(Topic, JointStateMsg);
 
-    Handler->Process();
-  }
+  Handler->Process();
 }
 
 void UROdomPublisher::CalculateOdomStates()

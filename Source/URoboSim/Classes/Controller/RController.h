@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Physics/RModel.h"
+#include "RControllerParameter.h"
 #include "ROSUtilities.h"
 // clang-format off
 #include "RController.generated.h"
@@ -23,6 +24,8 @@ public:
   void SetOwner(ARModel *InOwner) { Owner = InOwner; }
 
   ARModel *GetOwner();
+
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) {}
 
   void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
 

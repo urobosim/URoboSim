@@ -4,6 +4,7 @@
 
 #include "Controller/RController.h"
 #include "Physics/RModel.h"
+#include "RBaseControllerParameter.h"
 // clang-format off
 #include "RBaseController.generated.h"
 // clang-format on

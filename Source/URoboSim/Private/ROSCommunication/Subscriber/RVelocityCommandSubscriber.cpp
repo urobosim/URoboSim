@@ -4,32 +4,37 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRVelocityCommandSubscriber, Log, All)
 
-void URVelocityCommandSubscriber::Init()
+URVelocityCommandSubscriber::URVelocityCommandSubscriber()
 {
-  if (!SubscriberParameters)
-  {
-    SubscriberParameters = CreateDefaultSubobject<URVelocityCommandSubscriberParameter>(TEXT("VelocityCommandSubscriberParameters"));
-  }
+  Topic = TEXT("/base_controller/command");
+  MessageType = TEXT("geometry_msgs/Twist");
+  BaseControllerName = TEXT("BaseController");
+}
 
-  if (GetOwner())
+void URVelocityCommandSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
+{
+  Super::SetSubscriberParameters(SubscriberParameters);
+  URVelocityCommandSubscriberParameter *VelocityCommandSubscriberParameters = Cast<URVelocityCommandSubscriberParameter>(SubscriberParameters);
+  if (VelocityCommandSubscriberParameters)
   {
-    ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-  }
+    BaseControllerName = VelocityCommandSubscriberParameters->BaseControllerName;
+  }  
 }
 
 void URVelocityCommandSubscriber::CreateSubscriber()
 {
-  if (ControllerComponent)
+  if (GetOwner())
   {
-    if (Cast<URVelocityCommandSubscriberParameter>(SubscriberParameters))
+    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
+    if (ControllerComponent)
     {
       Subscriber = MakeShareable<FRVelocityCommandSubscriberCallback>(
-          new FRVelocityCommandSubscriberCallback(SubscriberParameters->Topic, SubscriberParameters->MessageType, ControllerComponent->GetController(TEXT("BaseController"))));
+          new FRVelocityCommandSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(BaseControllerName)));
     }
-  }
-  else
-  {
-    UE_LOG(LogRVelocityCommandSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
+    else
+    {
+      UE_LOG(LogRVelocityCommandSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
+    }
   }
 }
 

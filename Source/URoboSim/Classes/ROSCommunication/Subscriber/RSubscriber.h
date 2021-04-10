@@ -32,9 +32,14 @@ public:
 public:
   virtual ARModel *GetOwner() const { return Owner; }
 
+  virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
+
 public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
   UPROPERTY(VisibleAnywhere)
-  URSubscriberParameter *SubscriberParameters;
+  FString MessageType;
 
 protected:
   virtual void Init(UObject *InOwner, const FString &InTopic);

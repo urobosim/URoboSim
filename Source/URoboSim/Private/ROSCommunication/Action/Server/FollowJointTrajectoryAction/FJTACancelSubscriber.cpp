@@ -5,23 +5,13 @@ DEFINE_LOG_CATEGORY_STATIC(LogRFJTACancelSubscriber, Log, All)
 
 URFJTACancelSubscriber::URFJTACancelSubscriber()
 {
-  SubscriberParameters = CreateDefaultSubobject<URActionCancelSubscriberParameter>(TEXT("FJTACancelSubscriberParameters"));
+  ControllerName = TEXT("JointController");
 }
 
 void URFJTACancelSubscriber::CreateSubscriber()
 {
-  if (ControllerComponent)
-  {
-    if (Cast<URActionCancelSubscriberParameter>(SubscriberParameters))
-    {
-      Subscriber = MakeShareable<FRFJTACancelSubscriberCallback>(
-          new FRFJTACancelSubscriberCallback(SubscriberParameters->Topic, SubscriberParameters->MessageType, ControllerComponent->GetController(TEXT("JointController"))));
-    }
-  }
-  else
-  {
-    UE_LOG(LogRFJTACancelSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
-  }
+  Subscriber = MakeShareable<FRFJTACancelSubscriberCallback>(
+      new FRFJTACancelSubscriberCallback(Topic, MessageType, Controller));
 }
 
 FRFJTACancelSubscriberCallback::FRFJTACancelSubscriberCallback(

@@ -19,6 +19,7 @@ public:
                      const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
                      const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
 
+protected:
   virtual URPublisher *CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration);
 
   virtual URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);

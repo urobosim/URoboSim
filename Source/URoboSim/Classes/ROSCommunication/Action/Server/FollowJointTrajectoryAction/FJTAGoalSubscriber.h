@@ -19,12 +19,9 @@ public:
 public:
   void CreateSubscriber() override;
 
-protected:
-  void Init() override;
-
-protected:
-  UPROPERTY()
-  URControllerComponent *ControllerComponent;
+public:
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName;
 };
 
 class UROBOSIM_API FRFJTAGoalSubscriberCallback final : public FROSBridgeSubscriber

@@ -31,15 +31,10 @@ void URSubscriber::Init(UObject *InOwner, const FString &WebsocketIPAddr, const 
 
 void URSubscriber::Init(UObject *InOwner, const FString &InTopic)
 {
-  if (!SubscriberParameters)
-  {
-    SubscriberParameters = CreateDefaultSubobject<URSubscriberParameter>(TEXT("SubscriberParameters"));
-  }
-
   SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
-    SubscriberParameters->Topic = InTopic;
+    Topic = InTopic;
   }
   Init();
   CreateSubscriber();
@@ -61,4 +56,13 @@ void URSubscriber::AddSubscriber()
     UE_LOG(LogRSubscriber, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Handler->AddSubscriber(Subscriber);
   }
+}
+
+void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
+{
+  if (SubscriberParameters)
+  {
+    Topic = SubscriberParameters->Topic;
+    MessageType = SubscriberParameters->MessageType;
+  }  
 }

@@ -31,6 +31,9 @@ public:
 public:
   UPROPERTY(EditAnywhere)
   FString FrameId; 
+
+  UPROPERTY(EditAnywhere)
+  FString ControllerName; 
 };
 
 UCLASS()

@@ -16,6 +16,7 @@ public:
     ActionName = TEXT("/whole_body_controller/body/follow_joint_trajectory");
     FrameId = TEXT("odom");
     JointParamPath = TEXT("whole_body_controller/body/joints");
+    JointControllerName = TEXT("JointController");
   }
 
 public:
@@ -24,6 +25,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   FString JointParamPath; 
+
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName; 
 };
 
 UCLASS()

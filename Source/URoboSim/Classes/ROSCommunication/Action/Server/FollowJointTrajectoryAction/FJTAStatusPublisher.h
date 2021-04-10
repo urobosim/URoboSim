@@ -9,10 +9,5 @@ UCLASS()
 class UROBOSIM_API URFJTAStatusPublisher final : public URActionStatusPublisher
 {
   GENERATED_BODY()
-
-public:
-  URFJTAStatusPublisher();
-
-protected:
-  void Init() override;
+  
 };

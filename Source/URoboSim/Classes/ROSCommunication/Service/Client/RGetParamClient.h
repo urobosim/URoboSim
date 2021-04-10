@@ -41,7 +41,6 @@ public:
   FGetParamArgument GetParamArgument;
 
 protected:
-  UPROPERTY()
   URControllerComponent *ControllerComponent;
 
   TSharedPtr<class FRGetParamClientCallback> GetParamClient;

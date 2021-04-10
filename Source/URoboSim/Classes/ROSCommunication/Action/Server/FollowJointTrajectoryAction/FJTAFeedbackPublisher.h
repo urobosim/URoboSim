@@ -23,7 +23,18 @@ protected:
   void Init() override;
 
 public:
-  const URFJTAFeedbackPublisherParameter *GetFJTAFeedbackPublisherParameters() const { return Cast<URFJTAFeedbackPublisherParameter>(PublisherParameters); }
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName; 
+
+public:
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId; 
+
+  UPROPERTY(EditAnywhere)
+  FString JointParamPath; 
 
 private:
   URJointController *JointController;

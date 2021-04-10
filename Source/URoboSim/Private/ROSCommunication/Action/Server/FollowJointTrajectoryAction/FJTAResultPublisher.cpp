@@ -7,56 +7,60 @@ DEFINE_LOG_CATEGORY_STATIC(LogRFJTAResultPublisher, Log, All);
 
 URFJTAResultPublisher::URFJTAResultPublisher()
 {
-  PublisherParameters = CreateDefaultSubobject<URFJTAResultPublisherParameter>(TEXT("FJTAResultPublisherParameters"));
+  MessageType = TEXT("control_msgs/FollowJointTrajectoryActionResult");
+  FrameId = TEXT("odom");
+  JointControllerName = TEXT("JointController");
 }
 
 void URFJTAResultPublisher::Init()
 {
-  if (!PublisherParameters)
-  {
-    PublisherParameters = CreateDefaultSubobject<URFJTAResultPublisherParameter>(TEXT("FJTAResultPublisherParameters"));
-  }
-
   if (GetOwner())
   {
     URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
     if (ControllerComponent)
     {
-      JointController = Cast<URJointController>(ControllerComponent->GetController(TEXT("JointController")));
+      JointController = Cast<URJointController>(ControllerComponent->GetController(JointControllerName));
     }
     else
     {
-      UE_LOG(LogRFJTAResultPublisher, Error, TEXT("JointController not found in %s"), *GetName())
+      UE_LOG(LogRFJTAResultPublisher, Error, TEXT("%s not found in %s"), *JointControllerName, *GetName())
     }
   }
 }
 
+void URFJTAResultPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
+{
+  URFJTAResultPublisherParameter *FJTAResultPublisherParameters = Cast<URFJTAResultPublisherParameter>(PublisherParameters);
+  if (FJTAResultPublisherParameters)
+  {
+    Super::SetPublishParameters(PublisherParameters);
+    FrameId = FJTAResultPublisherParameters->FrameId;
+  }  
+}
+
 void URFJTAResultPublisher::Publish()
 {
-  if (JointController->bPublishResult)
+  if (JointController && JointController->bPublishResult)
   {
     static int Seq = 0;
-    const URFJTAResultPublisherParameter *FJTAResultPublisherParameters = GetFJTAResultPublisherParameters();
-    if (FJTAResultPublisherParameters)
-    {
-      UE_LOG(LogRFJTAResultPublisher, Log, TEXT("The goal of %s has been reached, publishing results"), *GetOwner()->GetName());
-      TSharedPtr<control_msgs::FollowJointTrajectoryActionResult> ActionResult =
-          MakeShareable(new control_msgs::FollowJointTrajectoryActionResult());
 
-      ActionResult->SetHeader(std_msgs::Header(Seq, FROSTime(), FJTAResultPublisherParameters->FrameId));
+    UE_LOG(LogRFJTAResultPublisher, Log, TEXT("The goal of %s has been reached, publishing results"), *GetOwner()->GetName());
+    TSharedPtr<control_msgs::FollowJointTrajectoryActionResult> ActionResult =
+        MakeShareable(new control_msgs::FollowJointTrajectoryActionResult());
 
-      FGoalStatusInfo GoalStatusInfo = JointController->GetGoalStatus();
-      actionlib_msgs::GoalStatus GoalStatus(actionlib_msgs::GoalID(FROSTime(GoalStatusInfo.Secs, GoalStatusInfo.NSecs), GoalStatusInfo.Id), GoalStatusInfo.Status, TEXT(""));
-      ActionResult->SetStatus(GoalStatus);
+    ActionResult->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
 
-      control_msgs::FollowJointTrajectoryResult Result(0);
-      ActionResult->SetResult(Result);
+    FGoalStatusInfo GoalStatusInfo = JointController->GetGoalStatus();
+    actionlib_msgs::GoalStatus GoalStatus(actionlib_msgs::GoalID(FROSTime(GoalStatusInfo.Secs, GoalStatusInfo.NSecs), GoalStatusInfo.Id), GoalStatusInfo.Status, TEXT(""));
+    ActionResult->SetStatus(GoalStatus);
 
-      Handler->PublishMsg(FJTAResultPublisherParameters->Topic, ActionResult);
-      Handler->Process();
+    control_msgs::FollowJointTrajectoryResult Result(0);
+    ActionResult->SetResult(Result);
 
-      JointController->bPublishResult = false;
-      Seq++;
-    }
+    Handler->PublishMsg(Topic, ActionResult);
+    Handler->Process();
+
+    JointController->bPublishResult = false;
+    Seq++;
   }
 }

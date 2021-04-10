@@ -14,6 +14,19 @@ class UROBOSIM_API URFJTAServer final : public URActionServer
 public:
   URFJTAServer();
 
+public:
+  void SetActionServerParameters(URActionServerParameter *&ActionServerParameters) override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId; 
+
+  UPROPERTY(EditAnywhere)
+  FString JointParamPath; 
+
+  UPROPERTY(EditAnywhere)
+  FString JointControllerName;
+
 protected:
   void Init() override;
 };
