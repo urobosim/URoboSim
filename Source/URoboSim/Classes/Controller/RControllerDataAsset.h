@@ -27,7 +27,7 @@ class UROBOSIM_API URControllerDataAsset : public UDataAsset
 
 public:
   // Names of the robots for which this configration asset is used
-  UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Basic Information")
+  UPROPERTY(EditAnywhere, Category = "Basic Information")
   TArray<FString> RobotNames;
 
   UPROPERTY(EditAnywhere, Category = "Basic Information")

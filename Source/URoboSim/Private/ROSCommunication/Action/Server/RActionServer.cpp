@@ -40,26 +40,38 @@ void URActionServer::Init(UObject *InOwner, const FString &InActionName)
 
 void URActionServer::Init(UObject *&InOwner)
 {
-  Init();
-  if (GoalSubscriber)
+  ARModel *Owner = Cast<ARModel>(InOwner);
+  if (Owner)
   {
-    GoalSubscriber->Init(InOwner, Handler, ActionName + TEXT("/goal"));
-  }
-  if (CancelSubscriber)
-  {
-    CancelSubscriber->Init(InOwner, Handler, ActionName + TEXT("/cancel"));
-  }
-  if (StatusPublisher)
-  {
-    StatusPublisher->Init(InOwner, Handler, ActionName + TEXT("/status"));
-  }
-  if (FeedbackPublisher)
-  {
-    FeedbackPublisher->Init(InOwner, Handler, ActionName + TEXT("/feedback"));
-  }
-  if (ResultPublisher)
-  {
-    ResultPublisher->Init(InOwner, Handler, ActionName + TEXT("/result"));
+    URController *Controller = Owner->GetController(ControllerName);
+
+    Init();
+
+    if (GoalSubscriber)
+    {
+      GoalSubscriber->SetController(Controller);
+      GoalSubscriber->Init(InOwner, Handler, ActionName + TEXT("/goal"));
+    }
+    if (CancelSubscriber)
+    {
+      CancelSubscriber->SetController(Controller);
+      CancelSubscriber->Init(InOwner, Handler, ActionName + TEXT("/cancel"));
+    }
+    if (StatusPublisher)
+    {
+      StatusPublisher->SetController(Controller);
+      StatusPublisher->Init(InOwner, Handler, ActionName + TEXT("/status"));
+    }
+    if (FeedbackPublisher)
+    {
+      FeedbackPublisher->SetController(Controller);
+      FeedbackPublisher->Init(InOwner, Handler, ActionName + TEXT("/feedback"));
+    }
+    if (ResultPublisher)
+    {
+      ResultPublisher->SetController(Controller);
+      ResultPublisher->Init(InOwner, Handler, ActionName + TEXT("/result"));
+    }
   }
 }
 

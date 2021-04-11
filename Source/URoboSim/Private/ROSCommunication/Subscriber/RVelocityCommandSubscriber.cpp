@@ -25,16 +25,8 @@ void URVelocityCommandSubscriber::CreateSubscriber()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-    if (ControllerComponent)
-    {
-      Subscriber = MakeShareable<FRVelocityCommandSubscriberCallback>(
-          new FRVelocityCommandSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(BaseControllerName)));
-    }
-    else
-    {
-      UE_LOG(LogRVelocityCommandSubscriber, Error, TEXT("ControllerComponent not found in %s"), *GetName())
-    }
+    Subscriber = MakeShareable<FRVelocityCommandSubscriberCallback>(
+        new FRVelocityCommandSubscriberCallback(Topic, MessageType, GetOwner()->GetController(BaseControllerName)));
   }
 }
 

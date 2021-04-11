@@ -4,6 +4,7 @@
 #include "ROSCommunication/Publisher/RJointTrajectoryControllerStatePublisher.h"
 #include "ROSCommunication/Publisher/ROdomPublisher.h"
 #include "ROSCommunication/Subscriber/RVelocityCommandSubscriber.h"
+#include "ROSCommunication/Service/Client/RGetJointsClient.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 
@@ -24,7 +25,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
                                       const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
                                       const TArray<FRActionServerConfiguration> &ActionServerConfigurations)
 {
-  URPluginComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
+  URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
   ROSCommunicationComponent->RegisterComponent();
 
   if (PublisherConfigurations.Num() > 0)
@@ -36,7 +37,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Publisher->GetName(), *Owner->GetName());
         Publisher->SetPublishParameters(PublisherConfiguration.PublisherParameters);
-        Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddPublisher(Publisher);
+        ROSCommunicationComponent->AddPublisher(Publisher);
       }
     }
   }
@@ -50,7 +51,21 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Subscriber->GetName(), *Owner->GetName());
         Subscriber->SetSubscriberParameters(SubscriberConfiguration.SubscriberParameters);
-        Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddSubscriber(Subscriber);
+        ROSCommunicationComponent->AddSubscriber(Subscriber);
+      }
+    }
+  }
+
+  if (ServiceClientConfigurations.Num() > 0)
+  {
+    for (FRServiceClientConfiguration ServiceClientConfiguration : ServiceClientConfigurations)
+    {
+      URServiceClient *ServiceClient = CreateServiceClient(Owner, ServiceClientConfiguration);
+      if (ServiceClient)
+      {
+        UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ServiceClient->GetName(), *Owner->GetName());
+        ServiceClient->SetServiceClientParameters(ServiceClientConfiguration.ServiceClientParameters);
+        ROSCommunicationComponent->AddServiceClient(ServiceClient);
       }
     }
   }
@@ -64,7 +79,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ActionServer->GetName(), *Owner->GetName());
         ActionServer->SetActionServerParameters(ActionServerConfiguration.ActionServerParameters);
-        Cast<URROSCommunicationComponent>(ROSCommunicationComponent)->AddActionServer(ActionServer);
+        ROSCommunicationComponent->AddActionServer(ActionServer);
       }
     }
   }
@@ -101,6 +116,23 @@ URSubscriber *URROSCommunicationBuilder::CreateSubscriber(ARModel *&InOwner, con
   {
     UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("SubscriberParameters of %s not found, use default"), *SubscriberConfiguration.SubscriberParameters->GetName())
     return NewObject<URSubscriber>(InOwner, TEXT("Subscriber"));
+  }
+}
+
+URServiceClient *URROSCommunicationBuilder::CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration)
+{
+  if (Cast<URGetJointsClientParameter>(ServiceClientConfiguration.ServiceClientParameters))
+  {
+    return NewObject<URGetJointsClient>(InOwner, TEXT("GetJointsClient"));
+  }
+  else if (Cast<URGetParamClientParameter>(ServiceClientConfiguration.ServiceClientParameters))
+  {
+    return NewObject<URGetParamClient>(InOwner, TEXT("GetParamClient"));
+  }
+  else
+  {
+    UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ServiceClientParameters of %s not found, use default"), *ServiceClientConfiguration.ServiceClientParameters->GetName())
+    return NewObject<URGetParamClient>(InOwner, TEXT("ServiceClient"));
   }
 }
 

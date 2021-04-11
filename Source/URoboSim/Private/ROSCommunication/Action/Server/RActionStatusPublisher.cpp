@@ -9,22 +9,6 @@ URActionStatusPublisher::URActionStatusPublisher()
   FrameId = TEXT("odom");
 }
 
-void URActionStatusPublisher::Init()
-{
-  if (GetOwner())
-  {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-    if (ControllerComponent)
-    {
-      Controller = ControllerComponent->GetController(ControllerName);
-    }
-    else
-    {
-      UE_LOG(LogRActionStatusPublisher, Error, TEXT("%s not found in %s"), *ControllerName, *GetName())
-    }
-  }
-}
-
 void URActionStatusPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
 {
   URActionStatusPublisherParameter *ActionStatusPublisherParameters = Cast<URActionStatusPublisherParameter>(PublisherParameters);
@@ -33,7 +17,6 @@ void URActionStatusPublisher::SetPublishParameters(URPublisherParameter *&Publis
     Super::SetPublishParameters(PublisherParameters);
     MessageType = ActionStatusPublisherParameters->MessageType;
     FrameId = ActionStatusPublisherParameters->FrameId;
-    ControllerName = ActionStatusPublisherParameters->ControllerName;
   }
 }
 

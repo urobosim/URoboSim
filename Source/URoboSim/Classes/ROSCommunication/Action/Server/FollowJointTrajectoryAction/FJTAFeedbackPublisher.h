@@ -1,15 +1,14 @@
 #pragma once
 
 #include "Controller/ControllerType/RJointController.h"
-#include "FJTAServerParameter.h"
-#include "ROSCommunication/Publisher/RPublisher.h"
+#include "FJTAServer.h"
 #include "ROSCommunication/Service/Client/RGetJointsClient.h"
 // clang-format off
 #include "FJTAFeedbackPublisher.generated.h"
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTAFeedbackPublisher final : public URPublisher
+class UROBOSIM_API URFJTAFeedbackPublisher final : public URActionPublisher
 {
   GENERATED_BODY()
 
@@ -21,10 +20,6 @@ public:
 
 protected:
   void Init() override;
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString JointControllerName; 
 
 public:
   void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;

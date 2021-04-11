@@ -2,7 +2,7 @@
 // Author: Michael Neumann
 
 #include "Physics/RModel.h"
-#include "RPlugin.h"
+#include "Controller/RControllerComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
@@ -107,6 +107,20 @@ URPluginComponent *ARModel::GetPlugin(const FString &PluginName) const
   }
   else
   {
+    return nullptr;
+  }
+}
+
+URController *ARModel::GetController(const FString &ControllerName) const
+{
+  URControllerComponent *ControllerComponent = FindComponentByClass<URControllerComponent>();
+  if (ControllerComponent)
+  {
+    return ControllerComponent->GetController(ControllerName);
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *ControllerName, *GetName())
     return nullptr;
   }
 }

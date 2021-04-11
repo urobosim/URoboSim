@@ -1,26 +1,13 @@
 #pragma once
 
 #include "ROSBridgeSrvClient.h"
-#include "ROSCommunication/Service/Client/RServiceClient.h"
+#include "RServiceClient.h"
+#include "RGetParamClientParameter.h"
 #include "srv/ConfigureJointStatePublisher.h"
-#include "Controller/ControllerType/RJointController.h"
-#include "Controller/RControllerComponent.h"
+#include "Controller/RController.h"
 // clang-format off
 #include "RGetParamClient.generated.h"
 // clang-format on
-
-USTRUCT()
-struct FGetParamArgument
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Name;
-
-  UPROPERTY(EditAnywhere)
-  FString Default;
-};
 
 UCLASS()
 class UROBOSIM_API URGetParamClient : public URServiceClient
@@ -37,11 +24,14 @@ protected:
   virtual void Init() override;
 
 public:
-  UPROPERTY(EditAnywhere)
-  FGetParamArgument GetParamArgument;
+  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters) override;
 
-protected:
-  URControllerComponent *ControllerComponent;
+public:
+  UPROPERTY(EditAnywhere)
+  FGetParamArgument GetParamArguments;
+
+  UPROPERTY(EditAnywhere)
+  FString ControllerName;
 
   TSharedPtr<class FRGetParamClientCallback> GetParamClient;
   TSharedPtr<rosapi::GetParam::Request> Request;
@@ -51,7 +41,7 @@ protected:
 class FRGetParamClientCallback : public FROSBridgeSrvClient
 {
 public:
-  FRGetParamClientCallback(const FString &InServiceName, const FString &InServiceType, UObject *InController);
+  FRGetParamClientCallback(const FString &InServiceName, const FString &InServiceType, URController *InController);
 
   void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
@@ -59,7 +49,7 @@ protected:
   virtual void Callback(){}
 
 protected:
-  URJointController *JointController;
+  URController *Controller;
 
   FString ParamString;
 };

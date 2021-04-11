@@ -3,6 +3,7 @@
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSrvClient.h"
+#include "RServiceClientParameter.h"
 // clang-format off
 #include "RServiceClient.generated.h"
 // clang-format on
@@ -29,6 +30,8 @@ public:
 
 public:
   ARModel *GetOwner() const { return Owner; }
+
+  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
 
   virtual void CallService(){}
 

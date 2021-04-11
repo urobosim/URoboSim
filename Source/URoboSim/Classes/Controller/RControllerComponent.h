@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "Controller/RController.h"
+#include "RController.h"
 #include "RPlugin.h"
 // clang-format off
 #include "RControllerComponent.generated.h"
@@ -28,6 +28,6 @@ public:
   TArray<URController *> GetControllers() const { return Controllers; }
 
 protected:
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  UPROPERTY(EditAnywhere, Instanced)
   TArray<URController *> Controllers;
 };

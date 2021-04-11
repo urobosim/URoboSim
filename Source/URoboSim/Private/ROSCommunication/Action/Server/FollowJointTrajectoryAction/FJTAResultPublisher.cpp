@@ -1,5 +1,4 @@
 #include "ROSCommunication/Action/Server/FollowJointTrajectoryAction/FJTAResultPublisher.h"
-#include "Controller/RControllerComponent.h"
 #include "control_msgs/FollowJointTrajectoryActionResult.h"
 #include "control_msgs/FollowJointTrajectoryResult.h"
 
@@ -9,23 +8,11 @@ URFJTAResultPublisher::URFJTAResultPublisher()
 {
   MessageType = TEXT("control_msgs/FollowJointTrajectoryActionResult");
   FrameId = TEXT("odom");
-  JointControllerName = TEXT("JointController");
 }
 
 void URFJTAResultPublisher::Init()
 {
-  if (GetOwner())
-  {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-    if (ControllerComponent)
-    {
-      JointController = Cast<URJointController>(ControllerComponent->GetController(JointControllerName));
-    }
-    else
-    {
-      UE_LOG(LogRFJTAResultPublisher, Error, TEXT("%s not found in %s"), *JointControllerName, *GetName())
-    }
-  }
+  JointController = Cast<URJointController>(Controller);
 }
 
 void URFJTAResultPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)

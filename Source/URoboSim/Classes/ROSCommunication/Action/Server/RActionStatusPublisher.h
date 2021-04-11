@@ -1,14 +1,13 @@
 #pragma once
 
-#include "Controller/RControllerComponent.h"
+#include "RActionServer.h"
 #include "RActionServerParameter.h"
-#include "ROSCommunication/Publisher/RPublisher.h"
 // clang-format off
 #include "RActionStatusPublisher.generated.h"
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URActionStatusPublisher : public URPublisher
+class UROBOSIM_API URActionStatusPublisher : public URActionPublisher
 {
   GENERATED_BODY()
 
@@ -20,16 +19,7 @@ public:
 
   void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
-protected:
-  virtual void Init() override;
-
 public:
   UPROPERTY(EditAnywhere)
   FString FrameId;
-
-  UPROPERTY(EditAnywhere)
-  FString ControllerName;
-
-protected:
-  URController *Controller;
 };

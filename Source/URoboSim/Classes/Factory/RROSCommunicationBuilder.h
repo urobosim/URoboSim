@@ -12,22 +12,24 @@ class UROBOSIM_API URROSCommunicationBuilder : public UObject
   GENERATED_BODY()
 
 public:
-  virtual void Init(ARModel *&InOwner, const FRROSCommunicationConfiguration &InROSCommunicationConfiguration);
+  void Init(ARModel *&InOwner, const FRROSCommunicationConfiguration &InROSCommunicationConfiguration);
 
-  virtual void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
-                     const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
-                     const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
-                     const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
-
-protected:
-  virtual URPublisher *CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration);
-
-  virtual URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);
-
-  virtual URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
+  void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
+             const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
+             const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
+             const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
 
 protected:
-  ARModel * Owner;
+  URPublisher *CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration);
+
+  URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);
+
+  URServiceClient *CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration);
+
+  URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
+
+protected:
+  ARModel *Owner;
 
   FRROSCommunicationConfiguration ROSCommunicationConfiguration;
 };

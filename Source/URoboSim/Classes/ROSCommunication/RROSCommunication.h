@@ -7,7 +7,6 @@
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
-#include "Controller/RControllerComponent.h"
 // #include "ROSCommunication/RROSService.h"
 // clang-format off
 #include "RROSCommunication.generated.h"
@@ -23,10 +22,8 @@ public:
 
   FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort);
 
-  ~FRROSCommunicationContainer(){};
-
 public:
-  void Init();
+  void Init(ARModel *&InOwner);
 
   void DeInit();
   
@@ -37,10 +34,9 @@ public:
 
   void AddSubscriber(URSubscriber *&InSubscriber) { Subscribers.Add(InSubscriber); }
 
-  void AddActionServer(URActionServer *&InActionServer) { ActionServers.Add(InActionServer); }
+  void AddServiceClient(URServiceClient *&InServiceClient) { ServiceClients.Add(InServiceClient); }
 
-public:
-  URControllerComponent *ControllerComponent;
+  void AddActionServer(URActionServer *&InActionServer) { ActionServers.Add(InActionServer); }
 
 protected:
   void InitPublishers();
@@ -49,6 +45,8 @@ protected:
   void InitActionServers();
 
 protected:
+  ARModel *Owner;
+
   TSharedPtr<FROSBridgeHandler> Handler;
 
   UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
@@ -57,15 +55,15 @@ protected:
   UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
   uint32 WebsocketPort;
 
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  UPROPERTY(EditAnywhere, Instanced)
   TArray<URPublisher *> Publishers;
 
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  UPROPERTY(EditAnywhere, Instanced)
   TArray<URSubscriber *> Subscribers;
 
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  UPROPERTY(EditAnywhere, Instanced)
   TArray<URServiceClient *> ServiceClients;
 
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
+  UPROPERTY(EditAnywhere, Instanced)
   TArray<URActionServer *> ActionServers;
 };

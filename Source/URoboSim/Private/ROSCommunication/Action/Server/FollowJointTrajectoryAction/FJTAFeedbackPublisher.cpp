@@ -10,25 +10,16 @@ URFJTAFeedbackPublisher::URFJTAFeedbackPublisher()
   MessageType = TEXT("control_msgs/FollowJointTrajectoryActionFeedback");
   FrameId = TEXT("odom");
   JointParamPath = TEXT("whole_body_controller/body/joints");
-  JointControllerName = TEXT("JointController");
 }
 
 void URFJTAFeedbackPublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-    if (ControllerComponent)
-    {
-      JointController = Cast<URJointController>(ControllerComponent->GetController(JointControllerName));
-    }
-    else
-    {
-      UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("ControllerComponent not found in %s"), *GetName())
-    }
+    JointController = Cast<URJointController>(Controller);
 
     GetJointsClient = NewObject<URGetJointsClient>();
-    GetJointsClient->GetParamArgument.Name = JointParamPath;
+    GetJointsClient->GetParamArguments.Name = JointParamPath;
     GetJointsClient->URServiceClient::Init(GetOwner(), Handler);
   }
 }

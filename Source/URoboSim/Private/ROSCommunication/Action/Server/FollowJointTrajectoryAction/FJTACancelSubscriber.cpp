@@ -3,15 +3,13 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRFJTACancelSubscriber, Log, All)
 
-URFJTACancelSubscriber::URFJTACancelSubscriber()
-{
-  ControllerName = TEXT("JointController");
-}
-
 void URFJTACancelSubscriber::CreateSubscriber()
 {
-  Subscriber = MakeShareable<FRFJTACancelSubscriberCallback>(
-      new FRFJTACancelSubscriberCallback(Topic, MessageType, Controller));
+  if (Controller)
+  {
+    Subscriber = MakeShareable<FRFJTACancelSubscriberCallback>(
+        new FRFJTACancelSubscriberCallback(Topic, MessageType, Controller));
+  }
 }
 
 FRFJTACancelSubscriberCallback::FRFJTACancelSubscriberCallback(

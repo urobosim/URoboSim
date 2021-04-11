@@ -26,7 +26,7 @@ void URControllerBuilder::Build()
 {
   for (ARModel *&Model : Models)
   {
-    URPluginComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
+    URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
     ControllerComponent->RegisterComponent();
 
     for (TPair<FString, URControllerParameter *> ControllerParameters : ControllerConfiguration.ControllerParameters)
@@ -34,7 +34,7 @@ void URControllerBuilder::Build()
       UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerParameters.Key, *Model->GetName());
       URController *Controller = CreateController(Model, ControllerParameters);
       Controller->SetControllerParameters(ControllerParameters.Value);
-      Cast<URControllerComponent>(ControllerComponent)->AddController(Controller);
+      ControllerComponent->AddController(Controller);
     }
   }
 }

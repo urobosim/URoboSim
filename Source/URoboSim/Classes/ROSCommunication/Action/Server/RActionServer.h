@@ -1,15 +1,38 @@
 #pragma once
 
-#include "ROSBridgeHandler.h"
+#include "Controller/RControllerComponent.h"
 #include "RActionServerParameter.h"
+#include "ROSBridgeHandler.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
 #include "RActionServer.generated.h"
 // clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URActionServer : public UObject
+UCLASS()
+class UROBOSIM_API URActionSubscriber : public URSubscriber
+{
+  GENERATED_BODY()
+
+public:
+  void SetController(URController *&InController) { Controller = InController; }
+
+protected:
+  URController *Controller;
+};
+
+UCLASS() class UROBOSIM_API URActionPublisher : public URPublisher
+{
+  GENERATED_BODY()
+
+public:
+  void SetController(URController *&InController) { Controller = InController; }
+
+protected:
+  URController *Controller;
+};
+
+UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew) class UROBOSIM_API URActionServer : public UObject
 {
   GENERATED_BODY()
 
@@ -21,11 +44,11 @@ public:
 
   void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
 
-  void DeInit() 
-  { 
+  void DeInit()
+  {
     if (Handler.IsValid())
     {
-      Handler->Disconnect(); 
+      Handler->Disconnect();
     }
   }
 
@@ -33,9 +56,13 @@ public:
 
   virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
+public:
+  UPROPERTY(EditAnywhere)
+  FString ControllerName;
+
 protected:
   void Init(UObject *InOwner, const FString &InActionName);
-  
+
   void Init(UObject *&InOwner);
 
   virtual void Init() {}
@@ -45,19 +72,19 @@ protected:
   FString ActionName;
 
   UPROPERTY(VisibleAnywhere)
-  URSubscriber *GoalSubscriber;
+  URActionSubscriber *GoalSubscriber;
 
   UPROPERTY(VisibleAnywhere)
-  URSubscriber *CancelSubscriber;
+  URActionSubscriber *CancelSubscriber;
 
   UPROPERTY(VisibleAnywhere)
-  URPublisher *StatusPublisher;
+  URActionPublisher *StatusPublisher;
 
   UPROPERTY(VisibleAnywhere)
-  URPublisher *ResultPublisher;
+  URActionPublisher *ResultPublisher;
 
   UPROPERTY(VisibleAnywhere)
-  URPublisher *FeedbackPublisher;
+  URActionPublisher *FeedbackPublisher;
 
   TSharedPtr<FROSBridgeHandler> Handler;
 };

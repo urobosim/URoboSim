@@ -16,15 +16,7 @@ void URJointTrajectoryControllerStatePublisher::Init()
 {
   if (GetOwner())
   {
-    URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetOwner()->GetPlugin(TEXT("ControllerComponent")));
-    if (ControllerComponent)
-    {
-      JointController = Cast<URJointController>(ControllerComponent->GetController(JointControllerName));
-    }
-    else
-    {
-      UE_LOG(LogRJointTrajectoryControllerStatePublisher, Error, TEXT("ControllerComponent not found in %s"), *GetName())
-    }
+    JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName));
   }
 }
 

@@ -24,9 +24,6 @@ public:
   UPROPERTY(EditAnywhere)
   FString JointParamPath; 
 
-  UPROPERTY(EditAnywhere)
-  FString JointControllerName;
-
 protected:
   void Init() override;
 };

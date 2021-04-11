@@ -48,10 +48,10 @@ public:
   UPROPERTY(EditAnywhere)
   FString Topic;
 
+protected:
   UPROPERTY(VisibleAnywhere)
   FString MessageType;
 
-protected:
   TSharedPtr<FROSBridgePublisher> Publisher;
 
   TSharedPtr<FROSBridgeHandler> Handler;

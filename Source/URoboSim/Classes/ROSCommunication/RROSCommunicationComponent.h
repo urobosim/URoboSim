@@ -31,6 +31,8 @@ public:
 
   void AddSubscriber(URSubscriber *&InSubscriber) { ROSCommunication.AddSubscriber(InSubscriber); }
 
+  void AddServiceClient(URServiceClient *&InServiceClient) { ROSCommunication.AddServiceClient(InServiceClient); }
+
   void AddActionServer(URActionServer *&InActionServer) { ROSCommunication.AddActionServer(InActionServer); }
 
 protected:

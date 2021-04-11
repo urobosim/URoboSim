@@ -26,16 +26,15 @@ void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick
 
 void URROSCommunicationComponent::Init()
 {
-  if (GetOwner()->FindComponentByClass<URControllerComponent>())
+  ARModel *Owner = GetOwner();
+  if (Owner)
   {
-    UE_LOG(LogRROSCommunication, Log, TEXT("Found ControllerComponent"));
-    ROSCommunication.ControllerComponent = GetOwner()->FindComponentByClass<URControllerComponent>();
-    ROSCommunication.Init();
+    ROSCommunication.Init(Owner);
     bComponentInitialized = true;
   }
   else
   {
-    UE_LOG(LogRROSCommunication, Error, TEXT("No FROSBridgeHandler created."));
+    UE_LOG(LogRROSCommunication, Error, TEXT("Owner of %s not found"), *GetName())
   }
 }
 

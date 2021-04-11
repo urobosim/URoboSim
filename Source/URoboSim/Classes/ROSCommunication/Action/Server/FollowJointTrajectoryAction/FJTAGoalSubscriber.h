@@ -1,15 +1,13 @@
 #pragma once
 
 #include "Controller/ControllerType/RJointController.h"
-#include "Controller/RControllerComponent.h"
-#include "FJTAServerParameter.h"
-#include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "FJTAServer.h"
 // clang-format off
 #include "FJTAGoalSubscriber.generated.h"
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URFJTAGoalSubscriber final : public URSubscriber
+class UROBOSIM_API URFJTAGoalSubscriber final : public URActionSubscriber
 {
   GENERATED_BODY()
 
@@ -18,10 +16,6 @@ public:
 
 public:
   void CreateSubscriber() override;
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString JointControllerName;
 };
 
 class UROBOSIM_API FRFJTAGoalSubscriberCallback final : public FROSBridgeSubscriber

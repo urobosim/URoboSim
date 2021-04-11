@@ -42,3 +42,12 @@ void URServiceClient::Tick()
     Handler->Process();
   }
 }
+
+void URServiceClient::SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters)
+{
+  if (ServiceClientParameters)
+  {
+    ServiceName = ServiceClientParameters->ServiceName;
+    ServiceType = ServiceClientParameters->ServiceType;
+  }
+}

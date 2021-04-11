@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSCommunication/Service/Client/RGetParamClient.h"
+#include "RGetJointsClientParameter.h"
 // clang-format off
 #include "RGetJointsClient.generated.h"
 // clang-format on
@@ -20,7 +21,7 @@ protected:
 class FRGetJointsClientCallback final : public FRGetParamClientCallback
 {
 public:
-  FRGetJointsClientCallback(const FString &InServiceName, const FString &InServiceType, UObject *InController);
+  FRGetJointsClientCallback(const FString &InServiceName, const FString &InServiceType, URController *InController);
 
 protected:
   void Callback() override;

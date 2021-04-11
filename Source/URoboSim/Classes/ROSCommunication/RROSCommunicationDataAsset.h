@@ -46,16 +46,6 @@ public:
   URSubscriberParameter *SubscriberParameters;
 };
 
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URServiceClientParameter : public UObject
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-};
-
 USTRUCT()
 struct FRServiceClientConfiguration
 {
@@ -83,11 +73,11 @@ class UROBOSIM_API URROSCommunicationDataAsset : public UDataAsset
 
 public:
   // Names of the robots for which this configration asset is used
-  UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Basic Information")
+  UPROPERTY(EditAnywhere, Category = "Basic Information")
   FString RobotName;
 
   // Basic ROS infos such as ip, port ...
-  UPROPERTY(EditAnywhere, export, noclear, Category = "Basic Information")
+  UPROPERTY(EditAnywhere, NoClear, Category = "Basic Information")
   FRROSCommunicationConfiguration ROSCommunicationConfiguration;
 
   // Publisher Configuration

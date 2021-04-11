@@ -64,6 +64,8 @@ public:
 
   URPluginComponent *GetPlugin(const FString &PluginName) const;
 
+  class URController *GetController(const FString &ControllerName) const;
+
 public:
   UPROPERTY(EditAnywhere)
   FEnableGravity EnableGravity;

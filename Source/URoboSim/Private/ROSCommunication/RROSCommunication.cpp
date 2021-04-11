@@ -3,18 +3,20 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationContainer, Log, All);
 
-FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort) : WebsocketIPAddr(InWebsocketIPAddr), WebsocketPort(InWebsocketPort)
-{
-  ControllerComponent = nullptr;
-}
-
-FRROSCommunicationContainer::FRROSCommunicationContainer() : FRROSCommunicationContainer::FRROSCommunicationContainer(TEXT("127.0.0.1"), 9393)
+FRROSCommunicationContainer::FRROSCommunicationContainer()
+    : FRROSCommunicationContainer::FRROSCommunicationContainer(TEXT("127.0.0.1"), 9393)
 {
 }
 
-void FRROSCommunicationContainer::Init()
+FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort)
+    : WebsocketIPAddr(InWebsocketIPAddr), WebsocketPort(InWebsocketPort)
 {
-  if (ControllerComponent)
+}
+
+void FRROSCommunicationContainer::Init(ARModel *&InOwner)
+{
+  Owner = InOwner;
+  if (Owner)
   {
     InitPublishers();
     InitSubscribers();
@@ -23,7 +25,7 @@ void FRROSCommunicationContainer::Init()
   }
   else
   {
-    UE_LOG(LogRROSCommunicationContainer, Error, TEXT("ControllerComponent not found"))
+    UE_LOG(LogRROSCommunicationContainer, Error, TEXT("Owner not found"))
   }
 }
 
@@ -31,7 +33,7 @@ void FRROSCommunicationContainer::InitPublishers()
 {
   for (URPublisher *&Publisher : Publishers)
   {
-    Publisher->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
+    Publisher->Init(Owner, WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -39,7 +41,7 @@ void FRROSCommunicationContainer::InitSubscribers()
 {
   for (URSubscriber *&Subscriber : Subscribers)
   {
-    Subscriber->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
+    Subscriber->Init(Owner, WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -47,7 +49,7 @@ void FRROSCommunicationContainer::InitServiceClients()
 {
   for (URServiceClient *&ServiceClient : ServiceClients)
   {
-    ServiceClient->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
+    ServiceClient->Init(Owner, WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -55,7 +57,7 @@ void FRROSCommunicationContainer::InitActionServers()
 {
   for (URActionServer *&ActionServer : ActionServers)
   {
-    ActionServer->Init(ControllerComponent->GetOwner(), WebsocketIPAddr, WebsocketPort);
+    ActionServer->Init(Owner, WebsocketIPAddr, WebsocketPort);
   }
 }
 
