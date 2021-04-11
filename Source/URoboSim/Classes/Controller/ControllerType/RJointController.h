@@ -110,23 +110,18 @@ public:
   UPROPERTY(EditAnywhere)
   TMap<FString, FJointState> DesiredJointStates;
 
-  UPROPERTY()
   TArray<FTrajectoryPoints> DesiredTrajectory;
 
 protected:
   UPROPERTY(EditAnywhere)
   UJointControllerMode Mode;
 
-  UPROPERTY()
   TArray<FTrajectoryStatus> TrajectoryStatusArray;
 
-  UPROPERTY()
   uint32 TrajectoryPointIndex;
 
-  UPROPERTY()
   float ActionStartTime;
 
-  UPROPERTY()
   float ActionDuration;
 
 protected:
@@ -139,6 +134,5 @@ protected:
   void SetDesiredJointState();
 
 private:
-  UPROPERTY()
   FTrajectoryPoints LastTrajectoryPoints;
 };

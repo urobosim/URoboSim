@@ -40,7 +40,6 @@ public:
   void AddActionServer(URActionServer *&InActionServer) { ActionServers.Add(InActionServer); }
 
 public:
-  UPROPERTY()
   URControllerComponent *ControllerComponent;
 
 protected:

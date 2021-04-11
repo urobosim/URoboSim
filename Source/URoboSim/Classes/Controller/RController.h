@@ -34,22 +34,17 @@ public:
   const TArray<FGoalStatusInfo> GetGoalStatusList() { return GoalStatusList; }
 
 public:
-  UPROPERTY()
   bool bCancel = false;
 
-  UPROPERTY()
   bool bPublishResult = false;
 
 protected:
-  UPROPERTY()
   TArray<FGoalStatusInfo> GoalStatusList;
 
   virtual void CancelAction();
 
-  UPROPERTY()
   bool bActive;
 
 private:
-  UPROPERTY()
   ARModel *Owner;
 };

@@ -27,9 +27,7 @@ protected:
   virtual URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
 
 protected:
-  UPROPERTY()
   ARModel * Owner;
 
-  UPROPERTY()
   FRROSCommunicationConfiguration ROSCommunicationConfiguration;
 };

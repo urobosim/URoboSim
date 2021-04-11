@@ -49,6 +49,5 @@ protected:
   TSharedPtr<FROSBridgeHandler> Handler;
 
 private:
-  UPROPERTY()
   ARModel *Owner;
 };

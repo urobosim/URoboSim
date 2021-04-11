@@ -30,13 +30,10 @@ protected:
 	virtual void MoveLinearTick(const float &InDeltaTime);
 
 protected:
-  UPROPERTY()
   URLink *BaseLink;
 
-  UPROPERTY()
 	FTransform TargetPose;
 
-  UPROPERTY()
   FTransform BasePose;
 
   UPROPERTY(EditAnywhere)

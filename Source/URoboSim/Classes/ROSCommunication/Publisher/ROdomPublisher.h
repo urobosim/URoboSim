@@ -37,9 +37,7 @@ private:
   UPROPERTY(EditAnywhere)
   bool bProjectToGround = true;
 
-  UPROPERTY()
 	TArray<double> OdomPosition;
 
-	UPROPERTY()
 	TArray<double> OdomVelocity;
 };

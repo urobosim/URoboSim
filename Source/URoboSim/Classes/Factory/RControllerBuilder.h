@@ -23,9 +23,7 @@ protected:
   virtual URController *CreateController(ARModel *&InOwner, const TPair<FString, URControllerParameter *> ControllerParameters);
 
 protected:
-  UPROPERTY()
   TArray<ARModel *> Models;
 
-  UPROPERTY()
   FRControllerConfiguration ControllerConfiguration;
 };

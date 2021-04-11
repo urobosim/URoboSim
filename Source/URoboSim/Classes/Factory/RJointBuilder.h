@@ -15,13 +15,11 @@ class UROBOSIM_API URJointBuilder : public UObject
   GENERATED_BODY()
 
 public:
-  UPROPERTY()
   ARModel *Model;
 
   virtual bool LoadSDF(USDFJoint *&SDFJoint);
 
 protected:
-  UPROPERTY()
   URJoint *Joint;
 
   virtual void SetNewJoint(USDFJoint *&SDFJoint);

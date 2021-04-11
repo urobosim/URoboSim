@@ -25,7 +25,6 @@ public:
   // Sets default values for this actor's properties
   URModelBuilder();
 
-  UPROPERTY()
   ARModel *Model;
 
   // Load model
@@ -33,10 +32,8 @@ public:
   virtual void LoadSDF(USDFModel *&SDFModel, const FTransform &WorldPose);
 
 protected:
-  UPROPERTY()
   URJointBuilder *JointBuilder;
 
-  UPROPERTY()
   URLinkBuilder *LinkBuilder;
 
   virtual void SwapBaseLinkToFirstIndex(USDFModel *&SDFModel);

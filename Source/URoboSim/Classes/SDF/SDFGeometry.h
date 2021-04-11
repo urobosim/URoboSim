@@ -24,7 +24,6 @@ class UROBOSIM_API USDFGeometry : public UObject
 	GENERATED_BODY()
 
 public:
-	UPROPERTY()
 	ESDFGeometryType Type;
 
 	UPROPERTY(VisibleAnywhere, Category = "GeometryMesh")

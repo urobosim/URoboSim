@@ -20,7 +20,6 @@ public:
   virtual bool LoadSDF(USDFLink *&SDFLink);
 
 public:
-  UPROPERTY()
   ARModel *Model;
 
 protected:
@@ -32,9 +31,7 @@ protected:
   virtual void SetPose(const FTransform &Pose);
 
 protected:
-  UPROPERTY()
   URLink *Link;
 
-  UPROPERTY()
   FTransform WorldPose;
 };

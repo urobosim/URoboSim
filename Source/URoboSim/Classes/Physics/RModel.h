@@ -81,9 +81,7 @@ protected:
   UPROPERTY(EditAnywhere)
   TArray<URPluginComponent *> Plugins;
 
-  // UPROPERTY()
   // TArray<URGraspComponent *> Grippers;
 private:
-  UPROPERTY()
   bool bModelInitialized = false;
 };

@@ -24,7 +24,6 @@ public:
   void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
 public:
-  UPROPERTY()
   TMap<FString, FJointState> JointStates;
 
 private:
