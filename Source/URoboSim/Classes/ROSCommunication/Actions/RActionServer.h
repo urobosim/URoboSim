@@ -3,6 +3,7 @@
 #include "ROSBridgeHandler.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "RActionServerParameter.h"
 #include "RActionServer.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -15,6 +16,8 @@ public:
 
   virtual void Init(TSharedPtr<FROSBridgeHandler> InHandler, UObject* InOwner, FString InActionName= "");
   virtual void Init(FString InHostIp, uint32 InPort, UObject* InOwner, FString InActionName= "");
+
+  virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
   virtual void Tick();
 

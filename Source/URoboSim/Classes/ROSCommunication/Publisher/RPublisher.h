@@ -12,6 +12,7 @@
 #include "Controller/RHeadController.h"
 #include "Controller/RController.h"
 #include "Conversions.h"
+#include "RPublisherParameter.h"
 #include "RPublisher.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -29,6 +30,8 @@ public:
 
     virtual void Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic);
     virtual void Init(FString InHostIp, uint32 InPort, UObject* InOwner);
+
+    virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters);
 
     TSharedPtr<FROSBridgePublisher> Publisher;
 	int Seq;

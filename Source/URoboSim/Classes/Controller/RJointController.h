@@ -3,7 +3,6 @@
 #include "Controller/RController.h"
 #include "RJointController.generated.h"
 
-
 UENUM()
 enum class UJointControllerState : uint8
 {

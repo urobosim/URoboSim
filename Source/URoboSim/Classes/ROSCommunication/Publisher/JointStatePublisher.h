@@ -6,6 +6,22 @@
 #include "JointStatePublisher.generated.h"
 
 UCLASS()
+class UROBOSIM_API URJointStatePublisherParameter : public URPublisherParameter
+{
+  GENERATED_BODY()
+
+public:
+  URJointStatePublisherParameter()
+  {
+    Topic = TEXT("/joint_states");
+    JointParamTopic = TEXT("/hardware_interface/joints");
+  }
+
+  UPROPERTY(EditAnywhere)
+  FString JointParamTopic;
+};
+
+UCLASS()
 class UROBOSIM_API URJointStatePublisher : public URPublisher
 {
     GENERATED_BODY()
@@ -13,6 +29,8 @@ class UROBOSIM_API URJointStatePublisher : public URPublisher
 public:
     // Sets default values for this component's properties
     URJointStatePublisher();
+
+    virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
     virtual void Publish();
     TArray<FString> ListJointName;
