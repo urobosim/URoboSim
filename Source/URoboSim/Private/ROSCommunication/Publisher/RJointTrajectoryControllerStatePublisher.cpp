@@ -48,15 +48,18 @@ void URJointTrajectoryControllerStatePublisher::Publish()
     TArray<double> DesiredVelocities;
     TArray<double> CurrentVelocities;
     TArray<double> ErrorVelocities;
-    for (const FTrajectoryStatus &TrajectoryStatus : JointController->GetTrajectoryStatusArray())
+    if (JointController->GetTrajectoryStatusArray().Num() > 0)
     {
-      JointNames.Add(TrajectoryStatus.JointName);
-      DesiredPositions.Add(TrajectoryStatus.DesiredState.JointPosition);
-      CurrentPositions.Add(TrajectoryStatus.CurrentState.JointPosition);
-      ErrorPositions.Add(TrajectoryStatus.ErrorState.JointPosition);
-      DesiredVelocities.Add(TrajectoryStatus.DesiredState.JointVelocity);
-      CurrentVelocities.Add(TrajectoryStatus.CurrentState.JointVelocity);
-      ErrorVelocities.Add(TrajectoryStatus.ErrorState.JointVelocity);
+      for (const FTrajectoryStatus &TrajectoryStatus : JointController->GetTrajectoryStatusArray())
+      {
+        JointNames.Add(TrajectoryStatus.JointName);
+        DesiredPositions.Add(TrajectoryStatus.DesiredState.JointPosition);
+        CurrentPositions.Add(TrajectoryStatus.CurrentState.JointPosition);
+        ErrorPositions.Add(TrajectoryStatus.ErrorState.JointPosition);
+        DesiredVelocities.Add(TrajectoryStatus.DesiredState.JointVelocity);
+        CurrentVelocities.Add(TrajectoryStatus.CurrentState.JointVelocity);
+        ErrorVelocities.Add(TrajectoryStatus.ErrorState.JointVelocity);
+      }
     }
 
     State->SetJointNames(JointNames);
