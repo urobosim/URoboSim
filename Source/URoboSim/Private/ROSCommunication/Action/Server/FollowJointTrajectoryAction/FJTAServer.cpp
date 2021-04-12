@@ -25,6 +25,8 @@ void URFJTAServer::Init()
   Cast<URFJTAStatusPublisher>(StatusPublisher)->FrameId = FrameId;
 
   Cast<URFJTAFeedbackPublisher>(FeedbackPublisher)->JointParamPath = JointParamPath;
+
+  Super::Init();
 }
 
 void URFJTAServer::SetActionServerParameters(URActionServerParameter *&ActionServerParameters)

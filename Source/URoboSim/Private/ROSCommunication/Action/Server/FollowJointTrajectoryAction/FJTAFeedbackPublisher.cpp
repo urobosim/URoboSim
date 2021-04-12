@@ -20,7 +20,8 @@ void URFJTAFeedbackPublisher::Init()
 
     GetJointsClient = NewObject<URGetJointsClient>();
     GetJointsClient->GetParamArguments.Name = JointParamPath;
-    GetJointsClient->URServiceClient::Init(GetOwner(), Handler);
+    GetJointsClient->SetOwner(GetOwner());
+    GetJointsClient->URServiceClient::Init(Handler);
   }
 }
 

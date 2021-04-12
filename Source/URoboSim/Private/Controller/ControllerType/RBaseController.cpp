@@ -37,9 +37,9 @@ void URBaseController::Tick(const float &DeltaTime)
   if (BaseLink)
   {
     BasePose = BaseLink->GetCollisionMeshes()[0]->GetComponentTransform();
+    MoveLinearTick(DeltaTime);
+    MoveAngularTick(DeltaTime);
   }
-  MoveLinearTick(DeltaTime);
-  MoveAngularTick(DeltaTime);
 }
 
 void URBaseController::MoveLinearTick(const float &DeltaTime)

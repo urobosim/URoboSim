@@ -16,31 +16,16 @@ URROSCommunicationComponent::URROSCommunicationComponent()
 
 void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
-  if (!bComponentInitialized)
-  {
-    Init();
-  }
-  
   ROSCommunication.Tick();
 }
 
 void URROSCommunicationComponent::Init()
 {
-  ARModel *Owner = GetOwner();
-  if (Owner)
-  {
-    ROSCommunication.Init(Owner);
-    bComponentInitialized = true;
-  }
-  else
-  {
-    UE_LOG(LogRROSCommunication, Error, TEXT("Owner of %s not found"), *GetName())
-  }
+  ROSCommunication.Init();
 }
 
 void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
   ROSCommunication.DeInit();
-  bComponentInitialized = false;
   Super::EndPlay(EndPlayReason);
 }

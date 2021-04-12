@@ -2,12 +2,12 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRPublisher, Log, All)
 
-void URPublisher::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
+void URPublisher::Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
 {
   Handler = InHandler;
   if (Handler.IsValid())
   {
-    Init(InOwner, InTopic);
+    Init(InTopic);
   }
   else
   {
@@ -15,13 +15,13 @@ void URPublisher::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &In
   }
 }
 
-void URPublisher::Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic)
+void URPublisher::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic)
 {
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
   if (Handler.IsValid())
   {
     Handler->Connect();
-    Init(InOwner, InTopic);
+    Init(InTopic);
   }
   else
   {
@@ -29,15 +29,22 @@ void URPublisher::Init(UObject *InOwner, const FString &WebsocketIPAddr, const u
   }
 }
 
-void URPublisher::Init(UObject *InOwner, const FString &InTopic)
+void URPublisher::Init(const FString &InTopic)
 {
-  SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
     Topic = InTopic;
   }
   Init();
   CreatePublisher();
+}
+
+void URPublisher::Init()
+{
+  if (!Owner && Cast<ARModel>(GetOuter()))
+  {
+    Owner = Cast<ARModel>(GetOuter());
+  }
 }
 
 void URPublisher::DeInit()

@@ -10,22 +10,18 @@ URControllerComponent::URControllerComponent()
 
 void URControllerComponent::Init()
 {
-  for (URController *&Controller : Controllers)
-  {   
-    Controller->SetOwner(GetOwner());
-    Controller->Init();
+  if (GetOwner())
+  {
+    for (URController *&Controller : Controllers)
+    {   
+      Controller->Init();
+    }
+    GetOwner()->Init();
   }
-  bComponentInitialized = true;
 }
 
 void URControllerComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
-  if (!bComponentInitialized)
-  {
-    Init();
-    GetOwner()->Init();
-  }
-  
   for (URController *&Controller : Controllers)
   {
     Controller->Tick(DeltaTime);

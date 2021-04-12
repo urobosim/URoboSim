@@ -2,12 +2,12 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRActionServer, Log, All)
 
-void URActionServer::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName)
+void URActionServer::Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName)
 {
   Handler = InHandler;
   if (Handler.IsValid())
   {
-    Init(InOwner, InActionName);
+    Init(InActionName);
   }
   else
   {
@@ -15,13 +15,13 @@ void URActionServer::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> 
   }
 }
 
-void URActionServer::Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName)
+void URActionServer::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName)
 {
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
   if (Handler.IsValid())
   {
     Handler->Connect();
-    Init(InOwner, InActionName);
+    Init(InActionName);
   }
   else
   {
@@ -29,48 +29,51 @@ void URActionServer::Init(UObject *InOwner, const FString &WebsocketIPAddr, cons
   }
 }
 
-void URActionServer::Init(UObject *InOwner, const FString &InActionName)
+void URActionServer::Init(const FString &InActionName)
 {
   if (!InActionName.Equals(TEXT("")))
   {
     ActionName = InActionName;
   }
-  Init(InOwner);
+  Init();
 }
 
-void URActionServer::Init(UObject *&InOwner)
+void URActionServer::Init()
 {
-  ARModel *Owner = Cast<ARModel>(InOwner);
+  ARModel *Owner = Cast<ARModel>(GetOuter());
   if (Owner)
   {
     URController *Controller = Owner->GetController(ControllerName);
 
-    Init();
-
     if (GoalSubscriber)
     {
       GoalSubscriber->SetController(Controller);
-      GoalSubscriber->Init(InOwner, Handler, ActionName + TEXT("/goal"));
+      GoalSubscriber->SetOwner(Owner);
+      GoalSubscriber->Init(Handler, ActionName + TEXT("/goal"));
     }
     if (CancelSubscriber)
     {
       CancelSubscriber->SetController(Controller);
-      CancelSubscriber->Init(InOwner, Handler, ActionName + TEXT("/cancel"));
+      CancelSubscriber->SetOwner(Owner);
+      CancelSubscriber->Init(Handler, ActionName + TEXT("/cancel"));
     }
     if (StatusPublisher)
     {
       StatusPublisher->SetController(Controller);
-      StatusPublisher->Init(InOwner, Handler, ActionName + TEXT("/status"));
+      StatusPublisher->SetOwner(Owner);
+      StatusPublisher->Init(Handler, ActionName + TEXT("/status"));
     }
     if (FeedbackPublisher)
     {
       FeedbackPublisher->SetController(Controller);
-      FeedbackPublisher->Init(InOwner, Handler, ActionName + TEXT("/feedback"));
+      FeedbackPublisher->SetOwner(Owner);
+      FeedbackPublisher->Init(Handler, ActionName + TEXT("/feedback"));
     }
     if (ResultPublisher)
     {
       ResultPublisher->SetController(Controller);
-      ResultPublisher->Init(InOwner, Handler, ActionName + TEXT("/result"));
+      ResultPublisher->SetOwner(Owner);
+      ResultPublisher->Init(Handler, ActionName + TEXT("/result"));
     }
   }
 }

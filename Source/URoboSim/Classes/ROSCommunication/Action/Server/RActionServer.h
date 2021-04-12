@@ -40,9 +40,9 @@ public:
   URActionServer(){};
 
 public:
-  void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName = "");
+  void Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName = "");
 
-  void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
+  void Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
 
   void DeInit();
 
@@ -55,11 +55,9 @@ public:
   FString ControllerName;
 
 protected:
-  void Init(UObject *InOwner, const FString &InActionName);
+  void Init(const FString &InActionName);
 
-  void Init(UObject *&InOwner);
-
-  virtual void Init() {}
+  virtual void Init();
 
 protected:
   UPROPERTY(EditAnywhere)

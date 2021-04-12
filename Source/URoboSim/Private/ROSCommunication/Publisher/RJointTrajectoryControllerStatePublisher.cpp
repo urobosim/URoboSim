@@ -14,6 +14,7 @@ URJointTrajectoryControllerStatePublisher::URJointTrajectoryControllerStatePubli
 
 void URJointTrajectoryControllerStatePublisher::Init()
 {
+  Super::Init();
   if (GetOwner())
   {
     JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName));

@@ -5,7 +5,7 @@
 #include "Components/ActorComponent.h"
 #include "Physics/RModel.h"
 // clang-format off
-#include "RPlugin.generated.h"
+#include "RPluginComponent.generated.h"
 // clang-format on
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -17,13 +17,12 @@ public:
 	virtual void OnComponentCreated() override;
 
 public:
+	virtual void BeginPlay() override;
+
 	virtual void Init() {}
 
 	virtual ARModel *GetOwner() const;
 
 protected:
 	virtual void RegisterPlugin();
-	
-protected:
-  bool bComponentInitialized = false;
 };

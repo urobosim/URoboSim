@@ -23,7 +23,7 @@ public:
   FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort);
 
 public:
-  void Init(ARModel *&InOwner);
+  void Init();
 
   void DeInit();
   
@@ -40,13 +40,14 @@ public:
 
 protected:
   void InitPublishers();
+
   void InitSubscribers();
+
   void InitServiceClients();
+
   void InitActionServers();
 
 protected:
-  ARModel *Owner;
-
   TSharedPtr<FROSBridgeHandler> Handler;
 
   UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")

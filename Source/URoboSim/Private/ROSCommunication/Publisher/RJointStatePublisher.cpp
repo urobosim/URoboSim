@@ -23,6 +23,7 @@ URJointStatePublisher::URJointStatePublisher()
 
 void URJointStatePublisher::Init()
 {
+  Super::Init();
   if (GetOwner())
   {
     for (const URJoint *Joint : GetOwner()->GetJoints())

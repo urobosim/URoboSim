@@ -21,8 +21,6 @@ public:
   virtual void Init();
 
 public:
-  void SetOwner(ARModel *InOwner) { Owner = InOwner; }
-
   ARModel *GetOwner();
 
   virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) {}

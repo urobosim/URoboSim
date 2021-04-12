@@ -14,9 +14,9 @@ class UROBOSIM_API URServiceClient : public UObject
   GENERATED_BODY()
 
 public:
-  void Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler);
+  void Init(const TSharedPtr<FROSBridgeHandler> &InHandler);
 
-  void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort);
+  void Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort);
 
   void Tick();
 
@@ -25,16 +25,14 @@ public:
 public:
   ARModel *GetOwner() const { return Owner; }
 
+  void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
+
   virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
 
   virtual void CallService(){}
 
 protected:
-  void Init(UObject *InOwner);
-
-  virtual void Init(){}
-
-  void SetOwner(UObject *&InOwner){ Owner = Cast<ARModel>(InOwner); }
+  virtual void Init();
 
 protected:
   UPROPERTY(EditAnywhere)

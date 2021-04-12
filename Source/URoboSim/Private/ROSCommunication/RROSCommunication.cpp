@@ -13,27 +13,19 @@ FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsoc
 {
 }
 
-void FRROSCommunicationContainer::Init(ARModel *&InOwner)
+void FRROSCommunicationContainer::Init()
 {
-  Owner = InOwner;
-  if (Owner)
-  {
-    InitPublishers();
-    InitSubscribers();
-    InitServiceClients();
-    InitActionServers();
-  }
-  else
-  {
-    UE_LOG(LogRROSCommunicationContainer, Error, TEXT("Owner not found"))
-  }
+  InitPublishers();
+  InitSubscribers();
+  InitServiceClients();
+  InitActionServers();
 }
 
 void FRROSCommunicationContainer::InitPublishers()
 {
   for (URPublisher *&Publisher : Publishers)
   {
-    Publisher->Init(Owner, WebsocketIPAddr, WebsocketPort);
+    Publisher->Init(WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -41,7 +33,7 @@ void FRROSCommunicationContainer::InitSubscribers()
 {
   for (URSubscriber *&Subscriber : Subscribers)
   {
-    Subscriber->Init(Owner, WebsocketIPAddr, WebsocketPort);
+    Subscriber->Init(WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -49,7 +41,7 @@ void FRROSCommunicationContainer::InitServiceClients()
 {
   for (URServiceClient *&ServiceClient : ServiceClients)
   {
-    ServiceClient->Init(Owner, WebsocketIPAddr, WebsocketPort);
+    ServiceClient->Init(WebsocketIPAddr, WebsocketPort);
   }
 }
 
@@ -57,7 +49,7 @@ void FRROSCommunicationContainer::InitActionServers()
 {
   for (URActionServer *&ActionServer : ActionServers)
   {
-    ActionServer->Init(Owner, WebsocketIPAddr, WebsocketPort);
+    ActionServer->Init(WebsocketIPAddr, WebsocketPort);
   }
 }
 

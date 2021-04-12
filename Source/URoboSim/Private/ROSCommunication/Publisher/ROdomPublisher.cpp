@@ -14,6 +14,7 @@ UROdomPublisher::UROdomPublisher()
 
 void UROdomPublisher::Init()
 {
+  Super::Init();
   OdomPosition.Init(0., FrameNames.Num());
   OdomVelocity.Init(0., FrameNames.Num());
 }

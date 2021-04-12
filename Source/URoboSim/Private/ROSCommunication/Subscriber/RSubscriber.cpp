@@ -2,12 +2,12 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRSubscriber, Log, All)
 
-void URSubscriber::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
+void URSubscriber::Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic)
 {
   Handler = InHandler;
   if (Handler.IsValid())
   {
-    Init(InOwner, InTopic);
+    Init(InTopic);
   }
   else
   {
@@ -15,13 +15,13 @@ void URSubscriber::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &I
   }
 }
 
-void URSubscriber::Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic)
+void URSubscriber::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic)
 {
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
   if (Handler.IsValid())
   {
     Handler->Connect();
-    Init(InOwner, InTopic);
+    Init(InTopic);
   }
   else
   {
@@ -29,9 +29,8 @@ void URSubscriber::Init(UObject *InOwner, const FString &WebsocketIPAddr, const 
   }
 }
 
-void URSubscriber::Init(UObject *InOwner, const FString &InTopic)
+void URSubscriber::Init(const FString &InTopic)
 {
-  SetOwner(InOwner);
   if (!InTopic.Equals(""))
   {
     Topic = InTopic;
@@ -39,6 +38,14 @@ void URSubscriber::Init(UObject *InOwner, const FString &InTopic)
   Init();
   CreateSubscriber();
   AddSubscriber();
+}
+
+void URSubscriber::Init()
+{
+  if (!Owner && Cast<ARModel>(GetOuter()))
+  {
+    Owner = Cast<ARModel>(GetOuter());
+  }
 }
 
 void URSubscriber::DeInit()

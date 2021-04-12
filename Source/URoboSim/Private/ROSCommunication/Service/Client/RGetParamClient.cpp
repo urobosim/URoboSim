@@ -19,6 +19,7 @@ void URGetParamClient::SetServiceClientParameters(URServiceClientParameter *&Ser
 
 void URGetParamClient::Init()
 {
+  Super::Init();
   if (GetOwner())
   {
     // Create a request instance with request parameters

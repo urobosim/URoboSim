@@ -2,12 +2,12 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRServiceClient, Log, All)
 
-void URServiceClient::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler> &InHandler)
+void URServiceClient::Init(const TSharedPtr<FROSBridgeHandler> &InHandler)
 {
   Handler = InHandler;
   if (Handler.IsValid())
   {
-    Init(InOwner);
+    Init();
   }
   else
   {
@@ -15,13 +15,13 @@ void URServiceClient::Init(UObject *InOwner, const TSharedPtr<FROSBridgeHandler>
   }
 }
 
-void URServiceClient::Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort)
+void URServiceClient::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort)
 {
   Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
   if (Handler.IsValid())
   {
     Handler->Connect();
-    Init(InOwner);
+    Init();
   }
   else
   {
@@ -29,10 +29,12 @@ void URServiceClient::Init(UObject *InOwner, const FString &WebsocketIPAddr, con
   }
 }
 
-void URServiceClient::Init(UObject *InOwner)
+void URServiceClient::Init()
 {
-  SetOwner(InOwner);
-  Init();
+  if (!Owner && Cast<ARModel>(GetOuter()))
+  {
+    Owner = Cast<ARModel>(GetOuter());
+  }
 }
 
 void URServiceClient::DeInit()
