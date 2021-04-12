@@ -22,9 +22,7 @@ protected:
   void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-
-  void Init() override;
+	void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 public:
   void AddPublisher(URPublisher *&InPublisher) { ROSCommunication.AddPublisher(InPublisher); }
@@ -34,6 +32,9 @@ public:
   void AddServiceClient(URServiceClient *&InServiceClient) { ROSCommunication.AddServiceClient(InServiceClient); }
 
   void AddActionServer(URActionServer *&InActionServer) { ROSCommunication.AddActionServer(InActionServer); }
+
+protected:
+  void Init() override;
 
 protected:
   UPROPERTY(EditAnywhere)

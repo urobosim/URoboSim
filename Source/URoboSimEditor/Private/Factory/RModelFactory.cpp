@@ -54,6 +54,7 @@ AActor *URModelFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTrans
       {
         NewRobot->SetActorTransform(Transform);
         FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
+        NewRobot->Init();
         return NewRobot;
       }
       else

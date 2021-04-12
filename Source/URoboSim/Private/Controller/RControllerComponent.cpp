@@ -10,13 +10,14 @@ URControllerComponent::URControllerComponent()
 
 void URControllerComponent::Init()
 {
-  if (GetOwner())
+  ARModel *Owner = Cast<ARModel>(GetOwner());
+  if (Owner)
   {
     for (URController *&Controller : Controllers)
     {   
       Controller->Init();
     }
-    GetOwner()->Init();
+    Owner->Init();
   }
 }
 

@@ -19,13 +19,15 @@ public:
 public:
   void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
-  void Init() override;
-
+public:
   void AddController(URController *Controller) { Controllers.Add(Controller); }
 
   URController *GetController(const FString &ControllerName);
 
   TArray<URController *> GetControllers() const { return Controllers; }
+
+protected:
+  void Init() override;
 
 protected:
   UPROPERTY(EditAnywhere, Instanced)

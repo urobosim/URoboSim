@@ -17,14 +17,9 @@ void URPluginComponent::BeginPlay()
 	Init();
 }
 
-ARModel *URPluginComponent::GetOwner() const
-{
-	return Cast<ARModel>(Super::GetOwner());
-}
-
 void URPluginComponent::RegisterPlugin()
 {
-	ARModel *Owner = GetOwner();
+	ARModel *Owner = Cast<ARModel>(GetOwner());
 	if (Owner)
 	{
 		Owner->AddPlugin(this);
