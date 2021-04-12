@@ -3,10 +3,27 @@
 #include "Controller/ControllerType/RBaseController.h"
 #include "Controller/RControllerComponent.h"
 #include "RSubscriber.h"
-#include "RVelocityCommandSubscriberParameter.h"
 // clang-format off
 #include "RVelocityCommandSubscriber.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URVelocityCommandSubscriberParameter : public URSubscriberParameter
+{
+  GENERATED_BODY()
+
+public:
+  URVelocityCommandSubscriberParameter()
+  {
+    Topic = TEXT("/base_controller/command");
+    MessageType = TEXT("geometry_msgs/Twist");
+    BaseControllerName = TEXT("BaseController");
+  }
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString BaseControllerName;
+};
 
 UCLASS()
 class UROBOSIM_API URVelocityCommandSubscriber final : public URSubscriber

@@ -40,6 +40,14 @@ void URPublisher::Init(UObject *InOwner, const FString &InTopic)
   CreatePublisher();
 }
 
+void URPublisher::DeInit()
+{
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
+}
+
 void URPublisher::Tick()
 {
   if (Handler.IsValid())

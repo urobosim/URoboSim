@@ -1,10 +1,22 @@
 #pragma once
 
 #include "ROSCommunication/Service/Client/RGetParamClient.h"
-#include "RGetJointsClientParameter.h"
 // clang-format off
 #include "RGetJointsClient.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URGetJointsClientParameter : public URGetParamClientParameter
+{
+  GENERATED_BODY()
+
+public:
+  URGetJointsClientParameter()
+  {
+    GetParamArguments.Name = TEXT("hardware_interface/joints");
+    ControllerName = TEXT("JointController");
+  }
+};
 
 UCLASS()
 class UROBOSIM_API URGetJointsClient final : public URGetParamClient

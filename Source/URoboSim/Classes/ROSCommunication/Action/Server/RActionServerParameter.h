@@ -1,7 +1,6 @@
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisherParameter.h"
-#include "ROSCommunication/Subscriber/RSubscriberParameter.h"
+#include "CoreMinimal.h"
 // clang-format off
 #include "RActionServerParameter.generated.h"
 // clang-format on
@@ -14,36 +13,4 @@ class UROBOSIM_API URActionServerParameter : public UObject
 public:
   UPROPERTY(EditAnywhere)
   FString ActionName;
-};
-
-UCLASS()
-class UROBOSIM_API URActionStatusPublisherParameter : public URPublisherParameter
-{
-  GENERATED_BODY()
-
-public:
-  URActionStatusPublisherParameter()
-  {
-    MessageType = TEXT("actionlib_msgs/GoalStatusArray");
-    FrameId = TEXT("odom");
-  }
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString FrameId; 
-
-  UPROPERTY(EditAnywhere)
-  FString ControllerName; 
-};
-
-UCLASS()
-class UROBOSIM_API URActionCancelSubscriberParameter : public URSubscriberParameter
-{
-  GENERATED_BODY()
-
-public:
-  URActionCancelSubscriberParameter()
-  {
-    MessageType = TEXT("actionlib_msgs/GoalID");
-  }
 };

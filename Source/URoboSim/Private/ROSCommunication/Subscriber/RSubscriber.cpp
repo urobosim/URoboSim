@@ -41,6 +41,14 @@ void URSubscriber::Init(UObject *InOwner, const FString &InTopic)
   AddSubscriber();
 }
 
+void URSubscriber::DeInit()
+{
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
+}
+
 void URSubscriber::Tick()
 {
   if (Handler.IsValid())
@@ -64,5 +72,5 @@ void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberPar
   {
     Topic = SubscriberParameters->Topic;
     MessageType = SubscriberParameters->MessageType;
-  }  
+  }
 }

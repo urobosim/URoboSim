@@ -38,13 +38,13 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
         if (Actor->GetName().Contains(ROSCommunicationDataAsset->RobotName))
         {
           UE_LOG(LogRROSCommunicationFactory, Log, TEXT("Found ARModel %s in ROSCommunicationDataAsset %s"), *Actor->GetName(), *ROSCommunicationDataAsset->GetName())
-          URROSCommunicationBuilder *ROSCommunicationBuiler = NewObject<URROSCommunicationBuilder>();
+          URROSCommunicationBuilder *ROSCommunicationBuilder = NewObject<URROSCommunicationBuilder>();
           ARModel *Robot = Cast<ARModel>(Actor);
-          ROSCommunicationBuiler->Init(Robot, ROSCommunicationDataAsset->ROSCommunicationConfiguration);
-          ROSCommunicationBuiler->Build(ROSCommunicationDataAsset->PublisherConfiguration,
-                                        ROSCommunicationDataAsset->SubscriberConfiguration,
-                                        ROSCommunicationDataAsset->ServiceClientConfiguration,
-                                        ROSCommunicationDataAsset->ActionServerConfiguration);
+          ROSCommunicationBuilder->Init(Robot, ROSCommunicationDataAsset->ROSCommunicationConfiguration);
+          ROSCommunicationBuilder->Build(ROSCommunicationDataAsset->PublisherConfiguration,
+                                         ROSCommunicationDataAsset->SubscriberConfiguration,
+                                         ROSCommunicationDataAsset->ServiceClientConfiguration,
+                                         ROSCommunicationDataAsset->ActionServerConfiguration);
         }
       }
     }

@@ -18,13 +18,7 @@ public:
 
   void Init(UObject *InOwner, const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic = TEXT(""));
 
-  void DeInit()
-  {
-    if (Handler.IsValid())
-    {
-      Handler->Disconnect();
-    }
-  }
+  void DeInit();
 
   void Tick();
 

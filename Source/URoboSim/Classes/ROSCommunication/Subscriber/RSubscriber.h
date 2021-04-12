@@ -21,13 +21,7 @@ public:
 
   virtual void Tick();
 
-  virtual void DeInit() 
-  { 
-    if (Handler.IsValid())
-    {
-      Handler->Disconnect(); 
-    }
-  }
+  virtual void DeInit();
 
 public:
   virtual ARModel *GetOwner() const { return Owner; }

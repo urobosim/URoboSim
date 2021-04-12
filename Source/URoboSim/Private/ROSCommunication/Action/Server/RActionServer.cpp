@@ -75,6 +75,14 @@ void URActionServer::Init(UObject *&InOwner)
   }
 }
 
+void URActionServer::DeInit()
+{
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
+}
+
 void URActionServer::Tick()
 {
   if (Handler.IsValid())

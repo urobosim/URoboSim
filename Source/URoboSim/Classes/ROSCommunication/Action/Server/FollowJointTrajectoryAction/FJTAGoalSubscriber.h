@@ -1,10 +1,22 @@
 #pragma once
 
 #include "Controller/ControllerType/RJointController.h"
-#include "FJTAServer.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "FJTAGoalSubscriber.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URFJTAGoalSubscriberParameter : public URSubscriberParameter
+{
+  GENERATED_BODY()
+
+public:
+  URFJTAGoalSubscriberParameter()
+  {
+    MessageType = TEXT("control_msgs/FollowJointTrajectoryActionGoal");
+  }
+};
 
 UCLASS()
 class UROBOSIM_API URFJTAGoalSubscriber final : public URActionSubscriber

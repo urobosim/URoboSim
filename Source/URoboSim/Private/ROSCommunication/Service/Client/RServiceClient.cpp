@@ -35,6 +35,14 @@ void URServiceClient::Init(UObject *InOwner)
   Init();
 }
 
+void URServiceClient::DeInit()
+{
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
+}
+
 void URServiceClient::Tick()
 {
   if (Handler.IsValid())

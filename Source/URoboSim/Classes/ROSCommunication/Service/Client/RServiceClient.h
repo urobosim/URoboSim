@@ -20,13 +20,7 @@ public:
 
   void Tick();
 
-  void DeInit() 
-  { 
-    if (Handler.IsValid())
-    {
-      Handler->Disconnect(); 
-    }
-  }
+  void DeInit();
 
 public:
   ARModel *GetOwner() const { return Owner; }
