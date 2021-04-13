@@ -123,7 +123,6 @@ bool URJointController::CheckTrajectoryGoalReached()
       // State = UJointControllerState::Normal;
 
       SwitchToNormal();
-      bPublishResult = true;
 
       GoalStatusList.Last().Status = 3;
       ActionFinished.Broadcast(GoalStatusList.Last());
@@ -368,7 +367,7 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
     }
 }
 
-void URJointController::FollowTrajectory()
+void URJointController::FollowTrajectory(double InActionStart, FGoalStatusInfo InGoalInfo, TArray<FString> InJointNames, TArray<FTrajectoryPoints> InTrajectory)
 {
   TrajectoryPointIndex = 0;
   OldTrajectoryPoints.Reset();
@@ -381,8 +380,11 @@ void URJointController::FollowTrajectory()
           OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
         }
     }
-  // State = UJointControllerState::FollowJointTrajectory;
   SwitchToFollowJointTrajectory();
+  SetJointNames(InJointNames);
+  Trajectory = InTrajectory;
+  GoalStatusList.Add(InGoalInfo);
+  // State = UJointControllerState::FollowJointTrajectory;
 }
 
 UJointControllerState URJointController::GetState()
@@ -416,6 +418,9 @@ bool URJointController::SwitchToFollowJointTrajectory()
       UE_LOG(LogTemp, Warning, TEXT("Trajectory already in Progress."));
       GoalStatusList.Last().Status = 4;
       ActionFinished.Broadcast(GoalStatusList.Last());
+      Trajectory.Empty();
+      TrajectoryPointIndex = 0;
+      ActionDuration = 0.0;
       break;
     case UJointControllerState::Normal:
       State = UJointControllerState::FollowJointTrajectory;
