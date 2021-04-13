@@ -120,7 +120,9 @@ bool URJointController::CheckTrajectoryGoalReached()
 {
   if(TrajectoryPointIndex == Trajectory.Num())
     {
-      State = UJointControllerState::Normal;
+      // State = UJointControllerState::Normal;
+
+      SwitchToNormal();
       bPublishResult = true;
 
       GoalStatusList.Last().Status = 3;
@@ -282,7 +284,9 @@ void URJointController::MoveJointsKinematic()
 
 void URJointController::Init()
 {
-  State = UJointControllerState::Normal;
+  // State = UJointControllerState::Normal;
+  SwitchToNormal();
+
   bPublishResult = false;
   if(!GetOwner())
     {
@@ -312,7 +316,7 @@ void URJointController::Init()
       //         Joint.Value->Constraint->JointAccuracy = PrismaticAccuracy;
       //       }
         // }
-      
+
     }
 }
 
@@ -376,10 +380,50 @@ void URJointController::FollowTrajectory()
           OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
         }
     }
-  State = UJointControllerState::FollowJointTrajectory;
+  // State = UJointControllerState::FollowJointTrajectory;
+  SwitchToFollowJointTrajectory();
 }
 
 UJointControllerState URJointController::GetState()
 {
   return State;
+}
+
+bool URJointController::SwitchToNormal()
+{
+  switch(State)
+    {
+    case UJointControllerState::FollowJointTrajectory:
+      State = UJointControllerState::Normal;
+      break;
+    case UJointControllerState::Normal:
+      UE_LOG(LogTemp, Warning, TEXT("Trajectory already in NormalMode."));
+      break;
+    case UJointControllerState::Off:
+      State = UJointControllerState::FollowJointTrajectory;
+
+      break;
+    }
+  return true;
+}
+
+bool URJointController::SwitchToFollowJointTrajectory()
+{
+  switch(State)
+    {
+    case UJointControllerState::FollowJointTrajectory:
+      UE_LOG(LogTemp, Warning, TEXT("Trajectory already in Progress."));
+      GoalStatusList.Last().Status = 4;
+
+      break;
+    case UJointControllerState::Normal:
+      State = UJointControllerState::FollowJointTrajectory;
+
+      break;
+    case UJointControllerState::Off:
+      State = UJointControllerState::FollowJointTrajectory;
+
+      break;
+    }
+  return true;
 }

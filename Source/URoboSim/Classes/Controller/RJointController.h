@@ -92,4 +92,6 @@ class UROBOSIM_API URJointController : public URController
   virtual bool CheckTrajectoryPoint();
   void CallculateJointVelocities(float InDeltaTime);
   void SetJointVelocities(float InDeltaTime);
+  virtual bool SwitchToNormal();
+  virtual bool SwitchToFollowJointTrajectory();
 };
