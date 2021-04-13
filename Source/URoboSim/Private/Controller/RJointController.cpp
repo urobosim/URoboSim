@@ -126,6 +126,7 @@ bool URJointController::CheckTrajectoryGoalReached()
       bPublishResult = true;
 
       GoalStatusList.Last().Status = 3;
+      ActionFinished.Broadcast(GoalStatusList.Last());
 
       Trajectory.Empty();
       TrajectoryPointIndex = 0;
@@ -414,7 +415,7 @@ bool URJointController::SwitchToFollowJointTrajectory()
     case UJointControllerState::FollowJointTrajectory:
       UE_LOG(LogTemp, Warning, TEXT("Trajectory already in Progress."));
       GoalStatusList.Last().Status = 4;
-
+      ActionFinished.Broadcast(GoalStatusList.Last());
       break;
     case UJointControllerState::Normal:
       State = UJointControllerState::FollowJointTrajectory;
