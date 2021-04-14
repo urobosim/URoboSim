@@ -210,7 +210,6 @@ void URJointController::Tick(float InDeltaTime)
     {
     case UJointControllerState::FollowJointTrajectory:
       ActionDuration+= InDeltaTime * SpeedFactorHack;
-      UE_LOG(LogTemp, Warning, TEXT("Trajectory Tick"));
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
