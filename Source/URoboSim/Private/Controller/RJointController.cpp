@@ -1,5 +1,6 @@
 
 #include "Controller/RJointController.h"
+#include "ROSTime.h"
 
 URJointController::URJointController()
 {
@@ -209,6 +210,7 @@ void URJointController::Tick(float InDeltaTime)
     {
     case UJointControllerState::FollowJointTrajectory:
       ActionDuration+= InDeltaTime * SpeedFactorHack;
+      UE_LOG(LogTemp, Warning, TEXT("Trajectory Tick"));
       if(!CheckTrajectoryPoint())
         {
           UpdateDesiredJointAngle(InDeltaTime);
@@ -369,8 +371,14 @@ void URJointController::SwitchMode(UJointControllerMode InMode, bool IsInit)
 
 void URJointController::FollowTrajectory(double InActionStart, FGoalStatusInfo InGoalInfo, TArray<FString> InJointNames, TArray<FTrajectoryPoints> InTrajectory)
 {
+  UE_LOG(LogTemp, Error, TEXT("FollowTrajectory"));
   TrajectoryPointIndex = 0;
   OldTrajectoryPoints.Reset();
+  SwitchToFollowJointTrajectory();
+  ActionDuration = FROSTime::Now().GetTimeAsDouble() - InActionStart;
+  UE_LOG(LogTemp, Error, TEXT("Start Trajectory Delayed %f"), ActionDuration);
+      // double ActionTimeDiff =  - ;
+  SetJointNames(InJointNames);
   URJoint* Joint = nullptr;
   for(auto& JointName : TrajectoryStatus.JointNames)
     {
@@ -380,8 +388,6 @@ void URJointController::FollowTrajectory(double InActionStart, FGoalStatusInfo I
           OldTrajectoryPoints.Points.Add(Joint->GetEncoderValue());
         }
     }
-  SwitchToFollowJointTrajectory();
-  SetJointNames(InJointNames);
   Trajectory = InTrajectory;
   GoalStatusList.Add(InGoalInfo);
   // State = UJointControllerState::FollowJointTrajectory;
