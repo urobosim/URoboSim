@@ -53,3 +53,12 @@ void URPublisher::CreatePublisher()
       UE_LOG(LogTemp, Log, TEXT("Publisher connected to RosBridge"));
     }
 }
+
+void URPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
+{
+  if (PublisherParameters)
+  {
+    Topic = PublisherParameters->Topic;
+    ControllerName = PublisherParameters->ControllerName;
+  }
+}

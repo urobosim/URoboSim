@@ -60,3 +60,12 @@ void URActionServer::Init()
   ResultPublisher->Init(Owner, Handler, ActionName + "/result");
   StatusPublisher->Init(Owner, Handler, ActionName + "/status");
 }
+
+void URActionServer::SetActionServerParameters(URActionServerParameter *&ActionServerParameters)
+{
+  if (ActionServerParameters)
+  {
+    ActionName = ActionServerParameters->ActionName;
+    ControllerName = ActionServerParameters->ActionName;
+  }
+}

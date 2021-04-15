@@ -9,6 +9,15 @@ void URROSService::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandle
 	ROSHandler->AddServiceServer(ServiceServer);
 }
 
+void URROSService::SetROSServiceParameters(URROSServiceParameter *&ROSServiceParameters)
+{
+	if (ROSServiceParameters)
+  {
+    Name = ROSServiceParameters->Name;
+    Type = ROSServiceParameters->Type;
+  }
+}
+
 void URROSSimulationCommandsService::SetOwner(UObject* InOwner)
 {
 	Owner = Cast<URControllerComponent>(InOwner);

@@ -40,6 +40,17 @@ URJointControllerConfigurationClient::URJointControllerConfigurationClient()
   LimitParamTopic = TEXT("/robot_description");
 }
 
+void URJointControllerConfigurationClient::SetROSClientParameters(URROSClientParameter *&ROSClientParameters)
+{
+  Super::SetROSClientParameters(ROSClientParameters);
+  URJointControllerConfigurationClientParameter *JointControllerConfigurationClientParameters = Cast<URJointControllerConfigurationClientParameter>(ROSClientParameters);
+  if (JointControllerConfigurationClientParameters)
+  {
+    JointParamTopic = JointControllerConfigurationClientParameters->JointParamTopic;
+    LimitParamTopic = JointControllerConfigurationClientParameters->LimitParamTopic;
+  }  
+}
+
 void URJointControllerConfigurationClient::Init(UObject* InControllerComp)
 {
   // ARModel* Model = Cast<ARModel>(InModel);

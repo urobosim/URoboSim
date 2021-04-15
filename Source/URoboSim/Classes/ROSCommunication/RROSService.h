@@ -4,6 +4,7 @@
 #include "ROSBridgePublisher.h"
 #include "ROSBridgeSrvServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
+#include "RROSServiceParameter.h"
 #include "ROSCommunication/RROSServiceServer.h"
 #include "Controller/RControllerComponent.h"
 #include "RROSService.generated.h"
@@ -15,6 +16,8 @@ GENERATED_BODY()
 public:
 	// virtual void CallService(){};
 	virtual void Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InName);
+
+	virtual void SetROSServiceParameters(URROSServiceParameter *&ROSServiceParameters);
 
 	TSharedPtr<FROSBridgeSrvServer> ServiceServer;
 protected:

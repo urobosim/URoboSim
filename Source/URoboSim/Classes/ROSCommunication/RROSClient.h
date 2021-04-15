@@ -6,6 +6,7 @@
 #include "ROSBridgeSrvClient.h"
 #include "ROSCommunication/RROSClientImpl.h"
 #include "RUtilityClasses.h"
+#include "RROSClientParameter.h"
 #include "Controller/RControllerComponent.h"
 #include "Controller/RController.h"
 #include "Controller/RJointController.h"
@@ -21,6 +22,8 @@ public:
 
 	virtual void Init(UObject* InControllerComp, TSharedPtr<FROSBridgeHandler> InHandler);
 	virtual void Init(UObject* InControllerComp, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler);
+
+  virtual void SetROSClientParameters(URROSClientParameter *&ROSClientParameters){}
 
 	virtual void SetParameters(float InSimTime, FJointState InParameters, FTransform InRobotPose){};
 	virtual void Init(UObject* InControllerComp){};
@@ -60,12 +63,34 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URJointControllerConfigurationClientParameter : public URROSClientParameter
+{
+  GENERATED_BODY()
+
+public:
+  URJointControllerConfigurationClientParameter()
+  {
+    JointParamTopic = TEXT("/whole_body_controller/joints");
+    LimitParamTopic = TEXT("/robot_description");
+  }
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString JointParamTopic;
+  
+  UPROPERTY(EditAnywhere)
+  FString LimitParamTopic;
+};
+
+UCLASS()
 class UROBOSIM_API URJointControllerConfigurationClient : public URROSClient
 {
   GENERATED_BODY()
 
 public:
     URJointControllerConfigurationClient();
+
+  virtual void SetROSClientParameters(URROSClientParameter *&ROSClientParameters) override;
 
    UPROPERTY()
      URControllerComponent* ControllerComp;

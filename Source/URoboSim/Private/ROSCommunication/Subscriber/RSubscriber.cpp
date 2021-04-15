@@ -19,3 +19,13 @@ void URSubscriber::Init(FString RosTopic)
   SetMessageType();
   CreateSubscriber();
 }
+
+void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
+{
+  if (SubscriberParameters)
+  {
+    Topic = SubscriberParameters->Topic;
+    MessageType = SubscriberParameters->MessageType;
+    ControllerName = SubscriberParameters->ControllerName;
+  }
+}

@@ -8,6 +8,16 @@ URJointStatePublisher::URJointStatePublisher()
   JointParamTopic = TEXT("/hardware_interface/joints");
 }
 
+void URJointStatePublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
+{
+  Super::SetPublishParameters(PublisherParameters);
+  URJointStatePublisherParameter *JointStatePublisherParameter = Cast<URJointStatePublisherParameter>(PublisherParameters);
+  if (JointStatePublisherParameter)
+  {
+    JointParamTopic = JointStatePublisherParameter->JointParamTopic;
+  }  
+}
+
 void URJointStatePublisher::SetMessageType()
 {
   MessageType = TEXT("sensor_msgs/JointState");

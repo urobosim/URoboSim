@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
+#include "RSubscriberParameter.h"
 #include "Controller/RControllerComponent.h"
 #include "Physics/RModel.h"
 #include "RSubscriber.generated.h"
@@ -26,6 +26,8 @@ public:
     virtual void Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic="");
 
     virtual void Init(UObject* InModel){};
+
+    virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
 
     TSharedPtr<FROSBridgeSubscriber> Subscriber;
 

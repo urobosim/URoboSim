@@ -60,7 +60,6 @@ AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const F
             }
 
 
-          return NewRobot;
         }
       else
         {
@@ -72,7 +71,7 @@ AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const F
     }
   else
     {
-      bDrag = true;
+      bDrag = !bDrag;
     }
 
   // Creates RRobot Actor.
