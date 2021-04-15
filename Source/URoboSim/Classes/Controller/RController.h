@@ -16,6 +16,9 @@
 #include "RController.generated.h"
 // clang-format on
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionFinishedDelegate, FGoalStatusInfo, StatusInfo);
+
+
 USTRUCT()
 struct FTFInfo
 {
@@ -105,6 +108,7 @@ public:
   TArray<FGoalStatusInfo> GoalStatusList;
 
   // float CheckAngleRange(float InAngle);
+  FActionFinishedDelegate ActionFinished;
 
   UPROPERTY()
   float CummulatedError = 0;

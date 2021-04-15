@@ -60,7 +60,7 @@ class UROBOSIM_API URJointController : public URController
   UPROPERTY()
     FTrajectoryStatus TrajectoryStatus;
 
-  virtual void FollowTrajectory();
+  virtual void FollowTrajectory(double InActionStart, FGoalStatusInfo InGoalInfo, TArray<FString> InJointNames, TArray<FTrajectoryPoints> InTrajectory);
   virtual void SetJointNames(TArray<FString> InNames);
   virtual void SwitchMode(UJointControllerMode InMode, bool IsInit = false);
 
@@ -91,4 +91,6 @@ class UROBOSIM_API URJointController : public URController
   virtual bool CheckTrajectoryPoint();
   void CallculateJointVelocities(float InDeltaTime);
   void SetJointVelocities(float InDeltaTime);
+  virtual bool SwitchToNormal();
+  virtual bool SwitchToFollowJointTrajectory();
 };

@@ -18,6 +18,7 @@ protected:
     virtual void SetMessageType();
     virtual void SetOwner(UObject* InOwner);
 
+    virtual void PublishResult(FGoalStatusInfo InStatusInfo);
     UPROPERTY()
       URJointController* Owner;
 
