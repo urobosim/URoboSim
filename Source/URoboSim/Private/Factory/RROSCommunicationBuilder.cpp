@@ -94,19 +94,19 @@ URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const
 {
   if (Cast<URJointStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
-    return NewObject<URJointStatePublisher>(InOwner, TEXT("JointStatePublisher"));
+    return NewObject<URJointStatePublisher>(InOwner);
   }
   else if (Cast<UROdomPublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
-    return NewObject<UROdomPublisher>(InOwner, TEXT("OdomPublisher"));
+    return NewObject<UROdomPublisher>(InOwner);
   }
   else if (Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
-    return NewObject<URJointTrajectoryControllerStatePublisher>(InOwner, TEXT("JointTrajectoryControllerStatePublisher"));
+    return NewObject<URJointTrajectoryControllerStatePublisher>(InOwner);
   }
   else if (Cast<URLidar2DPublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
-    return NewObject<URLidar2DPublisher>(InOwner, TEXT("LidarPublisher"));
+    return NewObject<URLidar2DPublisher>(InOwner);
   }
   else
   {
@@ -119,12 +119,12 @@ URSubscriber *URROSCommunicationBuilder::CreateSubscriber(ARModel *&InOwner, con
 {
   if (Cast<URVelocityCommandSubscriberParameter>(SubscriberConfiguration.SubscriberParameters))
   {
-    return NewObject<URVelocityCommandSubscriber>(InOwner, TEXT("VelocityCommandSubscriber"));
+    return NewObject<URVelocityCommandSubscriber>(InOwner);
   }
   else
   {
     UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("SubscriberParameters of %s not found, use default"), *SubscriberConfiguration.SubscriberParameters->GetName())
-    return NewObject<URSubscriber>(InOwner, TEXT("Subscriber"));
+    return NewObject<URSubscriber>(InOwner);
   }
 }
 
@@ -132,16 +132,16 @@ URServiceClient *URROSCommunicationBuilder::CreateServiceClient(ARModel *&InOwne
 {
   if (Cast<URGetJointsClientParameter>(ServiceClientConfiguration.ServiceClientParameters))
   {
-    return NewObject<URGetJointsClient>(InOwner, TEXT("GetJointsClient"));
+    return NewObject<URGetJointsClient>(InOwner);
   }
   else if (Cast<URGetParamClientParameter>(ServiceClientConfiguration.ServiceClientParameters))
   {
-    return NewObject<URGetParamClient>(InOwner, TEXT("GetParamClient"));
+    return NewObject<URGetParamClient>(InOwner);
   }
   else
   {
     UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ServiceClientParameters of %s not found, use default"), *ServiceClientConfiguration.ServiceClientParameters->GetName())
-    return NewObject<URGetParamClient>(InOwner, TEXT("ServiceClient"));
+    return NewObject<URGetParamClient>(InOwner);
   }
 }
 
@@ -149,11 +149,11 @@ URActionServer *URROSCommunicationBuilder::CreateActionServer(ARModel *&InOwner,
 {
   if (Cast<URFJTAServerParameter>(ActionServerConfiguration.ActionServerParameters))
   {
-    return NewObject<URFJTAServer>(InOwner, TEXT("FJTAServer"));
+    return NewObject<URFJTAServer>(InOwner);
   }
   else
   {
     UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ActionServerParameters of %s not found, use default"), *ActionServerConfiguration.ActionServerParameters->GetName())
-    return NewObject<URActionServer>(InOwner, TEXT("ActionServer"));
+    return NewObject<URActionServer>(InOwner);
   }
 }

@@ -29,11 +29,6 @@ void URLidar2DPublisher::SetPublishParameters(URPublisherParameter *&PublisherPa
     LidarReferenceROSLinkName = LidarPublisherParameters->LidarReferenceROSLinkName;
     LidarName = LidarPublisherParameters->LidarName;
     SetLidar();
-    if (Lidar)
-    {
-      URSensorParameter *LidarParameters = LidarPublisherParameters->LidarParameters;
-      Lidar->SetSensorParameters(LidarParameters);
-    }
   }
 }
 

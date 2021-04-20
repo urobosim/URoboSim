@@ -26,9 +26,6 @@ public:
 
   UPROPERTY(EditAnywhere)
   FString LidarName;
-
-  UPROPERTY(EditAnywhere)
-  URLidar2DParameter *LidarParameters;
 };
 
 UCLASS()
