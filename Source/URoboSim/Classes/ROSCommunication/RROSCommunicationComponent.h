@@ -36,7 +36,7 @@ public:
 protected:
   void Init() override;
 
-protected:
+private:
   UPROPERTY(EditAnywhere)
   FRROSCommunicationContainer ROSCommunication;
 };

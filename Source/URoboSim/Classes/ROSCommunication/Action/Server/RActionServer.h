@@ -1,13 +1,22 @@
 #pragma once
 
 #include "Controller/RControllerComponent.h"
-#include "RActionServerParameter.h"
 #include "ROSBridgeHandler.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
 #include "RActionServer.generated.h"
 // clang-format on
+
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URActionServerParameter : public UObject
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString ActionName;
+};
 
 UCLASS()
 class UROBOSIM_API URActionSubscriber : public URSubscriber

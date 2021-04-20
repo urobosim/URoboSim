@@ -1,4 +1,5 @@
 #include "ROSCommunication/Publisher/RPublisher.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRPublisher, Log, All)
 
@@ -21,6 +22,7 @@ void URPublisher::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPo
   if (Handler.IsValid())
   {
     Handler->Connect();
+    UE_LOG(LogRPublisher, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Init(InTopic);
   }
   else
@@ -41,9 +43,25 @@ void URPublisher::Init(const FString &InTopic)
 
 void URPublisher::Init()
 {
-  if (!Owner && Cast<ARModel>(GetOuter()))
+  SetOwner();
+}
+
+void URPublisher::SetOwner()
+{
+  if (!Owner)
   {
-    Owner = Cast<ARModel>(GetOuter());
+    if (Cast<ARModel>(GetOuter()))
+    {
+      Owner = Cast<ARModel>(GetOuter());
+    }
+    else if (Cast<URROSCommunicationComponent>(GetOuter()) && Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner()))
+    {
+      Owner = Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner());
+    }
+  }
+  if (!Owner)
+  {
+    UE_LOG(LogRPublisher, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
   }
 }
 

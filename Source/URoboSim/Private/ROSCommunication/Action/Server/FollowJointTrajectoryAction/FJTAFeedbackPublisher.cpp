@@ -17,11 +17,24 @@ void URFJTAFeedbackPublisher::Init()
   if (GetOwner())
   {
     JointController = Cast<URJointController>(Controller);
-
-    GetJointsClient = NewObject<URGetJointsClient>();
-    GetJointsClient->GetParamArguments.Name = JointParamPath;
-    GetJointsClient->SetOwner(GetOwner());
-    GetJointsClient->URServiceClient::Init(Handler);
+    if (JointController)
+    {
+      GetJointsClient = NewObject<URGetJointsClient>();
+      URServiceClientParameter *GetJointsClientParameters = NewObject<URGetJointsClientParameter>();
+      Cast<URGetJointsClientParameter>(GetJointsClientParameters)->GetParamArguments.Name = JointParamPath;
+      Cast<URGetJointsClientParameter>(GetJointsClientParameters)->ControllerName = JointController->GetName();
+      GetJointsClient->SetServiceClientParameters(GetJointsClientParameters);
+      GetJointsClient->SetOwner(GetOwner());
+      GetJointsClient->URServiceClient::Init(Handler);
+    }
+    else
+    {
+      UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("JointController not found in %s"), *GetOwner()->GetName())
+    }
+  }
+  else
+  {
+    UE_LOG(LogRFJTAFeedbackPublisher, Error, TEXT("Owner not found in %s, Outer is %s"), *GetName(), *GetOuter()->GetName())
   }
 }
 

@@ -1,10 +1,16 @@
 #pragma once
 
 #include "Controller/RController.h"
-#include "RJointControllerParameter.h"
 // clang-format off
 #include "RJointController.generated.h"
 // clang-format on
+
+UENUM()
+enum class UJointControllerMode : uint8
+{
+  Dynamic,
+  Kinematic
+};
 
 UENUM()
 enum class UJointControllerState : uint8
@@ -71,6 +77,22 @@ public:
   FJointState CurrentState;
   FJointState DesiredState;
   FJointState ErrorState;
+};
+
+UCLASS()
+class UROBOSIM_API URJointControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  UJointControllerMode Mode = UJointControllerMode::Dynamic;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
+
+  UPROPERTY(EditAnywhere)
+  bool bDisableCollision;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)

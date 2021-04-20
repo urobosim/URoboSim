@@ -3,11 +3,17 @@
 #pragma once
 
 #include "Physics/RModel.h"
-#include "RControllerParameter.h"
 #include "ROSUtilities.h"
 // clang-format off
 #include "RController.generated.h"
 // clang-format on
+
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URControllerParameter : public UObject
+{
+  GENERATED_BODY()
+
+};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URController : public UObject

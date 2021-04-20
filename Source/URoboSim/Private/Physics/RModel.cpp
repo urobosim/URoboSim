@@ -3,6 +3,7 @@
 
 #include "Physics/RModel.h"
 #include "Controller/RControllerComponent.h"
+#include "Sensor/RSensorComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
@@ -120,6 +121,20 @@ URController *ARModel::GetController(const FString &ControllerName) const
   else
   {
     UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *ControllerName, *GetName())
+    return nullptr;
+  }
+}
+
+URSensor *ARModel::GetSensor(const FString &SensorName) const
+{
+  URSensorComponent *SensorComponent = FindComponentByClass<URSensorComponent>();
+  if (SensorComponent)
+  {
+    return SensorComponent->GetSensor(SensorName);
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *SensorName, *GetName())
     return nullptr;
   }
 }

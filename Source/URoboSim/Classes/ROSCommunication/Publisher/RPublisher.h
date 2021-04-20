@@ -3,10 +3,22 @@
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgePublisher.h"
-#include "RPublisherParameter.h"
 // clang-format off
 #include "RPublisher.generated.h"
 // clang-format on
+
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URPublisherParameter : public UObject
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URPublisher : public UObject
@@ -26,6 +38,8 @@ public:
   ARModel *GetOwner() const { return Owner; }
 
   void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
+
+  void SetOwner();
 
   virtual void Publish() {}
 

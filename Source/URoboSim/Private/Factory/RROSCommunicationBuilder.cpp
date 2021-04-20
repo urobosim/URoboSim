@@ -1,10 +1,11 @@
 #include "Factory/RROSCommunicationBuilder.h"
 #include "ROSCommunication/Action/Server/FollowJointTrajectoryAction/FJTAServer.h"
+#include "ROSCommunication/Publisher/RLidar2DPublisher.h"
 #include "ROSCommunication/Publisher/RJointStatePublisher.h"
 #include "ROSCommunication/Publisher/RJointTrajectoryControllerStatePublisher.h"
 #include "ROSCommunication/Publisher/ROdomPublisher.h"
-#include "ROSCommunication/Subscriber/RVelocityCommandSubscriber.h"
 #include "ROSCommunication/Service/Client/RGetJointsClient.h"
+#include "ROSCommunication/Subscriber/RVelocityCommandSubscriber.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 
@@ -35,6 +36,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       if (Publisher)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Publisher->GetName(), *Owner->GetName());
+        Publisher->SetOwner();
         Publisher->SetPublishParameters(PublisherConfiguration.PublisherParameters);
         ROSCommunicationComponent->AddPublisher(Publisher);
       }
@@ -49,6 +51,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       if (Subscriber)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Subscriber->GetName(), *Owner->GetName());
+        Subscriber->SetOwner();
         Subscriber->SetSubscriberParameters(SubscriberConfiguration.SubscriberParameters);
         ROSCommunicationComponent->AddSubscriber(Subscriber);
       }
@@ -63,6 +66,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       if (ServiceClient)
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ServiceClient->GetName(), *Owner->GetName());
+        ServiceClient->SetOwner();
         ServiceClient->SetServiceClientParameters(ServiceClientConfiguration.ServiceClientParameters);
         ROSCommunicationComponent->AddServiceClient(ServiceClient);
       }
@@ -99,6 +103,10 @@ URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const
   else if (Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
     return NewObject<URJointTrajectoryControllerStatePublisher>(InOwner, TEXT("JointTrajectoryControllerStatePublisher"));
+  }
+  else if (Cast<URLidar2DPublisherParameter>(PublisherConfiguration.PublisherParameters))
+  {
+    return NewObject<URLidar2DPublisher>(InOwner, TEXT("LidarPublisher"));
   }
   else
   {

@@ -4,10 +4,22 @@
 
 #include "Physics/RModel.h"
 #include "ROSBridgeHandler.h"
-#include "RSubscriberParameter.h"
 // clang-format off
 #include "RSubscriber.generated.h"
 // clang-format on
+
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URSubscriberParameter : public UObject
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URSubscriber : public UObject
@@ -27,6 +39,8 @@ public:
   ARModel *GetOwner() const { return Owner; }
 
   void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
+
+  void SetOwner();
 
   virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
 

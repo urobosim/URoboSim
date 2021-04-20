@@ -1,4 +1,5 @@
 #include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRSubscriber, Log, All)
 
@@ -21,6 +22,7 @@ void URSubscriber::Init(const FString &WebsocketIPAddr, const uint32 &WebsocketP
   if (Handler.IsValid())
   {
     Handler->Connect();
+    UE_LOG(LogRSubscriber, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Init(InTopic);
   }
   else
@@ -42,9 +44,25 @@ void URSubscriber::Init(const FString &InTopic)
 
 void URSubscriber::Init()
 {
-  if (!Owner && Cast<ARModel>(GetOuter()))
+  SetOwner();
+}
+
+void URSubscriber::SetOwner()
+{
+  if (!Owner)
   {
-    Owner = Cast<ARModel>(GetOuter());
+    if (Cast<ARModel>(GetOuter()))
+    {
+      Owner = Cast<ARModel>(GetOuter());
+    }
+    else if (Cast<URROSCommunicationComponent>(GetOuter()) && Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner()))
+    {
+      Owner = Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner());
+    }
+  }
+  if (!Owner)
+  {
+    UE_LOG(LogRSubscriber, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
   }
 }
 
@@ -68,7 +86,6 @@ void URSubscriber::AddSubscriber()
 {
   if (Subscriber.IsValid())
   {
-    UE_LOG(LogRSubscriber, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Handler->AddSubscriber(Subscriber);
   }
 }

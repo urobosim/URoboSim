@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Engine/DataAsset.h"
-#include "Controller/RControllerParameter.h"
+#include "Controller/RController.h"
 #include "Containers/Map.h"
 // clang-format off
 #include "RControllerDataAsset.generated.h"

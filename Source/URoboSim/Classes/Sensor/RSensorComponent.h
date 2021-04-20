@@ -2,32 +2,32 @@
 
 #pragma once
 
-#include "RController.h"
+#include "RSensor.h"
 #include "RPluginComponent.h"
 // clang-format off
-#include "RControllerComponent.generated.h"
+#include "RSensorComponent.generated.h"
 // clang-format on
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class UROBOSIM_API URControllerComponent final : public URPluginComponent
+class UROBOSIM_API URSensorComponent final : public URPluginComponent
 {
   GENERATED_BODY()
 
 public:
-  URControllerComponent();
-  
+  URSensorComponent();
+
 public:
   void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 public:
-  void AddController(URController *Controller) { Controllers.Add(Controller); }
+  void AddSensor(URSensor *Sensor) { Sensors.Add(Sensor); }
 
-  URController *GetController(const FString &ControllerName);
+  URSensor *GetSensor(const FString &SensorName);
 
 protected:
   void Init() override;
 
 private:
   UPROPERTY(EditAnywhere, Instanced)
-  TArray<URController *> Controllers;
+  TArray<URSensor *> Sensors;
 };

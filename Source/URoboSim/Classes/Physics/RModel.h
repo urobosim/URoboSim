@@ -66,6 +66,8 @@ public:
 
   class URController *GetController(const FString &ControllerName) const;
 
+  class URSensor *GetSensor(const FString &SensorName) const;
+
 public:
   UPROPERTY(EditAnywhere)
   FEnableGravity EnableGravity;

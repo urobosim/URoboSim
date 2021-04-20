@@ -1,4 +1,5 @@
 #include "ROSCommunication/Action/Server/RActionServer.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRActionServer, Log, All)
 
@@ -21,6 +22,7 @@ void URActionServer::Init(const FString &WebsocketIPAddr, const uint32 &Websocke
   if (Handler.IsValid())
   {
     Handler->Connect();
+    UE_LOG(LogRActionServer, Log, TEXT("%s is connected to ROSBridge"), *GetName())
     Init(InActionName);
   }
   else
@@ -40,41 +42,58 @@ void URActionServer::Init(const FString &InActionName)
 
 void URActionServer::Init()
 {
-  ARModel *Owner = Cast<ARModel>(GetOuter());
+  ARModel *Owner = nullptr;
+  if (Cast<ARModel>(GetOuter()))
+  {
+    Owner = Cast<ARModel>(GetOuter());
+  }
+  else if (Cast<URROSCommunicationComponent>(GetOuter()) && Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner()))
+  {
+    Owner = Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner());
+  }
   if (Owner)
   {
     URController *Controller = Owner->GetController(ControllerName);
-
+    
     if (GoalSubscriber)
     {
+      UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *GoalSubscriber->GetName(), *GetName())
       GoalSubscriber->SetController(Controller);
       GoalSubscriber->SetOwner(Owner);
       GoalSubscriber->Init(Handler, ActionName + TEXT("/goal"));
     }
     if (CancelSubscriber)
     {
+      UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *CancelSubscriber->GetName(), *GetName())
       CancelSubscriber->SetController(Controller);
       CancelSubscriber->SetOwner(Owner);
       CancelSubscriber->Init(Handler, ActionName + TEXT("/cancel"));
     }
     if (StatusPublisher)
     {
+      UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *StatusPublisher->GetName(), *GetName())
       StatusPublisher->SetController(Controller);
       StatusPublisher->SetOwner(Owner);
       StatusPublisher->Init(Handler, ActionName + TEXT("/status"));
     }
     if (FeedbackPublisher)
     {
+      UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *FeedbackPublisher->GetName(), *GetName())
       FeedbackPublisher->SetController(Controller);
       FeedbackPublisher->SetOwner(Owner);
       FeedbackPublisher->Init(Handler, ActionName + TEXT("/feedback"));
     }
     if (ResultPublisher)
     {
+      UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *ResultPublisher->GetName(), *GetName())
       ResultPublisher->SetController(Controller);
       ResultPublisher->SetOwner(Owner);
       ResultPublisher->Init(Handler, ActionName + TEXT("/result"));
     }
+  }
+  else
+  {
+    UE_LOG(LogRActionServer, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
   }
 }
 

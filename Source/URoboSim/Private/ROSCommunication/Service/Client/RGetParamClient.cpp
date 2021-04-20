@@ -13,6 +13,7 @@ void URGetParamClient::SetServiceClientParameters(URServiceClientParameter *&Ser
   URGetParamClientParameter *GetParamClientParameter = Cast<URGetParamClientParameter>(ServiceClientParameters);
   if (GetParamClientParameter)
   {
+    ControllerName = GetParamClientParameter->ControllerName;
     GetParamArguments = GetParamClientParameter->GetParamArguments;
   }  
 }

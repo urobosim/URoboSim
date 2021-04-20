@@ -4,10 +4,16 @@
 
 #include "Controller/RController.h"
 #include "Physics/RModel.h"
-#include "RBaseControllerParameter.h"
 // clang-format off
 #include "RBaseController.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URBaseControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+};
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URBaseController : public URController

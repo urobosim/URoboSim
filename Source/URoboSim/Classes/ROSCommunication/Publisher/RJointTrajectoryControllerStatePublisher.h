@@ -39,11 +39,10 @@ public:
 public:
   void Publish() override;
 
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
+
 protected:
   void Init() override;
-
-public:
-  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
 public:
   UPROPERTY(EditAnywhere)
