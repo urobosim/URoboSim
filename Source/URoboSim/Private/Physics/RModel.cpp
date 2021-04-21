@@ -12,7 +12,6 @@ ARModel::ARModel()
 {
   PrimaryActorTick.bCanEverTick = true;
   PrimaryActorTick.TickGroup = TG_PrePhysics;
-  bSimulatePhysics = true;
 }
 
 // Called every frame
@@ -50,7 +49,6 @@ void ARModel::Init()
   }
   for (URLink *&Link : Links)
   {
-    Link->SetSimulatePhysics(bSimulatePhysics);
     Link->Init();
   }
 }

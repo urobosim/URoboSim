@@ -35,11 +35,11 @@ void URLink::SetEnableGravity(const bool &bGravityEnabled)
   }
 }
 
-void URLink::SetSimulatePhysics(const bool &bSimulate)
+void URLink::DisableSimulatePhysics()
 {
   for (UStaticMeshComponent *CollisionMesh : CollisionMeshes)
   {
-    CollisionMesh->SetSimulatePhysics(bSimulate);
+    CollisionMesh->SetSimulatePhysics(false);
   }
 }
 
@@ -59,8 +59,11 @@ void URLink::DisableCollision()
 {
   if (CollisionMeshes.Num() > 0)
   {
-    UE_LOG(LogRLink, Log, TEXT("Disable collision for %s"), *CollisionMeshes[0]->GetName())
-    CollisionMeshes[0]->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+    UE_LOG(LogRLink, Log, TEXT("Disable collision for %s"), *GetName())
+    for (UStaticMeshComponent *&CollisionMesh : CollisionMeshes)
+    {
+      CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+    }
   }
   else
   {
@@ -72,8 +75,12 @@ void URLink::EnableCollision()
 {
   if (CollisionMeshes.Num() > 0)
   {
-    UE_LOG(LogRLink, Log, TEXT("Enable collision for %s"), *CollisionMeshes[0]->GetName())
-    CollisionMeshes[0]->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+    UE_LOG(LogRLink, Log, TEXT("Enable collision for %s"), *GetName())
+    for (UStaticMeshComponent *&CollisionMesh : CollisionMeshes)
+    {
+      CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+      CollisionMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+    }
   }
   else
   {

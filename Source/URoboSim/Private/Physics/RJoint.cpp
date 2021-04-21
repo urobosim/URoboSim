@@ -132,13 +132,15 @@ void URPrismaticJoint::SetPosition(const float &Position)
 
 void URContinuousJoint::SetTargetPosition(const float &TargetPosition)
 {
-	Type->Constraint->SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition));
+	const FRotator TargetPositionRotator = UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition);
+	Type->Constraint->SetAngularOrientationTarget(TargetPositionRotator);
 	Child->GetCollisionMeshes()[0]->WakeRigidBody();
 }
 
 void URPrismaticJoint::SetTargetPosition(const float &TargetPosition)
 {
-	Type->Constraint->SetLinearPositionTarget(Type->Axis * -TargetPosition);
+	const FVector TargetPositionVector = Type->Axis * -TargetPosition;
+	Type->Constraint->SetLinearPositionTarget(TargetPositionVector);
 	Child->GetCollisionMeshes()[0]->WakeRigidBody();
 }
 

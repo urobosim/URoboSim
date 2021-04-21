@@ -58,26 +58,21 @@ void URJointController::Init()
 
 void URJointController::SetMode()
 {
-  if (!GetOwner())
-  {
-    return;
-  }
-  else
+  if (GetOwner())
   {
     switch (Mode)
     {
     case UJointControllerMode::Kinematic:
-      GetOwner()->bSimulatePhysics = false;
       EnableDrive.bPositionDrive = false;
       EnableDrive.bVelocityDrive = false;
       for (URLink *&Link : GetOwner()->GetLinks())
       {
+        Link->DisableSimulatePhysics();
         Link->DisableCollision();
       }
       break;
 
     case UJointControllerMode::Dynamic:
-      GetOwner()->bSimulatePhysics = true;
       GetOwner()->EnableGravity.bLinks = false;
       EnableDrive.bPositionDrive = true;
       EnableDrive.bVelocityDrive = true;
@@ -101,6 +96,10 @@ void URJointController::SetMode()
     {
       Joint->SetDrive(EnableDrive);
     }
+  }
+  else
+  {
+    UE_LOG(LogRJointController, Error, TEXT("Owner of %s not found"), *GetName())
   }
 }
 

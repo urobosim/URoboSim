@@ -32,12 +32,12 @@ void URLidar2D::Init()
       if (ActorComponent->GetName().Equals(ReferenceLinkName))
       {
         ReferenceLink = ActorComponent;
+        break;
       }
     }
     if (!ReferenceLink)
     {
       UE_LOG(LogRLidar2D, Error, TEXT("%s of %s not found"), *ReferenceLinkName, *GetOwner()->GetName());
-      return;
     }
   }
 }

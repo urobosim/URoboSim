@@ -1,5 +1,6 @@
 #include "Factory/RSensorBuilder.h"
 #include "Sensor/SensorType/RLidar2D.h"
+#include "Sensor/SensorType/RCamera.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRSensorBuilder, Log, All);
 
@@ -43,6 +44,10 @@ URSensor *URSensorBuilder::CreateSensor(ARModel *&InOwner, const TPair<FString, 
   if (Cast<URLidar2DParameter>(SensorParameters.Value))
   {
     return NewObject<URLidar2D>(InOwner, *SensorParameters.Key);
+  }
+  else if (Cast<URCameraParameter>(SensorParameters.Value))
+  {
+    return NewObject<URCamera>(InOwner, *SensorParameters.Key);
   }
   else
   {

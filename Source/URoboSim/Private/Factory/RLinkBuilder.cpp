@@ -103,11 +103,8 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
     {
       LinkMeshComponent->SetStaticMesh(SDFCollision->Geometry->Mesh);
       LinkMeshComponent->bVisible = false;
-      if (Link->GetCollisionMeshes().Num() == 0)
-      {
-        LinkMeshComponent->SetSimulatePhysics(true);
-      }
-      else
+      LinkMeshComponent->SetSimulatePhysics(true);
+      if (Link->GetCollisionMeshes().Num() > 0)
       {
         LinkMeshComponent->SetSimulatePhysics(false);
         LinkMeshComponent->WeldTo(Link->GetCollisionMeshes()[0]);
@@ -135,14 +132,7 @@ void URLinkBuilder::SetCollisionProfile(const bool &bSelfColide)
   {
     CollisionMesh->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
     CollisionMesh->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
-    if (Link->GetVisualMeshes().Num() == 0)
-    {
-      CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-    }
-    else
-    {
-      CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-    }
+    CollisionMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
     if (!bSelfColide)
     {
       CollisionMesh->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);

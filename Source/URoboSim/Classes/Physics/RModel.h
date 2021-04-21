@@ -72,9 +72,6 @@ public:
   UPROPERTY(EditAnywhere)
   FEnableGravity EnableGravity;
 
-  UPROPERTY(EditAnywhere)
-  bool bSimulatePhysics;
-
 protected:
   UPROPERTY(VisibleAnywhere)
   TArray<URJoint *> Joints;

@@ -37,7 +37,7 @@ public:
 
 	virtual void SetEnableGravity(const bool &bGravityEnabled);
 
-	virtual void SetSimulatePhysics(const bool &bSimulate);
+	virtual void DisableSimulatePhysics();
 
 	virtual void DisableCollision();
 
