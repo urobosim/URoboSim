@@ -14,11 +14,23 @@ void URLink::Init()
 {
 }
 
-void URLink::SetPose(const FTransform &Pose)
+UStaticMeshComponent *URLink::GetRootMesh() const
 {
   if (CollisionMeshes.Num() > 0)
   {
-    PoseComponent->AttachToComponent(CollisionMeshes[0], FAttachmentTransformRules::KeepWorldTransform);
+    return CollisionMeshes[0];
+  }
+  else
+  {
+    return nullptr;
+  }
+}
+
+void URLink::SetPose(const FTransform &Pose)
+{
+  if (GetRootMesh())
+  {
+    PoseComponent->AttachToComponent(GetRootMesh(), FAttachmentTransformRules::KeepWorldTransform);
     PoseComponent->SetWorldTransform(Pose);
   }
   else
@@ -45,9 +57,9 @@ void URLink::DisableSimulatePhysics()
 
 void URLink::AttachToComponent(USceneComponent *Parent)
 {
-  if (CollisionMeshes.Num() > 0)
+  if (GetRootMesh())
   {
-    CollisionMeshes[0]->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+    GetRootMesh()->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
   }
   else
   {
@@ -57,7 +69,7 @@ void URLink::AttachToComponent(USceneComponent *Parent)
 
 void URLink::DisableCollision()
 {
-  if (CollisionMeshes.Num() > 0)
+  if (GetRootMesh())
   {
     UE_LOG(LogRLink, Log, TEXT("Disable collision for %s"), *GetName())
     for (UStaticMeshComponent *&CollisionMesh : CollisionMeshes)
@@ -73,7 +85,7 @@ void URLink::DisableCollision()
 
 void URLink::EnableCollision()
 {
-  if (CollisionMeshes.Num() > 0)
+  if (GetRootMesh())
   {
     UE_LOG(LogRLink, Log, TEXT("Enable collision for %s"), *GetName())
     for (UStaticMeshComponent *&CollisionMesh : CollisionMeshes)

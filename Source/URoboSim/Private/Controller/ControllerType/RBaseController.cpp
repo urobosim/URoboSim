@@ -9,11 +9,15 @@ void URBaseController::Init()
 
   if (GetOwner())
   {
-    BaseLink = GetOwner()->GetBaseLink();
+    URLink *BaseLink = GetOwner()->GetBaseLink();
     if (BaseLink)
     {
-      BaseLink->GetCollisionMeshes()[0]->SetConstraintMode(EDOFMode::XYPlane);
-      TargetPose = BaseLink->GetCollisionMeshes()[0]->GetComponentTransform();
+      BaseMesh = BaseLink->GetRootMesh();
+      if (BaseMesh)
+      {
+        BaseMesh->SetConstraintMode(EDOFMode::XYPlane);
+        TargetPose = BaseMesh->GetComponentTransform();
+      }
     }
   }
   else
@@ -34,9 +38,9 @@ void URBaseController::MoveAngular(const float &InVelocity)
 
 void URBaseController::Tick(const float &DeltaTime)
 {
-  if (BaseLink)
+  if (BaseMesh)
   {
-    BasePose = BaseLink->GetCollisionMeshes()[0]->GetComponentTransform();
+    BasePose = BaseMesh->GetComponentTransform();
     MoveLinearTick(DeltaTime);
     MoveAngularTick(DeltaTime);
   }
@@ -62,7 +66,7 @@ void URBaseController::MoveLinearTick(const float &DeltaTime)
     TargetPose.AddToTranslation(VelocityInBaseFrame * DeltaTime);
   }
   // Calculate velocity in order to move from current position to the target position
-  BaseLink->GetCollisionMeshes()[0]->SetPhysicsLinearVelocity((TargetPose.GetLocation() - BasePose.GetLocation()) / DeltaTime);
+  BaseMesh->SetPhysicsLinearVelocity((TargetPose.GetLocation() - BasePose.GetLocation()) / DeltaTime);
 }
 
 void URBaseController::MoveAngularTick(const float &DeltaTime)
@@ -72,5 +76,5 @@ void URBaseController::MoveAngularTick(const float &DeltaTime)
   float TargetAngle = FRotator::NormalizeAxis(TargetPose.GetRotation().Rotator().Yaw);
   float CurrentAngle = FRotator::NormalizeAxis(BasePose.GetRotation().Rotator().Yaw);
 
-  BaseLink->GetCollisionMeshes()[0]->SetPhysicsAngularVelocityInDegrees(FVector::UpVector * FRotator::NormalizeAxis(TargetAngle - CurrentAngle) / DeltaTime);
+  BaseMesh->SetPhysicsAngularVelocityInDegrees(FVector::UpVector * FRotator::NormalizeAxis(TargetAngle - CurrentAngle) / DeltaTime);
 }

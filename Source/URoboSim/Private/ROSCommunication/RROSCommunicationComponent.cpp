@@ -1,7 +1,106 @@
 #include "ROSCommunication/RROSCommunicationComponent.h"
 #include "Controller/RControllerComponent.h"
+#include "ROSCommunication/Publisher/RPublisher.h"
+#include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunication, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationComponent, Log, All);
+
+FRROSCommunicationContainer::FRROSCommunicationContainer()
+    : FRROSCommunicationContainer::FRROSCommunicationContainer(TEXT("127.0.0.1"), 9393)
+{
+}
+
+FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort)
+    : WebsocketIPAddr(InWebsocketIPAddr), WebsocketPort(InWebsocketPort)
+{
+}
+
+void FRROSCommunicationContainer::Init()
+{
+  InitPublishers();
+  InitSubscribers();
+  InitServiceClients();
+  InitActionServers();
+}
+
+void FRROSCommunicationContainer::InitPublishers()
+{
+  for (URPublisher *&Publisher : Publishers)
+  {
+    Publisher->Connect(WebsocketIPAddr, WebsocketPort);
+  }
+}
+
+void FRROSCommunicationContainer::InitSubscribers()
+{
+  for (URSubscriber *&Subscriber : Subscribers)
+  {
+    Subscriber->Connect(WebsocketIPAddr, WebsocketPort);
+  }
+}
+
+void FRROSCommunicationContainer::InitServiceClients()
+{
+  for (URServiceClient *&ServiceClient : ServiceClients)
+  {
+    ServiceClient->Connect(WebsocketIPAddr, WebsocketPort);
+  }
+}
+
+void FRROSCommunicationContainer::InitActionServers()
+{
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->Connect(WebsocketIPAddr, WebsocketPort);
+  }
+}
+
+void FRROSCommunicationContainer::Tick()
+{
+  for (URPublisher *&Publisher : Publishers)
+  {
+    Publisher->Tick();
+  }
+  for (URSubscriber *&Subscriber : Subscribers)
+  {
+    Subscriber->Tick();
+  }
+  for (URServiceClient *&ServiceClient : ServiceClients)
+  {
+    ServiceClient->Tick();
+  }
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->Tick();
+  }
+}
+
+void FRROSCommunicationContainer::DeInit()
+{
+  UE_LOG(LogRROSCommunicationComponent, Log, TEXT("Deinitilize ROSCommunication"))
+  for (URPublisher *&Publisher : Publishers)
+  {
+    Publisher->Disconnect();
+  }
+  for (URSubscriber *&Subscriber : Subscribers)
+  {
+    Subscriber->Disconnect();
+  }
+  for (URServiceClient *&ServiceClient : ServiceClients)
+  {
+    ServiceClient->Disconnect();
+  }
+  for (URActionServer *&ActionServer : ActionServers)
+  {
+    ActionServer->Disconnect();
+  }
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
+}
 
 URROSCommunicationComponent::URROSCommunicationComponent(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort) : URROSCommunicationComponent::URROSCommunicationComponent()
 {

@@ -82,6 +82,10 @@ void URModelBuilder::LoadJoints(USDFModel *&SDFModel)
     {
       JointBuilder = NewObject<URPrismaticJointBuilder>(this, TEXT("PrismaticJointBuilder"));
     }
+    else if (SDFJoint->Type.Equals("screw"))
+    {
+      JointBuilder = NewObject<URPrismaticJointBuilder>(this, TEXT("PrismaticJointBuilder"));
+    }
     else
     {
       UE_LOG(LogRModelBuilder, Error, TEXT("Type %s of Joint %s not implemented"), *SDFJoint->Type, *SDFJoint->GetName())

@@ -36,7 +36,7 @@ protected:
 	virtual void MoveLinearTick(const float &InDeltaTime);
 
 protected:
-  URLink *BaseLink;
+  UStaticMeshComponent *BaseMesh;
 
 	FTransform TargetPose;
 

@@ -2,6 +2,8 @@
 #include "Conversions.h"
 #include "sensor_msgs/JointState.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogROdomPublisher, Log, All);
+
 UROdomPublisher::UROdomPublisher()
 {
   Topic = TEXT("/base/joint_states");
@@ -49,19 +51,27 @@ void UROdomPublisher::Publish()
 
 void UROdomPublisher::CalculateOdomStates()
 {
-  if (GetOwner() && OdomPosition.Num() == 3 && OdomVelocity.Num() == 3)
+  if (GetOwner() && GetOwner()->GetBaseLink() && OdomPosition.Num() == 3 && OdomVelocity.Num() == 3)
   {
-    FTransform BasePose = GetOwner()->GetBaseLink()->GetCollisionMeshes()[0]->GetComponentTransform();
-    FVector BasePosition = FConversions::UToROS(BasePose.GetLocation());
-    FQuat BaseQuaternion = FConversions::UToROS(BasePose.GetRotation());
-    OdomPosition[0] = BasePosition.X;
-    OdomPosition[1] = BasePosition.Y;
-    OdomPosition[2] = FMath::DegreesToRadians(BaseQuaternion.Rotator().Yaw);
+    UStaticMeshComponent *BaseMesh = GetOwner()->GetBaseLink()->GetRootMesh();
+    if (BaseMesh)
+    {
+      FTransform BasePose = BaseMesh->GetComponentTransform();
+      FVector BasePosition = FConversions::UToROS(BasePose.GetLocation());
+      FQuat BaseQuaternion = FConversions::UToROS(BasePose.GetRotation());
+      OdomPosition[0] = BasePosition.X;
+      OdomPosition[1] = BasePosition.Y;
+      OdomPosition[2] = FMath::DegreesToRadians(BaseQuaternion.Rotator().Yaw);
 
-    FVector BaseLinearVelocity = FConversions::UToROS(GetOwner()->GetBaseLink()->GetCollisionMeshes()[0]->GetComponentVelocity());
-    FVector BaseAngularVelocity = GetOwner()->GetBaseLink()->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
-    OdomVelocity[0] = BaseLinearVelocity.X;
-    OdomVelocity[1] = BaseLinearVelocity.Y;
-    OdomVelocity[2] = -FMath::DegreesToRadians(BaseAngularVelocity.Z);
+      FVector BaseLinearVelocity = FConversions::UToROS(BaseMesh->GetComponentVelocity());
+      FVector BaseAngularVelocity = BaseMesh->GetPhysicsAngularVelocityInDegrees();
+      OdomVelocity[0] = BaseLinearVelocity.X;
+      OdomVelocity[1] = BaseLinearVelocity.Y;
+      OdomVelocity[2] = -FMath::DegreesToRadians(BaseAngularVelocity.Z);
+    }
+    else
+    {
+      UE_LOG(LogROdomPublisher, Error, TEXT("BaseMesh of %s not found"), *GetOwner()->GetName())
+    }
   }
 }

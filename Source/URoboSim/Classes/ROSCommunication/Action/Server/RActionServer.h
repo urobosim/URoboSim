@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Controller/RControllerComponent.h"
-#include "ROSBridgeHandler.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 // clang-format off
@@ -16,6 +15,9 @@ class UROBOSIM_API URActionServerParameter : public UObject
 public:
   UPROPERTY(EditAnywhere)
   FString ActionName;
+
+  UPROPERTY(EditAnywhere)
+  FString ControllerName;
 };
 
 UCLASS()
@@ -41,7 +43,8 @@ protected:
   URController *Controller;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew) class UROBOSIM_API URActionServer : public UObject
+UCLASS() 
+class UROBOSIM_API URActionServer : public URROSCommunication
 {
   GENERATED_BODY()
 
@@ -49,13 +52,7 @@ public:
   URActionServer(){};
 
 public:
-  void Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InActionName = "");
-
-  void Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InActionName = "");
-
-  void DeInit();
-
-  void Tick();
+  void Tick() override;
 
   virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
@@ -64,9 +61,7 @@ public:
   FString ControllerName;
 
 protected:
-  void Init(const FString &InActionName);
-
-  virtual void Init();
+  virtual void Init() override;
 
 protected:
   UPROPERTY(EditAnywhere)
@@ -86,6 +81,4 @@ protected:
 
   UPROPERTY(VisibleAnywhere)
   URActionPublisher *FeedbackPublisher;
-
-  TSharedPtr<FROSBridgeHandler> Handler;
 };

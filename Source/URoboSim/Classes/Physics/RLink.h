@@ -17,31 +17,33 @@ public:
 	URLink();
 
 public:
-	virtual void Init();
+	void Init();
 
-	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
+	const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
-	virtual void SetPose(const FTransform &Pose);
+	void SetPose(const FTransform &Pose);
 
-	virtual const USceneComponent *GetPoseComponent() const { return PoseComponent; }
+	const USceneComponent *GetPoseComponent() const { return PoseComponent; }
 
-	virtual const TArray<UStaticMeshComponent *> GetVisualMeshes() const { return VisualMeshes; }
+	const TArray<UStaticMeshComponent *> GetVisualMeshes() const { return VisualMeshes; }
 
-	virtual void AddVisualMesh(UStaticMeshComponent *&VisualMesh) { VisualMeshes.Add(VisualMesh); }
+	void AddVisualMesh(UStaticMeshComponent *&VisualMesh) { VisualMeshes.Add(VisualMesh); }
 
-	virtual const TArray<UStaticMeshComponent *> GetCollisionMeshes() const { return CollisionMeshes; }
+	const TArray<UStaticMeshComponent *> GetCollisionMeshes() const { return CollisionMeshes; }
 
-	virtual void AddCollisionMesh(UStaticMeshComponent *&CollisionMesh) { CollisionMeshes.Add(CollisionMesh); }
+	void AddCollisionMesh(UStaticMeshComponent *&CollisionMesh) { CollisionMeshes.Add(CollisionMesh); }
 
-	virtual void AttachToComponent(USceneComponent *Parent);
+	UStaticMeshComponent *GetRootMesh() const;
 
-	virtual void SetEnableGravity(const bool &bGravityEnabled);
+	void AttachToComponent(USceneComponent *Parent);
 
-	virtual void DisableSimulatePhysics();
+	void SetEnableGravity(const bool &bGravityEnabled);
 
-	virtual void DisableCollision();
+	void DisableSimulatePhysics();
 
-	virtual void EnableCollision();
+	void DisableCollision();
+
+	void EnableCollision();
 
 protected:
 	UPROPERTY(VisibleAnywhere)

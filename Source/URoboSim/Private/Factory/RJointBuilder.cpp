@@ -42,21 +42,31 @@ void URJointBuilder::SetNewJoint(USDFJoint *&SDFJoint)
   if (Joint)
   {
     SetJointParameters(SDFJoint);
-    URLink *Parent = *Model->GetLinks().FindByPredicate([&](URLink *Link) { return Link->GetName().Equals(SDFJoint->Parent); });
-    URLink *Child = *Model->GetLinks().FindByPredicate([&](URLink *Link) { return Link->GetName().Equals(SDFJoint->Child); });
+    URLink *Parent = nullptr;
+    URLink *Child = nullptr;
+    for (URLink *&Link : Model->GetLinks())
+    {
+      if (Link->GetName().Equals(SDFJoint->Parent))
+      {
+        Parent = Link;
+      }
+      else if (Link->GetName().Equals(SDFJoint->Child))
+      {
+        Child = Link;
+      }
+    }
     if (!Parent)
     {
-      UE_LOG(LogRJointBuilder, Error, TEXT("ParentLink %s of Joint %s not found"), *Joint->GetParent()->GetName(), *Joint->GetName())
+      UE_LOG(LogRJointBuilder, Error, TEXT("ParentLink %s of Joint %s not found"), *SDFJoint->Parent, *SDFJoint->GetName())
+      return;
     }
-    else if (!Child)
+    if (!Child)
     {
-      UE_LOG(LogRJointBuilder, Error, TEXT("ChildLink %s of Joint %s not found"), *Joint->GetChild()->GetName(), *Joint->GetName())
+      UE_LOG(LogRJointBuilder, Error, TEXT("ChildLink %s of Joint %s not found"), *SDFJoint->Child, *SDFJoint->GetName())
+      return;
     }
-    else
-    {
-      Child->AttachToComponent(Parent->GetCollisionMeshes()[0]);
-      Joint->SetParentChild(Parent, Child);
-    }
+    Child->AttachToComponent(Parent->GetRootMesh());
+    Joint->SetParentChild(Parent, Child);
     CreateConstraint(SDFJoint);
     Model->AddJoint(Joint);
   }
@@ -85,7 +95,7 @@ void URJointBuilder::CreateConstraint(USDFJoint *&SDFJoint)
   Constraint->ConstraintInstance.AngularRotationOffset = FRotator(0.f);
   Constraint->ConstraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = false;
   Constraint->ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = false;
-  
+
   SetupConstraint(Constraint, SDFJoint->Axis);
   ConnectToComponents(Constraint, SDFJoint);
   Joint->SetConstraint(Constraint);
@@ -174,8 +184,20 @@ void URJointBuilder::ConnectToComponents(UPhysicsConstraintComponent *&Constrain
 {
   if (Constraint)
   {
+    UStaticMeshComponent *ParentRootMesh = Joint->GetParent()->GetRootMesh();
+    UStaticMeshComponent *ChildRootMesh = Joint->GetChild()->GetRootMesh();
+    if (!ParentRootMesh)
+    {
+      UE_LOG(LogRJointBuilder, Error, TEXT("Parent of %s not found"), *Joint->GetName())
+      return;
+    }
+    if (!ChildRootMesh)
+    {
+      UE_LOG(LogRJointBuilder, Error, TEXT("Child of %s not found"), *Joint->GetName())
+      return;
+    }
     Constraint->RegisterComponent();
-    Constraint->AttachToComponent(Joint->GetParent()->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
+    Constraint->AttachToComponent(ParentRootMesh, FAttachmentTransformRules::KeepWorldTransform);
     if (SDFJoint->Axis->bUseParentModelFrame)
     {
       Constraint->SetWorldLocation(Joint->GetChild()->GetPose().GetLocation());
@@ -186,9 +208,9 @@ void URJointBuilder::ConnectToComponents(UPhysicsConstraintComponent *&Constrain
       Constraint->SetWorldLocation(SDFJoint->Pose.GetLocation());
     }
     RotateConstraintToRefAxis(Constraint, SDFJoint->Axis);
-    Constraint->ConstraintActor1 = Joint->GetParent()->GetCollisionMeshes()[0]->GetOwner();
-    Constraint->ConstraintActor2 = Joint->GetChild()->GetCollisionMeshes()[0]->GetOwner();
-    Constraint->SetConstrainedComponents(Cast<UPrimitiveComponent>(Joint->GetParent()->GetCollisionMeshes()[0]), NAME_None, Cast<UPrimitiveComponent>(Joint->GetChild()->GetCollisionMeshes()[0]), NAME_None);
+    Constraint->ConstraintActor1 = ParentRootMesh->GetOwner();
+    Constraint->ConstraintActor2 = ChildRootMesh->GetOwner();
+    Constraint->SetConstrainedComponents(Cast<UPrimitiveComponent>(ParentRootMesh), NAME_None, Cast<UPrimitiveComponent>(ChildRootMesh), NAME_None);
   }
   else
   {

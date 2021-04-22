@@ -1,99 +1,61 @@
 #include "ROSCommunication/RROSCommunication.h"
-#include "Controller/RController.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationContainer, Log, All);
+DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunication, Log, All);
 
-FRROSCommunicationContainer::FRROSCommunicationContainer()
-    : FRROSCommunicationContainer::FRROSCommunicationContainer(TEXT("127.0.0.1"), 9393)
+void URROSCommunication::Connect(const TSharedPtr<FROSBridgeHandler> &InHandler)
 {
+  Handler = InHandler;
+  if (!Handler.IsValid())
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+  Init();
 }
 
-FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort)
-    : WebsocketIPAddr(InWebsocketIPAddr), WebsocketPort(InWebsocketPort)
+void URROSCommunication::Connect(const FString &WebsocketIPAddr, const uint32 &WebsocketPort)
 {
+  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
+  if (Handler.IsValid())
+  {
+    Handler->Connect();
+    UE_LOG(LogRROSCommunication, Log, TEXT("%s is connected to ROSBridge"), *GetName())
+  }
+  else
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+  Init();
 }
 
-void FRROSCommunicationContainer::Init()
+void URROSCommunication::Disconnect()
 {
-  InitPublishers();
-  InitSubscribers();
-  InitServiceClients();
-  InitActionServers();
-}
-
-void FRROSCommunicationContainer::InitPublishers()
-{
-  for (URPublisher *&Publisher : Publishers)
-  {
-    Publisher->Init(WebsocketIPAddr, WebsocketPort);
-  }
-}
-
-void FRROSCommunicationContainer::InitSubscribers()
-{
-  for (URSubscriber *&Subscriber : Subscribers)
-  {
-    Subscriber->Init(WebsocketIPAddr, WebsocketPort);
-  }
-}
-
-void FRROSCommunicationContainer::InitServiceClients()
-{
-  for (URServiceClient *&ServiceClient : ServiceClients)
-  {
-    ServiceClient->Init(WebsocketIPAddr, WebsocketPort);
-  }
-}
-
-void FRROSCommunicationContainer::InitActionServers()
-{
-  for (URActionServer *&ActionServer : ActionServers)
-  {
-    ActionServer->Init(WebsocketIPAddr, WebsocketPort);
-  }
-}
-
-void FRROSCommunicationContainer::Tick()
-{
-  for (URPublisher *&Publisher : Publishers)
-  {
-    Publisher->Tick();
-  }
-  for (URSubscriber *&Subscriber : Subscribers)
-  {
-    Subscriber->Tick();
-  }
-  for (URServiceClient *&ServiceClient : ServiceClients)
-  {
-    ServiceClient->Tick();
-  }
-  for (URActionServer *&ActionServer : ActionServers)
-  {
-    ActionServer->Tick();
-  }
-}
-
-void FRROSCommunicationContainer::DeInit()
-{
-  UE_LOG(LogRROSCommunicationContainer, Log, TEXT("Deinitilize ROSCommunication"))
-  for (URPublisher *&Publisher : Publishers)
-  {
-    Publisher->DeInit();
-  }
-  for (URSubscriber *&Subscriber : Subscribers)
-  {
-    Subscriber->DeInit();
-  }
-  for (URServiceClient *&ServiceClient : ServiceClients)
-  {
-    ServiceClient->DeInit();
-  }
-  for (URActionServer *&ActionServer : ActionServers)
-  {
-    ActionServer->DeInit();
-  }
   if (Handler.IsValid())
   {
     Handler->Disconnect();
+  }
+}
+
+void URROSCommunication::Init()
+{
+  SetOwner();
+}
+
+void URROSCommunication::SetOwner()
+{
+  if (!Owner)
+  {
+    if (Cast<ARModel>(GetOuter()))
+    {
+      Owner = Cast<ARModel>(GetOuter());
+    }
+    else if (Cast<URROSCommunicationComponent>(GetOuter()) && Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner()))
+    {
+      Owner = Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner());
+    }
+  }
+  if (!Owner)
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
   }
 }

@@ -47,15 +47,16 @@ AActor *URModelFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTrans
       SpawnInfo.ObjectFlags = InObjectFlags;
       SpawnInfo.Name = *SDFAsset->Model->GetName();
 
-      ARModel *NewRobot = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(NewActorClass, &Transform, SpawnInfo));
-      ModelBuilder->Model = NewRobot;
-      ModelBuilder->LoadSDF(SDFAsset->Model, Transform);
-      if (NewRobot)
+      FTransform ModelPose = Transform;
+      ModelPose.AddToTranslation(FVector(0.f, 0.f, 4.f)); // To avoid collision with ground
+      ARModel *Model = CastChecked<ARModel>(InLevel->OwningWorld->SpawnActor(NewActorClass, &ModelPose, SpawnInfo));
+      ModelBuilder->Model = Model;
+      ModelBuilder->LoadSDF(SDFAsset->Model, ModelPose);
+      if (Model)
       {
-        NewRobot->SetActorTransform(Transform);
-        FActorLabelUtilities::SetActorLabelUnique(NewRobot, SDFAsset->Model->GetName());
-        NewRobot->Init();
-        return NewRobot;
+        Model->SetActorTransform(ModelPose);
+        FActorLabelUtilities::SetActorLabelUnique(Model, SDFAsset->Model->GetName());
+        return Model;
       }
       else
       {

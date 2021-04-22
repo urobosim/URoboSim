@@ -44,20 +44,36 @@ const FJointState URPrismaticJoint::GetJointStateInROSUnit() const
 
 const float URContinuousJoint::GetVelocity() const
 {
-	FVector ParentAngularVelocity = Parent->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
-	FVector ChildAngularVelocity = Child->GetCollisionMeshes()[0]->GetPhysicsAngularVelocityInDegrees();
-	FVector JointAngularVelocity = Child->GetCollisionMeshes()[0]->GetComponentRotation().UnrotateVector(ChildAngularVelocity - ParentAngularVelocity);
-	JointAngularVelocity.Z *= -1;
-	return FMath::RadiansToDegrees(FVector::DotProduct(JointAngularVelocity, Type->Axis));
+	if (Parent->GetRootMesh() && Child->GetRootMesh())
+	{
+		FVector ParentAngularVelocity = Parent->GetRootMesh()->GetPhysicsAngularVelocityInDegrees();
+		FVector ChildAngularVelocity = Child->GetRootMesh()->GetPhysicsAngularVelocityInDegrees();
+		FVector JointAngularVelocity = Child->GetRootMesh()->GetComponentRotation().UnrotateVector(ChildAngularVelocity - ParentAngularVelocity);
+		JointAngularVelocity.Z *= -1;
+		return FMath::RadiansToDegrees(FVector::DotProduct(JointAngularVelocity, Type->Axis));
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Parent or Child of %s not found"), *GetName())
+		return 0.f;
+	}
 }
 
 const float URPrismaticJoint::GetVelocity() const
 {
-	FVector ParentLinearVelocity = Parent->GetCollisionMeshes()[0]->GetPhysicsLinearVelocity();
-	FVector ChildLinearVelocity = Child->GetCollisionMeshes()[0]->GetPhysicsLinearVelocity();
-	FVector JointLinearVelocity = Child->GetCollisionMeshes()[0]->GetComponentRotation().UnrotateVector(ChildLinearVelocity - ParentLinearVelocity);
-	JointLinearVelocity.Z *= -1;
-	return FVector::DotProduct(JointLinearVelocity, Type->Axis);
+	if (Parent->GetRootMesh() && Child->GetRootMesh())
+	{
+		FVector ParentLinearVelocity = Parent->GetRootMesh()->GetPhysicsLinearVelocity();
+		FVector ChildLinearVelocity = Child->GetRootMesh()->GetPhysicsLinearVelocity();
+		FVector JointLinearVelocity = Child->GetRootMesh()->GetComponentRotation().UnrotateVector(ChildLinearVelocity - ParentLinearVelocity);
+		JointLinearVelocity.Z *= -1;
+		return FVector::DotProduct(JointLinearVelocity, Type->Axis);
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Parent or Child of %s not found"), *GetName())
+		return 0.f;
+	}
 }
 
 const float URContinuousJoint::GetPosition() const
@@ -114,46 +130,88 @@ void URPrismaticJoint::SetTargetVelocityInROSUnit(const float &TargetVelocity)
 
 void URContinuousJoint::SetPosition(const float &Position)
 {
-	float DeltaPosition = Position - GetPosition();
-	Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
-	FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
-	FRotator DeltaRotationInWorldFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(AxisInWorldFrame, -DeltaPosition);
-	Child->GetCollisionMeshes()[0]->AddWorldRotation(DeltaRotationInWorldFrame);
+	if (Parent->GetRootMesh() && Child->GetRootMesh())
+	{
+		float DeltaPosition = Position - GetPosition();
+		Child->GetRootMesh()->AttachToComponent(Parent->GetRootMesh(), FAttachmentTransformRules::KeepWorldTransform);
+		FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+		FRotator DeltaRotationInWorldFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(AxisInWorldFrame, -DeltaPosition);
+		Child->GetRootMesh()->AddWorldRotation(DeltaRotationInWorldFrame);
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Parent or Child of %s not found"), *GetName())
+	}
 }
 
 void URPrismaticJoint::SetPosition(const float &Position)
 {
-	float DeltaPosition = Position - GetPosition();
-	Child->GetCollisionMeshes()[0]->AttachToComponent(Parent->GetCollisionMeshes()[0], FAttachmentTransformRules::KeepWorldTransform);
-	FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
-	FVector DeltaLocationInWorldFrame = AxisInWorldFrame * DeltaPosition;
-	Child->GetCollisionMeshes()[0]->AddWorldOffset(DeltaLocationInWorldFrame);
+	if (Parent->GetRootMesh() && Child->GetRootMesh())
+	{
+		float DeltaPosition = Position - GetPosition();
+		Child->GetRootMesh()->AttachToComponent(Parent->GetRootMesh(), FAttachmentTransformRules::KeepWorldTransform);
+		FVector AxisInWorldFrame = Type->Constraint->GetComponentRotation().RotateVector(Type->Axis);
+		FVector DeltaLocationInWorldFrame = AxisInWorldFrame * DeltaPosition;
+		Child->GetRootMesh()->AddWorldOffset(DeltaLocationInWorldFrame);
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Parent or Child of %s not found"), *GetName())
+	}
 }
 
 void URContinuousJoint::SetTargetPosition(const float &TargetPosition)
 {
-	const FRotator TargetPositionRotator = UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition);
-	Type->Constraint->SetAngularOrientationTarget(TargetPositionRotator);
-	Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	if (Child->GetRootMesh())
+	{
+		const FRotator TargetPositionRotator = UKismetMathLibrary::RotatorFromAxisAndAngle(Type->Axis, TargetPosition);
+		Type->Constraint->SetAngularOrientationTarget(TargetPositionRotator);
+		Child->GetRootMesh()->WakeRigidBody();
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Child of %s not found"), *GetName())
+	}
 }
 
 void URPrismaticJoint::SetTargetPosition(const float &TargetPosition)
 {
-	const FVector TargetPositionVector = Type->Axis * -TargetPosition;
-	Type->Constraint->SetLinearPositionTarget(TargetPositionVector);
-	Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	if (Child->GetRootMesh())
+	{
+		const FVector TargetPositionVector = Type->Axis * -TargetPosition;
+		Type->Constraint->SetLinearPositionTarget(TargetPositionVector);
+		Child->GetRootMesh()->WakeRigidBody();
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Child of %s not found"), *GetName())
+	}
 }
 
 void URContinuousJoint::SetTargetVelocity(const float &TargetVelocity)
 {
-	Type->Constraint->SetAngularVelocityTarget(Type->Axis * -TargetVelocity / 360.f);
-	Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	if (Child->GetRootMesh())
+	{
+		Type->Constraint->SetAngularVelocityTarget(Type->Axis * -TargetVelocity / 360.f);
+		Child->GetRootMesh()->WakeRigidBody();
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Child of %s not found"), *GetName())
+	}
 }
 
 void URPrismaticJoint::SetTargetVelocity(const float &TargetVelocity)
 {
-	Type->Constraint->SetLinearVelocityTarget(Type->Axis * -TargetVelocity);
-	Child->GetCollisionMeshes()[0]->WakeRigidBody();
+	if (Child->GetRootMesh())
+	{
+		Type->Constraint->SetLinearVelocityTarget(Type->Axis * -TargetVelocity);
+		Child->GetRootMesh()->WakeRigidBody();
+	}
+	else
+	{
+		UE_LOG(LogRJoint, Error, TEXT("Child of %s not found"), *GetName())
+	}
 }
 
 void URContinuousJoint::SetDrive(const FEnableDrive &EnableDrive)

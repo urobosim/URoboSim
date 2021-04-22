@@ -14,6 +14,7 @@ public:
   URFJTAServerParameter()
   {
     ActionName = TEXT("/whole_body_controller/body/follow_joint_trajectory");
+    ControllerName = TEXT("JointController");
     FrameId = TEXT("odom");
     JointParamPath = TEXT("/whole_body_controller/body/joints");
   }

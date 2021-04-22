@@ -93,6 +93,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;
+
+  UPROPERTY(EditAnywhere)
+  bool bControllAllJoints;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
@@ -128,6 +131,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;
+
+  UPROPERTY(EditAnywhere)
+  bool bControllAllJoints;
 
   UPROPERTY(EditAnywhere)
   TMap<FString, FJointState> DesiredJointStates;

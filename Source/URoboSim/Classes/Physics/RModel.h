@@ -83,6 +83,4 @@ protected:
   TArray<URPluginComponent *> Plugins;
 
   // TArray<URGraspComponent *> Grippers;
-private:
-  bool bModelInitialized = false;
 };

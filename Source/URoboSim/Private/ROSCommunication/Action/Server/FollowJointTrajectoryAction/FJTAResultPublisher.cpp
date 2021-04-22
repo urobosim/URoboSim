@@ -12,6 +12,7 @@ URFJTAResultPublisher::URFJTAResultPublisher()
 
 void URFJTAResultPublisher::Init()
 {
+  Super::Init();
   JointController = Cast<URJointController>(Controller);
 }
 

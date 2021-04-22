@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include "Physics/RModel.h"
-#include "ROSBridgeHandler.h"
+#include "ROSCommunication/RROSCommunication.h"
 // clang-format off
 #include "RSubscriber.generated.h"
 // clang-format on
@@ -21,27 +20,15 @@ public:
   FString MessageType;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URSubscriber : public UObject
+UCLASS()
+class UROBOSIM_API URSubscriber : public URROSCommunication
 {
   GENERATED_BODY()
 
 public:
-  void Init(const TSharedPtr<FROSBridgeHandler> &InHandler, const FString &InTopic = TEXT(""));
-
-  void Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort, const FString &InTopic = TEXT(""));
-
-  void Tick();
-
-  void DeInit();
+  void Tick() override;
 
 public:
-  ARModel *GetOwner() const { return Owner; }
-
-  void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
-
-  void SetOwner();
-
   virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
 
 public:
@@ -49,12 +36,10 @@ public:
   FString Topic;
 
 protected:
-  void Init(const FString &InTopic);
+  virtual void Init() override;
 
   void AddSubscriber();
-
-  virtual void Init();
-
+  
   virtual void CreateSubscriber(){}
 
 protected:
@@ -62,9 +47,4 @@ protected:
   FString MessageType;
   
   TSharedPtr<FROSBridgeSubscriber> Subscriber;
-
-  TSharedPtr<FROSBridgeHandler> Handler;
-
-private:
-  ARModel *Owner;
 };

@@ -14,6 +14,7 @@ URFJTAFeedbackPublisher::URFJTAFeedbackPublisher()
 
 void URFJTAFeedbackPublisher::Init()
 {
+  Super::Init();
   if (GetOwner())
   {
     JointController = Cast<URJointController>(Controller);
@@ -25,7 +26,7 @@ void URFJTAFeedbackPublisher::Init()
       Cast<URGetJointsClientParameter>(GetJointsClientParameters)->ControllerName = JointController->GetName();
       GetJointsClient->SetServiceClientParameters(GetJointsClientParameters);
       GetJointsClient->SetOwner(GetOwner());
-      GetJointsClient->URServiceClient::Init(Handler);
+      GetJointsClient->URServiceClient::Connect(Handler);
     }
     else
     {

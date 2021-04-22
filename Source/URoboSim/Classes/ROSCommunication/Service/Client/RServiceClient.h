@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Physics/RModel.h"
-#include "ROSBridgeHandler.h"
+#include "ROSCommunication/RROSCommunication.h"
 #include "ROSBridgeSrvClient.h"
 // clang-format off
 #include "RServiceClient.generated.h"
@@ -20,33 +19,18 @@ public:
   FString ServiceType;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URServiceClient : public UObject
+UCLASS()
+class UROBOSIM_API URServiceClient : public URROSCommunication
 {
   GENERATED_BODY()
 
 public:
-  void Init(const TSharedPtr<FROSBridgeHandler> &InHandler);
-
-  void Init(const FString &WebsocketIPAddr, const uint32 &WebsocketPort);
-
-  void Tick();
-
-  void DeInit();
+  void Tick() override;
 
 public:
-  ARModel *GetOwner() const { return Owner; }
-
-  void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
-
-  void SetOwner();
-
   virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
 
   virtual void CallService(){}
-
-protected:
-  virtual void Init();
 
 protected:
   UPROPERTY(EditAnywhere)
@@ -54,9 +38,4 @@ protected:
 
   UPROPERTY(EditAnywhere)
   FString ServiceType;
-  
-  TSharedPtr<FROSBridgeHandler> Handler;
-
-private:
-  ARModel *Owner;
 };

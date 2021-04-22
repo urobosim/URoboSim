@@ -66,7 +66,7 @@ void URLinkBuilder::SetVisualMeshes(USDFLink *&SDFLink)
       LinkMeshComponent->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
       LinkMeshComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
       LinkMeshComponent->bVisible = true;
-      LinkMeshComponent->WeldTo(Link->GetCollisionMeshes()[0]);
+      LinkMeshComponent->WeldTo(Link->GetRootMesh());
       Link->AddVisualMesh(LinkMeshComponent);
     }
     else
@@ -107,7 +107,7 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
       if (Link->GetCollisionMeshes().Num() > 0)
       {
         LinkMeshComponent->SetSimulatePhysics(false);
-        LinkMeshComponent->WeldTo(Link->GetCollisionMeshes()[0]);
+        LinkMeshComponent->WeldTo(Link->GetRootMesh());
       }
       Link->AddCollisionMesh(LinkMeshComponent);
     }
@@ -120,9 +120,9 @@ void URLinkBuilder::SetCollisionMeshes(USDFLink *&SDFLink)
 
 void URLinkBuilder::SetInertial(USDFLinkInertial *&InInertial)
 {
-  if (Link->GetCollisionMeshes().Num() > 0)
+  if (Link->GetRootMesh())
   {
-    Link->GetCollisionMeshes()[0]->SetMassOverrideInKg(NAME_None, InInertial->Mass, true);
+    Link->GetRootMesh()->SetMassOverrideInKg(NAME_None, InInertial->Mass, true);
   }
 }
 

@@ -18,6 +18,10 @@ void URJointTrajectoryControllerStatePublisher::Init()
   if (GetOwner())
   {
     JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName));
+    if (!JointController)
+    {
+      UE_LOG(LogRJointTrajectoryControllerStatePublisher, Error, TEXT("%s not found in %s"), *JointControllerName, *GetName())
+    }
   }
 }
 

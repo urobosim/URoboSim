@@ -55,32 +55,32 @@ class UROBOSIM_API URJoint : public UObject
 
 public:
   // Called every frame
-  virtual void Tick(float DeltaTime);
+  void Tick(float DeltaTime);
 
 public:
-  virtual void Init();
+  void Init();
 
   virtual const FJointState GetJointStateInROSUnit() const { return FJointState(); }
 
-  virtual const FJointState GetJointState() const { return JointState; }
+  const FJointState GetJointState() const { return JointState; }
 
-  virtual void SetJointType(const USDFJoint *InSDFJoint);
+  void SetJointType(const USDFJoint *InSDFJoint);
 
-  virtual void SetParentChild(URLink *&InParent, URLink *&InChild)
+  void SetParentChild(URLink *&InParent, URLink *&InChild)
   {
     Parent = InParent;
     Child = InChild;
   }
 
-  virtual void SetConstraint(UPhysicsConstraintComponent *&InConstraint) { Type->Constraint = InConstraint; }
+  void SetConstraint(UPhysicsConstraintComponent *&InConstraint) { Type->Constraint = InConstraint; }
 
-  virtual void SetJointAxis(const FVector &InJointAxis) { Type->Axis = InJointAxis; }
+  void SetJointAxis(const FVector &InJointAxis) { Type->Axis = InJointAxis; }
 
-  virtual URLink *GetParent() const { return Parent; }
+  URLink *GetParent() const { return Parent; }
 
-  virtual URLink *GetChild() const { return Child; }
+  URLink *GetChild() const { return Child; }
 
-  virtual const URJointType *GetType() const { return Type; }
+  const URJointType *GetType() const { return Type; }
 
   virtual void SetDrive(const FEnableDrive &EnableDrive) {}
 
@@ -97,11 +97,11 @@ public:
   virtual void SetTargetVelocity(const float &TargetVelocity) {}
 
 protected:
+  const FTransform GetChildPoseInJointFrame() const;
+
   virtual const float GetPosition() const { return 0.f; }
 
   virtual const float GetVelocity() const { return 0.f; }
-
-  virtual const FTransform GetChildPoseInJointFrame() const;
 
 protected:
   UPROPERTY(EditAnywhere)

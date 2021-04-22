@@ -29,6 +29,7 @@ void ARModel::BeginPlay()
 {
   UE_LOG(LogRModel, Log, TEXT("Model %s is spawned"), *GetName())
   Super::BeginPlay();
+  Init();
 }
 
 void ARModel::Init()

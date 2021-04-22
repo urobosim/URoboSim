@@ -20,6 +20,13 @@ void URJointController::SetJointNames(const TArray<FString> &InNames)
   for (const FString &InName : InNames)
   {
     TrajectoryStatusArray.Add(FTrajectoryStatus(InName));
+    if (!bControllAllJoints)
+    {
+      if (!DesiredJointStates.Contains(InName))
+      {
+        DesiredJointStates.Add(InName, FJointState());
+      }
+    }
   }
   TrajectoryPointIndex = 0;
   DesiredTrajectory.Empty();
@@ -33,6 +40,7 @@ void URJointController::SetControllerParameters(URControllerParameter *&Controll
     Mode = JointControllerParameters->Mode;
     EnableDrive = JointControllerParameters->EnableDrive;
     bDisableCollision = JointControllerParameters->bDisableCollision;
+    bControllAllJoints = JointControllerParameters->bControllAllJoints;
   }
 }
 
@@ -45,10 +53,13 @@ void URJointController::Init()
   if (GetOwner())
   {
     SetMode();
-    for (URJoint *&Joint : GetOwner()->GetJoints())
+    if (bControllAllJoints)
     {
-      DesiredJointStates.Add(Joint->GetName(), FJointState());
-    }
+      for (URJoint *&Joint : GetOwner()->GetJoints())
+      {
+        DesiredJointStates.Add(Joint->GetName(), FJointState());
+      }
+    } 
   }
   else
   {
