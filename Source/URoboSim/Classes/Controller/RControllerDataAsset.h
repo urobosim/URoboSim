@@ -6,7 +6,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "Controller/RGripperController.h"
+#include "Controller/ControllerType/JointController/RGripperController.h"
 #include "RControllerDataAsset.generated.h"
 /**
  *

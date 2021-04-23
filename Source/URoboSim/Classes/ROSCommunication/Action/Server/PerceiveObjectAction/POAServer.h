@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ROSCommunication/Actions/RActionServer.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 #include "POAServer.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)

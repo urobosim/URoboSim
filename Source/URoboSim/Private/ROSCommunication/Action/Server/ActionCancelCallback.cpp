@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/ActionCancelCallback.h"
+#include "ROSCommunication/Action/Server/ActionCancelCallback.h"
 #include "actionlib_msgs/GoalID.h"
 
 FROSActionCancelCallback::FROSActionCancelCallback(

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Physics/RModel.h"
-#include "ROSCommunication/RROSService.h"
+#include "ROSCommunication/Service/Server/RROSService.h"
 #include "CheckVisibilityService.generated.h"
 
 UCLASS()

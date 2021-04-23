@@ -6,11 +6,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "ROSCommunication/RROSService.h"
-#include "ROSCommunication/RROSClient.h"
+#include "ROSCommunication/Service/Server/RROSService.h"
+#include "ROSCommunication/Service/Client/RROSClient.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
-#include "ROSCommunication/Actions/RActionServer.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 #include "RROSCommunicationDataAsset.generated.h"
 /**
  *

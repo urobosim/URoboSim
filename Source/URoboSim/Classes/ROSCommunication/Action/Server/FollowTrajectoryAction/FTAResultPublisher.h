@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "Controller/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 #include "FTAResultPublisher.generated.h"
 
 UCLASS()

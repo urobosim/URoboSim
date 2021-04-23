@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAStatePublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAStatePublisher.h"
 
 void URFollowJointTrajectoryActionStatePublisher::SetOwner(UObject* InOwner)
 {

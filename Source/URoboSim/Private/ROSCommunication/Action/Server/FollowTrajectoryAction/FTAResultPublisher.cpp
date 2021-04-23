@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAResultPublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAResultPublisher.h"
 #include "control_msgs/FollowJointTrajectoryActionResult.h"
 #include "control_msgs/FollowJointTrajectoryResult.h"
 

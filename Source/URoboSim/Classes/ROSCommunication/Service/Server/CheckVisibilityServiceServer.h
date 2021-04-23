@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/World.h"
 #include "Physics/RModel.h"
 #include "ROSBridgeSrvServer.h"

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ROSCommunication/Actions/ActionStatePublisher.h"
+#include "ROSCommunication/Action/Server/ActionStatePublisher.h"
 #include "POAStatePublisher.generated.h"
 
 UCLASS()

@@ -1,5 +1,5 @@
 
-#include "ROSCommunication/Actions/ActionStatePublisher.h"
+#include "ROSCommunication/Action/Server/ActionStatePublisher.h"
 #include "actionlib_msgs/GoalStatusArray.h"
 
 void URActionStatePublisher::SetMessageType()

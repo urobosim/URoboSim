@@ -1,5 +1,5 @@
-#include "ROSCommunication/CheckVisibilityService.h"
-#include "ROSCommunication/CheckVisibilityServiceServer.h"
+#include "ROSCommunication/Service/Server/CheckVisibilityService.h"
+#include "ROSCommunication/Service/Server/CheckVisibilityServiceServer.h"
 
 void UCheckVisibilityService::SetOwner(UObject* InOwner)
 {

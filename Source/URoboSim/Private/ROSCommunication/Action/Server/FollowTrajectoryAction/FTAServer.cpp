@@ -1,9 +1,9 @@
 
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAServer.h"
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAResultPublisher.h"
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAFeedbackPublisher.h"
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAStatePublisher.h"
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAGoalSubscriber.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAServer.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAResultPublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAStatePublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAGoalSubscriber.h"
 
 URFollowTrajectoryActionServer::URFollowTrajectoryActionServer()
 {

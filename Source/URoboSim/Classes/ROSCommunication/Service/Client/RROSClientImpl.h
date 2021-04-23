@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "srv/ConfigureJointStatePublisher.h"
 #include "Physics/RModel.h"

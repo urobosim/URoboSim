@@ -1,5 +1,5 @@
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAGoalSubscriber.h"
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAGoalSubscriberCallback.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAGoalSubscriber.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAGoalSubscriberCallback.h"
 
 void URPerceiveObjectActionGoalSubscriber::SetMessageType()
 {

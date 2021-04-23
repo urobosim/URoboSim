@@ -1,6 +1,5 @@
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/World.h"
 #include "ROSBridgeSrvServer.h"
 #include "ROSBridgeHandler.h"

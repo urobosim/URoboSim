@@ -1,5 +1,5 @@
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAGoalSubscriber.h"
-#include "ROSCommunication/Actions/FollowTrajectoryAction/WholeBodyControllerCallback.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAGoalSubscriber.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/WholeBodyControllerCallback.h"
 
 void URFollowJointTrajectoryActionGoalSubscriber::SetMessageType()
 {

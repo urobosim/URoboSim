@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/FollowTrajectoryAction/WholeBodyControllerCallback.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/WholeBodyControllerCallback.h"
 #include "control_msgs/FollowJointTrajectoryActionGoal.h"
 
 FROSWholeBodyControllerCallback::FROSWholeBodyControllerCallback(

@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GripperReplaySubscriberCallback.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GripperReplaySubscriberCallback.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionGoal.h"
 
 FROSGripperReplaySubscriberCallback::FROSGripperReplaySubscriberCallback(

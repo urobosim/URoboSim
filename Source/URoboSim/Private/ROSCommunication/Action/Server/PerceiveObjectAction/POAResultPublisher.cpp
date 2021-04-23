@@ -1,5 +1,5 @@
 
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAResultPublisher.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAResultPublisher.h"
 #include "urobosim_msgs/PerceiveObjectActionResult.h"
 #include "urobosim_msgs/PerceiveObjectResult.h"
 #include "TFPublisher.h"

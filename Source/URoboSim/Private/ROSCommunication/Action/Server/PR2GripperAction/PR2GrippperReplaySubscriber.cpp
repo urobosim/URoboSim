@@ -1,5 +1,5 @@
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GripperReplaySubscriber.h"
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GripperReplaySubscriberCallback.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GripperReplaySubscriber.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GripperReplaySubscriberCallback.h"
 
 void URPR2GripperReplaySubscriber::SetMessageType()
 {

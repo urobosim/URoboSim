@@ -5,7 +5,7 @@
 #include "ROSBridgeSrvServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
 #include "RROSServiceParameter.h"
-#include "ROSCommunication/RROSServiceServer.h"
+#include "ROSCommunication/Service/Server/RROSServiceServer.h"
 #include "Controller/RControllerComponent.h"
 #include "RROSService.generated.h"
 

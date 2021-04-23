@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTACancelCallback.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTACancelCallback.h"
 
 FROSFollowTrajectoryActionCancelCallback::FROSFollowTrajectoryActionCancelCallback(
 	const FString& InTopic, const FString& InType, UObject* InController) :

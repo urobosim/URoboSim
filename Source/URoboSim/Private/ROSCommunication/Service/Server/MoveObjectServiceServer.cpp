@@ -1,6 +1,6 @@
 // Copyright 2017-2019, Institute for Artificial Intelligence - University of Bremen
 
-#include "ROSCommunication/MoveObjectServiceServer.h"
+#include "ROSCommunication/Service/Server/MoveObjectServiceServer.h"
 #include "Conversions.h"
 #include "Runtime/Engine/Classes/Engine/StaticMeshActor.h"
 #include "EngineUtils.h"

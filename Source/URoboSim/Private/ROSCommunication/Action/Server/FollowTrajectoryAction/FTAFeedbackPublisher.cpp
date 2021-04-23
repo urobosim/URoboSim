@@ -1,5 +1,5 @@
 
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAFeedbackPublisher.h"
 #include "control_msgs/FollowJointTrajectoryActionFeedback.h"
 
 URJointTrajectoryFeedbackPublisher::URJointTrajectoryFeedbackPublisher()

@@ -1,9 +1,9 @@
 
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAServer.h"
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAResultPublisher.h"
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAFeedbackPublisher.h"
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAStatePublisher.h"
-#include "ROSCommunication/Actions/PerceiveObjectAction/POAGoalSubscriber.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAServer.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAResultPublisher.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAStatePublisher.h"
+#include "ROSCommunication/Action/Server/PerceiveObjectAction/POAGoalSubscriber.h"
 
 
 URPerceiveObjectActionServer::URPerceiveObjectActionServer()

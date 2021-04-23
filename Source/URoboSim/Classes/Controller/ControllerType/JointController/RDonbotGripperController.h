@@ -1,9 +1,7 @@
 #pragma once
 
 #include "ConstructorHelpers.h"
-#include "Controller/RController.h"
-#include "Controller/RJointController.h"
-#include "Physics/RJoint.h"
+#include "RJointController.h"
 #include "Physics/RModel.h"
 #include "PhysicsEngine/PhysicsHandleComponent.h"
 #include "RGraspComponent.h"

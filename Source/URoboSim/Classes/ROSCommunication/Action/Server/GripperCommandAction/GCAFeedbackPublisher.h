@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "Controller/RGripperController.h"
+#include "Controller/ControllerType/JointController/RGripperController.h"
 #include "GCAFeedbackPublisher.generated.h"
 
 UCLASS()

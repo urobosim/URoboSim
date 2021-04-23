@@ -1,8 +1,8 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/RROSClient.h"
-#include "Controller/RJointController.h"
+#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 #include "FTAFeedbackPublisher.generated.h"
 
 UCLASS()

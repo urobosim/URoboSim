@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2HeadAction/PR2HAStatePublisher.h"
+#include "ROSCommunication/Action/Server/PR2HeadAction/PR2HAStatePublisher.h"
 
 void URPR2HeadActionStatePublisher::SetOwner(UObject* InOwner)
 {

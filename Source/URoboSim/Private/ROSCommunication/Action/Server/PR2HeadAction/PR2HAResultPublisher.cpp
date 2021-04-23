@@ -1,5 +1,5 @@
 
-#include "ROSCommunication/Actions/PR2HeadAction/PR2HAResultPublisher.h"
+#include "ROSCommunication/Action/Server/PR2HeadAction/PR2HAResultPublisher.h"
 #include "pr2_controllers_msgs/PR2PointHeadActionResult.h"
 #include "pr2_controllers_msgs/PR2PointHeadResult.h"
 

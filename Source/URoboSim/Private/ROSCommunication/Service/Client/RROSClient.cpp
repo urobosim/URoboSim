@@ -1,4 +1,4 @@
-#include "ROSCommunication/RROSClient.h"
+#include "ROSCommunication/Service/Client/RROSClient.h"
 #include "TimerManager.h"
 
 void URROSClient::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)

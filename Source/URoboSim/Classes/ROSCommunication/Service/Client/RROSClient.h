@@ -4,12 +4,11 @@
 #include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSrvClient.h"
-#include "ROSCommunication/RROSClientImpl.h"
+#include "ROSCommunication/Service/Client/RROSClientImpl.h"
 #include "RUtilityClasses.h"
 #include "RROSClientParameter.h"
 #include "Controller/RControllerComponent.h"
-#include "Controller/RController.h"
-#include "Controller/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 #include "RROSClient.generated.h"
 
 

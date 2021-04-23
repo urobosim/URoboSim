@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2HeadAction/PR2HAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/PR2HeadAction/PR2HAFeedbackPublisher.h"
 #include "pr2_controllers_msgs/PR2PointHeadActionFeedback.h"
 
 void URPR2HeadActionFeedbackPublisher::SetMessageType()

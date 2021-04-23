@@ -2,7 +2,7 @@
 #pragma once
 
 #include "ROSCommunication/Publisher/RPublisher.h"
-#include "Controller/RHeadController.h"
+#include "Controller/ControllerType/JointController/RHeadController.h"
 #include "PR2HAFeedbackPublisher.generated.h"
 
 UCLASS()

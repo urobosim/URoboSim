@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAStatePublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAStatePublisher.h"
 
 void URPR2GripperCommandActionStatePublisher::SetOwner(UObject* InOwner)
 {

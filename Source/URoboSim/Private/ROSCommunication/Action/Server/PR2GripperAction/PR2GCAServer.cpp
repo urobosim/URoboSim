@@ -1,9 +1,9 @@
 
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAServer.h"
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAResultPublisher.h"
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAFeedbackPublisher.h"
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAStatePublisher.h"
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAGoalSubscriber.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAServer.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAResultPublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAStatePublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAGoalSubscriber.h"
 
 URGripperCommandActionServer::URGripperCommandActionServer()
 {

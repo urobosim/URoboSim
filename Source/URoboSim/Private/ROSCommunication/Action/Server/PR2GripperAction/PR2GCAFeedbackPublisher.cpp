@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAFeedbackPublisher.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionFeedback.h"
 
 void URPR2GripperCommandActionFeedbackPublisher::SetMessageType()

@@ -1,10 +1,9 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSubscriber.h"
-#include "Controller/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 
 class UROBOSIM_API FROSFollowTrajectoryActionCancelCallback : public FROSBridgeSubscriber
 {

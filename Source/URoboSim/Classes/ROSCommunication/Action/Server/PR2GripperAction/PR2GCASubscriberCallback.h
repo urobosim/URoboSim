@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSubscriber.h"
 #include "Controller/RController.h"

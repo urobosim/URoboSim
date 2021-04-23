@@ -1,4 +1,4 @@
-#include "Controller/RDonbotGripperController.h"
+#include "Controller/ControllerType/JointController/RDonbotGripperController.h"
 
 void URDonbotGripperController::UpdateGripper()
 {

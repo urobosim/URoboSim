@@ -5,7 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 #include "SDF/SDFJoint.h"
 #include "Sensor/REncoder.h"
 #include "Physics/RLink.h"

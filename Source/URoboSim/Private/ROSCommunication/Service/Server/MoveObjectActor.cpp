@@ -1,5 +1,5 @@
-#include "ROSCommunication/MoveObjectActor.h"
-#include "ROSCommunication/MoveObjectServiceServer.h"
+#include "ROSCommunication/Service/Server/MoveObjectActor.h"
+#include "ROSCommunication/Service/Server/MoveObjectServiceServer.h"
 
 void AMoveObjectActor::BeginPlay()
 {

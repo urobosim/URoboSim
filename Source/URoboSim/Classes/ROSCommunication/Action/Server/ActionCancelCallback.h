@@ -8,7 +8,6 @@
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSubscriber.h"
 #include "Controller/RController.h"
-#include "Controller/RJointController.h"
 
 class UROBOSIM_API FROSActionCancelCallback : public FROSBridgeSubscriber
 {

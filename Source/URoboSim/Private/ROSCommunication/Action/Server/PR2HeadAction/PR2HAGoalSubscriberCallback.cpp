@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2HeadAction/PR2HAGoalSubscriberCallback.h"
+#include "ROSCommunication/Action/Server/PR2HeadAction/PR2HAGoalSubscriberCallback.h"
 #include "Conversions.h"
 #include "pr2_controllers_msgs/PR2PointHeadActionGoal.h"
 

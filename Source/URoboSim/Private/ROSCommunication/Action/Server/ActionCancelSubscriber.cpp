@@ -1,5 +1,5 @@
-#include "ROSCommunication/Actions/ActionCancelSubscriber.h"
-#include "ROSCommunication/Actions/ActionCancelCallback.h"
+#include "ROSCommunication/Action/Server/ActionCancelSubscriber.h"
+#include "ROSCommunication/Action/Server/ActionCancelCallback.h"
 
 void URActionCancelSubscriber::SetMessageType()
 {

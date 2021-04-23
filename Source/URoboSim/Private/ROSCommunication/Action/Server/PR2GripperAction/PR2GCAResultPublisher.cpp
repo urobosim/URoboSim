@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/PR2GripperAction/PR2GCAResultPublisher.h"
+#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAResultPublisher.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionResult.h"
 #include "pr2_controllers_msgs/PR2GripperCommandResult.h"
 

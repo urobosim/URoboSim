@@ -1,4 +1,4 @@
-#include "ROSCommunication/Actions/RActionServer.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 
 void URActionServer::Init(TSharedPtr<FROSBridgeHandler> InHandler, UObject* InOwner, FString InActionName)
 {
