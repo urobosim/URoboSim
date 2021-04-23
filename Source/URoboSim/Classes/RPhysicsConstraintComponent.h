@@ -64,7 +64,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void BeginPlay() override;
   virtual const FTransform GetChildPoseInJointFrame() const;
   virtual void ConnectToComponents(){};
-  virtual void EnableMotor(bool InEnable){};
+  virtual void EnableMotor(bool InEnable, FVector DriveParameter = FVector(1E8, 1E8, 1E10)){};
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
@@ -167,7 +167,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   virtual void SetJointVelocityInUUnits(float Velocity);
   virtual void SetJointEffort(float Effort);
   virtual void SetJointEffortFromROS(float InEffort);
-  virtual void EnableMotor(bool InEnable) override;
+  virtual void EnableMotor(bool InEnable, FVector DriveParameter) override;
   virtual void SetTargetPosition(float InTargetPos);
 
 
@@ -192,7 +192,7 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   };
 
   virtual void SetTargetPosition(float InTargetPos);
-  virtual void EnableMotor(bool InEnable) override;
+  virtual void EnableMotor(bool InEnable, FVector DriveParameter) override;
   virtual float GetConstraintPosition() override;
   virtual float GetJointPosition() override;
   virtual float GetJointVelocity() override;

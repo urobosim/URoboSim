@@ -254,11 +254,11 @@ void URRevoluteConstraintComponent::SetTargetPosition(float InTargetPos)
   SetAngularOrientationTarget(Temp);
 }
 
-void URContinuousConstraintComponent::EnableMotor(bool InEnable)
+void URContinuousConstraintComponent::EnableMotor(bool InEnable, FVector DriveParameter = FVector(1E8, 1E8, 1E10))
 {
   SetOrientationDriveTwistAndSwing(InEnable, InEnable);
   SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
-  SetAngularDriveParams(1E6, 1E5, 1E10);
+  SetAngularDriveParams(DriveParameter.X, DriveParameter.Y, DriveParameter.Z);
   if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
   {
     SetAngularOrientationDrive(false, true);
@@ -271,9 +271,9 @@ void URContinuousConstraintComponent::EnableMotor(bool InEnable)
   }
 }
 
-void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
+void URPrismaticConstraintComponent::EnableMotor(bool InEnable, FVector DriveParameter = FVector(1E8, 1E8, 1E10))
 {
-  SetLinearDriveParams(1E8, 1E8, 1E10);
+  SetLinearDriveParams(DriveParameter.X, DriveParameter.Y, DriveParameter.Z);
   bool bEnableX = false;
   bool bEnableY = false;
   bool bEnableZ = false;
