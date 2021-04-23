@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "ROSCommunication/Actions/FollowTrajectoryAction/FTAFeedbackPublisher.h"
+#include "ROSCommunication/Action/Server/FollowTrajectoryAction/FTAFeedbackPublisher.h"
 #include "JointTrajectoryControllerStatePublisher.generated.h"
 
 UCLASS()

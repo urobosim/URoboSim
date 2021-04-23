@@ -1,6 +1,6 @@
 #include "Factory/RModelBuilder.h"
 #include "Controller/RControllerComponent.h"
-#include "Controller/RBaseController.h"
+#include "Controller/ControllerType/BaseController/RBaseController.h"
 
 
 // Sets default values

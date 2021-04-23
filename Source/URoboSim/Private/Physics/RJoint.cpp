@@ -4,7 +4,7 @@
 #include "Physics/RJoint.h"
 #include "Physics/RLink.h"
 #include "Physics/RModel.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 
 
 // Sets default values for this component's properties

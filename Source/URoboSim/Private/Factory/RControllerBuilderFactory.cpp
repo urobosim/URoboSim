@@ -1,8 +1,8 @@
 #include "Factory/RControllerBuilderFactory.h"
-#include "Controller/RBaseController.h"
-#include "Controller/RJointController.h"
-#include "Controller/RHeadController.h"
-#include "Controller/RGripperController.h"
+#include "Controller/ControllerType/BaseController/RBaseController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
+#include "Controller/ControllerType/JointController/RHeadController.h"
+#include "Controller/ControllerType/JointController/RGripperController.h"
 #include "Controller/RController.h"
 #include "Components/ActorComponent.h"
 

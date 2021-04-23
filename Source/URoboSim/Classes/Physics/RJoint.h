@@ -5,7 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "RPhysicsConstraintComponent.h"
+#include "Physics/RPhysicsConstraintComponent.h"
 #include "RJoint.generated.h"
 
 class ARModel;

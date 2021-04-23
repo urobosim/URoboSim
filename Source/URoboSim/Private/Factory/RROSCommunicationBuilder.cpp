@@ -4,7 +4,7 @@
 // #include "ROSCommunication/Publisher/RJointTrajectoryControllerStatePublisher.h"
 // #include "ROSCommunication/Publisher/ROdomPublisher.h"
 // #include "ROSCommunication/Subscriber/RVelocityCommandSubscriber.h"
-#include "ROSCommunication/RROSClient.h"
+#include "ROSCommunication/Service/Client/RROSClient.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 

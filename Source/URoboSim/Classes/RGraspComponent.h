@@ -2,7 +2,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "Components/BoxComponent.h"

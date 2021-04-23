@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 #include "RLink.generated.h"
 
 class ARModel;

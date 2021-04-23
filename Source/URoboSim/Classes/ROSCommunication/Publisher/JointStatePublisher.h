@@ -1,8 +1,8 @@
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
+#include "RPublisher.h"
 #include "Physics/RModel.h"
-#include "ROSCommunication/RROSClient.h"
+#include "ROSCommunication/Service/Client/RROSClient.h"
 #include "JointStatePublisher.generated.h"
 
 UCLASS()
