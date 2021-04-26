@@ -9,7 +9,7 @@ void URPerceiveObjectActionGoalSubscriber::SetMessageType()
 void URPerceiveObjectActionGoalSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSPerceiveObjectGoalSubscriberCallback>(
-                                                                       new FROSPerceiveObjectGoalSubscriberCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList["CameraController"]));
+                                                                       new FROSPerceiveObjectGoalSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("CameraController"))));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("Subscriber connected to RosBridge"));

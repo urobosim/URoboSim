@@ -5,7 +5,7 @@
 void URPR2GripperCommandActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URGripperController>(ControllerComp->Controller.ControllerList[ControllerName]);
+  Owner = Cast<URGripperController>(ControllerComp->GetController(ControllerName));
 }
 
 void URPR2GripperCommandActionResultPublisher::SetMessageType()

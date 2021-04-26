@@ -5,7 +5,7 @@
 void URFollowTrajectoryActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URJointController>(ControllerComp->Controller.ControllerList["JointController"]);
+  Owner = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
   Owner->ActionFinished.AddDynamic(this, &URFollowTrajectoryActionResultPublisher::PublishResult);
   /* Controller->ControllerList["JointController"]; */
 }

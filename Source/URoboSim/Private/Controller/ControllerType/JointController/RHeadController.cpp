@@ -14,13 +14,10 @@ void URHeadTrajectoryController::Init()
 	{
 		UE_LOG(LogTemp, Error, TEXT("RobotComandsComponent not attached to ARModel"));
 	}
-	else
-	{
-        }
 
 
         ControllerComp = Cast<URControllerComponent>(GetOuter());
-        JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
+        JointController = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
 
         if(!JointController)
           {

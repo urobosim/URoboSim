@@ -36,6 +36,10 @@ public:
 
   void AddLink(URLink *Link);
 
+  UActorComponent *GetPlugin(const FString &PluginName) const;
+
+  class URController *GetController(const FString &ControllerName) const;
+
 public:
   UPROPERTY(EditAnywhere)
   TMap<FString, URJoint *> Joints;

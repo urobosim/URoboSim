@@ -11,7 +11,7 @@ void URVelocityCommandSubscriber::SetMessageType()
 void URVelocityCommandSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSVelocityCommandSubscriberCallback>(
-                                                                    new FROSVelocityCommandSubscriberCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList["BaseController"]));
+                                                                    new FROSVelocityCommandSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("BaseController"))));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("Subscriber connected to RosBridge"));

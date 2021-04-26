@@ -9,5 +9,5 @@ void UROdometrieReplaySubscriber::SetMessageType()
 void UROdometrieReplaySubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSOdomReplaySubscriberCallback>(
-                                                               new FROSOdomReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
+                                                               new FROSOdomReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->GetController(ControllerName)));
 }

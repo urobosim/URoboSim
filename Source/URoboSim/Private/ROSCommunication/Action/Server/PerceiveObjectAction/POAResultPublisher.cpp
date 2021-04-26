@@ -12,7 +12,7 @@ void URPerceiveObjectActionResultPublisher::SetMessageType()
 void URPerceiveObjectActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URCameraController>(ControllerComp->Controller.ControllerList["CameraController"]);
+  Owner = Cast<URCameraController>(ControllerComp->GetController(TEXT("CameraController")));
 
   for (TObjectIterator<ATFPublisher> Itr; Itr; ++Itr)
     {

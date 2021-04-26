@@ -10,5 +10,5 @@ void URJointStateReplaySubscriber::SetMessageType()
 void URJointStateReplaySubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSJointStateReplaySubscriberCallback>(
-                                                                     new FROSJointStateReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
+                                                                     new FROSJointStateReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->GetController(ControllerName)));
 }

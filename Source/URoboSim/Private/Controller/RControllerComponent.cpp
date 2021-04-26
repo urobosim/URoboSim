@@ -1,28 +1,21 @@
 #include "Controller/RControllerComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRControllerComponent, Log, All);
+
 URControllerComponent::URControllerComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.TickGroup = TG_PrePhysics;
+  PrimaryComponentTick.bCanEverTick = true;
+  PrimaryComponentTick.TickGroup = TG_PrePhysics;
 }
 
-URControllerComponent::~URControllerComponent()
-{
-}
-
-FString URControllerComponent::GetPluginName()
-{
-  return TEXT("ControllerComponent");
-}
-
-void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
   float realtimeSeconds = FPlatformTime::Seconds();
   Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-  for(auto& C : Controller.ControllerList)
-    {
-      C.Value->Tick(DeltaTime);
-    }
+  for (auto &Controller : Controllers.ControllerList)
+  {
+    Controller.Value->Tick(DeltaTime);
+  }
 }
 void URControllerComponent::BeginPlay()
 {
@@ -34,34 +27,37 @@ void URControllerComponent::BeginPlay()
 void URControllerComponent::Init()
 {
   RegisterComponent(); // Remove this will cause the TickComponent not fire in Play
-  if(!GetOwner())
-    {
-      UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
-    }
+  if (!GetOwner())
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("Owner of %s is not RModel"), *GetName())
+  }
   else
+  {
+    for (auto &Controller : Controllers.ControllerList)
     {
-      for(auto& C : Controller.ControllerList)
-        {
-          C.Value->SetOwner(GetOwner());
-          C.Value->Init();
-        }
+      Controller.Value->SetOwner(GetOwner());
+      Controller.Value->Init();
     }
+  }
 }
-
 
 void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
 {
-  for(int i = 0; i < InJointNames.Num();i++)
-    {
-      GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
-    }
+  for (int i = 0; i < InJointNames.Num(); i++)
+  {
+    GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
+  }
 }
 
-URController* URControllerComponent::ControllerList(FString ControllerName)
+URController *URControllerComponent::GetController(FString ControllerName) const
 {
-  if(Controller.ControllerList.Contains(ControllerName))
-    {
-      return Controller.ControllerList[ControllerName];
-    }
-  return nullptr;
+  if (Controllers.ControllerList.Contains(ControllerName))
+  {
+    return Controllers.ControllerList[ControllerName];
+  }
+  else
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("%s of %s not found"), *ControllerName, *GetName())
+    return nullptr;
+  }
 }

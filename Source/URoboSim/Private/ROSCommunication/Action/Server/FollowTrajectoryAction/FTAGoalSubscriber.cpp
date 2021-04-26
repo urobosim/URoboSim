@@ -9,7 +9,7 @@ void URFollowJointTrajectoryActionGoalSubscriber::SetMessageType()
 void URFollowJointTrajectoryActionGoalSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSWholeBodyControllerCallback>(
-                                                              new FROSWholeBodyControllerCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList["JointController"]));
+                                                              new FROSWholeBodyControllerCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("JointController"))));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("GiskardSubscriber connected to RosBridge"));

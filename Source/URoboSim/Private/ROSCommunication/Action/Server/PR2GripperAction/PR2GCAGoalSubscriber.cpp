@@ -11,7 +11,7 @@ void URPR2GripperCommandActionGoalSubscriber::CreateSubscriber()
   UE_LOG(LogTemp, Warning, TEXT("%s"), *ControllerName);
 
   Subscriber = MakeShareable<FROSGripperCommandSubscriberCallback>(
-                                                                   new FROSGripperCommandSubscriberCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList[ControllerName]));
+                                                                   new FROSGripperCommandSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(ControllerName)));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("Subscriber connected to RosBridge"));

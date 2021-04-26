@@ -9,5 +9,5 @@ void URTFSubscriber::SetMessageType()
 void URTFSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSTFReplaySubscriberCallback>(
-                                                             new FROSTFReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->Controller.ControllerList[ControllerName]));
+                                                             new FROSTFReplaySubscriberCallback(Topic, MessageType,  ControllerComponent->GetController(ControllerName)));
 }

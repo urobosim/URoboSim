@@ -119,7 +119,12 @@ void FRROSComunicationContainer::DeInit()
         {
           Publisher.Value->DeInit();
         }
-      Handler->Disconnect();
+        if (Handler.IsValid())
+        {
+          Handler->Disconnect();
+        }
+        
+      
     }
 
 }

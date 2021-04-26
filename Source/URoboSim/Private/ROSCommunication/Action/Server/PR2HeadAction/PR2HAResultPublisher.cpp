@@ -11,7 +11,7 @@ void URPR2HeadActionResultPublisher::SetMessageType()
 void URPR2HeadActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URHeadTrajectoryController>(ControllerComp->Controller.ControllerList["HeadController"]);
+  Owner = Cast<URHeadTrajectoryController>(ControllerComp->GetController(TEXT("HeadController")));
 }
 
 void URPR2HeadActionResultPublisher::Publish()

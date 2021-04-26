@@ -9,7 +9,7 @@ void URActionCancelSubscriber::SetMessageType()
 void URActionCancelSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSActionCancelCallback>(
-                                                       new FROSActionCancelCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList[ControllerName]));
+                                                       new FROSActionCancelCallback(Topic, MessageType, ControllerComponent->GetController(ControllerName)));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("GiskardSubscriber connected to RosBridge"));

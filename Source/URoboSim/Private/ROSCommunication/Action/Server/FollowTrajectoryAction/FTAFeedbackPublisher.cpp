@@ -16,7 +16,7 @@ void URJointTrajectoryFeedbackPublisher::SetOwner(UObject* InOwner)
 {
   ARModel* Model =Cast<ARModel>(InOwner);
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
-  Owner = Cast<URJointController>(ControllerComp->Controller.ControllerList["JointController"]);
+  Owner = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
   ConfigClient = NewObject<URJointStateConfigurationClient>(this);
   ConfigClient->JointParamTopic = JointParamTopic;
   // ConfigClient->URROSClient::Init(ControllerComp, Handler);

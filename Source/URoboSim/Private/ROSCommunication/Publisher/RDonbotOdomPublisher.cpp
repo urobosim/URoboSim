@@ -14,7 +14,7 @@ void URDonbotOdomPublisher::SetMessageType()
 void URDonbotOdomPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  this->Owner = Cast<URBaseController>(ControllerComp->Controller.ControllerList["BaseController"]);
+  this->Owner = Cast<URBaseController>(ControllerComp->GetController(TEXT("BaseController")));
 
   this->FrameNames.Add(this->OdomFrameXId);
   this->FrameNames.Add(this->OdomFrameYId);

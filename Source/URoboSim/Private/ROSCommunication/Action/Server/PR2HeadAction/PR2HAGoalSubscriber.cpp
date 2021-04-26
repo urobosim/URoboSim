@@ -9,7 +9,7 @@ void URPR2HeadActionGoalSubscriber::SetMessageType()
 void URPR2HeadActionGoalSubscriber::CreateSubscriber()
 {
   Subscriber = MakeShareable<FROSPointHeadGoalSubscriberCallback>(
-                                                                  new FROSPointHeadGoalSubscriberCallback(Topic, MessageType, ControllerComponent->Controller.ControllerList["HeadController"]));
+                                                                  new FROSPointHeadGoalSubscriberCallback(Topic, MessageType, ControllerComponent->GetController(TEXT("HeadController"))));
   if(Subscriber.IsValid())
     {
       UE_LOG(LogTemp, Log, TEXT("Subscriber connected to RosBridge"));

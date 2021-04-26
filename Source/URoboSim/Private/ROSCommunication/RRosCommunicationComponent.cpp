@@ -34,8 +34,3 @@ void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReas
   RosComunication.DeInit();
   Super::EndPlay(EndPlayReason);
 }
-
-FString URROSCommunicationComponent::GetPluginName()
-{
-  return TEXT("ROSComunicationComponent");
-}

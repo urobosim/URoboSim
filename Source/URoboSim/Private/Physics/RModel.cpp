@@ -2,6 +2,9 @@
 // Author: Michael Neumann
 
 #include "Physics/RModel.h"
+#include "Controller/RControllerComponent.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogRModel, Log, All);
 
 // Sets default values
 ARModel::ARModel()
@@ -30,6 +33,32 @@ void ARModel::AddLink(URLink *Link)
 void ARModel::AddJoint(URJoint *Joint)
 {
   Joints.Add(Joint->GetName(), Joint);
+}
+
+UActorComponent *ARModel::GetPlugin(const FString &PluginName) const
+{
+  if (Plugins.Contains(PluginName))
+  {
+    return Plugins[PluginName];
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *PluginName, *GetName())
+    return nullptr;
+  }
+}
+
+URController *ARModel::GetController(const FString &ControllerName) const
+{
+  URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetPlugin(TEXT("Controller")));
+  if (ControllerComponent)
+  {
+    return ControllerComponent->GetController(ControllerName);
+  }
+  else
+  {
+    return nullptr;
+  }
 }
 
 TArray<FJointState> ARModel::GetJointStates() const

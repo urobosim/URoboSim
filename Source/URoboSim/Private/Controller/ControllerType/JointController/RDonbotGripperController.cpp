@@ -76,7 +76,7 @@ void URDonbotGripperController::Init()
         }
 
         URControllerComponent* ControllerComp = Cast<URControllerComponent>(GetOuter());
-        JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
+        JointController = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
         if (!JointController)
         {
             UE_LOG(LogTemp, Error, TEXT("JointController not found"))

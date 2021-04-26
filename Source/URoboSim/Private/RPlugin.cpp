@@ -17,15 +17,10 @@ void URPluginComponent::RegisterPlugin()
 {
   if (GetOwner())
   {
-    GetOwner()->Plugins.Add(GetPluginName(), this);
+    GetOwner()->Plugins.Add(this->GetName(), this);
   }
   else
   {
     UE_LOG(LogTemp, Error, TEXT("%s not Attached to a ARModel"), *GetName());
   }
-}
-
-FString URPluginComponent::GetPluginName()
-{
-  return TEXT("DefaultPluginName");
 }

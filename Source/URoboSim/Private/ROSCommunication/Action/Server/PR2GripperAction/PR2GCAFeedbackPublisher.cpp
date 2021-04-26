@@ -10,7 +10,7 @@ void URPR2GripperCommandActionFeedbackPublisher::SetOwner(UObject* InOwner)
 {
   ARModel* Model =Cast<ARModel>(InOwner);
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
-  Owner = Cast<URGripperController>(ControllerComp->Controller.ControllerList[ControllerName]);
+  Owner = Cast<URGripperController>(ControllerComp->GetController(ControllerName));
 }
 
 void URPR2GripperCommandActionFeedbackPublisher::Publish()

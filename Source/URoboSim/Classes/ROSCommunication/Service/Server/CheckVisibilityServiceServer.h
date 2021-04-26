@@ -32,10 +32,7 @@ public:
           Owner = Cast<ARModel>(InOwner);
           if(Owner)
             {
-              URControllerComponent* ControllerComp = Cast<URControllerComponent>(Owner->Plugins["ControllerComponent"]);
-              if(ControllerComp)
-                {
-                  URCameraController* CameraController = Cast<URCameraController>(ControllerComp->ControllerList("CameraController"));
+              URCameraController* CameraController = Cast<URCameraController>(Owner->GetController("CameraController"));
                   if(CameraController)
                     {
                       ARGBDCamera* Camera = CameraController->Camera;
@@ -44,7 +41,6 @@ public:
                           PlayerIndex = Camera->GetAutoActivatePlayerIndex();
                         }
                     }
-                }
             }
 	}
 

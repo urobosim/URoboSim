@@ -56,7 +56,7 @@ void URControllerBuilder::Build()
     {
       UE_LOG(LogTemp, Error, TEXT("Create Controller"));
       URController* Controller = CreateController(ControllerComp);
-      ControllerComp->Controller.ControllerList.Add(ControllerConfiguration->ControllerName, Controller);
+      ControllerComp->Controllers.ControllerList.Add(ControllerConfiguration->ControllerName, Controller);
       ControllerComp->Init();
     }
 }

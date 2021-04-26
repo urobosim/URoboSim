@@ -9,5 +9,5 @@
 void URPerceiveObjectActionStatePublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URCameraController>(ControllerComp->Controller.ControllerList["CameraController"]);
+  Owner = Cast<URCameraController>(ControllerComp->GetController(TEXT("CameraController")));
 }

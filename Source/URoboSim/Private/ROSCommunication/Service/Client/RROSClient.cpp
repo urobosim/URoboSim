@@ -61,7 +61,7 @@ void URJointControllerConfigurationClient::Init(UObject* InControllerComp)
 
 void URJointControllerConfigurationClient::CreateClient()
 {
-  URJointController* JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
+  URJointController* JointController = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
   TMap<FString,float>* JointNames = &JointController->DesiredJointState;
   JointRequest = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, ""));
   JointResponse = MakeShareable(new rosapi::GetParam::Response());

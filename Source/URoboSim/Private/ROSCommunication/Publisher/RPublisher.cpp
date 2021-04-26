@@ -15,7 +15,10 @@ URPublisher::URPublisher()
 
 void URPublisher::DeInit()
 {
-  Handler->Disconnect();
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
 }
 
 void URPublisher::Init(FString InHostIp, uint32 InPort, UObject* InOwner)

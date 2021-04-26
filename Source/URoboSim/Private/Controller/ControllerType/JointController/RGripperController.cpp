@@ -199,7 +199,7 @@ void URGripperController::Init()
       PoseOffsetFromJoints = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size();
 
       ControllerComp = Cast<URControllerComponent>(GetOuter());
-      JointController = Cast<URJointController>(ControllerComp->ControllerList("JointController"));
+      JointController = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
 
       if(!JointController)
         {

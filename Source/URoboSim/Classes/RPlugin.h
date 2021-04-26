@@ -17,7 +17,4 @@ public:
 
 protected:
   virtual void RegisterPlugin();
-
-  //Generates the name that is used to find it in the model
-  virtual FString GetPluginName();
 };
