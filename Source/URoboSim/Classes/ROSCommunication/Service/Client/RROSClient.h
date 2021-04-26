@@ -24,7 +24,7 @@ public:
 
   virtual void SetROSClientParameters(URROSClientParameter *&ROSClientParameters){}
 
-	virtual void SetParameters(float InSimTime, FJointState InParameters, FTransform InRobotPose){};
+	virtual void SetParameters(float InSimTime, TArray<FJointState> InParameters, FTransform InRobotPose){};
 	virtual void Init(UObject* InControllerComp){};
 	virtual void Init(UObject* InControllerComp, TArray<FString>* OutArray){};
 protected:
