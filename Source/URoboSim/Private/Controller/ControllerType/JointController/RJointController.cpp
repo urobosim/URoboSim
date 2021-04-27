@@ -136,42 +136,42 @@ bool URJointController::CheckTrajectoryGoalReached()
   return false;
 }
 
-void URJointController::CallculateJointVelocities(float InDeltaTime)
+float URJointController::CallculateJointVelocity(float InDeltaTime, FString InJointName)
 {
   FString Velocity = "";
-  for(auto & Joint: GetOwner()->Joints)
-    {
-      if(DesiredJointState.Contains(Joint.Key))
-        {
-          Joint.Value->bActuate = true;
-          float DesiredPos = 0.0f;
-          DesiredPos = DesiredJointState[Joint.Key];
+
+  float DesiredPos = DesiredJointState[InJointName];
+  URJoint* Joint = GetOwner()->Joints[InJointName];
+  float CurrentJointPos = Joint->GetEncoderValue();
+  float Diff = DesiredPos - CurrentJointPos;
+  Diff = Joint->Constraint->CheckPositionRange(Diff);
+
+  float Vel = Diff / InDeltaTime;
+  float VelSave = Vel;
+  return Vel;
+
+
+  // for(auto & Joint: GetOwner()->Joints)
+  //   {
+  //     if(DesiredJointState.Contains(Joint.Key))
+  //       {
+  //         Joint.Value->bActuate = true;
+  //         float DesiredPos = 0.0f;
+  //         DesiredPos = DesiredJointState[Joint.Key];
 
 
 
-          float CurrentJointPos = Joint.Value->GetEncoderValue();
-          float Diff = DesiredPos - CurrentJointPos;
+  //         float CurrentJointPos = Joint.Value->GetEncoderValue();
+  //         float Diff = DesiredPos - CurrentJointPos;
 
 
-          Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
+  //         Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
 
-          float Vel = Diff / InDeltaTime;
-          float VelSave = Vel;
-          // if(Joint.Value->MaxJointVel > 0)
-          //   {
-          //     if(FMath::Abs(Vel) > Joint.Value->MaxJointVel)
-          //       {
-          //         Vel = Vel / FMath::Abs(Vel) * Joint.Value->MaxJointVel;
-          //       }
-          //   }
-          // if(Joint.Value->GetName().Contains("torso_lift_joint"))
-          //   {
-          //     // UE_LOG(LogTemp, Error, TEXT("Vel: %f VelSave %f"), Vel, VelSave);
-          //     UE_LOG(LogTemp, Error, TEXT("CurrentJointPos: %f DesiredPos %f Diff %f"), CurrentJointPos, DesiredPos, Diff);
-          //   }
-          Joint.Value->SetJointVelocity(Vel);
-        }
-    }
+  //         float Vel = Diff / InDeltaTime;
+  //         float VelSave = Vel;
+  //         Joint.Value->SetJointVelocity(Vel);
+  //       }
+  //   }
 }
 
 void URJointController::SetDesiredJointState(FString JointName, float InJointState)
@@ -227,7 +227,7 @@ void URJointController::Tick(float InDeltaTime)
       break;
 
     case UJointControllerState::Normal:
-      CallculateJointVelocities(InDeltaTime);
+      // CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
 
       break;
@@ -262,8 +262,8 @@ void URJointController::MoveJointsDynamic(float InDeltaTime)
     {
       if(DesiredJointState.Contains(Joint.Key))
         {
-          // TODO: Change TargetVelocity
-          float TargetVelocity = 0.f;
+          // // TODO: Change TargetVelocity
+          float TargetVelocity = CallculateJointVelocity(InDeltaTime, Joint.Key);
           Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
         }
     }
