@@ -205,6 +205,20 @@ void URJointController::Tick(float InDeltaTime)
       Joint.Value->UpdateEncoder();
     }
 
+  if(bBreak)
+    {
+      for(auto &Joint : GetOwner()->Joints)
+        {
+          if(DesiredJointState.Contains(Joint.Key))
+            {
+              // // TODO: Change TargetVelocity
+              float TargetVelocity = 0.0f;
+              Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
+            }
+        }
+      bBreak = false;
+    }
+
   switch(State)
     {
     case UJointControllerState::FollowJointTrajectory:
@@ -227,7 +241,6 @@ void URJointController::Tick(float InDeltaTime)
       break;
 
     case UJointControllerState::Normal:
-      // CallculateJointVelocities(InDeltaTime);
       MoveJoints(InDeltaTime);
 
       break;
@@ -267,6 +280,7 @@ void URJointController::MoveJointsDynamic(float InDeltaTime)
           Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
         }
     }
+  bBreak = true;
 }
 
 void URJointController::MoveJointsKinematic()

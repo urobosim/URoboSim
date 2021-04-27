@@ -93,4 +93,7 @@ class UROBOSIM_API URJointController : public URController
   void SetJointVelocities(float InDeltaTime);
   virtual bool SwitchToNormal();
   virtual bool SwitchToFollowJointTrajectory();
+
+  UPROPERTY()
+    bool bBreak;
 };
