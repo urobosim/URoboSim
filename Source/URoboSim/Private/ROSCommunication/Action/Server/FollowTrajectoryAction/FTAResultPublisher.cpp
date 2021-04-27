@@ -6,7 +6,14 @@ void URFollowTrajectoryActionResultPublisher::SetOwner(UObject* InOwner)
 {
   URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
   Owner = Cast<URJointController>(ControllerComp->GetController(TEXT("JointController")));
-  Owner->ActionFinished.AddDynamic(this, &URFollowTrajectoryActionResultPublisher::PublishResult);
+  if(Owner)
+    {
+      Owner->ActionFinished.AddDynamic(this, &URFollowTrajectoryActionResultPublisher::PublishResult);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("FTAResultPublisher: JointController not found"));
+    }
   /* Controller->ControllerList["JointController"]; */
 }
 
