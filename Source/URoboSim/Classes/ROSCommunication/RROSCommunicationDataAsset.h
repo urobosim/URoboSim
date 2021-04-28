@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "ROSCommunication/Service/Server/RServiceServer.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"

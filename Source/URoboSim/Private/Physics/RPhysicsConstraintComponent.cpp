@@ -261,12 +261,12 @@ void URContinuousConstraintComponent::EnableMotor(bool InEnable)
   SetAngularDriveParams(1E6, 1E5, 1E10);
   if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
   {
-    // SetAngularOrientationDrive(false, true);
+    SetAngularOrientationDrive(false, true);
     SetAngularVelocityDrive(false, true);
   }
   else
   {
-    // SetAngularOrientationDrive(true, false);
+    SetAngularOrientationDrive(true, false);
     SetAngularVelocityDrive(true, false);
   }
 }
@@ -413,9 +413,7 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  // SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), FMath::RadiansToDegrees(TargetJointVelocity));
-  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -TargetJointVelocity);
-  // SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), 0);
+  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
 }
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)

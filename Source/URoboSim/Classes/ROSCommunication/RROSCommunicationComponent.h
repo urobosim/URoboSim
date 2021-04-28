@@ -3,8 +3,8 @@
 #pragma once
 
 #include "RPluginComponent.h"
-#include "ROSCommunication/RRosComunication.h"
-#include "RRosCommunicationComponent.generated.h"
+#include "RROSCommunication.h"
+#include "RROSCommunicationComponent.generated.h"
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URROSCommunicationComponent : public URPluginComponent
@@ -15,7 +15,7 @@ public:
 
 
     UPROPERTY(EditAnywhere)
-    FRROSComunicationContainer RosComunication;
+    FRROSCommunicationContainer ROSCommunication;
 
     virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

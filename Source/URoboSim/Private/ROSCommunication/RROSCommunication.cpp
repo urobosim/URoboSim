@@ -1,7 +1,7 @@
-#include "ROSCommunication/RRosComunication.h"
+#include "ROSCommunication/RROSCommunication.h"
 #include "Controller/RController.h"
 
-FRROSComunicationContainer::FRROSComunicationContainer()
+FRROSCommunicationContainer::FRROSCommunicationContainer()
 {
   WebsocketIPAddr = TEXT("127.0.0.1");
   WebsocketPort = 9090;
@@ -11,7 +11,7 @@ FRROSComunicationContainer::FRROSComunicationContainer()
 }
 
 
-void FRROSComunicationContainer::Init()
+void FRROSCommunicationContainer::Init()
 {
   InitHandler();
   if(Handler.IsValid())
@@ -30,7 +30,7 @@ void FRROSComunicationContainer::Init()
 }
 
 
-void FRROSComunicationContainer::InitAllServiceProvider()
+void FRROSCommunicationContainer::InitAllServiceProvider()
 {
   for(auto& ServiceProvider : ServiceProviderList)
     {
@@ -38,7 +38,7 @@ void FRROSComunicationContainer::InitAllServiceProvider()
     }
 }
 
-void FRROSComunicationContainer::InitAllPublisher()
+void FRROSCommunicationContainer::InitAllPublisher()
 {
   for(auto& Publisher : PublisherList)
     {
@@ -46,7 +46,7 @@ void FRROSComunicationContainer::InitAllPublisher()
     }
 }
 
-void FRROSComunicationContainer::InitAllSubscriber()
+void FRROSCommunicationContainer::InitAllSubscriber()
 {
   for(auto& Subscriber : SubscriberList)
     {
@@ -54,7 +54,7 @@ void FRROSComunicationContainer::InitAllSubscriber()
     }
 }
 
-void FRROSComunicationContainer::InitAllClients()
+void FRROSCommunicationContainer::InitAllClients()
 {
   for(auto& Client : ClientList)
     {
@@ -62,7 +62,7 @@ void FRROSComunicationContainer::InitAllClients()
     }
 }
 
-void FRROSComunicationContainer::InitAllActionServer()
+void FRROSCommunicationContainer::InitAllActionServer()
 {
   for(auto& ActionServer : ActionServerList)
     {
@@ -70,7 +70,7 @@ void FRROSComunicationContainer::InitAllActionServer()
     }
 }
 
-void FRROSComunicationContainer::Tick()
+void FRROSCommunicationContainer::Tick()
 {
   if(Handler.IsValid())
     {
@@ -92,7 +92,7 @@ void FRROSComunicationContainer::Tick()
     }
 }
 
-void FRROSComunicationContainer::InitHandler()
+void FRROSCommunicationContainer::InitHandler()
 {
   if(bUseGlobalHandler)
     {
@@ -105,7 +105,7 @@ void FRROSComunicationContainer::InitHandler()
     }
 }
 
-void FRROSComunicationContainer::DeInit()
+void FRROSCommunicationContainer::DeInit()
 {
   //Disconnect the handler before parent ends
   if(bUseGlobalHandler)

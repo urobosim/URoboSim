@@ -1,4 +1,4 @@
-#include "ROSCommunication/RRosCommunicationComponent.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 #include "Controller/RControllerComponent.h"
 
 URROSCommunicationComponent::URROSCommunicationComponent()
@@ -12,11 +12,11 @@ void URROSCommunicationComponent::BeginPlay()
   Super::BeginPlay();
 
   AActor * Owner = GetOwner();
-  RosComunication.ControllerComponent = Owner->FindComponentByClass<URControllerComponent>();
-  if(RosComunication.ControllerComponent)
+  ROSCommunication.ControllerComponent = Owner->FindComponentByClass<URControllerComponent>();
+  if(ROSCommunication.ControllerComponent)
     {
       UE_LOG(LogTemp, Error, TEXT("Found controller comp"));
-      RosComunication.Init();
+      ROSCommunication.Init();
     }
   else
     {
@@ -26,11 +26,11 @@ void URROSCommunicationComponent::BeginPlay()
 
 void URROSCommunicationComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-  RosComunication.Tick();
+  ROSCommunication.Tick();
 }
 
 void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-  RosComunication.DeInit();
+  ROSCommunication.DeInit();
   Super::EndPlay(EndPlayReason);
 }

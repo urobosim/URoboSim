@@ -1,10 +1,10 @@
 
 #include "ROSCommunication/Service/Client/RServiceClientImpl.h"
-#include "ROSCommunication/RRosComunication.h"
+#include "ROSCommunication/RROSCommunication.h"
 // #include "ROSCommunication/RPublisher.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "Controller/ControllerType/JointController/RJointController.h"
-// #include "ROSCommunication/RRosCommunicationComponent.h"
+// #include "ROSCommunication/RROSCommunicationComponent.h"
 #include "XmlFile.h"
 
 

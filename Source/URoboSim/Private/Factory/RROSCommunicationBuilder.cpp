@@ -29,10 +29,10 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
   URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
   ROSCommunicationComponent->RegisterComponent();
 
-  ROSCommunicationComponent->RosComunication.bUseGlobalHandler = ROSCommunicationConfiguration.bUseGlobalHandler;
-  ROSCommunicationComponent->RosComunication.WebsocketIPAddr = ROSCommunicationConfiguration.WebsocketIPAddr;
-  ROSCommunicationComponent->RosComunication.WebsocketPort = ROSCommunicationConfiguration.WebsocketPort;
-  ROSCommunicationComponent->RosComunication.RobotName = Owner->GetName();
+  ROSCommunicationComponent->ROSCommunication.bUseGlobalHandler = ROSCommunicationConfiguration.bUseGlobalHandler;
+  ROSCommunicationComponent->ROSCommunication.WebsocketIPAddr = ROSCommunicationConfiguration.WebsocketIPAddr;
+  ROSCommunicationComponent->ROSCommunication.WebsocketPort = ROSCommunicationConfiguration.WebsocketPort;
+  ROSCommunicationComponent->ROSCommunication.RobotName = Owner->GetName();
 
   if (PublisherConfigurations.Num() > 0)
   {
@@ -43,7 +43,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Publisher->GetName(), *Owner->GetName());
         Publisher->SetPublishParameters(PublisherConfiguration.PublisherParameters);
-        ROSCommunicationComponent->RosComunication.PublisherList.Add(Publisher->GetName(), Publisher);
+        ROSCommunicationComponent->ROSCommunication.PublisherList.Add(Publisher->GetName(), Publisher);
       }
     }
   }
@@ -57,7 +57,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *Subscriber->GetName(), *Owner->GetName());
         Subscriber->SetSubscriberParameters(SubscriberConfiguration.SubscriberParameters);
-        ROSCommunicationComponent->RosComunication.SubscriberList.Add(Subscriber->GetName(), Subscriber);
+        ROSCommunicationComponent->ROSCommunication.SubscriberList.Add(Subscriber->GetName(), Subscriber);
       }
     }
   }
@@ -71,7 +71,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
       {
         UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ServiceClient->GetName(), *Owner->GetName());
         ServiceClient->SetServiceClientParameters(ServiceClientConfiguration.ServiceClientParameters);
-        ROSCommunicationComponent->RosComunication.ClientList.Add(ServiceClient->GetName(), ServiceClient);
+        ROSCommunicationComponent->ROSCommunication.ClientList.Add(ServiceClient->GetName(), ServiceClient);
       }
     }
   }

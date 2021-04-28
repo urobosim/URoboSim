@@ -13,12 +13,12 @@
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "Physics/RModel.h"
 #include "ROSUtilities.h"
-#include "RRosComunication.generated.h"
+#include "RROSCommunication.generated.h"
 
 class URControllerComponent;
 
 USTRUCT(Blueprintable)
-struct FRROSComunicationContainer
+struct FRROSCommunicationContainer
 {
 	GENERATED_BODY()
 
@@ -27,7 +27,7 @@ struct FRROSComunicationContainer
     TSharedPtr<FROSBridgeHandler> Handler;
 
 	// UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	// URRosComunicationInterface* Interface;
+	// URROSCommunicationInterface* Interface;
 
 	UPROPERTY()
 	URControllerComponent* ControllerComponent;
@@ -59,9 +59,9 @@ struct FRROSComunicationContainer
 	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
 	TMap<FString, URActionServer*> ActionServerList;
 
-	FRROSComunicationContainer();
+	FRROSCommunicationContainer();
 
-	virtual ~FRROSComunicationContainer(){};
+	virtual ~FRROSCommunicationContainer(){};
 	virtual void InitHandler();
 
 	virtual void InitAllPublisher() ;

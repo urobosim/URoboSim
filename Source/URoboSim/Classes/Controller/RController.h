@@ -6,7 +6,7 @@
 #include "Physics/RJoint.h"
 #include "Physics/RModel.h"
 #include "RGraspComponent.h"
-//#include "ROSCommunication/RRosComunication.h"
+//#include "ROSCommunication/RROSCommunication.h"
 #include "Containers/Queue.h"
 #include "Conversions.h"
 #include "RGBDCamera.h"

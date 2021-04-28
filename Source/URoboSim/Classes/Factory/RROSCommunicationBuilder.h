@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ROSCommunication/RRosCommunicationComponent.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 #include "ROSCommunication/RROSCommunicationDataAsset.h"
 // clang-format off
 #include "RROSCommunicationBuilder.generated.h"
