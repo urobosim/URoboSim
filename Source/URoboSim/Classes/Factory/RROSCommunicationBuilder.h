@@ -17,7 +17,7 @@ public:
   void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
              const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
              const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
-             const TArray<FRROSServiceConfiguration> &ROSServiceConfigurations,
+             const TArray<FRServiceServerConfiguration> &ServiceServerConfigurations,
              const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
 
 protected:
@@ -27,7 +27,7 @@ protected:
 
   URServiceClient *CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration);
 
-  URROSService *CreateROSService(ARModel *&InOwner, const FRROSServiceConfiguration &ROSServiceConfiguration);
+  URServiceServer *CreateServiceServer(ARModel *&InOwner, const FRServiceServerConfiguration &ServiceServerConfiguration);
 
   URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
 

@@ -23,7 +23,7 @@ void URROSCommunicationBuilder::Init(ARModel *&InOwner, const FRROSCommunication
 void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
                                       const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
                                       const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
-                                      const TArray<FRROSServiceConfiguration> &ROSServiceConfigurations,
+                                      const TArray<FRServiceServerConfiguration> &ServiceServerConfigurations,
                                       const TArray<FRActionServerConfiguration> &ActionServerConfigurations)
 {
   URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
@@ -142,10 +142,10 @@ URServiceClient *URROSCommunicationBuilder::CreateServiceClient(ARModel *&InOwne
   }
 }
 
-URROSService *URROSCommunicationBuilder::CreateROSService(ARModel *&InOwner, const FRROSServiceConfiguration &ROSServiceConfiguration)
+URServiceServer *URROSCommunicationBuilder::CreateServiceServer(ARModel *&InOwner, const FRServiceServerConfiguration &ServiceServerConfiguration)
 {
-  UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ROSClientParameters of %s not found, use default"), *ROSServiceConfiguration.ROSServiceParameters->GetName())
-  return NewObject<URROSService>(InOwner, TEXT("ROSService"));
+  UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ROSClientParameters of %s not found, use default"), *ServiceServerConfiguration.ServiceServerParameters->GetName())
+  return NewObject<URServiceServer>(InOwner, TEXT("ServiceServer"));
 }
 
 URActionServer *URROSCommunicationBuilder::CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration)

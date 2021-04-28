@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "Physics/RModel.h"
-#include "ROSCommunication/Service/Server/RROSService.h"
+#include "ROSCommunication/Service/Server/RServiceServer.h"
 #include "CheckVisibilityService.generated.h"
 
 UCLASS()
-class UROBOSIM_API UCheckVisibilityService : public URROSService
+class UROBOSIM_API UCheckVisibilityService : public URServiceServer
 {
     GENERATED_BODY()
 

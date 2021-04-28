@@ -45,7 +45,7 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
           ROSCommunicationBuilder->Build(ROSCommunicationDataAsset->PublisherConfiguration,
                                          ROSCommunicationDataAsset->SubscriberConfiguration,
                                          ROSCommunicationDataAsset->ServiceClientConfiguration,
-                                         ROSCommunicationDataAsset->ROSServiceConfiguration,
+                                         ROSCommunicationDataAsset->ServiceServerConfiguration,
                                          ROSCommunicationDataAsset->ActionServerConfiguration);
         }
       }

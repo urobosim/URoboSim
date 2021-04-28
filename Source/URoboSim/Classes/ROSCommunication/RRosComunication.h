@@ -9,7 +9,7 @@
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
-#include "ROSCommunication/Service/Server/RROSService.h"
+#include "ROSCommunication/Service/Server/RServiceServer.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "Physics/RModel.h"
 #include "ROSUtilities.h"
@@ -54,7 +54,7 @@ struct FRROSComunicationContainer
 	TMap<FString, URServiceClient*> ClientList;
 
 	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URROSService*> ServiceProviderList;
+	TMap<FString, URServiceServer*> ServiceProviderList;
 
 	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
 	TMap<FString, URActionServer*> ActionServerList;

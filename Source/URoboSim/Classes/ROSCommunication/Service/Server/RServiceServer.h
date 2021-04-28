@@ -4,20 +4,20 @@
 #include "ROSBridgePublisher.h"
 #include "ROSBridgeSrvServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
-#include "RROSServiceParameter.h"
-#include "ROSCommunication/Service/Server/RROSServiceServer.h"
+#include "RServiceServerParameter.h"
+#include "ROSCommunication/Service/Server/RServiceServerImpl.h"
 #include "Controller/RControllerComponent.h"
-#include "RROSService.generated.h"
+#include "RServiceServer.generated.h"
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URROSService : public UObject
+class UROBOSIM_API URServiceServer : public UObject
 {
 GENERATED_BODY()
 public:
 	// virtual void CallService(){};
 	virtual void Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InName);
 
-	virtual void SetROSServiceParameters(URROSServiceParameter *&ROSServiceParameters);
+	virtual void SetServiceServerParameters(URServiceServerParameter *&ServiceServerParameters);
 
 	TSharedPtr<FROSBridgeSrvServer> ServiceServer;
 protected:
@@ -36,7 +36,7 @@ protected:
 };
 
 UCLASS()
-class UROBOSIM_API URROSSimulationCommandsService : public URROSService
+class UROBOSIM_API URROSSimulationCommandsService : public URServiceServer
 {
 GENERATED_BODY()
 public:
@@ -54,7 +54,7 @@ protected:
 };
 
 // UCLASS()
-// class UROBOSIM_API URROSRobotRegistrationService : public URROSService
+// class UROBOSIM_API URROSRobotRegistrationService : public URServiceServer
 // {
 // GENERATED_BODY()
 //
@@ -67,10 +67,10 @@ protected:
 // };
 //
 // UCLASS()
-// class UROBOSIM_API URROSServiceFactory: public UObject
+// class UROBOSIM_API URServiceServerFactory: public UObject
 // {
 //     GENERATED_BODY()
 // public:
-// 	static URROSService* CreateInstance(FString Type, UObject* Owner);
+// 	static URServiceServer* CreateInstance(FString Type, UObject* Owner);
 //
 // };
