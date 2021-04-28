@@ -1,6 +1,6 @@
-#include "ROSCommunication/Service/Server/RROSService.h"
+#include "ROSCommunication/Service/Server/RServiceServer.h"
 
-void URROSService::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InName)
+void URServiceServer::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InName)
 {
 	ROSHandler = InHandler;
 	SetOwner(InOwner);
@@ -9,12 +9,12 @@ void URROSService::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandle
 	ROSHandler->AddServiceServer(ServiceServer);
 }
 
-void URROSService::SetROSServiceParameters(URROSServiceParameter *&ROSServiceParameters)
+void URServiceServer::SetServiceServerParameters(URServiceServerParameter *&ServiceServerParameters)
 {
-	if (ROSServiceParameters)
+	if (ServiceServerParameters)
   {
-    Name = ROSServiceParameters->Name;
-    Type = ROSServiceParameters->Type;
+    Name = ServiceServerParameters->Name;
+    Type = ServiceServerParameters->Type;
   }
 }
 
@@ -37,9 +37,9 @@ void URROSSimulationCommandsService::SetType()
 	Type = TEXT("u_robo_sim_communication/SimulationCommands");
 }
 
-// URROSService* URROSService::Init(FString InType, UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
+// URServiceServer* URServiceServer::Init(FString InType, UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
 // {
-// 		URROSService* Service = URROSServiceFactory::CreateInstance(InType, InOwner);
+// 		URServiceServer* Service = URServiceServerFactory::CreateInstance(InType, InOwner);
 // 			if(Service)
 // 					{
 // 								Service->ROSHandler = InHandler;
@@ -56,9 +56,9 @@ void URROSSimulationCommandsService::SetType()
 //
 // }
 
-// URROSService* URROSServiceFactory::CreateInstance(FString InType, UObject* InOwner)
+// URServiceServer* URServiceServerFactory::CreateInstance(FString InType, UObject* InOwner)
 // {
-// 		URROSService* Service = nullptr;
+// 		URServiceServer* Service = nullptr;
 //
 // 			return Service;
 // }

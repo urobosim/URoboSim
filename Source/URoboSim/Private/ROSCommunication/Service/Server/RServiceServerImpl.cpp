@@ -1,4 +1,4 @@
-#include "ROSCommunication/Service/Server/RROSServiceServer.h"
+#include "ROSCommunication/Service/Server/RServiceServerImpl.h"
 
 TSharedPtr<FROSBridgeSrv::SrvRequest> FROSRobotRegistrationServer::FromJson(TSharedPtr<FJsonObject> JsonObject) const
 {

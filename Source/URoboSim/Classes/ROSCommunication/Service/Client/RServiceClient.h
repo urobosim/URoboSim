@@ -4,16 +4,16 @@
 #include "CoreMinimal.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSrvClient.h"
-#include "ROSCommunication/Service/Client/RROSClientImpl.h"
+#include "ROSCommunication/Service/Client/RServiceClientImpl.h"
 #include "RUtilityClasses.h"
-#include "RROSClientParameter.h"
+#include "RServiceClientParameter.h"
 #include "Controller/RControllerComponent.h"
 #include "Controller/ControllerType/JointController/RJointController.h"
-#include "RROSClient.generated.h"
+#include "RServiceClient.generated.h"
 
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URROSClient : public UObject
+class UROBOSIM_API URServiceClient : public UObject
 {
 GENERATED_BODY()
 public:
@@ -22,7 +22,7 @@ public:
 	virtual void Init(UObject* InControllerComp, TSharedPtr<FROSBridgeHandler> InHandler);
 	virtual void Init(UObject* InControllerComp, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler);
 
-  virtual void SetROSClientParameters(URROSClientParameter *&ROSClientParameters){}
+  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters){}
 
 	virtual void SetParameters(float InSimTime, TArray<FJointState> InParameters, FTransform InRobotPose){};
 	virtual void Init(UObject* InControllerComp){};
@@ -38,7 +38,7 @@ protected:
 };
 
 UCLASS()
-class UROBOSIM_API URJointStateConfigurationClient : public URROSClient
+class UROBOSIM_API URJointStateConfigurationClient : public URServiceClient
 {
 GENERATED_BODY()
 
@@ -62,7 +62,7 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URJointControllerConfigurationClientParameter : public URROSClientParameter
+class UROBOSIM_API URJointControllerConfigurationClientParameter : public URServiceClientParameter
 {
   GENERATED_BODY()
 
@@ -82,14 +82,14 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URJointControllerConfigurationClient : public URROSClient
+class UROBOSIM_API URJointControllerConfigurationClient : public URServiceClient
 {
   GENERATED_BODY()
 
 public:
     URJointControllerConfigurationClient();
 
-  virtual void SetROSClientParameters(URROSClientParameter *&ROSClientParameters) override;
+  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters) override;
 
    UPROPERTY()
      URControllerComponent* ControllerComp;

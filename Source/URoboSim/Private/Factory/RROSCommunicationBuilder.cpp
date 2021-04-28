@@ -4,7 +4,7 @@
 // #include "ROSCommunication/Publisher/RJointTrajectoryControllerStatePublisher.h"
 // #include "ROSCommunication/Publisher/ROdomPublisher.h"
 // #include "ROSCommunication/Subscriber/RVelocityCommandSubscriber.h"
-#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 
@@ -22,8 +22,8 @@ void URROSCommunicationBuilder::Init(ARModel *&InOwner, const FRROSCommunication
 
 void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
                                       const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
-                                      const TArray<FRROSClientConfiguration> &ROSClientConfigurations,
-                                      const TArray<FRROSServiceConfiguration> &ROSServiceConfigurations,
+                                      const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
+                                      const TArray<FRServiceServerConfiguration> &ServiceServerConfigurations,
                                       const TArray<FRActionServerConfiguration> &ActionServerConfigurations)
 {
   URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
@@ -62,16 +62,16 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
     }
   }
 
-  if (ROSClientConfigurations.Num() > 0)
+  if (ServiceClientConfigurations.Num() > 0)
   {
-    for (FRROSClientConfiguration ROSClientConfiguration : ROSClientConfigurations)
+    for (FRServiceClientConfiguration ServiceClientConfiguration : ServiceClientConfigurations)
     {
-      URROSClient *ROSClient = CreateROSClient(Owner, ROSClientConfiguration);
-      if (ROSClient)
+      URServiceClient *ServiceClient = CreateServiceClient(Owner, ServiceClientConfiguration);
+      if (ServiceClient)
       {
-        UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ROSClient->GetName(), *Owner->GetName());
-        ROSClient->SetROSClientParameters(ROSClientConfiguration.ROSClientParameters);
-        ROSCommunicationComponent->RosComunication.ClientList.Add(ROSClient->GetName(), ROSClient);
+        UE_LOG(LogRROSCommunicationBuilder, Log, TEXT("Create %s of %s"), *ServiceClient->GetName(), *Owner->GetName());
+        ServiceClient->SetServiceClientParameters(ServiceClientConfiguration.ServiceClientParameters);
+        ROSCommunicationComponent->RosComunication.ClientList.Add(ServiceClient->GetName(), ServiceClient);
       }
     }
   }
@@ -125,9 +125,9 @@ URSubscriber *URROSCommunicationBuilder::CreateSubscriber(ARModel *&InOwner, con
   // }
 }
 
-URROSClient *URROSCommunicationBuilder::CreateROSClient(ARModel *&InOwner, const FRROSClientConfiguration &ROSClientConfiguration)
+URServiceClient *URROSCommunicationBuilder::CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration)
 {
-  if (Cast<URJointControllerConfigurationClientParameter>(ROSClientConfiguration.ROSClientParameters))
+  if (Cast<URJointControllerConfigurationClientParameter>(ServiceClientConfiguration.ServiceClientParameters))
   {
     return NewObject<URJointControllerConfigurationClient>(InOwner, TEXT("JointControllerConfigurationClient"));
   }
@@ -137,15 +137,15 @@ URROSClient *URROSCommunicationBuilder::CreateROSClient(ARModel *&InOwner, const
   // }
   else
   {
-    UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ROSClientParameters of %s not found, use default"), *ROSClientConfiguration.ROSClientParameters->GetName())
-    return NewObject<URROSClient>(InOwner, TEXT("ROSClient"));
+    UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ServiceClientParameters of %s not found, use default"), *ServiceClientConfiguration.ServiceClientParameters->GetName())
+    return NewObject<URServiceClient>(InOwner, TEXT("ServiceClient"));
   }
 }
 
-URROSService *URROSCommunicationBuilder::CreateROSService(ARModel *&InOwner, const FRROSServiceConfiguration &ROSServiceConfiguration)
+URServiceServer *URROSCommunicationBuilder::CreateServiceServer(ARModel *&InOwner, const FRServiceServerConfiguration &ServiceServerConfiguration)
 {
-  UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ROSClientParameters of %s not found, use default"), *ROSServiceConfiguration.ROSServiceParameters->GetName())
-  return NewObject<URROSService>(InOwner, TEXT("ROSService"));
+  UE_LOG(LogRROSCommunicationBuilder, Warning, TEXT("ROSClientParameters of %s not found, use default"), *ServiceServerConfiguration.ServiceServerParameters->GetName())
+  return NewObject<URServiceServer>(InOwner, TEXT("ServiceServer"));
 }
 
 URActionServer *URROSCommunicationBuilder::CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration)

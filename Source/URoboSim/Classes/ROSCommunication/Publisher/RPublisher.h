@@ -6,7 +6,7 @@
 #include "Physics/RModel.h"
 #include "Physics/RJoint.h"
 #include "Physics/RLink.h"
-#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "Controller/ControllerType/JointController/RJointController.h"
 #include "Controller/ControllerType/JointController/RGripperController.h"
 #include "Controller/ControllerType/JointController/RHeadController.h"

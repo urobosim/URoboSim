@@ -2,11 +2,11 @@
 
 #include "CoreMinimal.h"
 // clang-format off
-#include "RROSServiceParameter.generated.h"
+#include "RServiceServerParameter.generated.h"
 // clang-format on
 
 UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URROSServiceParameter : public UObject
+class UROBOSIM_API URServiceServerParameter : public UObject
 {
   GENERATED_BODY()
 

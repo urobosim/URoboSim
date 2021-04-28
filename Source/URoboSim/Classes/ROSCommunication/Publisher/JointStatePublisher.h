@@ -2,7 +2,7 @@
 
 #include "RPublisher.h"
 #include "Physics/RModel.h"
-#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "JointStatePublisher.generated.h"
 
 UCLASS()

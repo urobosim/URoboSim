@@ -6,8 +6,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
-#include "ROSCommunication/Service/Server/RROSService.h"
-#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "ROSCommunication/Service/Server/RServiceServer.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
@@ -55,23 +55,23 @@ public:
 };
 
 USTRUCT()
-struct FRROSClientConfiguration
+struct FRServiceClientConfiguration
 {
   GENERATED_BODY()
 
 public:
   UPROPERTY(EditAnywhere)
-  URROSClientParameter *ROSClientParameters;
+  URServiceClientParameter *ServiceClientParameters;
 };
 
 USTRUCT()
-struct FRROSServiceConfiguration
+struct FRServiceServerConfiguration
 {
   GENERATED_BODY()
 
 public:
   UPROPERTY(EditAnywhere)
-  URROSServiceParameter *ROSServiceParameters;
+  URServiceServerParameter *ServiceServerParameters;
 };
 
 USTRUCT()
@@ -108,11 +108,11 @@ public:
 
   // Service client Configuration
   UPROPERTY(EditAnywhere, Category = "Communication Information")
-  TArray<FRROSClientConfiguration> ROSClientConfiguration;
+  TArray<FRServiceClientConfiguration> ServiceClientConfiguration;
 
 	// Service server Configuration
   UPROPERTY(EditAnywhere, Category = "Communication Information")
-  TArray<FRROSServiceConfiguration> ROSServiceConfiguration;
+  TArray<FRServiceServerConfiguration> ServiceServerConfiguration;
 
   // Action Configuration
   UPROPERTY(EditAnywhere, Category = "Communication Information")

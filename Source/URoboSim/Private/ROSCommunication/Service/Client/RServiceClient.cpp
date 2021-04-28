@@ -1,13 +1,13 @@
-#include "ROSCommunication/Service/Client/RROSClient.h"
+#include "ROSCommunication/Service/Client/RServiceClient.h"
 #include "TimerManager.h"
 
-void URROSClient::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
+void URServiceClient::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
 {
 	ROSHandler = InHandler;
 	Init(InOwner);
 }
 
-void URROSClient::Init(UObject* InOwner, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler)
+void URServiceClient::Init(UObject* InOwner, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler)
 {
 	ROSHandler = InHandler;
 	Init(InOwner, OutArray);
@@ -40,10 +40,10 @@ URJointControllerConfigurationClient::URJointControllerConfigurationClient()
   LimitParamTopic = TEXT("/robot_description");
 }
 
-void URJointControllerConfigurationClient::SetROSClientParameters(URROSClientParameter *&ROSClientParameters)
+void URJointControllerConfigurationClient::SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters)
 {
-  Super::SetROSClientParameters(ROSClientParameters);
-  URJointControllerConfigurationClientParameter *JointControllerConfigurationClientParameters = Cast<URJointControllerConfigurationClientParameter>(ROSClientParameters);
+  Super::SetServiceClientParameters(ServiceClientParameters);
+  URJointControllerConfigurationClientParameter *JointControllerConfigurationClientParameters = Cast<URJointControllerConfigurationClientParameter>(ServiceClientParameters);
   if (JointControllerConfigurationClientParameters)
   {
     JointParamTopic = JointControllerConfigurationClientParameters->JointParamTopic;
