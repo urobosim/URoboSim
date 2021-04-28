@@ -144,10 +144,12 @@ float URJointController::CallculateJointVelocity(float InDeltaTime, FString InJo
   URJoint* Joint = GetOwner()->Joints[InJointName];
   float CurrentJointPos = Joint->GetEncoderValue();
   float Diff = DesiredPos - CurrentJointPos;
-  Diff = Joint->Constraint->CheckPositionRange(Diff);
+  // Diff = Joint->Constraint->CheckPositionRange(Diff);
 
-  float Vel = Diff / InDeltaTime;
+  // float Vel = Diff / InDeltaTime;
+  float Vel = Diff ;
   float VelSave = Vel;
+  UE_LOG(LogTemp, Warning, TEXT("JointName %s Current %f Desir %f Diff %f Vel %f"), *InJointName, CurrentJointPos, DesiredPos, Diff, Vel);
   return Vel;
 
 
