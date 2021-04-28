@@ -35,7 +35,23 @@ void ARModel::AddJoint(URJoint *Joint)
   Joints.Add(Joint->GetName(), Joint);
 }
 
-UActorComponent *ARModel::GetPlugin(const FString &PluginName) const
+bool ARModel::AddPlugin(URPluginComponent *InPlugin)
+{
+  URPluginComponent *Plugin = GetPlugin(InPlugin->GetName());
+  if (Plugin)
+  {
+    UE_LOG(LogRModel, Warning, TEXT("Plugin %s was found in %s, replace..."), *InPlugin->GetName(), *GetName())
+    Plugin = InPlugin;
+    return false;
+  }
+  else
+  {
+    Plugins.Add(InPlugin->GetName(), InPlugin);
+    return true;
+  }
+}
+
+URPluginComponent *ARModel::GetPlugin(const FString &PluginName) const
 {
   if (Plugins.Contains(PluginName))
   {

@@ -38,8 +38,8 @@ void URControllerBuilder::Build()
         {
           // ControllerComponent = NewObject<URControllerComponent*>(Model);
           UE_LOG(LogTemp, Error, TEXT("Create Controller Comp"));
-          UActorComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
-          Model->Plugins.Add(TEXT("ControllerComponent"), ControllerComponent);
+          URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
+          Model->AddPlugin(ControllerComponent);
           if(ControllerComponent)
             {
               ControllerComponents.Add(Cast<URControllerComponent>(ControllerComponent));

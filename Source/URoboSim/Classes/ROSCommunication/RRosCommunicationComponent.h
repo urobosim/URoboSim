@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RPlugin.h"
+#include "RPluginComponent.h"
 #include "ROSCommunication/RRosComunication.h"
 #include "RRosCommunicationComponent.generated.h"
 

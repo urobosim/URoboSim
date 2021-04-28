@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "RPlugin.h"
+#include "RPluginComponent.h"
 #include "RController.h"
 // clang-format off
 #include "RControllerComponent.generated.h"

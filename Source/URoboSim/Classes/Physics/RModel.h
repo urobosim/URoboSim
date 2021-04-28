@@ -12,6 +12,8 @@
 #include "RModel.generated.h"
 // clang-format on
 
+class URPluginComponent;
+
 UCLASS()
 class UROBOSIM_API ARModel : public AActor
 {
@@ -36,7 +38,9 @@ public:
 
   void AddLink(URLink *Link);
 
-  UActorComponent *GetPlugin(const FString &PluginName) const;
+  bool AddPlugin(URPluginComponent *InPlugin); 
+
+  URPluginComponent *GetPlugin(const FString &PluginName) const;
 
   class URController *GetController(const FString &ControllerName) const;
 
@@ -50,7 +54,7 @@ public:
   URLink *BaseLink;
 
   UPROPERTY(VisibleAnywhere)
-  TMap<FString, UActorComponent *> Plugins;
+  TMap<FString, URPluginComponent *> Plugins;
 
   TArray<URGraspComponent *> Grippers;
 };

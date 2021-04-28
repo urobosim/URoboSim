@@ -3,7 +3,7 @@
 #include "Components/ActorComponent.h"
 #include "Physics/RModel.h"
 // clang-format off
-#include "RPlugin.generated.h"
+#include "RPluginComponent.generated.h"
 // clang-format on
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -13,8 +13,12 @@ class UROBOSIM_API URPluginComponent : public UActorComponent
 public:
   virtual void OnComponentCreated() override;
 
-  ARModel* GetOwner();
+  virtual void BeginPlay() override;
+
+  ARModel *GetOwner() const;
 
 protected:
   virtual void RegisterPlugin();
+
+  virtual void Init() {}
 };
