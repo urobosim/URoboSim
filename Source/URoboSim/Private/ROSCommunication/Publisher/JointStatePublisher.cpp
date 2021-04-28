@@ -28,7 +28,7 @@ void URJointStatePublisher::SetOwner(UObject* InOwner)
   Owner = Cast<ARModel>(InOwner);
   ConfigClient = NewObject<URJointStateConfigurationClient>(this);
   ConfigClient->JointParamTopic = JointParamTopic;
-  ConfigClient->URROSClient::Init(InOwner, &ListJointName, Handler);
+  ConfigClient->URServiceClient::Init(InOwner, &ListJointName, Handler);
 }
 
 void URJointStatePublisher::CreatePublisher()

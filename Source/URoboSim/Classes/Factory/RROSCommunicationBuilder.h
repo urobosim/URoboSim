@@ -16,7 +16,7 @@ public:
 
   void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
              const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
-             const TArray<FRROSClientConfiguration> &ROSClientConfigurations,
+             const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
              const TArray<FRROSServiceConfiguration> &ROSServiceConfigurations,
              const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
 
@@ -25,7 +25,7 @@ protected:
 
   URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);
 
-  URROSClient *CreateROSClient(ARModel *&InOwner, const FRROSClientConfiguration &ROSClientConfiguration);
+  URServiceClient *CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration);
 
   URROSService *CreateROSService(ARModel *&InOwner, const FRROSServiceConfiguration &ROSServiceConfiguration);
 
