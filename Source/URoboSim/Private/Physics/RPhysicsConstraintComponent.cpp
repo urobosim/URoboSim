@@ -413,7 +413,8 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
+  //SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), FMath::RadiansToDegrees(TargetJointVelocity));
+  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), 0);
 }
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
