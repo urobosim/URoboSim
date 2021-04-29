@@ -149,7 +149,6 @@ float URJointController::CallculateJointVelocity(float InDeltaTime, FString InJo
   // float Vel = Diff / InDeltaTime;
   float Vel = Diff ;
   float VelSave = Vel;
-  UE_LOG(LogTemp, Warning, TEXT("JointName %s Current %f Desir %f Diff %f Vel %f"), *InJointName, CurrentJointPos, DesiredPos, Diff, Vel);
   return Vel;
 
 
