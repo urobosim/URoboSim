@@ -1,12 +1,13 @@
 #pragma once
 
+#include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
 #include "RPublisher.h"
-#include "Physics/RModel.h"
-#include "ROSCommunication/Service/Client/RServiceClient.h"
+// clang-format off
 #include "JointStatePublisher.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URJointStatePublisherParameter : public URPublisherParameter
+class UROBOSIM_API URJointStatePublisherParameter final : public URPublisherParameter
 {
   GENERATED_BODY()
 
@@ -14,39 +15,45 @@ public:
   URJointStatePublisherParameter()
   {
     Topic = TEXT("/joint_states");
+    MessageType = TEXT("sensor_msgs/JointState");
     JointParamTopic = TEXT("/hardware_interface/joints");
+    FrameId = TEXT("odom");
   }
 
   UPROPERTY(EditAnywhere)
   FString JointParamTopic;
+
+  UPROPERTY(EditAnywhere)
+  FString FrameId;
 };
 
 UCLASS()
-class UROBOSIM_API URJointStatePublisher : public URPublisher
+class UROBOSIM_API URJointStatePublisher final : public URPublisher
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 
 public:
-    // Sets default values for this component's properties
-    URJointStatePublisher();
+  URJointStatePublisher();
 
-    virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
+public:
+  void Publish() override;
 
-    virtual void Publish();
-    TArray<FString> ListJointName;
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
+
 protected:
-    virtual void SetMessageType();
-    virtual void SetOwner(UObject* InOwner);
-    virtual void CreatePublisher();
+  void Init() override;
 
-    UPROPERTY()
-      URJointStateConfigurationClient* ConfigClient;
+public:
+  UPROPERTY(EditAnywhere)
+  FString JointParamTopic;
 
-    UPROPERTY(EditAnywhere)
-      FString JointParamTopic;
+  UPROPERTY(EditAnywhere)
+  FString FrameId;
 
-    UPROPERTY()
-      ARModel* Owner;
 private:
-    TArray<double> ListJointPosition, ListJointVelocity, ListJointEffort;
+  URJointStateConfigurationClient *ConfigClient;
+
+  TArray<FString> ListJointName;
+
+  TArray<double> ListJointPosition, ListJointVelocity, ListJointEffort;
 };

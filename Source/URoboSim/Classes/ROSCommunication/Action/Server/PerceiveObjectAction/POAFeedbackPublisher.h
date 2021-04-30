@@ -1,23 +1,25 @@
-
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/RController.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
+// clang-format off
 #include "POAFeedbackPublisher.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URPerceiveObjectActionFeedbackPublisher : public URPublisher
+class UROBOSIM_API URPOAFeedbackPublisher : public URActionPublisher
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-
-    virtual void Publish();
+	URPOAFeedbackPublisher();
+	
+public:
+	void Publish() override;
 
 protected:
-    virtual void SetMessageType();
-    virtual void SetOwner(UObject* InOwner);
+	void Init() override;
 
-    UPROPERTY()
-      URCameraController* Owner;
+private:
+	URCameraController *CameraController;
 };

@@ -1,17 +1,21 @@
-
 #include "ROSCommunication/Action/Server/PerceiveObjectAction/POAFeedbackPublisher.h"
 #include "urobosim_msgs/PerceiveObjectActionFeedback.h"
 
-void URPerceiveObjectActionFeedbackPublisher::SetMessageType()
+URPOAFeedbackPublisher::URPOAFeedbackPublisher()
 {
   MessageType = TEXT("urobosim_msgs/PerceiveObjectActionFeedback");
 }
 
-void URPerceiveObjectActionFeedbackPublisher::SetOwner(UObject* InOwner)
+void URPOAFeedbackPublisher::Init()
 {
-  URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  Owner = Cast<URCameraController>(ControllerComp->GetController(TEXT("CameraController")));
+  Super::Init();
+  CameraController = Cast<URCameraController>(Controller);
 }
 
-void URPerceiveObjectActionFeedbackPublisher::Publish()
-{}
+void URPOAFeedbackPublisher::Publish()
+{
+  if (CameraController)
+  {
+    /* code */
+  }
+}

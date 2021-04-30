@@ -2,78 +2,40 @@
 
 #pragma once
 
-#include "Components/ActorComponent.h"
-#include "Physics/RJoint.h"
 #include "ROSBridgeHandler.h"
-#include "ROSBridgePublisher.h"
-#include "ROSCommunication/Publisher/RPublisher.h"
-#include "ROSCommunication/Subscriber/RSubscriber.h"
-#include "ROSCommunication/Service/Client/RServiceClient.h"
-#include "ROSCommunication/Service/Server/RServiceServer.h"
-#include "ROSCommunication/Action/Server/RActionServer.h"
 #include "Physics/RModel.h"
 #include "ROSUtilities.h"
+// clang-format off
 #include "RROSCommunication.generated.h"
+// clang-format on
 
-class URControllerComponent;
-
-USTRUCT(Blueprintable)
-struct FRROSCommunicationContainer
+UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URROSCommunication : public UObject
 {
-	GENERATED_BODY()
+  GENERATED_BODY()
 
- public:
+public:
+  void Connect(const FString &WebsocketIPAddr, const uint32 &WebsocketPort);
 
-    TSharedPtr<FROSBridgeHandler> Handler;
+  void Connect(const TSharedPtr<FROSBridgeHandler> &InHandler);
 
-	// UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	// URROSCommunicationInterface* Interface;
+  void Disconnect();
 
-	UPROPERTY()
-	URControllerComponent* ControllerComponent;
+  ARModel *GetOwner() const { return Owner; }
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-	bool bUseGlobalHandler;
+  void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        FString WebsocketIPAddr;
+  void SetOwner();
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        uint32 WebsocketPort;
+public:
+  virtual void Tick() {}
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-        FString RobotName;
+protected:
+  virtual void Init() {}
 
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URPublisher*> PublisherList;
+protected:
+  TSharedPtr<FROSBridgeHandler> Handler;
 
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URSubscriber*> SubscriberList;
-
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URServiceClient*> ClientList;
-
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URServiceServer*> ServiceProviderList;
-
-	UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-	TMap<FString, URActionServer*> ActionServerList;
-
-	FRROSCommunicationContainer();
-
-	virtual ~FRROSCommunicationContainer(){};
-	virtual void InitHandler();
-
-	virtual void InitAllPublisher() ;
-	virtual void InitAllSubscriber() ;
-	virtual void InitAllServiceProvider() ;
-	virtual void InitAllClients() ;
-	virtual void InitAllActionServer() ;
-
-	virtual void Init();
-	virtual void DeInit();
-	virtual void Tick();
-
- protected:
-
+private:
+  ARModel *Owner;
 };

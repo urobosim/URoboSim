@@ -1,24 +1,28 @@
-
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/ControllerType/JointController/RGripperController.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
+// clang-format off
 #include "GCAFeedbackPublisher.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URGripperCommandActionFeedbackPublisher : public URPublisher
+class UROBOSIM_API URGCAFeedbackPublisher : public URActionPublisher
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
+	URGCAFeedbackPublisher();
 
-    virtual void Publish(){};
+public:
+  void Publish() override;
+
+public:
+	// TODO: Add ROS parameters
 
 protected:
+	void Init() override;
 
-    virtual void SetMessageType(){};
-    virtual void SetOwner(UObject* InOwner){};
-
-    UPROPERTY()
-      URGripperController* Owner;
+private:
+	URGripperController *GripperController;
 };

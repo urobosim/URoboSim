@@ -1,23 +1,37 @@
 #pragma once
 
-#include "CoreMinimal.h"
-#include "Physics/RModel.h"
-#include "ROSCommunication/Service/Server/RServiceServer.h"
+#include "RServiceServer.h"
+// clang-format off
 #include "CheckVisibilityService.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API UCheckVisibilityService : public URServiceServer
+class UROBOSIM_API URCheckVisibilityServer : public URServiceServer
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
+public:
+	URCheckVisibilityServer();
 
 protected:
+	virtual void CreateServiceServer() override;
+};
 
-    virtual void SetOwner(UObject* InOwner) override;
-    virtual void SetType() override;
-    virtual void CreateServiceServer() override;
+class FRCheckVisibilityServerCallback : public FROSBridgeSrvServer
+{
+public:
+	FRCheckVisibilityServerCallback(FString Name, FString Type, UWorld *InWorld, UObject *InOwner);
 
+	TSharedPtr<FROSBridgeSrv::SrvRequest> FromJson(TSharedPtr<FJsonObject> JsonObject) const override;
 
-    UPROPERTY()
-      ARModel* Owner;
+	TSharedPtr<FROSBridgeSrv::SrvResponse> Callback(TSharedPtr<FROSBridgeSrv::SrvRequest> Request) override;
 
+private:
+	UWorld *World;
+
+	ARModel *Owner;
+
+	int32 PlayerIndex;
+
+	FThreadSafeBool bAllSuccessfull;
 };

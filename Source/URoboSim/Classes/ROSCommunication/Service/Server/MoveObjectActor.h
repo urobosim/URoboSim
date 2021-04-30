@@ -1,39 +1,63 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
-#include "Components/SceneComponent.h"
 #include "ROSBridgeHandler.h"
 #include "ROSBridgeSrvServer.h"
+// clang-format off
 #include "MoveObjectActor.generated.h"
-
-
-
+// clang-format on
 
 UCLASS()
 class UROBOSIM_API AMoveObjectActor : public AActor
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
 
 public:
-    virtual void BeginPlay() override;
+  AMoveObjectActor()
+  {
+    WebsocketIPAddr = TEXT("127.0.0.1");
+    WebsocketPort = 9090;
+    PrimaryActorTick.bCanEverTick = true;
+    PrimaryActorTick.TickGroup = TG_PrePhysics;
+  };
 
-    AMoveObjectActor()
-      {
-        WebsocketIPAddr = TEXT("127.0.0.1");
-	WebsocketPort = 9090;
-	PrimaryActorTick.bCanEverTick = true;
-	PrimaryActorTick.TickGroup = TG_PrePhysics;
-      };
-    TSharedPtr<FROSBridgeHandler> Handler;
+public:
+  virtual void BeginPlay() override;
 
-    TSharedPtr<FROSBridgeSrvServer> Server;
+  virtual void TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction &ThisTickFunction) override;
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-    FString WebsocketIPAddr;
+  virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+  
+public:
+  UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
+  FString WebsocketIPAddr;
 
-    UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-    uint32 WebsocketPort;
+  UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
+  uint32 WebsocketPort;
 
-    virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-    virtual void TickActor(float DeltaTime, ELevelTick TickType, FActorTickFunction& ThisTickFunction) override;
+private:
+  TSharedPtr<FROSBridgeHandler> Handler;
+
+  TSharedPtr<FROSBridgeSrvServer> Server;
+};
+
+class FRMoveObjectServerCallback : public FROSBridgeSrvServer
+{
+public:
+  FRMoveObjectServerCallback(FString Namespace, FString Name, UWorld *InWorld, UObject *InOwner) : FROSBridgeSrvServer(Namespace + TEXT("/") + Name, TEXT("world_control_msgs/MoveObject"))
+	{
+		World = InWorld;
+		Owner = InOwner;
+	}
+
+  TSharedPtr<FROSBridgeSrv::SrvRequest> FromJson(TSharedPtr<FJsonObject> JsonObject) const override;
+
+	TSharedPtr<FROSBridgeSrv::SrvResponse> Callback(TSharedPtr<FROSBridgeSrv::SrvRequest> Request) override;
+
+private:
+	UWorld *World;
+
+	UObject *Owner;
+
+	FThreadSafeBool bAllSuccessfull;
 };

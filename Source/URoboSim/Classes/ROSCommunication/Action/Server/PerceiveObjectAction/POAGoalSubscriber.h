@@ -1,15 +1,32 @@
 #pragma once
 
-#include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "Controller/RController.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
+// clang-format off
 #include "POAGoalSubscriber.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URPerceiveObjectActionGoalSubscriber: public URSubscriber
+class UROBOSIM_API URPOAGoalSubscriber: public URActionSubscriber
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
+	URPOAGoalSubscriber();
 
-	virtual void SetMessageType();
-	virtual void CreateSubscriber();
+protected:
+	void CreateSubscriber() override;
+};
 
+class UROBOSIM_API FPOAGoalSubscriberCallback : public FROSBridgeSubscriber
+{
+public:
+	FPOAGoalSubscriberCallback(const FString& InTopic, const FString& InType, UObject* InController);
+
+	TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
+
+	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
+
+private:
+	URCameraController* CameraController;
 };

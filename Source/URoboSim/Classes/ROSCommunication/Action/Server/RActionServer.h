@@ -1,52 +1,84 @@
 #pragma once
 
-#include "ROSBridgeHandler.h"
+#include "Controller/RController.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
-#include "RActionServerParameter.h"
+// clang-format off
 #include "RActionServer.generated.h"
+// clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URActionServer : public UObject
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URActionServerParameter : public UObject
 {
   GENERATED_BODY()
+
 public:
+  UPROPERTY(EditAnywhere)
+  FString ActionName;
 
-  URActionServer(){};
+  UPROPERTY(EditAnywhere)
+  FString ControllerName;
+};
 
-  virtual void Init(TSharedPtr<FROSBridgeHandler> InHandler, UObject* InOwner, FString InActionName= "");
-  virtual void Init(FString InHostIp, uint32 InPort, UObject* InOwner, FString InActionName= "");
+UCLASS()
+class UROBOSIM_API URActionSubscriber : public URSubscriber
+{
+  GENERATED_BODY()
+
+public:
+  void SetController(URController *&InController) { Controller = InController; }
+
+protected:
+  URController *Controller;
+};
+
+UCLASS()
+class UROBOSIM_API URActionPublisher : public URPublisher
+{
+  GENERATED_BODY()
+
+public:
+  void SetController(URController *&InController) { Controller = InController; }
+
+protected:
+  URController *Controller;
+};
+
+UCLASS()
+class UROBOSIM_API URActionServer : public URROSCommunication
+{
+  GENERATED_BODY()
+
+public:
+  void Tick() override;
 
   virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
-  virtual void Tick();
-
+public:
   UPROPERTY(EditAnywhere)
-    FString ControllerName;
+  FString ControllerName;
+
 protected:
+  virtual void Init() override;
 
+  virtual void CreateActionServer() {}
+
+protected:
   UPROPERTY(EditAnywhere)
-    URPublisher* FeedbackPublisher;
+  FString ActionName;
 
-  UPROPERTY(EditAnywhere)
-    URPublisher* StatusPublisher;
+  UPROPERTY(VisibleAnywhere)
+  URActionSubscriber *GoalSubscriber;
 
-  UPROPERTY(EditAnywhere)
-    URPublisher* ResultPublisher;
+  UPROPERTY(VisibleAnywhere)
+  URActionSubscriber *CancelSubscriber;
 
-  UPROPERTY(EditAnywhere)
-    URSubscriber* GoalSubscriber;
+  UPROPERTY(VisibleAnywhere)
+  URActionPublisher *StatusPublisher;
 
-  UPROPERTY(EditAnywhere)
-    URSubscriber* CancelSubscriber;
+  UPROPERTY(VisibleAnywhere)
+  URActionPublisher *ResultPublisher;
 
-  TSharedPtr<FROSBridgeHandler> Handler;
-
-  virtual void Init();
-
-  UPROPERTY()
-    UObject* Owner;
-
-  UPROPERTY(EditAnywhere)
-    FString ActionName;
+  UPROPERTY(VisibleAnywhere)
+  URActionPublisher *FeedbackPublisher;
 };

@@ -1,37 +1,38 @@
 #include "ROSCommunication/Action/Server/PR2GripperAction/PR2GCAFeedbackPublisher.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionFeedback.h"
 
-void URPR2GripperCommandActionFeedbackPublisher::SetMessageType()
+URPR2GCAFeedbackPublisher::URPR2GCAFeedbackPublisher()
 {
   MessageType = TEXT("pr2_controllers_msgs/Pr2GripperCommandActionFeedback");
 }
 
-void URPR2GripperCommandActionFeedbackPublisher::SetOwner(UObject* InOwner)
+void URPR2GCAFeedbackPublisher::Init()
 {
-  ARModel* Model =Cast<ARModel>(InOwner);
-  URControllerComponent* ControllerComp = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
-  Owner = Cast<URGripperController>(ControllerComp->GetController(ControllerName));
+  Super::Init();
+  GripperController = Cast<URGripperController>(Controller);
 }
 
-void URPR2GripperCommandActionFeedbackPublisher::Publish()
+void URPR2GCAFeedbackPublisher::Publish()
 {
-  if(Owner->bActive)
-    {
-      TSharedPtr<pr2_controllers_msgs::PR2GripperCommandActionFeedback> Feedback =
+  if (GripperController->bActive)
+  {
+    static int Seq = 0;
+
+    TSharedPtr<pr2_controllers_msgs::PR2GripperCommandActionFeedback> Feedback =
         MakeShareable(new pr2_controllers_msgs::PR2GripperCommandActionFeedback());
 
-      FGoalStatusInfo StatusInfo = Owner->GoalStatusList.Last();
-      actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
-      Feedback->SetStatus(GS);
-      Feedback->SetHeader(std_msgs::Header(Seq, FROSTime(), ""));
+    FGoalStatusInfo StatusInfo = GripperController->GoalStatusList.Last();
+    actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
+    Feedback->SetStatus(GS);
+    Feedback->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
 
-      pr2_controllers_msgs::PR2GripperCommandFeedback FeedbackMsg(Owner->Result.Position / 100.0, Owner->Result.Effort , Owner->Result.bStalled , Owner->Result.bReachedGoal );
+    pr2_controllers_msgs::PR2GripperCommandFeedback FeedbackMsg(GripperController->Result.Position / 100.0, GripperController->Result.Effort, GripperController->Result.bStalled, GripperController->Result.bReachedGoal);
 
-      Feedback->SetFeedback(FeedbackMsg);
-      Handler->PublishMsg(Topic, Feedback);
-      Handler->Process();
+    Feedback->SetFeedback(FeedbackMsg);
+    Handler->PublishMsg(Topic, Feedback);
+    Handler->Process();
 
-      // UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
-      Seq += 1;
-    }
+    // UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
+    Seq++;
+  }
 }

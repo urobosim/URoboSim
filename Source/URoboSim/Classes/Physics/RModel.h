@@ -36,6 +36,10 @@ public:
 
   void AddJoint(URJoint *Joint);
 
+  TArray<URJoint *> GetJoints() const;
+
+  URJoint *GetJoint(const FString &JointName) const;
+
   void AddLink(URLink *Link);
 
   bool AddPlugin(URPluginComponent *InPlugin); 
