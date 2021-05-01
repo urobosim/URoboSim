@@ -5,7 +5,20 @@
 #include "POAServer.generated.h"
 // clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
+class UROBOSIM_API URPOAServerParameter : public URActionServerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URPOAServerParameter()
+  {
+    ActionName = TEXT("/perceive_object");
+    ControllerName = TEXT("CameraController");
+  }
+};
+
+UCLASS()
 class UROBOSIM_API URPOAServer final : public URActionServer
 {
   GENERATED_BODY()

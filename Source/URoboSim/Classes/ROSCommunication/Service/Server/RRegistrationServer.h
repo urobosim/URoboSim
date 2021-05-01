@@ -6,9 +6,24 @@
 // clang-format on
 
 UCLASS()
+class UROBOSIM_API URRegistrationServerParameter final : public URServiceServerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URRegistrationServerParameter()
+  {
+    Type = TEXT("unreal_controller_manager/RegisterRobot");
+  }
+};
+
+UCLASS()
 class UROBOSIM_API URRegistrationServer final : public URServiceServer
 {
   GENERATED_BODY()
+
+public:
+  URRegistrationServer();
 
 protected:
   void CreateServiceServer() override;

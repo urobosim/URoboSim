@@ -1,4 +1,4 @@
-#include "ROSCommunication/Service/Server/CheckVisibilityService.h"
+#include "ROSCommunication/Service/Server/CheckVisibilityServer.h"
 #include "Controller/RController.h"
 #include "EngineUtils.h"
 #include "Runtime/Engine/Classes/Engine/StaticMeshActor.h"

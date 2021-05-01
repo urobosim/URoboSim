@@ -15,7 +15,8 @@ class UROBOSIM_API URJointTrajectoryControllerStatePublisherParameter final : pu
 public:
   URJointTrajectoryControllerStatePublisherParameter()
   {
-    MessageType = TEXT("control_msgs/FollowJointTrajectoryActionFeedback");
+    Topic = TEXT("/whole_body_controller/body/state");
+    MessageType = TEXT("control_msgs/JointTrajectoryControllerState");
     FrameId = TEXT("odom");
     JointParamTopic = TEXT("/whole_body_controller/body/joints");
     JointControllerName = TEXT("JointController");

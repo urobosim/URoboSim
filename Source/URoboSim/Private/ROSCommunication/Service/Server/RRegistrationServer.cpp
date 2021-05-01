@@ -1,9 +1,14 @@
 #include "ROSCommunication/Service/Server/RRegistrationServer.h"
 #include "PR2UnrealSimulator/RegisterRobot.h"
 
+URRegistrationServer::URRegistrationServer()
+{
+  Type = TEXT("unreal_controller_manager/RegisterRobot");
+}
+
 void URRegistrationServer::CreateServiceServer()
 {
-  ServiceServer = MakeShareable<FRRegistrationServerCallback>(new FRRegistrationServerCallback(Name, TEXT("unreal_controller_manager/RegisterRobot")));
+  ServiceServer = MakeShareable<FRRegistrationServerCallback>(new FRRegistrationServerCallback(Name, Type));
 }
 
 FRRegistrationServerCallback::FRRegistrationServerCallback(const FString &InName, const FString &InType) : FROSBridgeSrvServer(InName, InType)

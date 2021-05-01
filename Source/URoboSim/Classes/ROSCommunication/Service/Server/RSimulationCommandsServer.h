@@ -6,6 +6,18 @@
 // clang-format on
 
 UCLASS()
+class UROBOSIM_API URSimulationCommandsServerParameter final : public URServiceServerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URSimulationCommandsServerParameter()
+  {
+    Type = TEXT("u_robo_sim_communication/SimulationCommands");
+  }
+};
+
+UCLASS()
 class UROBOSIM_API URSimulationCommandsServer final : public URServiceServer
 {
 	GENERATED_BODY()

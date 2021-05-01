@@ -10,6 +10,7 @@
 
 class URPublisher;
 class URSubscriber;
+class URServiceServer;
 class URServiceClient;
 class URActionServer;
 
@@ -35,9 +36,18 @@ public:
 
 	void AddSubscriber(URSubscriber *&InSubscriber) { Subscribers.Add(InSubscriber); }
 
+	void AddServiceServer(URServiceServer *&InServiceServer) { ServiceServers.Add(InServiceServer); }
+
 	void AddServiceClient(URServiceClient *&InServiceClient) { ServiceClients.Add(InServiceClient); }
 
 	void AddActionServer(URActionServer *&InActionServer) { ActionServers.Add(InActionServer); }
+
+public:
+	UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
+	FString WebsocketIPAddr;
+
+	UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
+	uint32 WebsocketPort;
 
 protected:
 	void InitPublishers();
@@ -51,17 +61,14 @@ protected:
 protected:
 	TSharedPtr<FROSBridgeHandler> Handler;
 
-	UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-	FString WebsocketIPAddr;
-
-	UPROPERTY(EditAnywhere, Category = "ROS Bridge Robot")
-	uint32 WebsocketPort;
-
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<URPublisher *> Publishers;
 
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<URSubscriber *> Subscribers;
+
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<URServiceServer *> ServiceServers;
 
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<URServiceClient *> ServiceClients;
@@ -90,6 +97,8 @@ public:
 	void AddPublisher(URPublisher *&InPublisher) { ROSCommunication.AddPublisher(InPublisher); }
 
 	void AddSubscriber(URSubscriber *&InSubscriber) { ROSCommunication.AddSubscriber(InSubscriber); }
+
+	void AddServiceServer(URServiceServer *&InServiceServer) { ROSCommunication.AddServiceServer(InServiceServer); }
 
 	void AddServiceClient(URServiceClient *&InServiceClient) { ROSCommunication.AddServiceClient(InServiceClient); }
 

@@ -2,8 +2,20 @@
 
 #include "RServiceServer.h"
 // clang-format off
-#include "CheckVisibilityService.generated.h"
+#include "CheckVisibilityServer.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URCheckVisibilityServerParameter final : public URServiceServerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URCheckVisibilityServerParameter()
+  {
+    Type = TEXT("urobosim_msgs/CheckVisibility");
+  }
+};
 
 UCLASS()
 class UROBOSIM_API URCheckVisibilityServer : public URServiceServer
