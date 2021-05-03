@@ -278,7 +278,7 @@ void URJointController::MoveJointsDynamic(float InDeltaTime)
         {
           // // TODO: Change TargetVelocity
           float TargetVelocity = CallculateJointVelocity(InDeltaTime, Joint.Key);
-          Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], 0.f);
+          Joint.Value->SetMotorJointState(DesiredJointState[Joint.Key], TargetVelocity);
         }
     }
   bBreak = true;
