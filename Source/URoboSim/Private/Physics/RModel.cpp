@@ -35,10 +35,32 @@ void ARModel::AddJoint(URJoint *Joint)
   Joints.Add(Joint->GetName(), Joint);
 }
 
+TArray<URJoint *> ARModel::GetJoints() const
+{
+  TArray<URJoint *> JointArray;
+  for (const TPair<FString, URJoint *> &Joint : Joints)
+  {
+    JointArray.Add(Joint.Value);
+  }
+  return JointArray;
+}
+
+URJoint *ARModel::GetJoint(const FString &JointName) const
+{
+  if (Joints.Contains(JointName))
+  {
+    return Joints[JointName];
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *JointName, *GetName())
+    return nullptr;
+  }
+}
+
 bool ARModel::AddPlugin(URPluginComponent *InPlugin)
 {
-  URPluginComponent *Plugin = GetPlugin(InPlugin->GetName());
-  if (Plugin)
+  if (URPluginComponent *Plugin = GetPlugin(InPlugin->GetName()))
   {
     UE_LOG(LogRModel, Warning, TEXT("Plugin %s was found in %s, replace..."), *InPlugin->GetName(), *GetName())
     Plugin = InPlugin;
@@ -66,15 +88,15 @@ URPluginComponent *ARModel::GetPlugin(const FString &PluginName) const
 
 URController *ARModel::GetController(const FString &ControllerName) const
 {
-  URControllerComponent *ControllerComponent = Cast<URControllerComponent>(GetPlugin(TEXT("Controller")));
-  if (ControllerComponent)
+  for (TPair<FString, URPluginComponent *> Plugin : Plugins)
   {
-    return ControllerComponent->GetController(ControllerName);
+    if (URControllerComponent *ControllerComponent = Cast<URControllerComponent>(Plugin.Value))
+    {
+      return ControllerComponent->GetController(ControllerName);
+    }
   }
-  else
-  {
-    return nullptr;
-  }
+  UE_LOG(LogRModel, Error, TEXT("ControllerComponent not found in %s"), *GetName())
+  return nullptr;
 }
 
 TArray<FJointState> ARModel::GetJointStates() const

@@ -1,29 +1,33 @@
 
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/RController.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
 #include "ROSCommunication/Publisher/RTFPublisher.h"
+// clang-format off
 #include "POAResultPublisher.generated.h"
+// clang-format on
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FObjectDetection, UObject* /*PerceivedObject*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FObjectDetection, UObject * /*PerceivedObject*/);
 
 UCLASS()
-class UROBOSIM_API URPerceiveObjectActionResultPublisher : public URPublisher
+class UROBOSIM_API URPOAResultPublisher final : public URActionPublisher
 {
   GENERATED_BODY()
 
 public:
-    virtual void Publish();
+  URPOAResultPublisher();
+
+public:
+  void Publish() override;
+
+protected:
+  void Init() override;
+  
+private:
+  URCameraController *CameraController;
+
+  URTFPublisher *TFPublisher;
 
   FObjectDetection OnObjectDetected;
-protected:
-    virtual void SetMessageType();
-    virtual void SetOwner(UObject* InOwner);
-
-    UPROPERTY()
-      URCameraController* Owner;
-
-    UPROPERTY()
-      URTFPublisher* TFPublisher;
 };

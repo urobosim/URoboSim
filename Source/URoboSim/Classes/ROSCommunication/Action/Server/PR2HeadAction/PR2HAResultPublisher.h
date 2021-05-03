@@ -1,24 +1,29 @@
-
 #pragma once
 
-#include "ROSCommunication/Publisher/RPublisher.h"
 #include "Controller/ControllerType/JointController/RHeadController.h"
+#include "ROSCommunication/Action/Server/RActionServer.h"
+// clang-format off
 #include "PR2HAResultPublisher.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URPR2HeadActionResultPublisher : public URPublisher
+class UROBOSIM_API URPR2HAResultPublisher final : public URActionPublisher
 {
   GENERATED_BODY()
 
 public:
+  URPR2HAResultPublisher();
 
-    virtual void Publish();
+public:
+  void Publish() override;
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString FrameId;
 
 protected:
+  void Init() override;
 
-    virtual void SetMessageType();
-    virtual void SetOwner(UObject* InOwner);
-
-    UPROPERTY()
-      URHeadTrajectoryController* Owner;
+private:
+  URHeadTrajectoryController *HeadController;
 };

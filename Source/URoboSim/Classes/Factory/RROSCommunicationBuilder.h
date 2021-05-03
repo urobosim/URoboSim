@@ -16,8 +16,8 @@ public:
 
   void Build(const TArray<FRPublisherConfiguration> &PublisherConfigurations,
              const TArray<FRSubscriberConfiguration> &SubscriberConfigurations,
-             const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
              const TArray<FRServiceServerConfiguration> &ServiceServerConfigurations,
+             const TArray<FRServiceClientConfiguration> &ServiceClientConfigurations,
              const TArray<FRActionServerConfiguration> &ActionServerConfigurations);
 
 protected:
@@ -25,9 +25,9 @@ protected:
 
   URSubscriber *CreateSubscriber(ARModel *&InOwner, const FRSubscriberConfiguration &SubscriberConfiguration);
 
-  URServiceClient *CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration);
-
   URServiceServer *CreateServiceServer(ARModel *&InOwner, const FRServiceServerConfiguration &ServiceServerConfiguration);
+
+  URServiceClient *CreateServiceClient(ARModel *&InOwner, const FRServiceClientConfiguration &ServiceClientConfiguration);
 
   URActionServer *CreateActionServer(ARModel *&InOwner, const FRActionServerConfiguration &ActionServerConfiguration);
 

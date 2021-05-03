@@ -1,116 +1,45 @@
 #pragma once
 
-
-#include "CoreMinimal.h"
-#include "ROSBridgeHandler.h"
-#include "ROSBridgeSrvClient.h"
-#include "ROSCommunication/Service/Client/RServiceClientImpl.h"
-#include "RUtilityClasses.h"
-#include "RServiceClientParameter.h"
-#include "Controller/RControllerComponent.h"
-#include "Controller/ControllerType/JointController/RJointController.h"
+#include "ROSCommunication/RROSCommunication.h"
+// clang-format off
 #include "RServiceClient.generated.h"
+// clang-format on
 
-
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URServiceClient : public UObject
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URServiceClientParameter : public UObject
 {
-GENERATED_BODY()
+  GENERATED_BODY()
+
 public:
-	virtual void CallService(){};
+  UPROPERTY(EditAnywhere)
+  FString ServiceName;
 
-	virtual void Init(UObject* InControllerComp, TSharedPtr<FROSBridgeHandler> InHandler);
-	virtual void Init(UObject* InControllerComp, TArray<FString>* OutArray, TSharedPtr<FROSBridgeHandler> InHandler);
+  UPROPERTY(EditAnywhere)
+  FString ServiceType;
+};
 
-  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters){}
+UCLASS()
+class UROBOSIM_API URServiceClient : public URROSCommunication
+{
+  GENERATED_BODY()
 
-	virtual void SetParameters(float InSimTime, TArray<FJointState> InParameters, FTransform InRobotPose){};
-	virtual void Init(UObject* InControllerComp){};
-	virtual void Init(UObject* InControllerComp, TArray<FString>* OutArray){};
+public:
+  void Tick() override;
+
+public:
+  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
+
+  virtual void CallService(){}
+
 protected:
+  virtual void Init() override;
 
-	// UPROPERTY(EditAnywhere, Category = "ROS Service Server")
-	// FString Name;
+  virtual void CreateServiceClient(){}
 
-
-	TSharedPtr<FROSBridgeHandler> ROSHandler;
-
-};
-
-UCLASS()
-class UROBOSIM_API URJointStateConfigurationClient : public URServiceClient
-{
-GENERATED_BODY()
-
-public:
-  virtual void CallService();
-
-// UPROPERTY()
-// TArray<FString>* JointNames = nullptr;
-
-   UPROPERTY(EditAnywhere)
-     FString JointParamTopic;
-
-   // virtual void Init(UObject* InControllerComp, TA) override;
- virtual void Init(UObject* InModel, TArray<FString>* OutArray) override;
-
- private:
-
-   TSharedPtr<FROSJointStateConfigurationClient> ServiceClient;
-   TSharedPtr<rosapi::GetParam::Request> Request;
-   TSharedPtr<rosapi::GetParam::Response> Response;
-};
-
-UCLASS()
-class UROBOSIM_API URJointControllerConfigurationClientParameter : public URServiceClientParameter
-{
-  GENERATED_BODY()
-
-public:
-  URJointControllerConfigurationClientParameter()
-  {
-    JointParamTopic = TEXT("/whole_body_controller/joints");
-    LimitParamTopic = TEXT("/robot_description");
-  }
-
-public:
+protected:
   UPROPERTY(EditAnywhere)
-  FString JointParamTopic;
-  
+  FString ServiceName;
+
   UPROPERTY(EditAnywhere)
-  FString LimitParamTopic;
-};
-
-UCLASS()
-class UROBOSIM_API URJointControllerConfigurationClient : public URServiceClient
-{
-  GENERATED_BODY()
-
-public:
-    URJointControllerConfigurationClient();
-
-  virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters) override;
-
-   UPROPERTY()
-     URControllerComponent* ControllerComp;
-
-   UPROPERTY(EditAnywhere)
-     FString JointParamTopic;
-
-   UPROPERTY(EditAnywhere)
-     FString LimitParamTopic;
-
-   virtual void CallService();
-
-    virtual void Init(UObject* InControllerComp) override;
-    virtual void CreateClient();
-
-private:
-    TSharedPtr<FROSJointControllerConfigurationClient> JointServiceClient;
-    TSharedPtr<FROSJointLimitControllerConfigurationClient> JointLimitServiceClient;
-    TSharedPtr<rosapi::GetParam::Request> JointRequest;
-    TSharedPtr<rosapi::GetParam::Response> JointResponse;
-
-    TSharedPtr<rosapi::GetParam::Request> LimitRequest;
-    TSharedPtr<rosapi::GetParam::Response> LimitResponse;
+  FString ServiceType;
 };

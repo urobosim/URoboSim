@@ -1,130 +1,58 @@
 #include "ROSCommunication/RROSCommunication.h"
-#include "Controller/RController.h"
+#include "ROSCommunication/RROSCommunicationComponent.h"
 
-FRROSCommunicationContainer::FRROSCommunicationContainer()
+DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunication, Log, All);
+
+void URROSCommunication::Connect(const TSharedPtr<FROSBridgeHandler> &InHandler)
 {
-  WebsocketIPAddr = TEXT("127.0.0.1");
-  WebsocketPort = 9090;
-  RobotName = TEXT("pr2");
-  ControllerComponent = nullptr;
-  bUseGlobalHandler = false;
+  Handler = InHandler;
+  if (!Handler.IsValid())
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+  SetOwner();
+  Init();
 }
 
-
-void FRROSCommunicationContainer::Init()
+void URROSCommunication::Connect(const FString &WebsocketIPAddr, const uint32 &WebsocketPort)
 {
-  InitHandler();
-  if(Handler.IsValid())
-    {
-      Handler->Connect();
-      InitAllPublisher();
-      InitAllSubscriber();
-      InitAllServiceProvider();
-      InitAllClients();
-      InitAllActionServer();
-    }
+  Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
+  if (Handler.IsValid())
+  {
+    Handler->Connect();
+    UE_LOG(LogRROSCommunication, Log, TEXT("%s is connected to ROSBridge"), *GetName())
+  }
   else
-    {
-      UE_LOG(LogTemp, Error, TEXT("No FROSBridgeHandler created."));
-    }
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("No FROSBridgeHandler created in %s"), *GetName())
+  }
+  SetOwner();
+  Init();
 }
 
-
-void FRROSCommunicationContainer::InitAllServiceProvider()
+void URROSCommunication::Disconnect()
 {
-  for(auto& ServiceProvider : ServiceProviderList)
-    {
-      ServiceProvider.Value->Init(ControllerComponent->GetOwner(), Handler, ServiceProvider.Key);
-    }
+  if (Handler.IsValid())
+  {
+    Handler->Disconnect();
+  }
 }
 
-void FRROSCommunicationContainer::InitAllPublisher()
+void URROSCommunication::SetOwner()
 {
-  for(auto& Publisher : PublisherList)
+  if (!Owner)
+  {
+    if (Cast<ARModel>(GetOuter()))
     {
-      Publisher.Value->Init(WebsocketIPAddr, WebsocketPort, ControllerComponent->GetOwner());
+      Owner = Cast<ARModel>(GetOuter());
     }
-}
-
-void FRROSCommunicationContainer::InitAllSubscriber()
-{
-  for(auto& Subscriber : SubscriberList)
+    else if (Cast<URROSCommunicationComponent>(GetOuter()) && Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner()))
     {
-      Subscriber.Value->Init(ControllerComponent->GetOwner(), Handler);
+      Owner = Cast<ARModel>(Cast<URROSCommunicationComponent>(GetOuter())->GetOwner());
     }
-}
-
-void FRROSCommunicationContainer::InitAllClients()
-{
-  for(auto& Client : ClientList)
-    {
-      Client.Value->Init(ControllerComponent, Handler);
-    }
-}
-
-void FRROSCommunicationContainer::InitAllActionServer()
-{
-  for(auto& ActionServer : ActionServerList)
-    {
-      ActionServer.Value->Init(WebsocketIPAddr, WebsocketPort, ControllerComponent->GetOwner());
-    }
-}
-
-void FRROSCommunicationContainer::Tick()
-{
-  if(Handler.IsValid())
-    {
-      for(auto& Publisher : PublisherList)
-        {
-          Publisher.Value->Publish();
-        }
-
-      for(auto& ActionServer : ActionServerList)
-        {
-          ActionServer.Value->Tick();
-        }
-
-      Handler->Process();
-    }
-  else
-    {
-      UE_LOG(LogTemp, Error, TEXT("Handler Invalid"));
-    }
-}
-
-void FRROSCommunicationContainer::InitHandler()
-{
-  if(bUseGlobalHandler)
-    {
-      //TODO implement use global handler
-      UE_LOG(LogTemp, Error, TEXT("Global handler not supported yet"));
-    }
-  else
-    {
-      Handler = MakeShareable<FROSBridgeHandler>(new FROSBridgeHandler(WebsocketIPAddr, WebsocketPort));
-    }
-}
-
-void FRROSCommunicationContainer::DeInit()
-{
-  //Disconnect the handler before parent ends
-  if(bUseGlobalHandler)
-    {
-      //TODO implement use global handler
-      UE_LOG(LogTemp, Error, TEXT("Global handler not supported yet"));
-    }
-  else
-    {
-      for(auto& Publisher : PublisherList)
-        {
-          Publisher.Value->DeInit();
-        }
-        if (Handler.IsValid())
-        {
-          Handler->Disconnect();
-        }
-        
-      
-    }
-
+  }
+  if (!Owner)
+  {
+    UE_LOG(LogRROSCommunication, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
+  }
 }

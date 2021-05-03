@@ -1,49 +1,65 @@
 
 #pragma once
 
-#include "ROSBridgeHandler.h"
-#include "ROSBridgePublisher.h"
-#include "Physics/RModel.h"
+#include "Controller/ControllerType/BaseController/RBaseController.h"
 #include "Conversions.h"
-#include "Controller/RController.h"
+#include "ROdomPublisher.h"
+// clang-format off
 #include "RDonbotOdomPublisher.generated.h"
+// clang-format on
 
 UCLASS()
-class UROBOSIM_API URDonbotOdomPublisher : public URPublisher
+class UROBOSIM_API URDonbotOdomPublisherParameter final : public UROdomPublisherParameter
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
+
 public:
-    virtual void Publish();
-    URDonbotOdomPublisher();
+  URDonbotOdomPublisherParameter()
+  {
+    Topic = TEXT("/joint_states");
+		MessageType = TEXT("sensor_msgs/JointState");
+		OdomFrameXId = TEXT("odom_x_joint");
+		OdomFrameYId = TEXT("odom_y_joint");
+		OdomFrameZId = TEXT("odom_z_joint");
+  }
+
+public:
+  UPROPERTY(EditAnywhere)
+	FString OdomFrameXId;
 
 	UPROPERTY(EditAnywhere)
-	FTransform FrameTransform;
+	FString OdomFrameYId;
 
 	UPROPERTY(EditAnywhere)
-	FString MapFrameId = "map";
+	FString OdomFrameZId;
+};
 
-	UPROPERTY(EditAnywhere)
-	FString OdomFrameXId = "odom_x";
+UCLASS()
+class UROBOSIM_API URDonbotOdomPublisher final : public UROdomPublisher
+{
+	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
-	FString OdomFrameYId = "odom_y";
+public:
+	URDonbotOdomPublisher();
 
-	UPROPERTY(EditAnywhere)
-	FString OdomFrameZId = "odom_z";
+public:
+	void Publish() override;
 
-	UPROPERTY(EditAnywhere)
-	FString BaseFrameId = "base_footprint";
+  void SetPublishParameters(URPublisherParameter *&PublisherParameters) override;
 
-	UPROPERTY(EditAnywhere)
-	bool bProjectToGround = true;
-	
 protected:
-	virtual void SetMessageType();
-	virtual void SetOwner(UObject* InOwner);
+  void Init() override;
 
-	UPROPERTY()
-	TArray<FString> FrameNames;
+public:
+	UPROPERTY(EditAnywhere)
+	FString OdomFrameXId;
 
-	UPROPERTY()
-	URBaseController* Owner;
+	UPROPERTY(EditAnywhere)
+	FString OdomFrameYId;
+
+	UPROPERTY(EditAnywhere)
+	FString OdomFrameZId;
+
+private:
+	URBaseController *BaseController;
 };

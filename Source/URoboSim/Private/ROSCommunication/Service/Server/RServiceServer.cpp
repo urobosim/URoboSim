@@ -1,14 +1,5 @@
 #include "ROSCommunication/Service/Server/RServiceServer.h"
 
-void URServiceServer::Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InName)
-{
-	ROSHandler = InHandler;
-	SetOwner(InOwner);
-	SetType();
-	CreateServiceServer();
-	ROSHandler->AddServiceServer(ServiceServer);
-}
-
 void URServiceServer::SetServiceServerParameters(URServiceServerParameter *&ServiceServerParameters)
 {
 	if (ServiceServerParameters)
@@ -18,23 +9,13 @@ void URServiceServer::SetServiceServerParameters(URServiceServerParameter *&Serv
   }
 }
 
-void URROSSimulationCommandsService::SetOwner(UObject* InOwner)
+void URServiceServer::Init()
 {
-	Owner = Cast<URControllerComponent>(InOwner);
-	if(!Owner)
+	CreateServiceServer();
+	if (Handler.IsValid())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Owner of SimulationCommands no ControllerComponent"));
+		Handler->AddServiceServer(ServiceServer);
 	}
-}
-
-void URROSSimulationCommandsService::CreateServiceServer()
-{
-	ServiceServer =	MakeShareable<FROSSimulationCommandsServer>(new FROSSimulationCommandsServer(Name, Type, Owner));
-}
-
-void URROSSimulationCommandsService::SetType()
-{
-	Type = TEXT("u_robo_sim_communication/SimulationCommands");
 }
 
 // URServiceServer* URServiceServer::Init(FString InType, UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler)
@@ -45,15 +26,6 @@ void URROSSimulationCommandsService::SetType()
 // 								Service->ROSHandler = InHandler;
 // 									}
 // 				return Service;
-// }
-
-
-// void URROSRobotRegistrationService::Init()
-// {
-// 		ServiceServer =	MakeShareable<FROSRobotRegistrationServer>(new FROSRobotRegistrationServer(Name, TEXT("unreal_controller_manager/RegisterRobot")));
-//
-// 			ROSHandler->AddServiceServer(ServiceServer);
-//
 // }
 
 // URServiceServer* URServiceServerFactory::CreateInstance(FString InType, UObject* InOwner)

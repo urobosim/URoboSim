@@ -1,17 +1,46 @@
 #include "ROSCommunication/Action/Server/ActionCancelSubscriber.h"
-#include "ROSCommunication/Action/Server/ActionCancelCallback.h"
+#include "actionlib_msgs/GoalID.h"
 
-void URActionCancelSubscriber::SetMessageType()
+DEFINE_LOG_CATEGORY_STATIC(LogRActionCancelSubscriber, Log, All)
+
+URActionCancelSubscriber::URActionCancelSubscriber()
 {
   MessageType = TEXT("actionlib_msgs/GoalID");
 }
 
 void URActionCancelSubscriber::CreateSubscriber()
 {
-  Subscriber = MakeShareable<FROSActionCancelCallback>(
-                                                       new FROSActionCancelCallback(Topic, MessageType, ControllerComponent->GetController(ControllerName)));
-  if(Subscriber.IsValid())
-    {
-      UE_LOG(LogTemp, Log, TEXT("GiskardSubscriber connected to RosBridge"));
-    }
+  if (GetOwner())
+  {
+    Subscriber = MakeShareable<FActionCancelSubscriberCallback>(
+        new FActionCancelSubscriberCallback(Topic, MessageType, Controller));
+  }
+}
+
+FActionCancelSubscriberCallback::FActionCancelSubscriberCallback(
+    const FString &InTopic, const FString &InType, UObject *InController) : FROSBridgeSubscriber(InTopic, InType)
+{
+  Controller = Cast<URController>(InController);
+}
+
+void FActionCancelSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
+{
+  if (Controller)
+  {
+    Controller->bCancel = true;
+  }
+  else
+  {
+    UE_LOG(LogRActionCancelSubscriber, Error, TEXT("Controller not found"));
+  }
+}
+
+TSharedPtr<FROSBridgeMsg> FActionCancelSubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const
+{
+  TSharedPtr<actionlib_msgs::GoalID> GoalId =
+      MakeShareable<actionlib_msgs::GoalID>(new actionlib_msgs::GoalID());
+
+  GoalId->FromJson(JsonObject);
+
+  return StaticCastSharedPtr<FROSBridgeMsg>(GoalId);
 }
