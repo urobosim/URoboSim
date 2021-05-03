@@ -17,14 +17,11 @@ public:
     Topic = TEXT("/joint_states");
     MessageType = TEXT("sensor_msgs/JointState");
     JointParamTopic = TEXT("/hardware_interface/joints");
-    FrameId = TEXT("odom");
   }
 
   UPROPERTY(EditAnywhere)
   FString JointParamTopic;
 
-  UPROPERTY(EditAnywhere)
-  FString FrameId;
 };
 
 UCLASS()

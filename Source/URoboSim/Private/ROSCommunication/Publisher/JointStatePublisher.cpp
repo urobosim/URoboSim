@@ -18,7 +18,6 @@ void URJointStatePublisher::SetPublishParameters(URPublisherParameter *&Publishe
   {
     Super::SetPublishParameters(PublisherParameters);
     JointParamTopic = JointStatePublisherParameter->JointParamTopic;
-    FrameId = JointStatePublisherParameter->FrameId;
   }
 }
 
@@ -31,7 +30,7 @@ void URJointStatePublisher::Init()
     ConfigClient->JointParamTopic = JointParamTopic;
     ConfigClient->Connect(Handler);
     ConfigClient->GetJointNames(&ListJointName);
-  }  
+  }
 }
 
 void URJointStatePublisher::Publish()
