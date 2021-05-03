@@ -22,13 +22,13 @@ public:
 public:
 	void Init();
 
+	void AddController(URController *Controller) { Controllers.Add(Controller); }
+
 	URController* GetController(FString ControllerName) const;
 
-	void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
-
 public:
-	UPROPERTY(EditAnywhere)
-	FRControllerContainer Controllers;
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<URController *> Controllers;
 
 protected:
   void BeginPlay() override;

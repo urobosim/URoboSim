@@ -12,9 +12,9 @@ void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
   float realtimeSeconds = FPlatformTime::Seconds();
   Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-  for (auto &Controller : Controllers.ControllerList)
+  for (URController *&Controller : Controllers)
   {
-    Controller.Value->Tick(DeltaTime);
+    Controller->Tick(DeltaTime);
   }
 }
 void URControllerComponent::BeginPlay()
@@ -33,27 +33,20 @@ void URControllerComponent::Init()
   }
   else
   {
-    for (auto &Controller : Controllers.ControllerList)
+    for (URController *&Controller : Controllers)
     {
-      Controller.Value->SetOwner(GetOwner());
-      Controller.Value->Init();
+      Controller->SetOwner(GetOwner());
+      Controller->Init();
     }
-  }
-}
-
-void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
-{
-  for (int i = 0; i < InJointNames.Num(); i++)
-  {
-    GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
   }
 }
 
 URController *URControllerComponent::GetController(FString ControllerName) const
 {
-  if (Controllers.ControllerList.Contains(ControllerName))
+  URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
+  if (ControllerPtr)
   {
-    return Controllers.ControllerList[ControllerName];
+    return *ControllerPtr;
   }
   else
   {
