@@ -22,9 +22,9 @@ public:
 public:
 	void Init();
 
-	void AddController(URController *Controller) { Controllers.Add(Controller); }
+	void AddController(URController *&Controller) { Controllers.Add(Controller); }
 
-	URController* GetController(FString ControllerName) const;
+	URController* GetController(const FString &ControllerName) const;
 
 public:
 	UPROPERTY(EditAnywhere, Instanced)

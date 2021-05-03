@@ -41,7 +41,7 @@ void URControllerComponent::Init()
   }
 }
 
-URController *URControllerComponent::GetController(FString ControllerName) const
+URController *URControllerComponent::GetController(const FString &ControllerName) const
 {
   URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
   if (ControllerPtr)
