@@ -13,17 +13,17 @@ URFJTAResultPublisher::URFJTAResultPublisher()
 void URFJTAResultPublisher::Init()
 {
   Super::Init();
-  JointController = Cast<URJointController>(Controller);
-  if (JointController)
+  JointTrajectoryController = Cast<URJointTrajectoryController>(Controller);
+  if (JointTrajectoryController)
   {
-    JointController->ActionFinished.AddDynamic(this, &URFJTAResultPublisher::PublishResult);
+    JointTrajectoryController->ActionFinished.AddDynamic(this, &URFJTAResultPublisher::PublishResult);
   }
 }
 
 void URFJTAResultPublisher::PublishResult(FGoalStatusInfo InStatusInfo)
 {
   // if(Owner->bPublishResult)
-  if (GetOwner() && JointController)
+  if (GetOwner() && JointTrajectoryController)
   {
     static int Seq = 0;
 

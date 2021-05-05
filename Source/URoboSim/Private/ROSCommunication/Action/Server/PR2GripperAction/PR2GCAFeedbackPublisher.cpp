@@ -21,7 +21,7 @@ void URPR2GCAFeedbackPublisher::Publish()
     TSharedPtr<pr2_controllers_msgs::PR2GripperCommandActionFeedback> Feedback =
         MakeShareable(new pr2_controllers_msgs::PR2GripperCommandActionFeedback());
 
-    FGoalStatusInfo StatusInfo = GripperController->GoalStatusList.Last();
+    FGoalStatusInfo StatusInfo = GripperController->GetGoalStatusList().Last();
     actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
     Feedback->SetStatus(GS);
     Feedback->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));

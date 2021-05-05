@@ -20,7 +20,7 @@ void URFJTAGoalSubscriber::CreateSubscriber()
 FRFJTAGoalSubscriberCallback::FRFJTAGoalSubscriberCallback(
     const FString &InTopic, const FString &InType, UObject *InController) : FROSBridgeSubscriber(InTopic, InType)
 {
-  JointController = Cast<URJointController>(InController);
+  JointTrajectoryController = Cast<URJointTrajectoryController>(InController);
 }
 
 TSharedPtr<FROSBridgeMsg> FRFJTAGoalSubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const
@@ -35,11 +35,11 @@ TSharedPtr<FROSBridgeMsg> FRFJTAGoalSubscriberCallback::ParseMessage(TSharedPtr<
 
 void FRFJTAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 {
-  if (JointController)
+  if (JointTrajectoryController)
   {
     TSharedPtr<control_msgs::FollowJointTrajectoryActionGoal> TrajectoryMsg = StaticCastSharedPtr<control_msgs::FollowJointTrajectoryActionGoal>(Msg);
 
-    TArray<FString> Names = TrajectoryMsg->GetGoal().GetTrajectory().GetJointNames();
+    TArray<FString> JointNames = TrajectoryMsg->GetGoal().GetTrajectory().GetJointNames();
     actionlib_msgs::GoalID Id = TrajectoryMsg->GetGoalId();
     FGoalStatusInfo GoalStatusInfo = FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs);
 
@@ -48,17 +48,13 @@ void FRFJTAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
     FROSTime ActionStart = TrajectoryMsg->GetGoal().GetTrajectory().GetHeader().GetStamp();
 
     TArray<FTrajectoryPoints> Trajectory;
-    for (auto &JointPoint : TrajectoryMsg->GetGoal().GetTrajectory().GetPoints())
+    for (const trajectory_msgs::JointTrajectoryPoint &JointPoint : TrajectoryMsg->GetGoal().GetTrajectory().GetPoints())
     {
-      FTrajectoryPoints TempPoints;
-      TempPoints.Points = JointPoint.GetPositions();
-      TempPoints.Velocities = JointPoint.GetVelocities();
       FROSTime TimeStep(JointPoint.GetTimeFromStart());
-      TempPoints.SetTimeStep(TimeStep.Secs, TimeStep.NSecs);
-      Trajectory.Add(TempPoints);
+      Trajectory.Add(FTrajectoryPoints(TimeStep.Secs, TimeStep.NSecs, JointNames, JointPoint.GetPositions(), JointPoint.GetVelocities()));
     }
 
-    JointController->FollowTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Names, Trajectory);
+    JointTrajectoryController->FollowJointTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
 
     // double ActionTimeDiff = ActionStart.GetTimeAsDouble() - FROSTime::Now().GetTimeAsDouble();
     // if(ActionTimeDiff < 0.0f)

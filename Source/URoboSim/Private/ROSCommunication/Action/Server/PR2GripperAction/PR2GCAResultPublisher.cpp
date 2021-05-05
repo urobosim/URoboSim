@@ -26,7 +26,7 @@ void URPR2GCAResultPublisher::Publish()
     ActionResult->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
 
     // uint8 status = Owner->Status;
-    FGoalStatusInfo StatusInfo = GripperController->GoalStatusList.Last();
+    FGoalStatusInfo StatusInfo = GripperController->GetGoalStatusList().Last();
     actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
     ActionResult->SetStatus(GS);
 

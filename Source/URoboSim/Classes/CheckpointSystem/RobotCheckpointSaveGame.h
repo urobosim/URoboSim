@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "RUtilityClasses.h"
 #include "ActorCheckpointSaveGame.h"
 #include "RobotCheckpointSaveGame.generated.h"
 
@@ -17,12 +17,12 @@ class UROBOSIM_API URobotCheckpointSaveGame : public UActorCheckpointSaveGame
 protected:
 
     UPROPERTY(VisibleAnywhere)
-    TMap<FString, float> JointStates;
+    TMap<FString, FJointState> JointStates;
 
 public:
 
 
-    virtual void SetJointState(TMap<FString, float> InJointState);
-    virtual TMap<FString, float> GetJointStates();
+    virtual void SetJointState(TMap<FString, FJointState> InJointState);
+    virtual TMap<FString, FJointState> GetJointStates();
 
 };

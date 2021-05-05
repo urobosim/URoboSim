@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointTrajectoryController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "FJTAResultPublisher.generated.h"
@@ -25,5 +25,5 @@ private:
 	void PublishResult(FGoalStatusInfo InStatusInfo);
 
 private:
-	URJointController *JointController;
+	URJointTrajectoryController *JointTrajectoryController;
 };

@@ -1,5 +1,6 @@
 #include "ROSCommunication/Action/Server/PerceiveObjectAction/POAResultPublisher.h"
 #include "TFPublisher.h"
+#include "Conversions.h"
 #include "urobosim_msgs/PerceiveObjectActionResult.h"
 #include "urobosim_msgs/PerceiveObjectResult.h"
 
@@ -47,7 +48,7 @@ void URPOAResultPublisher::Publish()
     ActionResult->SetHeader(std_msgs::Header(Seq, FROSTime(), ""));
 
     // uint8 status = Owner->Status;
-    FGoalStatusInfo StatusInfo = CameraController->GoalStatusList.Last();
+    FGoalStatusInfo StatusInfo = CameraController->GetGoalStatusList().Last();
     actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
     ActionResult->SetStatus(GS);
 

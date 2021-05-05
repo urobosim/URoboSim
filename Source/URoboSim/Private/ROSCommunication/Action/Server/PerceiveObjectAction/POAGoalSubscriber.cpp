@@ -40,7 +40,7 @@ void FPOAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
   {
     TSharedPtr<urobosim_msgs::PerceiveObjectActionGoal> Command = StaticCastSharedPtr<urobosim_msgs::PerceiveObjectActionGoal>(Msg);
     actionlib_msgs::GoalID Id = Command->GetGoalId();
-    CameraController->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
+    CameraController->AddGoalStatus(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
     CameraController->TypeToPerceive = Command->GetGoal().GetType();
     CameraController->bActive = true;
     AsyncTask(ENamedThreads::GameThread, [this]() {

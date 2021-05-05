@@ -25,7 +25,7 @@ void URobotCheckpointHandler::GetContent()
       URobotCheckpointSaveGame *RobotState = Cast<URobotCheckpointSaveGame>(SaveGame);
       if (RobotState)
       {
-        RobotState->SetJointState(Controller->DesiredJointState);
+        RobotState->SetJointState(Controller->DesiredJointStates);
       }
     }
   }
@@ -74,7 +74,7 @@ void URobotCheckpointHandler::SetJointState(URobotCheckpointSaveGame *InRobotSta
       {
         for (auto &JointState : InRobotState->GetJointStates())
         {
-          Controller->SetDesiredJointState(JointState.Key, JointState.Value);
+          Controller->DesiredJointStates[JointState.Key] = JointState.Value;
         }
       }
     }

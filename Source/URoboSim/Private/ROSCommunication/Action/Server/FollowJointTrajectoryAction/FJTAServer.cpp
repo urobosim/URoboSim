@@ -10,7 +10,7 @@ URFJTAServer::URFJTAServer()
   ActionName = TEXT("/whole_body_controller/body/follow_joint_trajectory");
   FrameId = TEXT("odom");
   JointParamTopic = TEXT("whole_body_controller/body/joints");
-  ControllerName = TEXT("JointController");
+  ControllerName = TEXT("JointTrajectoryController");
 }
 
 void URFJTAServer::SetActionServerParameters(URActionServerParameter *&ActionServerParameters)

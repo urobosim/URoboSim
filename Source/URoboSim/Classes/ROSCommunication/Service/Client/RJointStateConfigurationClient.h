@@ -41,7 +41,7 @@ protected:
   void CreateServiceClient() override;
 
 public:
-  void GetJointNames(TArray<FString> *OutJointNamesPtr);
+  void GetJointNames(TFunction<void (const TArray<FString> &JointNames)> GetJointNamesFunction);
 
 public:
   UPROPERTY(EditAnywhere)
@@ -58,10 +58,10 @@ private:
 class FRJointStateConfigurationClient final : public FROSBridgeSrvClient
 {
 public:
-  FRJointStateConfigurationClient(TArray<FString> *OutJointNames, const FString &InName, const FString &InType);
+  FRJointStateConfigurationClient(const FString &InName, const FString &InType, TFunction<void (const TArray<FString> &JointNames)> InFunction);
 
   void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
 private:
-  TArray<FString> *JointNames;
+  TFunction<void (const TArray<FString> &JointNames)> Function;
 };

@@ -1,62 +1,62 @@
 #pragma once
 
 #include "Controller/RControllerComponent.h"
-#include "RJointController.h"
 #include "Physics/RModel.h"
+#include "RJointController.h"
+// clang-format off
 #include "RHeadController.generated.h"
 // clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URHeadTrajectoryController : public URController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
 	URHeadTrajectoryController();
 
+public:
 	virtual void Init() override;
-	virtual void Tick(float InDeltaTime);
 
-	UPROPERTY()
+	virtual void Tick(const float &InDeltaTime);
+
+public:
+	virtual void UpdateHeadDirection(){};
+
+public:
 	float AngleError;
 
-	UPROPERTY()
 	FString FrameId;
 
-	UPROPERTY()
 	FVector Point;
 
-	UPROPERTY()
 	FString PointingFrame;
 
-	UPROPERTY()
 	FVector Axis;
 
-	UPROPERTY()
-	ARModel* Model;
-
-    virtual void UpdateHeadDirection(){};
 protected:
-
-    UPROPERTY()
-      URJointController* JointController;
-
-    UPROPERTY()
-      URControllerComponent* ControllerComp;
-
 	virtual FVector CalculateNewViewDirection();
-	virtual void MoveToNewPosition(FVector InNewDirection){};
-    virtual void CheckPointHeadState(){};
 
+	virtual void MoveToNewPosition(FVector InNewDirection){};
+
+	virtual void CheckPointHeadState(){};
+
+protected:
+	float ActionStartTime;
+
+	URJointController *JointController;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URPR2HeadTrajectoryController : public URHeadTrajectoryController
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
-    virtual void UpdateHeadDirection();
+	virtual void UpdateHeadDirection();
+
 protected:
 	virtual void MoveToNewPosition(FVector InNewDirection) override;
-    virtual void CheckPointHeadState();
 
+	virtual void CheckPointHeadState();
 };

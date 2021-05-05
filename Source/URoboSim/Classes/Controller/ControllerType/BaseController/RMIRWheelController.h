@@ -63,7 +63,7 @@ class UROBOSIM_API URMIRWheelController : public URBaseController
 public:
   URMIRWheelController();
 
-  virtual void Tick(float InDeltaTime) override;
+  virtual void Tick(const float &InDeltaTime) override;
 
 protected:
 

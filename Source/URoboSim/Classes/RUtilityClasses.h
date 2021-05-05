@@ -30,15 +30,17 @@ struct FJointState
   GENERATED_BODY()
 
 public:
-  FJointState() {}
+  FJointState() : FJointState(0.f, 0.f) {}
 
-  FJointState(const FString &InJointName, const float &InJointPosition, const float &InJointVelocity)
-      : JointName(InJointName), JointPosition(InJointPosition), JointVelocity(InJointVelocity)
+  FJointState(const float &InJointPosition, const float &InJointVelocity)
+      : JointPosition(InJointPosition), JointVelocity(InJointVelocity)
   {
   }
 
 public:
-  FString JointName;
+  UPROPERTY(EditAnywhere)
   float JointPosition;
+
+  UPROPERTY(EditAnywhere)
   float JointVelocity;
 };

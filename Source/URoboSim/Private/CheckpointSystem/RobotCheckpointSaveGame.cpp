@@ -4,12 +4,12 @@
 #include "CheckpointSystem/RobotCheckpointSaveGame.h"
 
 
-void URobotCheckpointSaveGame::SetJointState(TMap<FString, float> InJointState)
+void URobotCheckpointSaveGame::SetJointState(TMap<FString, FJointState> InJointStates)
 {
-  JointStates = InJointState;
+  JointStates = InJointStates;
 }
 
-TMap<FString, float> URobotCheckpointSaveGame::GetJointStates()
+TMap<FString, FJointState> URobotCheckpointSaveGame::GetJointStates()
 {
   return JointStates;
 }

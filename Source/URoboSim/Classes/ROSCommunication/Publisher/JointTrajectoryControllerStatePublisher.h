@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointTrajectoryController.h"
 #include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
 #include "RPublisher.h"
 // clang-format off
@@ -19,7 +19,7 @@ public:
     MessageType = TEXT("control_msgs/JointTrajectoryControllerState");
     FrameId = TEXT("odom");
     JointParamTopic = TEXT("/whole_body_controller/body/joints");
-    JointControllerName = TEXT("JointController");
+    JointTrajectoryControllerName = TEXT("JointTrajectoryController");
   }
 
 public:
@@ -30,7 +30,7 @@ public:
   FString JointParamTopic;
 
   UPROPERTY(EditAnywhere)
-  FString JointControllerName;
+  FString JointTrajectoryControllerName;
 };
 
 UCLASS()
@@ -57,10 +57,10 @@ public:
   FString JointParamTopic;
 
   UPROPERTY(EditAnywhere)
-  FString JointControllerName;
+  FString JointTrajectoryControllerName;
 
 private:
-  URJointController *JointController;
+  URJointTrajectoryController *JointTrajectoryController;
 
   URJointStateConfigurationClient *ConfigClient;
 };

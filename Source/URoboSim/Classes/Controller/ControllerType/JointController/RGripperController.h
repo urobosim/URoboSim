@@ -1,32 +1,32 @@
 #pragma once
 
+#include "ConstructorHelpers.h"
 #include "Controller/RControllerComponent.h"
-#include "RJointController.h"
+#include "Physics/RJoint.h"
 #include "Physics/RModel.h"
 #include "RGraspComponent.h"
-#include "ConstructorHelpers.h"
-#include "Physics/RJoint.h"
+#include "RJointController.h"
+// clang-format off
 #include "RGripperController.generated.h"
+// clang-format on
 
 USTRUCT()
 struct FGraspComponentSetting
 {
   GENERATED_BODY()
-  public:
-
+public:
   UPROPERTY(EditAnywhere)
   FString GripperName;
 
   UPROPERTY(EditAnywhere)
   FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
-
 };
 
 USTRUCT()
 struct FGraspResult
 {
   GENERATED_BODY()
-  public:
+public:
   float Position;
   float Effort;
   bool bStalled;
@@ -41,103 +41,88 @@ struct FGraspResult
   };
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URGripperController : public URController
 {
   GENERATED_BODY()
-    public:
-    URGripperController();
 
+public:
+  URGripperController();
+
+public:
   virtual void Init() override;
+
   virtual bool Grasp();
+
   virtual void Release();
+
   virtual void UpdateGripper();
 
   virtual void CheckGripperActionResult(float InError, float InThreshold);
-  virtual void Tick(float InDeltaTime);
 
-  UPROPERTY()
-    URGraspComponent* GraspComponent;
+  virtual void Tick(const float &InDeltaTime);
 
-  UPROPERTY(EditAnywhere)
-    FGraspComponentSetting GraspCompSetting;
-
-  UPROPERTY()
-    float GripperPosition = 0;
-
-  UPROPERTY()
-    float Position;
-
-  UPROPERTY()
-    float OldPosition;
-
-  UPROPERTY()
-    float MaxEffort;
-
-  UPROPERTY()
-    bool bStalled;
+public:
+  URGraspComponent *GraspComponent;
 
   UPROPERTY(EditAnywhere)
-    bool bUseMultipleConstraints = true;
+  FGraspComponentSetting GraspCompSetting;
+
+  float GripperPosition = 0;
+
+  float Position;
+
+  float OldPosition;
+
+  float MaxEffort;
+
+  bool bStalled;
 
   UPROPERTY(EditAnywhere)
-    float GripperSpeedFactor = 0.03;
-
-  UPROPERTY()
-    float PoseOffsetFromJoints = 0;
-
-  UPROPERTY()
-    FGraspResult Result;
+  bool bUseMultipleConstraints = true;
 
   UPROPERTY(EditAnywhere)
-    FString RightJointName;
+  float GripperSpeedFactor = 0.03;
+
+  float PoseOffsetFromJoints = 0;
+
+  FGraspResult Result;
 
   UPROPERTY(EditAnywhere)
-    FString LeftJointName;
+  FString RightJointName;
 
   UPROPERTY(EditAnywhere)
-    FString RightFingerTipName;
+  FString LeftJointName;
 
   UPROPERTY(EditAnywhere)
-    FString LeftFingerTipName;
-
-  UPROPERTY()
-    URJoint* RightFinger ;
-
-  UPROPERTY()
-    URJoint* LeftFinger ;
-
-  UPROPERTY()
-    URJoint* RightFingerTip;
-
-  UPROPERTY()
-    URJoint* LeftFingerTip;
+  FString RightFingerTipName;
 
   UPROPERTY(EditAnywhere)
-    bool bDisableCollision;
+  FString LeftFingerTipName;
 
- protected:
+  URJoint *RightFinger;
 
+  URJoint *LeftFinger;
+
+  URJoint *RightFingerTip;
+
+  URJoint *LeftFingerTip;
+
+  UPROPERTY(EditAnywhere)
+  bool bDisableCollision;
+
+protected:
   virtual void SetGripperCollision(bool InCollisionEnabled);
 
-  UPROPERTY()
-    bool bSuccessGrasp = false;
+protected:
+  bool bSuccessGrasp = false;
 
-  UPROPERTY()
-    bool bMoved = false;
+  bool bMoved = false;
 
-  UPROPERTY()
-    ARModel* Model;
-
-  UPROPERTY()
-    URControllerComponent* ControllerComp;
-
-  UPROPERTY()
-    URJointController* JointController;
+  URJointController *JointController;
 
   UPROPERTY(EditAnywhere)
-    FString GraspComponentName;
+  FString GraspComponentName;
 
-  UPROPERTY()
-    float JointValue;
+  float JointValue;
 };

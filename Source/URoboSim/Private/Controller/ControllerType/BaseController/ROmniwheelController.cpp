@@ -9,7 +9,7 @@ UROmniwheelController::UROmniwheelController()
   OdomVelocityStates.Init(0.0, 3);
 }
 
-void UROmniwheelController::Tick(float InDeltaTime)
+void UROmniwheelController::Tick(const float &InDeltaTime)
 {
   MoveLinearTick(InDeltaTime);
   TurnTick(InDeltaTime);

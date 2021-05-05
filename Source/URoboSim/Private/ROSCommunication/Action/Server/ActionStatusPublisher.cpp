@@ -20,7 +20,7 @@ void URActionStatusPublisher::Publish()
     GoalStatusArrayMsg->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
 
     TArray<actionlib_msgs::GoalStatus> GoalStatusArray;
-    for (const FGoalStatusInfo &GoalStatusInfo : Controller->GoalStatusList)
+    for (const FGoalStatusInfo &GoalStatusInfo : Controller->GetGoalStatusList())
     {
       actionlib_msgs::GoalStatus GoalStatus(actionlib_msgs::GoalID(FROSTime(GoalStatusInfo.Secs, GoalStatusInfo.NSecs), GoalStatusInfo.Id), GoalStatusInfo.Status, TEXT(""));
       GoalStatusArray.Add(GoalStatus);

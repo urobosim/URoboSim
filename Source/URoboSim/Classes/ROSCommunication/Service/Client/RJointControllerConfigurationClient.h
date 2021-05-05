@@ -77,12 +77,12 @@ private:
 class FRJointControllerConfigurationClient final : public FROSBridgeSrvClient
 {
 public:
-  FRJointControllerConfigurationClient(URJointController *InJointController, TMap<FString, float> *OutJointNames, const FString &InName, const FString &InType);
+  FRJointControllerConfigurationClient(URJointController *InJointController, TMap<FString, FJointState> *OutJointNames, const FString &InName, const FString &InType);
 
   void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
 private:
-  TMap<FString, float> *JointNames;
+  TMap<FString, FJointState> *JointNames;
 
   URJointController *JointController;
 };
@@ -90,12 +90,12 @@ private:
 class FRJointLimitControllerConfigurationClient final : public FROSBridgeSrvClient
 {
 public:
-  FRJointLimitControllerConfigurationClient(TMap<FString, float> *OutJointNames, ARModel *InModel, const FString &InName, const FString &InType);
+  FRJointLimitControllerConfigurationClient(TMap<FString, FJointState> *OutJointNames, ARModel *InModel, const FString &InName, const FString &InType);
 
   void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
 private:
-  TMap<FString, float> *JointNames;
+  TMap<FString, FJointState> *JointNames;
 
   ARModel *Model;
 };

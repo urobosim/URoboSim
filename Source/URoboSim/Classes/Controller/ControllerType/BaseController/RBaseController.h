@@ -13,7 +13,7 @@
 #include "RBaseController.generated.h"
 // clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URBaseController : public URController
 {
 	GENERATED_BODY()
@@ -34,7 +34,7 @@ public:
 	virtual void AddRelativeRotation(URLink* InLink, FRotator InRotation);
 	virtual void SetLocationAndRotation(FVector InPosition, FRotator InRotation);
 
-	virtual void Tick(float InDeltaTime) override;
+	virtual void Tick(const float &InDeltaTime) override;
 
 	virtual TArray<double> GetOdomPositionStates();
 	virtual TArray<double> GetOdomVelocityStates();
@@ -78,7 +78,7 @@ protected:
 	float MaxAngularVelocity;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URBaseControllerKinematic : public URBaseController
 {
     GENERATED_BODY()
