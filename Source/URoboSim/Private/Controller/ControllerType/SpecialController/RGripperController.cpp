@@ -1,4 +1,4 @@
-#include "Controller/ControllerType/JointController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/RGripperController.h"
 
 void URGripperController::UpdateGripper()
 {
