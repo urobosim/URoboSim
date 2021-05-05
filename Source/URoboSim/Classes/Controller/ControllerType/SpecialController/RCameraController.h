@@ -1,12 +1,6 @@
 #pragma once
 
-#include "RController.h"
-#include "ConstructorHelpers.h"
-#include "Physics/RJoint.h"
-#include "Physics/RModel.h"
-#include "RGraspComponent.h"
-#include "Containers/Queue.h"
-#include "Conversions.h"
+#include "Controller/RController.h"
 #include "RGBDCamera.h"
 // clang-format off
 #include "RCameraController.generated.h"

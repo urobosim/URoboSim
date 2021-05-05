@@ -13,7 +13,7 @@ enum class UJointControllerMode : uint8
   Kinematic
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
 class UROBOSIM_API URJointController : public URController
 {
   GENERATED_BODY()

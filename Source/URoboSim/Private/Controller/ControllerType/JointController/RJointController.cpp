@@ -77,7 +77,7 @@ void URJointController::SetJointNames(const TArray<FString> &JointNames)
   {
     if (!DesiredJointStates.Contains(JointName) && GetOwner()->GetJoint(JointName))
     {
-      DesiredJointStates.Add(JointName);
+      DesiredJointStates.Add(JointName, FJointState());
       GetOwner()->GetJoint(JointName)->SetDrive(EnableDrive);
     }
   }

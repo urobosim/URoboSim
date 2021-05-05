@@ -1,4 +1,6 @@
-#include "RController.h"
+#pragma once
+
+#include "Controller/RController.h"
 // clang-format off
 #include "RTFController.generated.h"
 // clang-format on

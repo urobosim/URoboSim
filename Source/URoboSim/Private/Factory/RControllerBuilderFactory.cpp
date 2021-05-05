@@ -1,9 +1,9 @@
 #include "Factory/RControllerBuilderFactory.h"
 #include "Controller/ControllerType/BaseController/RBaseController.h"
 #include "Controller/ControllerType/JointController/RJointController.h"
-#include "Controller/ControllerType/JointController/RHeadController.h"
-#include "Controller/ControllerType/JointController/RGripperController.h"
-#include "Controller/RCameraController.h"
+#include "Controller/ControllerType/SpecialController/RHeadController.h"
+#include "Controller/ControllerType/SpecialController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/RCameraController.h"
 #include "Components/ActorComponent.h"
 
 void URControllerBuilder::Init(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)

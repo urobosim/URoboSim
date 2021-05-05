@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Controller/RControllerComponent.h"
 #include "Physics/RModel.h"
-#include "RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 // clang-format off
 #include "RHeadController.generated.h"
 // clang-format on

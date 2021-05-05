@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RHeadController.h"
+#include "Controller/ControllerType/SpecialController/RHeadController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "PR2HAResultPublisher.generated.h"

@@ -1,11 +1,7 @@
 #pragma once
 
-#include "ConstructorHelpers.h"
-#include "Controller/RControllerComponent.h"
-#include "Physics/RJoint.h"
 #include "Physics/RModel.h"
-#include "RGraspComponent.h"
-#include "RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 // clang-format off
 #include "RGripperController.generated.h"
 // clang-format on

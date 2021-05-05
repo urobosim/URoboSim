@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/RGripperController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "GCAStatusPublisher.generated.h"
