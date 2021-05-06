@@ -38,6 +38,28 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URGripperControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString RightJointName;
+
+  UPROPERTY(EditAnywhere)
+  FString LeftJointName;
+
+  UPROPERTY(EditAnywhere)
+  FString RightFingerTipName;
+
+  UPROPERTY(EditAnywhere)
+  FString LeftFingerTipName;
+
+  UPROPERTY(EditAnywhere)
+  bool bDisableCollision;
+};
+
+UCLASS()
 class UROBOSIM_API URGripperController : public URController
 {
   GENERATED_BODY()
@@ -47,6 +69,8 @@ public:
 
 public:
   virtual void Init() override;
+
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   virtual bool Grasp();
 

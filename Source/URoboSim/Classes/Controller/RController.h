@@ -10,6 +10,13 @@
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionFinishedDelegate, FGoalStatusInfo, StatusInfo);
 
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URControllerParameter : public UObject
+{
+  GENERATED_BODY()
+
+};
+
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URController : public UObject
 {
@@ -27,7 +34,9 @@ public:
 
   void SetOwner();
 
-  TArray<FGoalStatusInfo> GetGoalStatusList() const { return GoalStatusList; }
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) {}
+
+  const TArray<FGoalStatusInfo> GetGoalStatusList() const { return GoalStatusList; }
 
   void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
 

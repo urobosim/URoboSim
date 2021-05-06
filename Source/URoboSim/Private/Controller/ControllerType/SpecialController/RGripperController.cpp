@@ -1,5 +1,109 @@
 #include "Controller/ControllerType/SpecialController/RGripperController.h"
 
+void URGripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URGripperControllerParameter *GripperControllerParameters = Cast<URGripperControllerParameter>(ControllerParameters);
+  if (GripperControllerParameters)
+  {
+    RightJointName = GripperControllerParameters->RightJointName;
+    LeftJointName = GripperControllerParameters->LeftJointName;
+    RightFingerTipName = GripperControllerParameters->RightFingerTipName;
+    LeftFingerTipName = GripperControllerParameters->LeftFingerTipName;
+    bDisableCollision = GripperControllerParameters->bDisableCollision;
+  }
+}
+
+void URGripperController::Init()
+{
+  Super::Init();
+
+  if (!GetOwner())
+  {
+    UE_LOG(LogTemp, Error, TEXT("%s not attached to ARModel"), *GetName());
+  }
+  else
+  {
+    TArray<URGraspComponent *> TempGraspComponents;
+    GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
+
+    RightFinger = GetOwner()->Joints.FindRef(RightJointName);
+    LeftFinger = GetOwner()->Joints.FindRef(LeftJointName);
+
+    RightFingerTip = GetOwner()->Joints.FindRef(RightFingerTipName);
+    LeftFingerTip = GetOwner()->Joints.FindRef(LeftFingerTipName);
+
+    if (!RightFinger)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
+      return;
+    }
+    if (!LeftFinger)
+    {
+
+      UE_LOG(LogTemp, Error, TEXT("LeftFinger of %s not found"), *GetName());
+      return;
+    }
+    if (!RightFingerTip)
+    {
+      UE_LOG(LogTemp, Error, TEXT("RightFingerTip of %s not found"), *GetName());
+      return;
+    }
+    if (!LeftFingerTip)
+    {
+      UE_LOG(LogTemp, Error, TEXT("LeftFingerTip of %s not found"), *GetName());
+      return;
+    }
+
+    if (bDisableCollision)
+    {
+      RightFinger->Child->DisableCollision();
+      LeftFinger->Child->DisableCollision();
+      RightFingerTip->Child->DisableCollision();
+      LeftFingerTip->Child->DisableCollision();
+    }
+
+    PoseOffsetFromJoints = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size();
+
+    JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
+
+    if (!JointController)
+    {
+      UE_LOG(LogTemp, Error, TEXT("JointController not found"));
+      return;
+    }
+    TArray<FString> JointNames;
+    JointNames.Add(RightJointName);
+    JointNames.Add(LeftJointName);
+    JointController->SetJointNames(JointNames);
+
+    for (auto &GraspComp : TempGraspComponents)
+    {
+      if (GraspComp->GetName().Equals(GraspComponentName))
+      {
+        GraspComponent = GraspComp;
+        URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
+        GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+        GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
+
+        if (bUseMultipleConstraints)
+        {
+          GraspComponent->Init(RightFinger->Child->GetCollision(), LeftFinger->Child->GetCollision());
+        }
+        else
+        {
+          GraspComponent->Init(ReferenceLink->GetCollision());
+        }
+      }
+    }
+
+    float &RightJointValue = JointController->DesiredJointStates.FindOrAdd(RightJointName).JointPosition;
+    RightJointValue = RightFinger->GetEncoderValue();
+    float &LeftJointValue = JointController->DesiredJointStates.FindOrAdd(LeftJointName).JointPosition;
+    LeftJointValue = LeftFinger->GetEncoderValue();
+    JointValue = (RightJointValue + LeftJointValue) / 2.0;
+  }
+}
+
 void URGripperController::UpdateGripper()
 {
   SetGripperCollision(true);
@@ -147,97 +251,6 @@ void URGripperController::Release()
   if (GraspComponent)
   {
     GraspComponent->TryToDetach();
-  }
-}
-
-void URGripperController::Init()
-{
-  Super::Init();
-
-  if (!GetOwner())
-  {
-    UE_LOG(LogTemp, Error, TEXT("%s not attached to ARModel"), *GetName());
-  }
-  else
-  {
-    TArray<URGraspComponent *> TempGraspComponents;
-    GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
-
-    RightFinger = GetOwner()->Joints.FindRef(RightJointName);
-    LeftFinger = GetOwner()->Joints.FindRef(LeftJointName);
-
-    RightFingerTip = GetOwner()->Joints.FindRef(RightFingerTipName);
-    LeftFingerTip = GetOwner()->Joints.FindRef(LeftFingerTipName);
-
-    if (!RightFinger)
-    {
-      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
-      return;
-    }
-    if (!LeftFinger)
-    {
-
-      UE_LOG(LogTemp, Error, TEXT("LeftFinger of %s not found"), *GetName());
-      return;
-    }
-    if (!RightFingerTip)
-    {
-      UE_LOG(LogTemp, Error, TEXT("RightFingerTip of %s not found"), *GetName());
-      return;
-    }
-    if (!LeftFingerTip)
-    {
-      UE_LOG(LogTemp, Error, TEXT("LeftFingerTip of %s not found"), *GetName());
-      return;
-    }
-
-    if (bDisableCollision)
-    {
-      RightFinger->Child->DisableCollision();
-      LeftFinger->Child->DisableCollision();
-      RightFingerTip->Child->DisableCollision();
-      LeftFingerTip->Child->DisableCollision();
-    }
-
-    PoseOffsetFromJoints = (RightFingerTip->Constraint->GetComponentLocation() - LeftFingerTip->Constraint->GetComponentLocation()).Size();
-
-    JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
-
-    if (!JointController)
-    {
-      UE_LOG(LogTemp, Error, TEXT("JointController not found"));
-      return;
-    }
-    TArray<FString> JointNames;
-    JointNames.Add(RightJointName);
-    JointNames.Add(LeftJointName);
-    JointController->SetJointNames(JointNames);
-
-    for (auto &GraspComp : TempGraspComponents)
-    {
-      if (GraspComp->GetName().Equals(GraspComponentName))
-      {
-        GraspComponent = GraspComp;
-        URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
-        GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-        GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-
-        if (bUseMultipleConstraints)
-        {
-          GraspComponent->Init(RightFinger->Child->GetCollision(), LeftFinger->Child->GetCollision());
-        }
-        else
-        {
-          GraspComponent->Init(ReferenceLink->GetCollision());
-        }
-      }
-    }
-
-    float &RightJointValue = JointController->DesiredJointStates.FindOrAdd(RightJointName).JointPosition;
-    RightJointValue = RightFinger->GetEncoderValue();
-    float &LeftJointValue = JointController->DesiredJointStates.FindOrAdd(LeftJointName).JointPosition;
-    LeftJointValue = LeftFinger->GetEncoderValue();
-    JointValue = (RightJointValue + LeftJointValue) / 2.0;
   }
 }
 

@@ -18,6 +18,13 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URTFControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS()
 class UROBOSIM_API URTFController : public URController
 {
   GENERATED_BODY()

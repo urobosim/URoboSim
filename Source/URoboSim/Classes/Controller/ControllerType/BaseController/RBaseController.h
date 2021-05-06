@@ -14,6 +14,22 @@
 // clang-format on
 
 UCLASS()
+class UROBOSIM_API URBaseControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+	URBaseControllerParameter()
+	{
+		BaseName = TEXT("base_footprint");
+	}
+
+public:
+	UPROPERTY(EditAnywhere)
+	FString BaseName;
+};
+
+UCLASS()
 class UROBOSIM_API URBaseController : public URController
 {
 	GENERATED_BODY()
@@ -21,6 +37,7 @@ public:
 	URBaseController();
 
 	virtual void Init() override;
+	virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 	virtual void MoveLinear(FVector InVelocity, float InDeltaTime);
 	virtual void MoveLinear(FVector InVelocity);
 	virtual void MoveLinearToWorld(FVector InVelocity, float InDeltaTime);

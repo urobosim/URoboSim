@@ -7,11 +7,6 @@
 #include "ActorFactories/ActorFactory.h"
 #include "RControllerFactory.generated.h"
 
-class ARModel;
-// class SDFAssetData;
-// struct FSDFLink;
-// struct FSDFJoint;
-
 /**
  * Own ActorFactory which creates a robot from SDFData Asset.
  */
@@ -35,10 +30,5 @@ private:
     /** Spawns the robot */
     virtual AActor* SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform& Transform, EObjectFlags ObjectFlags, const FName Name) override;
 
-    virtual void CreateModels(ARModel* OutModel, USDFDataAsset* InSDFData);
-
-    UPROPERTY()
-      bool bDrag;
-
-
+    bool bDrag;
 };

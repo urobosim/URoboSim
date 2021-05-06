@@ -6,11 +6,23 @@ DEFINE_LOG_CATEGORY_STATIC(LogRJointController, Log, All);
 URJointController::URJointController()
 {
   Mode = UJointControllerMode::Dynamic;
-  bDisableCollision = true;
-  bControllAllJoints = true;
+  bDisableCollision = false;
+  bControllAllJoints = false;
   EnableDrive.PositionStrength = 1E5;
   EnableDrive.VelocityStrength = 1E4;
   EnableDrive.MaxForce = 1E10;
+}
+
+void URJointController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URJointControllerParameter *JointControllerParameters = Cast<URJointControllerParameter>(ControllerParameters);
+  if (JointControllerParameters)
+  {
+    Mode = JointControllerParameters->Mode;
+    bDisableCollision = JointControllerParameters->bDisableCollision;
+    bControllAllJoints = JointControllerParameters->bControllAllJoints;
+    EnableDrive = JointControllerParameters->EnableDrive;
+  }
 }
 
 void URJointController::Init()

@@ -7,6 +7,13 @@
 // clang-format on
 
 UCLASS()
+class UROBOSIM_API URHeadTrajectoryControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS()
 class UROBOSIM_API URHeadTrajectoryController : public URController
 {
 	GENERATED_BODY()
@@ -44,6 +51,13 @@ protected:
 	float ActionStartTime;
 
 	URJointController *JointController;
+};
+
+UCLASS()
+class UROBOSIM_API URPR2HeadTrajectoryControllerParameter : public URHeadTrajectoryControllerParameter
+{
+  GENERATED_BODY()
+
 };
 
 UCLASS()

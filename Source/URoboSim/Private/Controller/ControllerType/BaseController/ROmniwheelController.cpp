@@ -5,8 +5,17 @@ UROmniwheelController::UROmniwheelController()
   BaseName = TEXT("base_footprint");
 
   OdomPositionStates.Init(0.0, 3);
-  WheelSetting.WheelVelocities.Init(0.0, 4);
   OdomVelocityStates.Init(0.0, 3);
+}
+
+void UROmniwheelController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  UROmniwheelControllerParameter *OmniWheelControllerParameters = Cast<UROmniwheelControllerParameter>(ControllerParameters);
+  if (OmniWheelControllerParameters)
+  {
+    Super::SetControllerParameters(ControllerParameters);
+    WheelSetting = OmniWheelControllerParameters->WheelSetting;
+  }
 }
 
 void UROmniwheelController::Tick(const float &InDeltaTime)
