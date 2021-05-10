@@ -8,7 +8,7 @@
 UROdomPublisher::UROdomPublisher()
 {
   Topic = TEXT("/tf");
-  MessageType = TEXT("sensor_msgs/JointState");
+  MessageType = TEXT("tf2_msgs/TFMessage");
   MapFrameId = TEXT("map");
   OdomFrameId = TEXT("odom_combined");
   BaseFrameId = TEXT("base_footprint");
