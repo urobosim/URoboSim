@@ -6,7 +6,6 @@
 #include "Physics/RJoint.h"
 #include "Physics/RModel.h"
 #include "RGraspComponent.h"
-//#include "ROSCommunication/RROSCommunication.h"
 #include "Containers/Queue.h"
 #include "Conversions.h"
 #include "RGBDCamera.h"
@@ -17,7 +16,6 @@
 // clang-format on
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FActionFinishedDelegate, FGoalStatusInfo, StatusInfo);
-
 
 USTRUCT()
 struct FTFInfo
@@ -186,14 +184,4 @@ protected:
 
   UPROPERTY()
   TMap<FString, FTFInfo> TFList;
-};
-
-USTRUCT(Blueprintable)
-struct FRControllerContainer
-{
-  GENERATED_BODY()
-
-public:
-  UPROPERTY(BlueprintReadWrite, Instanced, EditAnywhere, export, noclear)
-  TMap<FString, URController*> ControllerList;
 };
