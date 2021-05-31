@@ -23,13 +23,13 @@ protected:
 
 public:
   UPROPERTY(EditAnywhere)
-  FString FrameId; 
+  FString FrameId;
 
   UPROPERTY(EditAnywhere)
-  FString JointParamTopic; 
+  FString JointParamTopic;
 
 private:
   URJointController *JointController;
 
-  URJointStateConfigurationClient *ConfigClient;
+  // URJointStateConfigurationClient *ConfigClient;
 };

@@ -12,7 +12,7 @@ void URJointStateConfigurationClient::SetServiceClientParameters(URServiceClient
   {
     Super::SetServiceClientParameters(ServiceClientParameters);
     JointParamTopic = JointStateConfigurationClientParameters->JointParamTopic;
-  }  
+  }
 }
 
 void URJointStateConfigurationClient::CreateServiceClient()
@@ -30,7 +30,7 @@ void URJointStateConfigurationClient::GetJointNames(TArray<FString> *OutJointNam
   if (GetOwner())
   {
     ServiceClient = MakeShareable<FRJointStateConfigurationClient>(new FRJointStateConfigurationClient(OutJointNamesPtr, ServiceName, ServiceType));
-      
+
     FTimerHandle MyTimerHandle;
     GetOwner()->GetWorldTimerManager().SetTimer(MyTimerHandle, this, &URJointStateConfigurationClient::CallService, 1.0f, false);
   }
@@ -54,9 +54,18 @@ void FRJointStateConfigurationClient::Callback(TSharedPtr<FROSBridgeSrv::SrvResp
   FString JointString = Response->GetValue();
   JointString.RemoveFromStart(TEXT("["));
   JointString.RemoveFromEnd(TEXT("]"));
-  JointString.ParseIntoArray(*JointNames, TEXT(","), true);
-  for (FString &JointName : *JointNames)
-  {
-    JointName = JointName.TrimStartAndEnd().TrimQuotes();
-  }
+  // JointString.ParseIntoArray(*JointNames, TEXT(","), true);
+  // for (FString &JointName : *JointNames)
+  // {
+  //   JointName = JointName.TrimStartAndEnd().TrimQuotes();
+  // }
+  TArray<FString> StringArray;
+  JointString.ParseIntoArray(StringArray,TEXT(","),true);
+  for(auto& st : StringArray)
+    {
+      st = st.TrimStartAndEnd().TrimQuotes();
+      UE_LOG(LogTemp, Error, TEXT("%s"),*st);
+    }
+  JointNames->Empty();
+  JointNames->Append(StringArray);
 }

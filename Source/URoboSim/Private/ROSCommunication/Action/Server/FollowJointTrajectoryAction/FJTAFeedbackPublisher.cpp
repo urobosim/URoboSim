@@ -13,13 +13,14 @@ void URFJTAFeedbackPublisher::Init()
   if (GetOwner())
   {
     JointController = Cast<URJointController>(Controller);
-    if (JointController)
-    {
-      ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
-      ConfigClient->JointParamTopic = JointParamTopic;
-      ConfigClient->Connect(Handler);
-      ConfigClient->GetJointNames(&JointController->TrajectoryStatus.JointNames);
-    }
+    // if (JointController)
+    // {
+    //   UE_LOG(LogTemp, Error, TEXT("Configure JointControllerStatePublisher Feedback"));
+    //   ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
+    //   ConfigClient->JointParamTopic = JointParamTopic;
+    //   ConfigClient->Connect(Handler);
+    //   ConfigClient->GetJointNames(&JointController->TrajectoryStatus.JointNames);
+    // }
   }
 }
 

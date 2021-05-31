@@ -17,7 +17,7 @@ void URJointTrajectoryControllerStatePublisher::SetPublishParameters(URPublisher
     FrameId = JointTrajectoryControllerStatePublisherParameters->FrameId;
     JointParamTopic = JointTrajectoryControllerStatePublisherParameters->JointParamTopic;
     JointControllerName = JointTrajectoryControllerStatePublisherParameters->JointControllerName;
-  }  
+  }
 }
 
 void URJointTrajectoryControllerStatePublisher::Init()
@@ -28,6 +28,7 @@ void URJointTrajectoryControllerStatePublisher::Init()
     JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName));
     if (JointController)
     {
+      UE_LOG(LogTemp, Error, TEXT("Configure JointControllerStatePublisher publisher"));
       ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
       ConfigClient->JointParamTopic = JointParamTopic;
       ConfigClient->Connect(Handler);
@@ -41,7 +42,7 @@ void URJointTrajectoryControllerStatePublisher::Publish()
   if (GetOwner() && JointController)
   {
     static int Seq = 0;
-    
+
     TSharedPtr<control_msgs::JointTrajectoryControllerState> State =
         MakeShareable(new control_msgs::JointTrajectoryControllerState());
 
@@ -62,7 +63,7 @@ void URJointTrajectoryControllerStatePublisher::Publish()
     State->SetError(ErrorMsg);
 
     State->SetJointNames(JointController->TrajectoryStatus.JointNames);
-    
+
     Handler->PublishMsg(Topic, State);
     Handler->Process();
 
