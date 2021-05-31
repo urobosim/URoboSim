@@ -56,7 +56,7 @@ void FRPR2GCAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 
       GripperController->MaxEffort = Command->GetGoal().GetCommand().GetMaxEffort();
       UE_LOG(LogRPR2GCAGoalSubscriber, Log, TEXT("Received GripperCommand Id: %s Goal: %f"), *Id.GetId(), GripperController->Position);
-      GripperController->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
+      GripperController->GetGoalStatusList().Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
       GripperController->UpdateGripper();
     });
   }

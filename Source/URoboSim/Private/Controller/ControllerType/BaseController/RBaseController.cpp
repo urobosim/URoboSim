@@ -11,6 +11,8 @@ URBaseController::URBaseController()
 
 void URBaseController::Init()
 {
+  Super::Init();
+  
   if (!GetOwner())
   {
     UE_LOG(LogTemp, Error, TEXT("URBaseController not attached to ARModel"));
@@ -45,7 +47,7 @@ void URBaseController::Turn(float InVelocity)
   //   }
 }
 
-void URBaseController::Tick(float InDeltaTime)
+void URBaseController::Tick(const float &InDeltaTime)
 {
   MoveLinearTick(InDeltaTime);
   TurnTick(InDeltaTime);

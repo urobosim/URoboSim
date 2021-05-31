@@ -9,7 +9,7 @@ URMIRWheelController::URMIRWheelController()
   OdomVelocityStates.Init(0.0, 3);
 }
 
-void URMIRWheelController::Tick(float InDeltaTime)
+void URMIRWheelController::Tick(const float &InDeltaTime)
 {
   MoveLinearTick(InDeltaTime);
   TurnTick(InDeltaTime);

@@ -45,7 +45,7 @@ void FRPR2HAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
     HeadController->Axis = Command->GetGoal().GetPointingAxis().GetVector();
 
     actionlib_msgs::GoalID Id = Command->GetGoalId();
-    HeadController->GoalStatusList.Add(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
+    HeadController->AddGoalStatus(FGoalStatusInfo(Id.GetId(), Id.GetStamp().Secs, Id.GetStamp().NSecs));
     UE_LOG(LogRPR2HAGoalSubscriber, Log, TEXT("Recieved HeadAction Id: %s Goal: %s"), *Id.GetId(), *HeadController->Point.ToString());
     AsyncTask(ENamedThreads::GameThread, [this]() {
       HeadController->UpdateHeadDirection();

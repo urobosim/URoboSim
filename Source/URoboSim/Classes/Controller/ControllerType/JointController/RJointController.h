@@ -1,15 +1,10 @@
 #pragma once
 
 #include "Controller/RController.h"
+#include "RUtilityClasses.h"
+// clang-format off
 #include "RJointController.generated.h"
-
-UENUM()
-enum class UJointControllerState : uint8
-{
-  Normal,
-  FollowJointTrajectory,
-  Off
-};
+// clang-format on
 
 UENUM()
 enum class UJointControllerMode : uint8
@@ -22,78 +17,44 @@ UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = O
 class UROBOSIM_API URJointController : public URController
 {
   GENERATED_BODY()
-    public:
-    URJointController();
 
+public:
+  URJointController();
+
+public:
   virtual void Init() override;
-  virtual void Tick(float InDeltaTime);
 
-  UPROPERTY(VisibleAnywhere)
-    UJointControllerState State;
+  virtual void Tick(const float &InDeltaTime) override;
+
+  void SetJointNames(const TArray<FString> &JointNames);
+
+public:
+  UPROPERTY(EditAnywhere)
+  TMap<FString, FJointState> DesiredJointStates;
+
+protected:
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
 
   UPROPERTY(EditAnywhere)
-    FString BaseLink;
+  bool bDisableCollision;
 
   UPROPERTY(EditAnywhere)
-    float RevolutAccuracy;
+  bool bControllAllJoints;
 
+protected:
+  void SetMode();
+
+  void SetTargetJointState();
+
+protected:
   UPROPERTY(EditAnywhere)
-    float PrismaticAccuracy;
+  UJointControllerMode Mode;
 
+protected:
+  void MoveJoints(const float &InDeltaTime);
 
-  UPROPERTY(EditAnywhere)
-    bool bDisableCollision;
+  virtual void MoveJointsDynamic();
 
-  UPROPERTY()
-    TArray<FTrajectoryPoints> Trajectory;
-
-  UPROPERTY(EditAnywhere)
-    TMap<FString,float> DesiredJointState;
-
-  UPROPERTY()
-    TArray<bool> bTrajectoryPointsReached;
-
-
-  UPROPERTY(EditAnywhere)
-    float MaxJointAngularVel;
-
-  UPROPERTY()
-    FTrajectoryStatus TrajectoryStatus;
-
-  virtual void FollowTrajectory(double InActionStart, FGoalStatusInfo InGoalInfo, TArray<FString> InJointNames, TArray<FTrajectoryPoints> InTrajectory);
-  virtual void SetJointNames(TArray<FString> InNames);
-  virtual void SwitchMode(UJointControllerMode InMode, bool IsInit = false);
-
-  UJointControllerState GetState();
-
-  virtual void SetDesiredJointState(FString JointName, float InJointState);
-
-  virtual void EnableMotor(bool bEnableTrue);
-
- protected:
-  UPROPERTY(EditAnywhere)
-    UJointControllerMode Mode;
-
-  UPROPERTY(EditAnywhere)
-    float SpeedFactorHack = 1;
-  virtual void MoveJoints(float InDeltaTime);
-  virtual void MoveJointsDynamic(float InDeltaTime);
   virtual void MoveJointsKinematic();
-
-  UPROPERTY()
-    FTrajectoryPoints OldTrajectoryPoints;
-
-  UPROPERTY()
-    uint32 TrajectoryPointIndex;
-
-  void UpdateDesiredJointAngle(float InDeltaTime);
-  virtual bool CheckTrajectoryGoalReached();
-  virtual bool CheckTrajectoryPoint();
-  float CallculateJointVelocity(float InDeltaTime, FString InJointName);
-  void SetJointVelocities(float InDeltaTime);
-  virtual bool SwitchToNormal();
-  virtual bool SwitchToFollowJointTrajectory();
-
-  UPROPERTY()
-    bool bBreak;
 };

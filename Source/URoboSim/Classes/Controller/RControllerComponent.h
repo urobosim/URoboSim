@@ -8,7 +8,7 @@
 #include "RControllerComponent.generated.h"
 // clang-format on
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS()
 class UROBOSIM_API URControllerComponent : public URPluginComponent
 {
 	GENERATED_BODY()
@@ -20,16 +20,14 @@ public:
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 public:
-	void Init();
-
 	void AddController(URController *&Controller) { Controllers.Add(Controller); }
 
 	URController* GetController(const FString &ControllerName) const;
 
+protected:
+	void Init() override;
+
 public:
 	UPROPERTY(EditAnywhere, Instanced)
 	TArray<URController *> Controllers;
-
-protected:
-  void BeginPlay() override;
 };

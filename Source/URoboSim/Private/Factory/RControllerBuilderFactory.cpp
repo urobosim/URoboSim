@@ -3,7 +3,7 @@
 #include "Controller/ControllerType/JointController/RJointController.h"
 #include "Controller/ControllerType/JointController/RHeadController.h"
 #include "Controller/ControllerType/JointController/RGripperController.h"
-#include "Controller/RController.h"
+#include "Controller/RCameraController.h"
 #include "Components/ActorComponent.h"
 
 void URControllerBuilder::Init(TArray<ARModel*> InModels, const URControllerConfiguration* InControllerConfiguration)
@@ -57,7 +57,6 @@ void URControllerBuilder::Build()
       UE_LOG(LogTemp, Error, TEXT("Create Controller"));
       URController* Controller = CreateController(ControllerComp);
       ControllerComp->AddController(Controller);
-      ControllerComp->Init();
     }
 }
 

@@ -6,6 +6,7 @@
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
 #include "Physics/RPhysicsConstraintComponent.h"
+#include "RUtilityClasses.h"
 #include "RJoint.generated.h"
 
 class ARModel;
@@ -41,17 +42,18 @@ public:
         UPROPERTY()
           class URLink* Child;
 
+  FJointState GetJointState();
 	virtual float GetJointPosition();
 	virtual float GetJointPositionInUUnits();
 	virtual float GetJointVelocity();
 
-  void SetMotorJointState(float Position, float Velocity);
+  void SetMotorJointState(const FJointState &JointState);
 	virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
 	virtual void SetJointVelocity(float Velocity);
 	virtual void SetJointVelocityInUUnits(float Velocity);
 	virtual void SetJointEffort(float Effort);
 	virtual void SetJointEffortFromROS(float Effort);
-        virtual void EnableMotor(bool InEnable);
+  virtual void SetDrive(const FEnableDrive &EnableDrive);
 
     UPROPERTY(EditAnywhere)
     URConstraintComponent* Constraint;

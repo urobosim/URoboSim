@@ -6,7 +6,6 @@
 #include "Physics/RModel.h"
 #include "Physics/RStaticMeshComponent.h"
 
-
 // Sets default values for this component's properties
 URJoint::URJoint()
 {
@@ -25,9 +24,9 @@ void URJoint::UpdateEncoder()
   Constraint->UpdateEncoderValue(GetJointPosition());
 }
 
-void URJoint::EnableMotor(bool InEnable)
+void URJoint::SetDrive(const FEnableDrive &EnableDrive)
 {
-  Constraint->EnableMotor(InEnable);
+  Constraint->SetDrive(EnableDrive);
 }
 
 void URJoint::UpdateVelocity(float InDeltaTime)
@@ -48,9 +47,14 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
   Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
 
-void URJoint::SetMotorJointState(float Position, float Velocity)
+void URJoint::SetMotorJointState(const FJointState &JointState)
 {
-	Constraint->SetMotorJointState(Position, Velocity);
+	Constraint->SetMotorJointState(JointState.JointPosition, JointState.JointVelocity);
+}
+
+FJointState URJoint::GetJointState()
+{
+  return FJointState(GetJointPosition(), GetJointVelocity());
 }
 
 float URJoint::GetJointPosition()

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Controller/RController.h"
+#include "Controller/RCameraController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "ROSCommunication/Publisher/RTFPublisher.h"
 // clang-format off

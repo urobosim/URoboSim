@@ -29,7 +29,7 @@ void URJointStatePublisher::Init()
     ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
     ConfigClient->JointParamTopic = JointParamTopic;
     ConfigClient->Connect(Handler);
-    ConfigClient->GetJointNames(&ListJointName);
+    ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ ListJointName = JointNames; });
   }
 }
 

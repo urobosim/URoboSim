@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RJointController.h"
+#include "Controller/ControllerType/JointController/RJointTrajectoryController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 #include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
 // clang-format off
@@ -29,7 +29,7 @@ public:
   FString JointParamTopic;
 
 private:
-  URJointController *JointController;
+  URJointTrajectoryController *JointTrajectoryController;
 
   // URJointStateConfigurationClient *ConfigClient;
 };

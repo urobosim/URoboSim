@@ -30,7 +30,7 @@ void URJointControllerConfigurationClient::CreateServiceClient()
   {
     if (URJointController *JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName)))
     {
-      TMap<FString, float> *JointNames = &JointController->DesiredJointState;
+      TMap<FString, FJointState> *JointNames = &JointController->DesiredJointStates;
       JointRequest = MakeShareable(new rosapi::GetParam::Request(JointParamTopic, TEXT("")));
       JointResponse = MakeShareable(new rosapi::GetParam::Response());
       JointServiceClient = MakeShareable<FRJointControllerConfigurationClient>(new FRJointControllerConfigurationClient(JointController, JointNames, ServiceName, ServiceType));
@@ -52,7 +52,7 @@ void URJointControllerConfigurationClient::CallService()
   Handler->CallService(JointLimitServiceClient, LimitRequest, LimitResponse);
 }
 
-FRJointControllerConfigurationClient::FRJointControllerConfigurationClient(URJointController *InJointController, TMap<FString, float> *OutJointNames, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)
+FRJointControllerConfigurationClient::FRJointControllerConfigurationClient(URJointController *InJointController, TMap<FString, FJointState> *OutJointNames, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)
 {
   JointNames = OutJointNames;
   JointController = InJointController;
@@ -71,13 +71,12 @@ void FRJointControllerConfigurationClient::Callback(TSharedPtr<FROSBridgeSrv::Sr
   for (auto &st : StringArray)
   {
     st = st.TrimStartAndEnd().TrimQuotes();
-    float &JointState = JointNames->FindOrAdd(st);
+    float &JointState = JointNames->FindOrAdd(st).JointPosition;
     JointState = 0.f;
   }
-  JointController->EnableMotor(true);
 }
 
-FRJointLimitControllerConfigurationClient::FRJointLimitControllerConfigurationClient(TMap<FString, float> *OutJointNames, ARModel *InModel, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)
+FRJointLimitControllerConfigurationClient::FRJointLimitControllerConfigurationClient(TMap<FString, FJointState> *OutJointNames, ARModel *InModel, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)
 {
   Model = InModel;
   JointNames = OutJointNames;
@@ -125,12 +124,12 @@ void FRJointLimitControllerConfigurationClient::Callback(TSharedPtr<FROSBridgeSr
 
               if (0.0f < SoftLowerLimit)
               {
-                float &JointState = JointNames->FindOrAdd(MyName);
+                float &JointState = JointNames->FindOrAdd(MyName).JointPosition;
                 JointState = SoftLowerLimit;
               }
               else if (0.0f > SoftUpperLimit)
               {
-                float &JointState = JointNames->FindOrAdd(MyName);
+                float &JointState = JointNames->FindOrAdd(MyName).JointPosition;
                 JointState = SoftUpperLimit;
               }
             }

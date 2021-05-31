@@ -12,6 +12,28 @@
 #include "RPhysicsConstraintComponent.generated.h"
 
 USTRUCT()
+struct FEnableDrive
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  bool bPositionDrive = true;
+
+  UPROPERTY(EditAnywhere)
+  bool bVelocityDrive = true;
+
+  UPROPERTY(EditAnywhere)
+  float PositionStrength = 1E5;
+
+  UPROPERTY(EditAnywhere)
+  float VelocityStrength = 1E5;
+
+  UPROPERTY(EditAnywhere)
+  float MaxForce = 1E10;
+};
+
+USTRUCT()
 struct FJointInformation
 {
   GENERATED_BODY()
@@ -64,7 +86,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void BeginPlay() override;
   virtual const FTransform GetChildPoseInJointFrame() const;
   virtual void ConnectToComponents(){};
-  virtual void EnableMotor(bool InEnable){};
+  virtual void SetDrive(const FEnableDrive &EnableDrive) {}
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
@@ -167,7 +189,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
   virtual void SetJointVelocityInUUnits(float Velocity);
   virtual void SetJointEffort(float Effort);
   virtual void SetJointEffortFromROS(float InEffort);
-  virtual void EnableMotor(bool InEnable) override;
+  virtual void SetDrive(const FEnableDrive &EnableDrive) override;
   virtual void SetTargetPosition(float InTargetPos);
 
 
@@ -192,7 +214,7 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   };
 
   virtual void SetTargetPosition(float InTargetPos);
-  virtual void EnableMotor(bool InEnable) override;
+  virtual void SetDrive(const FEnableDrive &EnableDrive) override;
   virtual float GetConstraintPosition() override;
   virtual float GetJointPosition() override;
   virtual float GetJointVelocity() override;

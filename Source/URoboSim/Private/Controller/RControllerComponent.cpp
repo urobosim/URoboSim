@@ -10,40 +10,30 @@ URControllerComponent::URControllerComponent()
 
 void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
-  float realtimeSeconds = FPlatformTime::Seconds();
-  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
   for (URController *&Controller : Controllers)
   {
     Controller->Tick(DeltaTime);
   }
 }
-void URControllerComponent::BeginPlay()
-{
-  Super::BeginPlay();
-
-  Init();
-}
 
 void URControllerComponent::Init()
 {
-  RegisterComponent(); // Remove this will cause the TickComponent not fire in Play
-  if (!GetOwner())
-  {
-    UE_LOG(LogRControllerComponent, Error, TEXT("Owner of %s is not RModel"), *GetName())
-  }
-  else
+  if (ARModel *Owner = Cast<ARModel>(GetOwner()))
   {
     for (URController *&Controller : Controllers)
     {
-      Controller->SetOwner(GetOwner());
       Controller->Init();
     }
+  }
+  else
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("Owner of %s is not ARModel"), *GetName())
   }
 }
 
 URController *URControllerComponent::GetController(const FString &ControllerName) const
 {
-  URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Equals(ControllerName); });
+  URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Contains(ControllerName); });
   if (ControllerPtr)
   {
     return *ControllerPtr;

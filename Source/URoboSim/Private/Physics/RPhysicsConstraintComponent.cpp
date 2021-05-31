@@ -254,43 +254,40 @@ void URRevoluteConstraintComponent::SetTargetPosition(float InTargetPos)
   SetAngularOrientationTarget(Temp);
 }
 
-void URContinuousConstraintComponent::EnableMotor(bool InEnable)
+void URContinuousConstraintComponent::SetDrive(const FEnableDrive &EnableDrive)
 {
-  SetOrientationDriveTwistAndSwing(InEnable, InEnable);
   SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
-  SetAngularDriveParams(1E6, 1E5, 1E10);
+  SetAngularDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
   if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
   {
-    SetAngularOrientationDrive(false, true);
-    SetAngularVelocityDrive(false, true);
+    SetAngularOrientationDrive(false, EnableDrive.bPositionDrive);
+    SetAngularVelocityDrive(false, EnableDrive.bVelocityDrive);
   }
   else
   {
-    SetAngularOrientationDrive(true, false);
-    SetAngularVelocityDrive(true, false);
+    SetAngularOrientationDrive(EnableDrive.bPositionDrive, false);
+    SetAngularVelocityDrive(EnableDrive.bVelocityDrive, false);
   }
 }
 
-void URPrismaticConstraintComponent::EnableMotor(bool InEnable)
+void URPrismaticConstraintComponent::SetDrive(const FEnableDrive &EnableDrive)
 {
-  SetLinearDriveParams(1E8, 1E8, 1E10);
-  bool bEnableX = false;
-  bool bEnableY = false;
-  bool bEnableZ = false;
-  if(RefAxis.GetAbs().Equals(FVector::ForwardVector))
-    {
-      bEnableX = InEnable;
-    }
-  else if(RefAxis.GetAbs().Equals(FVector::RightVector))
-    {
-      bEnableY = InEnable;
-    }
+  SetLinearDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
+  if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
+  {
+    SetLinearPositionDrive(EnableDrive.bPositionDrive, false, false);
+    SetLinearVelocityDrive(EnableDrive.bVelocityDrive, false, false);
+  }
+  else if (RefAxis.GetAbs().Equals(FVector::RightVector))
+  {
+    SetLinearPositionDrive(false, EnableDrive.bPositionDrive, false);
+    SetLinearVelocityDrive(false, EnableDrive.bVelocityDrive, false);
+  }
   else
-    {
-      bEnableZ = InEnable;
-    }
-  SetLinearPositionDrive(bEnableX, bEnableY, bEnableZ);
-  SetLinearVelocityDrive(bEnableX, bEnableY, bEnableZ);
+  {
+    SetLinearPositionDrive(false, false, EnableDrive.bPositionDrive);
+    SetLinearVelocityDrive(false, false, EnableDrive.bVelocityDrive);
+  }
 }
 
 void URFixedConstraintComponent::ConnectToComponents()
@@ -413,14 +410,14 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -TargetJointVelocity);
+  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
 }
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
 {
   SetTargetPosition(TargetPosition);
   // SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition));
-  SetAngularVelocityTarget(RefAxis * TargetJointVelocity);
+  SetAngularVelocityTarget(RefAxis * TargetJointVelocity / 360.f);
   Child->WakeRigidBody();
 }
 

@@ -58,6 +58,29 @@ URJoint *ARModel::GetJoint(const FString &JointName) const
   }
 }
 
+TArray<URLink *> ARModel::GetLinks() const
+{
+  TArray<URLink *> LinkArray;
+  for (const TPair<FString, URLink *> &Link : Links)
+  {
+    LinkArray.Add(Link.Value);
+  }
+  return LinkArray;
+}
+
+URLink *ARModel::GetLink(const FString &LinkName) const
+{
+  if (Links.Contains(LinkName))
+  {
+    return Links[LinkName];
+  }
+  else
+  {
+    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *LinkName, *GetName())
+    return nullptr;
+  }
+}
+
 bool ARModel::AddPlugin(URPluginComponent *InPlugin)
 {
   if (URPluginComponent *Plugin = GetPlugin(InPlugin->GetName()))
@@ -97,16 +120,4 @@ URController *ARModel::GetController(const FString &ControllerName) const
   }
   UE_LOG(LogRModel, Error, TEXT("ControllerComponent not found in %s"), *GetName())
   return nullptr;
-}
-
-TArray<FJointState> ARModel::GetJointStates() const
-{
-  TArray<FJointState> JointStates;
-
-  for (const TPair<FString, URJoint *> &Joint : Joints)
-  {
-    JointStates.Add(FJointState(Joint.Key, Joint.Value->GetJointPosition(), Joint.Value->GetJointVelocity()));
-  }
-
-  return JointStates;
 }

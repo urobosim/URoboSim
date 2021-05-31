@@ -23,7 +23,7 @@ void URPR2HAFeedbackPublisher::Publish()
     TSharedPtr<pr2_controllers_msgs::PR2PointHeadActionFeedback> Feedback =
         MakeShareable(new pr2_controllers_msgs::PR2PointHeadActionFeedback());
 
-    FGoalStatusInfo StatusInfo = HeadController->GoalStatusList.Last();
+    FGoalStatusInfo StatusInfo = HeadController->GetGoalStatusList().Last();
     actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, TEXT(""));
     Feedback->SetStatus(GS);
     Feedback->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));

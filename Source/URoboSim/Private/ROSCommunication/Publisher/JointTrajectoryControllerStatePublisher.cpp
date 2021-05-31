@@ -6,7 +6,7 @@ URJointTrajectoryControllerStatePublisher::URJointTrajectoryControllerStatePubli
   Topic = TEXT("/whole_body_controller/body/state");
   MessageType = TEXT("control_msgs/JointTrajectoryControllerState");
   JointParamTopic = TEXT("/whole_body_controller/joints");
-  JointControllerName = TEXT("JointController");
+  JointTrajectoryControllerName = TEXT("JointTrajectoryController");
 }
 
 void URJointTrajectoryControllerStatePublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
@@ -16,7 +16,7 @@ void URJointTrajectoryControllerStatePublisher::SetPublishParameters(URPublisher
     Super::SetPublishParameters(PublisherParameters);
     FrameId = JointTrajectoryControllerStatePublisherParameters->FrameId;
     JointParamTopic = JointTrajectoryControllerStatePublisherParameters->JointParamTopic;
-    JointControllerName = JointTrajectoryControllerStatePublisherParameters->JointControllerName;
+    JointTrajectoryControllerName = JointTrajectoryControllerStatePublisherParameters->JointTrajectoryControllerName;
   }
 }
 
@@ -25,21 +25,21 @@ void URJointTrajectoryControllerStatePublisher::Init()
   Super::Init();
   if (GetOwner())
   {
-    JointController = Cast<URJointController>(GetOwner()->GetController(JointControllerName));
-    if (JointController)
+    JointTrajectoryController = Cast<URJointTrajectoryController>(GetOwner()->GetController(JointTrajectoryControllerName));
+    if (JointTrajectoryController)
     {
       UE_LOG(LogTemp, Error, TEXT("Configure JointControllerStatePublisher publisher"));
       ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
       ConfigClient->JointParamTopic = JointParamTopic;
       ConfigClient->Connect(Handler);
-      ConfigClient->GetJointNames(&JointController->TrajectoryStatus.JointNames);
+      ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ JointTrajectoryController->SetJointNames(JointNames); });
     }
   }
 }
 
 void URJointTrajectoryControllerStatePublisher::Publish()
 {
-  if (GetOwner() && JointController)
+  if (GetOwner() && JointTrajectoryController)
   {
     static int Seq = 0;
 
@@ -48,21 +48,50 @@ void URJointTrajectoryControllerStatePublisher::Publish()
 
     State->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
 
-    State->SetJointNames(JointController->TrajectoryStatus.JointNames);
+    TArray<FString> JointNames;
+    TArray<double> DesiredPositions;
+    TArray<double> CurrentPositions;
+    TArray<double> ErrorPositions;
+    TArray<double> DesiredVelocities;
+    TArray<double> CurrentVelocities;
+    TArray<double> ErrorVelocities;
+    for (const TPair<FString, FJointState> &DesiredJointState : JointTrajectoryController->DesiredJointStates)
+    {
+      const FString JointName = DesiredJointState.Key;
+      if (URJoint *Joint = GetOwner()->GetJoint(JointName))
+      {
+        JointNames.Add(JointName);
+
+        DesiredPositions.Add(DesiredJointState.Value.JointPosition);
+        DesiredVelocities.Add(DesiredJointState.Value.JointVelocity);
+
+        CurrentPositions.Add(Joint->GetJointState().JointPosition);
+        CurrentVelocities.Add(Joint->GetJointState().JointVelocity);
+
+        ErrorPositions.Add(DesiredJointState.Value.JointPosition - Joint->GetJointState().JointPosition);
+        ErrorVelocities.Add(DesiredJointState.Value.JointVelocity - Joint->GetJointState().JointVelocity);
+      }
+    }
+
+    State->SetJointNames(JointNames);
 
     trajectory_msgs::JointTrajectoryPoint DesiredMsg;
-    DesiredMsg.SetPositions(JointController->TrajectoryStatus.Desired);
+    DesiredMsg.SetPositions(DesiredPositions);
+    DesiredMsg.SetVelocities(DesiredVelocities);
     State->SetDesired(DesiredMsg);
 
     trajectory_msgs::JointTrajectoryPoint ActualMsg;
-    ActualMsg.SetPositions(JointController->TrajectoryStatus.Position);
+    ActualMsg.SetPositions(CurrentPositions);
+    ActualMsg.SetVelocities(CurrentVelocities);
     State->SetActual(ActualMsg);
 
     trajectory_msgs::JointTrajectoryPoint ErrorMsg;
-    ErrorMsg.SetPositions(JointController->TrajectoryStatus.Error);
+    ErrorMsg.SetPositions(ErrorPositions);
+    ErrorMsg.SetVelocities(ErrorVelocities);
     State->SetError(ErrorMsg);
 
-    State->SetJointNames(JointController->TrajectoryStatus.JointNames);
+    // State->SetJointNames(JointController->TrajectoryStatus.JointNames);
+
 
     Handler->PublishMsg(Topic, State);
     Handler->Process();

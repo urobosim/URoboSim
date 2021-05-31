@@ -7,7 +7,6 @@
 #include "Physics/RJoint.h"
 #include "Physics/RLink.h"
 #include "RGraspComponent.h"
-#include "RUtilityClasses.h"
 // clang-format off
 #include "RModel.generated.h"
 // clang-format on
@@ -32,13 +31,15 @@ protected:
   virtual void BeginPlay() override;
 
 public:
-  TArray<FJointState> GetJointStates() const;
-
   void AddJoint(URJoint *Joint);
 
   TArray<URJoint *> GetJoints() const;
 
   URJoint *GetJoint(const FString &JointName) const;
+
+  TArray<URLink *> GetLinks() const;
+
+  URLink *GetLink(const FString &LinkName) const;
 
   void AddLink(URLink *Link);
 
