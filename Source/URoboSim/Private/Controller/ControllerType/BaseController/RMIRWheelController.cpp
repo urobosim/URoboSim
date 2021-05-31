@@ -2,11 +2,17 @@
 
 URMIRWheelController::URMIRWheelController()
 {
-  BaseName = TEXT("base_footprint");
-
-  OdomPositionStates.Init(0.0, 3);
   WheelSetting.WheelVelocities.Init(0.0, 5);
-  OdomVelocityStates.Init(0.0, 3);
+}
+
+void URMIRWheelController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URMIRWheelControllerParameter *MIRWheelControllerParameters = Cast<URMIRWheelControllerParameter>(ControllerParameters);
+  if (MIRWheelControllerParameters)
+  {
+    Super::SetControllerParameters(ControllerParameters);
+    WheelSetting = MIRWheelControllerParameters->WheelSetting;
+  }
 }
 
 void URMIRWheelController::Tick(const float &InDeltaTime)

@@ -1,4 +1,6 @@
-#include "RController.h"
+#pragma once
+
+#include "Controller/RController.h"
 // clang-format off
 #include "RTFController.generated.h"
 // clang-format on
@@ -13,6 +15,13 @@ public:
   // FString ChildFrame;
   // FORCEINLINE FTransform() : ParentFrame(""), Pose(FTransform()){};
   // FORCEINLINE explicit FTFInfo() : ParentFrame(InParentFrame), Pose(InPose){};
+};
+
+UCLASS()
+class UROBOSIM_API URTFControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
 };
 
 UCLASS()

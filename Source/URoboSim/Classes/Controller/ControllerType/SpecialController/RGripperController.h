@@ -1,11 +1,7 @@
 #pragma once
 
-#include "ConstructorHelpers.h"
-#include "Controller/RControllerComponent.h"
-#include "Physics/RJoint.h"
 #include "Physics/RModel.h"
-#include "RGraspComponent.h"
-#include "RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 // clang-format off
 #include "RGripperController.generated.h"
 // clang-format on
@@ -42,6 +38,28 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URGripperControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString RightJointName;
+
+  UPROPERTY(EditAnywhere)
+  FString LeftJointName;
+
+  UPROPERTY(EditAnywhere)
+  FString RightFingerTipName;
+
+  UPROPERTY(EditAnywhere)
+  FString LeftFingerTipName;
+
+  UPROPERTY(EditAnywhere)
+  bool bDisableCollision;
+};
+
+UCLASS()
 class UROBOSIM_API URGripperController : public URController
 {
   GENERATED_BODY()
@@ -51,6 +69,8 @@ public:
 
 public:
   virtual void Init() override;
+
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   virtual bool Grasp();
 

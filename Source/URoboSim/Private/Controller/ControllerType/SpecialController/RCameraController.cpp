@@ -1,8 +1,62 @@
-#include "Controller/RCameraController.h"
+#include "Controller/ControllerType/SpecialController/RCameraController.h"
 
 URCameraController::URCameraController()
 {
 
+}
+
+void URCameraController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URCameraControllerParameter *CameraControllerParameters = Cast<URCameraControllerParameter>(ControllerParameters);
+  if (CameraControllerParameters)
+  {
+    CameraRef = CameraControllerParameters->CameraRef;
+    CameraName = CameraControllerParameters->CameraName;
+    PoseOffset = CameraControllerParameters->PoseOffset;
+  }
+}
+
+void URCameraController::Init()
+{
+  Super::Init();
+
+  if (!GetOwner())
+  {
+    UE_LOG(LogTemp, Error, TEXT("%s is not attached to ARModel"), *GetName());
+    return;
+  }
+
+  TArray<AActor *> FoundActors;
+  TArray<URStaticMeshComponent *> ActorComponents;
+  URStaticMeshComponent *ReferenceLink = nullptr;
+  GetOwner()->GetComponents(ActorComponents);
+
+  for (URStaticMeshComponent *&Component : ActorComponents)
+  {
+    if (Component->GetName().Contains(CameraRef))
+    {
+      ReferenceLink = Component;
+    }
+  }
+  if (!ReferenceLink)
+  {
+    UE_LOG(LogTemp, Error, TEXT("CameraRef not found"));
+    return;
+  }
+
+  UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
+
+  for (auto &MyCamera : FoundActors)
+  {
+    if (MyCamera->GetName().Equals(CameraName))
+    {
+      MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+      MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
+      MyCamera->AddActorLocalRotation(PoseOffset.GetRotation());
+      return;
+    }
+  }
+  UE_LOG(LogTemp, Error, TEXT("Camera %s not found"), *CameraName);
 }
 
 void URCameraController::PerceiveObject()
@@ -61,47 +115,4 @@ void URCameraController::PerceiveObject()
 
 void URCameraController::Tick(const float &InDeltaTime)
 {
-}
-
-void URCameraController::Init()
-{
-  Super::Init();
-
-  if (!GetOwner())
-  {
-    UE_LOG(LogTemp, Error, TEXT("%s is not attached to ARModel"), *GetName());
-    return;
-  }
-
-  TArray<AActor *> FoundActors;
-  TArray<URStaticMeshComponent *> ActorComponents;
-  URStaticMeshComponent *ReferenceLink = nullptr;
-  GetOwner()->GetComponents(ActorComponents);
-
-  for (URStaticMeshComponent *&Component : ActorComponents)
-  {
-    if (Component->GetName().Contains(CameraRef))
-    {
-      ReferenceLink = Component;
-    }
-  }
-  if (!ReferenceLink)
-  {
-    UE_LOG(LogTemp, Error, TEXT("CameraRef not found"));
-    return;
-  }
-
-  UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
-
-  for (auto &MyCamera : FoundActors)
-  {
-    if (MyCamera->GetName().Equals(CameraName))
-    {
-      MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-      MyCamera->AddActorLocalOffset(PoseOffset.GetLocation());
-      MyCamera->AddActorLocalRotation(PoseOffset.GetRotation());
-      return;
-    }
-  }
-  UE_LOG(LogTemp, Error, TEXT("Camera %s not found"), *CameraName);
 }

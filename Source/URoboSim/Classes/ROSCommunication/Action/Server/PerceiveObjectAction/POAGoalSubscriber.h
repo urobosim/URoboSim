@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/RCameraController.h"
+#include "Controller/ControllerType/SpecialController/RCameraController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "POAGoalSubscriber.generated.h"

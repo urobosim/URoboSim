@@ -9,6 +9,15 @@ URBaseController::URBaseController()
   OdomVelocityStates.Init(0.0, 3);
 }
 
+void URBaseController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+{
+  URBaseControllerParameter *BaseControllerParameters = Cast<URBaseControllerParameter>(ControllerParameters);
+  if (BaseControllerParameters)
+  {
+    BaseName = BaseControllerParameters->BaseName;
+  }
+}
+
 void URBaseController::Init()
 {
   Super::Init();

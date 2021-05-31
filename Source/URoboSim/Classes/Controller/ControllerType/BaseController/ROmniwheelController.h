@@ -11,6 +11,13 @@ USTRUCT()
 struct FWheelSetting
 {
   GENERATED_BODY()
+
+public:
+	FWheelSetting()
+	{
+		WheelVelocities.Init(0.0, 4);
+	}
+	
 public:
   UPROPERTY(EditAnywhere)
 	float WheelRadius = 10.f;
@@ -34,13 +41,25 @@ public:
   TArray<double> WheelVelocities;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
+class UROBOSIM_API UROmniwheelControllerParameter : public URBaseControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	FWheelSetting WheelSetting;
+};
+
+UCLASS()
 class UROBOSIM_API UROmniwheelController : public URBaseController
 {
   GENERATED_BODY()
 
 public:
   UROmniwheelController();
+
+	virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   virtual void Tick(const float &InDeltaTime) override;
 

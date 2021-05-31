@@ -13,7 +13,37 @@ enum class UJointControllerMode : uint8
   Kinematic
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
+class UROBOSIM_API URJointControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+  URJointControllerParameter()
+  {
+    Mode = UJointControllerMode::Dynamic;
+    bDisableCollision = false;
+    bControllAllJoints = false;
+    EnableDrive.PositionStrength = 1E5;
+    EnableDrive.VelocityStrength = 1E4;
+    EnableDrive.MaxForce = 1E10;
+  }
+
+public:
+  UPROPERTY(EditAnywhere)
+  UJointControllerMode Mode;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
+
+  UPROPERTY(EditAnywhere)
+  bool bDisableCollision;
+
+  UPROPERTY(EditAnywhere)
+  bool bControllAllJoints;
+};
+
+UCLASS()
 class UROBOSIM_API URJointController : public URController
 {
   GENERATED_BODY()
@@ -25,6 +55,8 @@ public:
   virtual void Init() override;
 
   virtual void Tick(const float &InDeltaTime) override;
+
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   void SetJointNames(const TArray<FString> &JointNames);
 

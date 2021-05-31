@@ -1,86 +1,66 @@
 #include "Factory/RControllerFactory.h"
-#include "Factory/RControllerBuilderFactory.h"
-#include "Physics/RModel.h"
+#include "Factory/RControllerBuilder.h"
 #include "Kismet/GameplayStatics.h"
-#include "Editor/EditorEngine.h"
 
-URControllerFactory::URControllerFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+DEFINE_LOG_CATEGORY_STATIC(LogRControllerFactory, Log, All);
+
+URControllerFactory::URControllerFactory(const FObjectInitializer &ObjectInitializer) : Super(ObjectInitializer)
 {
-    // AActor subclass this ActorFactory creates.
-    NewActorClassName = FString("ARModel");
-    NewActorClass = ARModel::StaticClass();
-    bDrag = false;
+  // AActor subclass this ActorFactory creates.
+  NewActorClassName = FString("AActor");
+  NewActorClass = AActor::StaticClass();
+  bDrag = false;
 }
 
-bool URControllerFactory::CanCreateActorFrom(const FAssetData & AssetData, FText & OutErrorMsg)
+bool URControllerFactory::CanCreateActorFrom(const FAssetData &AssetData, FText &OutErrorMsg)
 {
-    // Only designed for ControllerAsset Asset.
-    return AssetData.GetClass()->IsChildOf( URControllerDataAsset::StaticClass());
+  // Only designed for ControllerAsset Asset.
+  return AssetData.GetClass()->IsChildOf(URControllerDataAsset::StaticClass());
 }
 
-AActor* URControllerFactory::GetDefaultActor(const FAssetData & AssetData)
+AActor *URControllerFactory::GetDefaultActor(const FAssetData &AssetData)
 {
-    return NewActorClass->GetDefaultObject<ARModel>();
+  return NewActorClass->GetDefaultObject<AActor>();
 }
 
-
-AActor* URControllerFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
+AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
 {
-  if(bDrag)
+  if (bDrag)
+  {
+    URControllerDataAsset *ControllerDataAsset = CastChecked<URControllerDataAsset>(Asset);
+    if (ControllerDataAsset)
     {
-      URControllerDataAsset* ControllerAsset = CastChecked<URControllerDataAsset>(Asset);
-      if(ControllerAsset)
+      TArray<AActor *> WorldActors;
+      UGameplayStatics::GetAllActorsOfClass(InLevel->OwningWorld, ARModel::StaticClass(), WorldActors);
+
+      TArray<ARModel *> Robots;
+      for (AActor *&Actor : WorldActors)
+      {
+        if (ControllerDataAsset->RobotNames.ContainsByPredicate([&](FString RobotName){ return Actor->GetName().Contains(RobotName); }))
         {
-          ARModel* NewRobot = nullptr;
-          TArray<AActor*> WorldActors;
-          UGameplayStatics::GetAllActorsOfClass(InLevel->OwningWorld, ARModel::StaticClass(), WorldActors);
-
-
-          TArray<ARModel*> TargetModel;
-          for (auto & Robot : WorldActors)
-            {
-              UE_LOG(LogTemp, Error, TEXT("Found Model %s"), *Robot->GetName());
-              if (ControllerAsset->RobotNames.Contains(Robot->GetName()))
-                {
-                  UE_LOG(LogTemp, Error, TEXT("Robot found"));
-                  TargetModel.Add(Cast<ARModel>(Robot));
-                }
-            }
-          if(TargetModel.Num() != 0)
-            {
-              URControllerBuilderFactory* ControllerFacotry = NewObject<URControllerBuilderFactory>(this);
-              for(auto & Configuration : ControllerAsset->ControllerConfigurations)
-                {
-                  UE_LOG(LogTemp, Error, TEXT("Create Builder"));
-                  URControllerBuilder* ControllerBuilder = ControllerFacotry->CreateBuilder(TargetModel, Configuration);
-                  ControllerBuilder->Build();
-                  ControllerBuilder->ConfigureController();
-                }
-
-            }
-
-
+          UE_LOG(LogRControllerFactory, Log, TEXT("Found ARModel %s in ControllerDataAsset %s"), *Actor->GetName(), *ControllerDataAsset->GetName())
+          Robots.Add(Cast<ARModel>(Actor));
         }
+      }
+      if (Robots.Num() != 0)
+      {
+        URControllerBuilder *ControllerBuilder = NewObject<URControllerBuilder>();
+        ControllerBuilder->Init(Robots, ControllerDataAsset->ControllerConfiguration);
+        ControllerBuilder->Build();
+      }
       else
+      {
+        for (const FString &RobotName : ControllerDataAsset->RobotNames)
         {
-          UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
-
+          UE_LOG(LogRControllerFactory, Warning, TEXT("%s not found"), *RobotName)
         }
-
-      UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
+      }
     }
-  else
+    else
     {
-      bDrag = !bDrag;
+      UE_LOG(LogRControllerFactory, Error, TEXT("Casting Asset to USDFDataAsset failed"))
     }
-
-  // Creates RRobot Actor.
+  }
+  bDrag = !bDrag;
   return nullptr;
-
-}
-
-
-void URControllerFactory::CreateModels(ARModel* OutModel, USDFDataAsset* SDFData)
-{
-  // OutModel->Load(Model);
 }

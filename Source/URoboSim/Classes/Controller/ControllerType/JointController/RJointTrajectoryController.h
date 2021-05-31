@@ -53,6 +53,13 @@ public:
 };
 
 UCLASS()
+class UROBOSIM_API URJointTrajectoryControllerParameter : public URJointControllerParameter
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS()
 class UROBOSIM_API URJointTrajectoryController : public URJointController
 {
   GENERATED_BODY()

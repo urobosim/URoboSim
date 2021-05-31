@@ -51,11 +51,20 @@ public:
 	UPROPERTY(EditAnywhere)
 	FString WheelBackRightTranslation = FString(TEXT("br_caster_wheel_link"));
 
-  UPROPERTY()
   TArray<double> WheelVelocities;
 };
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS()
+class UROBOSIM_API URMIRWheelControllerParameter : public URBaseControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere)
+	FMIRWheelSetting WheelSetting;
+};
+
+UCLASS()
 class UROBOSIM_API URMIRWheelController : public URBaseController
 {
   GENERATED_BODY()
@@ -65,6 +74,8 @@ public:
 
   virtual void Tick(const float &InDeltaTime) override;
 
+	virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
+	
 protected:
 
   UPROPERTY(EditAnywhere)

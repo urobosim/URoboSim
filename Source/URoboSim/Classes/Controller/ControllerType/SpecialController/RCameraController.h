@@ -1,16 +1,26 @@
 #pragma once
 
-#include "RController.h"
-#include "ConstructorHelpers.h"
-#include "Physics/RJoint.h"
-#include "Physics/RModel.h"
-#include "RGraspComponent.h"
-#include "Containers/Queue.h"
-#include "Conversions.h"
+#include "Controller/RController.h"
 #include "RGBDCamera.h"
 // clang-format off
 #include "RCameraController.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URCameraControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  FString CameraRef;
+
+  UPROPERTY(EditAnywhere)
+  FString CameraName;
+
+  UPROPERTY(EditAnywhere)
+  FTransform PoseOffset;
+};
 
 UCLASS()
 class UROBOSIM_API URCameraController : public URController
@@ -22,6 +32,8 @@ public:
 
 public:
   virtual void Init() override;
+
+  virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   virtual void PerceiveObject();
 

@@ -1,11 +1,17 @@
 #pragma once
 
-#include "Controller/RControllerComponent.h"
 #include "Physics/RModel.h"
-#include "RJointController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 // clang-format off
 #include "RHeadController.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URHeadTrajectoryControllerParameter : public URControllerParameter
+{
+  GENERATED_BODY()
+
+};
 
 UCLASS()
 class UROBOSIM_API URHeadTrajectoryController : public URController
@@ -45,6 +51,13 @@ protected:
 	float ActionStartTime;
 
 	URJointController *JointController;
+};
+
+UCLASS()
+class UROBOSIM_API URPR2HeadTrajectoryControllerParameter : public URHeadTrajectoryControllerParameter
+{
+  GENERATED_BODY()
+
 };
 
 UCLASS()
