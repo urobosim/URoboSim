@@ -77,6 +77,9 @@ public:
 
   UJointControllerState GetState() const { return State; }
 
+  UPROPERTY(EditAnywhere)
+    float SpeedFactor = 1.0;
+
 protected:
   void Reset();
 

@@ -19,9 +19,11 @@ protected:
 
 public:
   UPROPERTY(EditAnywhere)
-  FString FrameId; 
+  FString FrameId;
 
 private:
+
+  UFUNCTION()
 	void PublishResult(FGoalStatusInfo InStatusInfo);
 
 private:
