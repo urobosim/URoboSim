@@ -60,9 +60,9 @@ void URJointTrajectoryController::UpdateDesiredJointAngle(float InDeltaTime)
       if (Trajectory[TrajectoryPointIndex].JointStates.Contains(JointName))
       {
         float DiffJointPosition = Trajectory[TrajectoryPointIndex].JointStates[JointName].JointPosition - OldTrajectoryPoints.JointStates[JointName].JointPosition;
-        float DiffJointVelocity = Trajectory[TrajectoryPointIndex].JointStates[JointName].JointVelocity - OldTrajectoryPoints.JointStates[JointName].JointVelocity;
+        float DiffJointVelocity = CalculateJointVelocity(InDeltaTime, JointName);
         JointState.JointPosition = DiffJointPosition / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.JointStates[JointName].JointPosition;
-        JointState.JointVelocity = DiffJointVelocity / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.JointStates[JointName].JointVelocity;
+        JointState.JointVelocity = DiffJointVelocity;
       }
     }
   }
@@ -79,8 +79,9 @@ bool URJointTrajectoryController::CheckTrajectoryPoint()
 
   GoalStatusList.Last().Status = 1;
 
-  if (ActionDuration > NextTimeStep)
+  if (ActionDuration >= NextTimeStep)
   {
+    UE_LOG(LogRJointTrajectoryController, Error, TEXT("Actionduration %f NextTimeStep %f"), ActionDuration, NextTimeStep);
     float CurrentTimeStep = ActionDuration;
     OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
     TrajectoryPointIndex++;
@@ -94,12 +95,22 @@ bool URJointTrajectoryController::CheckTrajectoryPoint()
 
 bool URJointTrajectoryController::CheckTrajectoryGoalReached()
 {
-  if (TrajectoryPointIndex == Trajectory.Num())
+  UE_LOG(LogRJointTrajectoryController, Error, TEXT("TrajectoryPointIndex %d TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
+  if (TrajectoryPointIndex >= Trajectory.Num())
   {
     // State = UJointControllerState::Normal;
     SwitchToNormal();
 
     GoalStatusList.Last().Status = 3;
+    if( ActionFinished.IsBound() )
+      {
+        UE_LOG(LogTemp, Error, TEXT("JointTrjac Result is bound"));
+      }
+    else
+      {
+        UE_LOG(LogTemp, Error, TEXT("JointTrjac Result not bound"));
+      }
+
     ActionFinished.Broadcast(GoalStatusList.Last());
 
     Trajectory.Empty();
@@ -175,7 +186,7 @@ void URJointTrajectoryController::Tick(const float &InDeltaTime)
 
     if (State == UJointControllerState::FollowJointTrajectory)
     {
-      ActionDuration += InDeltaTime;
+      ActionDuration += SpeedFactor * InDeltaTime;
       if (!CheckTrajectoryPoint() || !CheckTrajectoryGoalReached())
       {
         UpdateDesiredJointAngle(InDeltaTime);
@@ -212,7 +223,7 @@ bool URJointTrajectoryController::SwitchToNormal()
   case UJointControllerState::FollowJointTrajectory:
     State = UJointControllerState::Normal;
     break;
-    
+
   case UJointControllerState::Normal:
     UE_LOG(LogRJointTrajectoryController, Warning, TEXT("Trajectory already in NormalMode."));
     break;

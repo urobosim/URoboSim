@@ -17,12 +17,17 @@ void URFJTAResultPublisher::Init()
   if (JointTrajectoryController)
   {
     JointTrajectoryController->ActionFinished.AddDynamic(this, &URFJTAResultPublisher::PublishResult);
+    if( JointTrajectoryController->ActionFinished.IsBound() )
+      {
+        UE_LOG(LogTemp, Error, TEXT("Result is bound"));
+      }
   }
 }
 
 void URFJTAResultPublisher::PublishResult(FGoalStatusInfo InStatusInfo)
 {
   // if(Owner->bPublishResult)
+  UE_LOG(LogTemp, Error, TEXT("Enter publish result"));
   if (GetOwner() && JointTrajectoryController)
   {
     static int Seq = 0;
