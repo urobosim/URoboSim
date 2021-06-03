@@ -31,5 +31,5 @@ public:
 private:
   URJointTrajectoryController *JointTrajectoryController;
 
-  // URJointStateConfigurationClient *ConfigClient;
+  URJointStateConfigurationClient *ConfigClient;
 };

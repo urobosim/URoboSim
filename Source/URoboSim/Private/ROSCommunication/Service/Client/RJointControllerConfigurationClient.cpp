@@ -68,12 +68,17 @@ void FRJointControllerConfigurationClient::Callback(TSharedPtr<FROSBridgeSrv::Sr
   JointString.RemoveFromStart(TEXT("["));
   JointString.RemoveFromEnd(TEXT("]"));
   JointString.ParseIntoArray(StringArray, TEXT(","), true);
+
+
+  TArray<FString> JointNamesTemp;
   for (auto &st : StringArray)
   {
     st = st.TrimStartAndEnd().TrimQuotes();
-    float &JointState = JointNames->FindOrAdd(st).JointPosition;
-    JointState = 0.f;
+    // float &JointState = JointNames->FindOrAdd(st).JointPosition;
+    JointNamesTemp.Add(st);
+    // JointState = 0.f;
   }
+  JointController->SetJointNames(JointNamesTemp);
 }
 
 FRJointLimitControllerConfigurationClient::FRJointLimitControllerConfigurationClient(TMap<FString, FJointState> *OutJointNames, ARModel *InModel, const FString &InName, const FString &InType) : FROSBridgeSrvClient(InName, InType)

@@ -13,13 +13,14 @@ void URFJTAFeedbackPublisher::Init()
   if (GetOwner())
   {
     JointTrajectoryController = Cast<URJointTrajectoryController>(Controller);
-    // if (JointTrajectoryController)
-    // {
-    //   ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
-    //   ConfigClient->JointParamTopic = JointParamTopic;
-    //   ConfigClient->Connect(Handler);
-    //   ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ JointTrajectoryController->SetJointNames(JointNames); });
-    // }
+    if (JointTrajectoryController)
+    {
+      UE_LOG(LogRJointController, Error, TEXT("Create JointTrajecotry Controller"));
+      ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
+      ConfigClient->JointParamTopic = JointParamTopic;
+      ConfigClient->Connect(Handler);
+      ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ JointTrajectoryController->SetJointNames(JointNames); });
+    }
   }
 }
 
