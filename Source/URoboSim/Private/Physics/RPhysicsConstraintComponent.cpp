@@ -504,7 +504,7 @@ void URContinuousConstraintComponent::SetJointPosition(float Angle, FHitResult *
 {
   Child->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 		
-  FQuat DeltaJointRotationInJointFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, -FMath::RadiansToDegrees(Angle)).Quaternion();
+  FQuat DeltaJointRotationInJointFrame = FQuat(RefAxis, -Angle);
   FQuat ChildRotationInJointFrame = DeltaJointRotationInJointFrame * InitChildMeshPoseInJointFrame.GetRotation();
   Child->SetRelativeRotation(ChildRotationInJointFrame);
 
