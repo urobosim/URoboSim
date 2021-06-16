@@ -208,6 +208,7 @@ void URConstraintComponent::BeginPlay()
 {
   Super::BeginPlay();
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
+  InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
 }
 
 void URContinuousConstraintComponent::BeginPlay()
@@ -463,10 +464,18 @@ void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosi
 
 void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
-  float OldAngle = Encoder->GetValue();
-  FVector RotAxis = GetComponentRotation().Quaternion().RotateVector(RefAxis);
-  FVector DeltaPos = RotAxis * (Angle - OldAngle);
-  Child->AddWorldOffset(DeltaPos * 100, true, OutSweepHitResult, ETeleportType::None);
+  Child->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+
+  FVector DeltaJointLocationInJointFrame = RefAxis * FConversions::MToCm((float)Angle);
+  FVector ChildLocationInJointFrame = DeltaJointLocationInJointFrame + InitChildMeshPoseInJointFrame.GetTranslation();
+  Child->SetRelativeLocation(ChildLocationInJointFrame);
+
+  Child->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+
+  // float OldAngle = Encoder->GetValue();
+  // FVector RotAxis = GetComponentRotation().Quaternion().RotateVector(RefAxis);
+  // FVector DeltaPos = RotAxis * (Angle - OldAngle);
+  // Child->AddWorldOffset(DeltaPos * 100, true, OutSweepHitResult, ETeleportType::None);
 }
 
 void URPrismaticConstraintComponent::SetJointVelocity(float Velocity)
@@ -493,10 +502,18 @@ void URPrismaticConstraintComponent::SetJointEffort(float InEffort)
 
 void URContinuousConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
-  float OldAngle = Encoder->GetValue();
-  FVector RotAxis = GetComponentRotation().Quaternion().RotateVector(RefAxis);
-  FQuat Rot= FQuat(RotAxis, OldAngle - Angle);
-  Child->AddWorldRotation(Rot,true , OutSweepHitResult, ETeleportType::None);
+  Child->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+		
+  FQuat DeltaJointRotationInJointFrame = UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, -FMath::RadiansToDegrees(Angle)).Quaternion();
+  FQuat ChildRotationInJointFrame = DeltaJointRotationInJointFrame * InitChildMeshPoseInJointFrame.GetRotation();
+  Child->SetRelativeRotation(ChildRotationInJointFrame);
+
+  Child->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+
+  // float OldAngle = Encoder->GetValue();
+  // FVector RotAxis = GetComponentRotation().Quaternion().RotateVector(RefAxis);
+  // FQuat Rot= FQuat(RotAxis, OldAngle - Angle);
+  // Child->AddWorldRotation(Rot,true , OutSweepHitResult, ETeleportType::None);
 }
 
 
