@@ -34,12 +34,12 @@ void URController::CancelAction()
   {
     if (bActive)
     {
-      GoalStatusList.Last().Status = 6;
+      // GoalStatusList.Last().Status = 6;
       bActive = false;
     }
     else
     {
-      GoalStatusList.Last().Status = 2;
+      // GoalStatusList.Last().Status = 2;
     }
     bPublishResult = true;
   }
