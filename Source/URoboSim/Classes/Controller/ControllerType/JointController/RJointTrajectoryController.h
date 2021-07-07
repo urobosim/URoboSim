@@ -12,8 +12,10 @@ enum class UJointControllerState : uint8
   FollowJointTrajectory
 };
 
+USTRUCT()
 struct FTrajectoryPoints
 {
+  GENERATED_BODY()
 public:
   FTrajectoryPoints() {}
 
@@ -73,7 +75,9 @@ public:
 public:
   TArray<FTrajectoryPoints> Trajectory;
 
-  virtual void FollowJointTrajectory(float InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory);
+
+  UFUNCTION()
+  void FollowJointTrajectory(float InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory);
 
   UJointControllerState GetState() const { return State; }
 
