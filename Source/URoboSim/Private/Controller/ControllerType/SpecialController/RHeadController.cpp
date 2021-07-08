@@ -12,7 +12,7 @@ URHeadTrajectoryController::URHeadTrajectoryController()
 void URHeadTrajectoryController::Init()
 {
   Super::Init();
-  
+
   bActive = false;
   if (GetOwner())
   {
@@ -21,7 +21,7 @@ void URHeadTrajectoryController::Init()
     {
       UE_LOG(LogRHeadTrajectoryController, Error, TEXT("JointController not found"));
     }
-    ActionStartTime = GetOwner()->GetGameTimeSinceCreation();
+    ActionDuration = 0;
   }
   else
   {
@@ -41,7 +41,7 @@ void URHeadTrajectoryController::Tick(const float &InDeltaTime)
       CheckPointHeadState();
       if (bActive)
       {
-        ActionDuration = GetOwner()->GetGameTimeSinceCreation() - ActionStartTime;
+        ActionDuration += InDeltaTime;
       }
     }
   }
@@ -52,6 +52,7 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
   FVector Direction;
   if (GetOwner())
   {
+  UE_LOG(LogRHeadTrajectoryController, Error, TEXT("CalculateNewViewDirection"));
     FTransform ReferenceLinkTransform;
     if (!FrameId.Equals(TEXT("map")))
     {
@@ -90,6 +91,7 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
 
 void URPR2HeadTrajectoryController::UpdateHeadDirection()
 {
+  UE_LOG(LogRHeadTrajectoryController, Error, TEXT("UpdateHeadDirection"));
   if (PointingFrame.Equals("high_def_frame"))
   {
     PointingFrame = TEXT("head_tilt_link");
@@ -103,6 +105,7 @@ void URPR2HeadTrajectoryController::CheckPointHeadState()
 {
   if (GetOwner())
   {
+    UE_LOG(LogTemp, Error, TEXT("CheckPointHeadState"));
     URJoint *AzimuthJoint = GetOwner()->Joints.FindRef("head_pan_joint");
     URJoint *ElevationJoint = GetOwner()->Joints.FindRef("head_tilt_joint");
 
@@ -128,6 +131,7 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
 {
   if (GetOwner())
   {
+    UE_LOG(LogTemp, Error, TEXT("MoveToNewPosition"));
     TArray<URStaticMeshComponent *> ActorComponents;
     GetOwner()->GetComponents(ActorComponents);
     URStaticMeshComponent *PointingLink = nullptr;
@@ -159,4 +163,9 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
     DesEl = ElevationJoint->Constraint->ClampJointStateToConstraintLimit(El - AzEl.Y);
     // DesEl = El - AzEl.Y;
   }
+  else
+    {
+
+      UE_LOG(LogTemp, Error, TEXT("MoveToNewPosition failed because GetOwner"));
+    }
 }
