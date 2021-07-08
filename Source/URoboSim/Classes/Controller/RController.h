@@ -27,6 +27,8 @@ public:
 
   virtual void Init();
 
+  URController(){ControllerName = GetName();};
+
 public:
   ARModel *GetOwner() const { return Owner; }
 
@@ -48,6 +50,9 @@ public:
   bool bPublishResult = false;
 
   FActionFinishedDelegate ActionFinished;
+
+  UPROPERTY(VisibleAnywhere)
+    FString ControllerName;
 
 protected:
   virtual void CancelAction();
