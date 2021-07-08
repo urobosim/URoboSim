@@ -200,6 +200,8 @@ void URGripperController::Tick(const float &InDeltaTime)
         RightJointValue += Speed;
         LeftJointValue += Speed;
       }
+      RightJointValue = RightFinger->ClampJointStateToConstraintLimit(RightJointValue);
+      LeftJointValue = LeftFinger->ClampJointStateToConstraintLimit(LeftJointValue);
     }
     else if (bStalled && (OldPosition - Position >= -0.12))
     {
