@@ -138,6 +138,9 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
 
   UPROPERTY()
   FTransform InitChildPoseInJointFrame;
+
+  UPROPERTY()
+  FTransform InitChildMeshPoseInJointFrame;
  protected:
 
   UPROPERTY()
