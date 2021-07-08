@@ -131,6 +131,8 @@ public:
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;
 
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
 protected:
   virtual void SetGripperCollision(bool InCollisionEnabled);
 
