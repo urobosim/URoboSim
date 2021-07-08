@@ -77,7 +77,7 @@ public:
 
 
   UFUNCTION()
-  void FollowJointTrajectory(float InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory);
+  void FollowJointTrajectory(double InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory);
 
   UJointControllerState GetState() const { return State; }
 
