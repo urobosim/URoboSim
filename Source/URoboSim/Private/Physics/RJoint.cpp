@@ -49,7 +49,7 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
 
 void URJoint::SetMotorJointState(const FJointState &JointState)
 {
-	Constraint->SetMotorJointState(JointState.JointPosition, JointState.JointVelocity);
+  Constraint->SetMotorJointState(JointState.JointPosition, JointState.JointVelocity);
 }
 
 FJointState URJoint::GetJointState()
