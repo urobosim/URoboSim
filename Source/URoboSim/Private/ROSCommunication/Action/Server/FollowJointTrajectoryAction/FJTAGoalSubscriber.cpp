@@ -54,21 +54,25 @@ void FRFJTAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
       Trajectory.Add(FTrajectoryPoints(TimeStep.Secs, TimeStep.NSecs, JointNames, JointPoint.GetPositions(), JointPoint.GetVelocities()));
     }
 
-    JointTrajectoryController->FollowJointTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
+    // JointTrajectoryController->FollowJointTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
 
-    // double ActionTimeDiff = ActionStart.GetTimeAsDouble() - FROSTime::Now().GetTimeAsDouble();
-    // if(ActionTimeDiff < 0.0f)
-    //   {
-    //     UE_LOG(LogTemp, Error, TEXT("Start Trajectory Instantly"));
-    //   }
-    // else
-    //   {
-    //     UE_LOG(LogTemp, Error, TEXT("Start Trajectory Delayed %f"), ActionTimeDiff);
-    //     FTimerHandle MyTimerHandle;
-    //     FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::CreateUObject( JointController,  &URJointController::FollowTrajectory, ActionStart.GetTimeAsDouble(), GoalStatusInfo, Names, Trajectory);
-    //     // FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::BindUFunction( this,  FName("FollowTrajectory"), ActionStart.GetTimeAsDouble(), GoalStatusInfo, Names, Trajectory);
-    //     JointController->GetOwner()->GetWorldTimerManager().SetTimer(MyTimerHandle, StartTrajectoryDelegate, ActionTimeDiff, false);
-    //   }
+    double ActionTimeDiff = ActionStart.GetTimeAsDouble() - FROSTime::Now().GetTimeAsDouble();
+    if(ActionTimeDiff <= 0.0f)
+      {
+        UE_LOG(LogTemp, Error, TEXT("Start Trajectory Instantly"));
+        JointTrajectoryController->FollowJointTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
+      }
+    else
+      {
+        UE_LOG(LogTemp, Error, TEXT("Start Trajectory Delayed %f"), ActionTimeDiff);
+        FTimerHandle MyTimerHandle;
+        FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::CreateUObject( JointTrajectoryController,  &URJointTrajectoryController::FollowJointTrajectory, ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
+        // FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::BindUFunction( JointTrajectoryController,  FName("FollowJointTrajectory"), ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
+
+        // FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::CreateUObject( JointController,  &URJointController::FollowTrajectory, ActionStart.GetTimeAsDouble(), GoalStatusInfo, Names, Trajectory);
+        // FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::BindUFunction( this,  FName("FollowTrajectory"), ActionStart.GetTimeAsDouble(), GoalStatusInfo, Names, Trajectory);
+        JointTrajectoryController->GetOwner()->GetWorldTimerManager().SetTimer(MyTimerHandle, StartTrajectoryDelegate, ActionTimeDiff, false);
+      }
   }
   else
   {
