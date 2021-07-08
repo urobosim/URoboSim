@@ -74,7 +74,7 @@ void URGripperController::Init()
     TArray<FString> JointNames;
     JointNames.Add(RightJointName);
     JointNames.Add(LeftJointName);
-    JointController->SetJointNames(JointNames);
+    JointController->SetJointNames(JointNames, EnableDrive);
 
     for (auto &GraspComp : TempGraspComponents)
     {
