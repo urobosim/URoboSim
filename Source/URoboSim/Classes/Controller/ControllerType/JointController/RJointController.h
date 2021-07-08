@@ -59,7 +59,7 @@ public:
   virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
 
   void SetJointNames(const TArray<FString> &JointNames);
-
+  void SetJointNames(const TArray<FString> &JointNames, const FEnableDrive &InEnableDrive);
 public:
   UPROPERTY(EditAnywhere)
   TMap<FString, FJointState> DesiredJointStates;
