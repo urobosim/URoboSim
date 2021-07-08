@@ -21,7 +21,7 @@ void URBaseController::SetControllerParameters(URControllerParameter *&Controlle
 void URBaseController::Init()
 {
   Super::Init();
-  
+
   if (!GetOwner())
   {
     UE_LOG(LogTemp, Error, TEXT("URBaseController not attached to ARModel"));

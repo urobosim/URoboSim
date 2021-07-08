@@ -46,6 +46,7 @@ public:
 	virtual float GetJointPosition();
 	virtual float GetJointPositionInUUnits();
 	virtual float GetJointVelocity();
+        virtual float ClampJointStateToConstraintLimit(float InJointState){return Constraint->ClampJointStateToConstraintLimit(InJointState);};
 
   void SetMotorJointState(const FJointState &JointState);
 	virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);

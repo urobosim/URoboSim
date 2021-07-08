@@ -74,7 +74,7 @@ void URGripperController::Init()
     TArray<FString> JointNames;
     JointNames.Add(RightJointName);
     JointNames.Add(LeftJointName);
-    JointController->SetJointNames(JointNames);
+    JointController->SetJointNames(JointNames, EnableDrive);
 
     for (auto &GraspComp : TempGraspComponents)
     {
@@ -200,6 +200,8 @@ void URGripperController::Tick(const float &InDeltaTime)
         RightJointValue += Speed;
         LeftJointValue += Speed;
       }
+      RightJointValue = RightFinger->ClampJointStateToConstraintLimit(RightJointValue);
+      LeftJointValue = LeftFinger->ClampJointStateToConstraintLimit(LeftJointValue);
     }
     else if (bStalled && (OldPosition - Position >= -0.12))
     {

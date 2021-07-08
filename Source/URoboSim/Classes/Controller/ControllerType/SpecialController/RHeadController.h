@@ -48,7 +48,7 @@ protected:
 	virtual void CheckPointHeadState(){};
 
 protected:
-	float ActionStartTime;
+	float ActionDuration;
 
 	URJointController *JointController;
 };

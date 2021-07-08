@@ -81,7 +81,7 @@ bool URJointTrajectoryController::CheckTrajectoryPoint()
 
   if (ActionDuration >= NextTimeStep)
   {
-    UE_LOG(LogRJointTrajectoryController, Error, TEXT("Actionduration %f NextTimeStep %f"), ActionDuration, NextTimeStep);
+    // UE_LOG(LogRJointTrajectoryController, Error, TEXT("Actionduration %f NextTimeStep %f"), ActionDuration, NextTimeStep);
     float CurrentTimeStep = ActionDuration;
     OldTrajectoryPoints = Trajectory[TrajectoryPointIndex];
     TrajectoryPointIndex++;
@@ -95,7 +95,6 @@ bool URJointTrajectoryController::CheckTrajectoryPoint()
 
 bool URJointTrajectoryController::CheckTrajectoryGoalReached()
 {
-  UE_LOG(LogRJointTrajectoryController, Error, TEXT("TrajectoryPointIndex %d TrajectoryNum %d"), TrajectoryPointIndex, Trajectory.Num());
   if (TrajectoryPointIndex >= Trajectory.Num())
   {
     // State = UJointControllerState::Normal;
@@ -196,14 +195,11 @@ void URJointTrajectoryController::Tick(const float &InDeltaTime)
   }
 }
 
-void URJointTrajectoryController::FollowJointTrajectory(float InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory)
+void URJointTrajectoryController::FollowJointTrajectory(double InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory)
 {
   UE_LOG(LogRJointTrajectoryController, Error, TEXT("FollowTrajectory"));
   Reset();
   SwitchToFollowJointTrajectory();
-  ActionStartTime = InActionStartTime;
-  UE_LOG(LogRJointTrajectoryController, Error, TEXT("Start Trajectory Delayed %f"), ActionDuration);
-  // double ActionTimeDiff =  - ;
   for (const TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
   {
     if (URJoint *Joint = GetOwner()->GetJoint(DesiredJointState.Key))

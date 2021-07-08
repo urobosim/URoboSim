@@ -48,12 +48,10 @@ float URPrismaticConstraintComponent::ClampJointStateToConstraintLimit(float InJ
 
   if(InJointState > UsedUpper)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), UsedUpper);
       JointValue =  UsedUpper;
     }
   else if(InJointState < UsedLower)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), UsedLower);
       JointValue =  UsedLower;
     }
   else
@@ -70,12 +68,10 @@ float URRevoluteConstraintComponent::ClampJointStateToConstraintLimit(float InJo
   float UsedLower = GetLowerLimit();
   if(InJointState > UsedUpper)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s over the UpperJointLimit %f"), InJointState, *GetName(), Upper);
       JointValue =  UsedUpper;
     }
   else if(InJointState < UsedLower)
     {
-      UE_LOG(LogTemp, Warning, TEXT("DesiredJointState %f of Joint %s below the LowerJointLimit %f"), InJointState, *GetName(), Lower);
       JointValue =  UsedLower;
     }
   else
@@ -411,7 +407,7 @@ float URContinuousConstraintComponent::GetJointPosition()
 
 void URContinuousConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(TargetPosition), -FMath::RadiansToDegrees(TargetJointVelocity));
+  SetMotorJointStateInUUnits(FMath::RadiansToDegrees(ClampJointStateToConstraintLimit(TargetPosition)), -FMath::RadiansToDegrees(TargetJointVelocity));
 }
 
 void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
@@ -452,7 +448,7 @@ float URContinuousConstraintComponent::GetJointVelocityInUUnits()
 
 void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  SetMotorJointStateInUUnits(-FConversions::MToCm((float)TargetPosition), -FConversions::MToCm((float)TargetJointVelocity));
+  SetMotorJointStateInUUnits(-FConversions::MToCm((float)ClampJointStateToConstraintLimit(TargetPosition)), -FConversions::MToCm((float)TargetJointVelocity));
 }
 
 void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
