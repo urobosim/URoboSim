@@ -4,7 +4,7 @@
 
 #include "Physics/RModel.h"
 #include "Components/SceneCaptureComponent2D.h"
-#include "ConstructorHelpers.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "GameFramework/Actor.h"
 #include "CoreMinimal.h"

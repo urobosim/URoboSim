@@ -8,7 +8,7 @@
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
 #include "AssetRegistryModule.h"
-#include "ObjectMacros.h" // EObjectFlags
+#include "UObject/ObjectMacros.h" // EObjectFlags
 //#include "SDFParserBase.h"
 #include "SDFParserInterface.h"
 

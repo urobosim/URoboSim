@@ -183,7 +183,7 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
           LinkComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
           LinkComponent->WeldTo(Link->Collisions[0]);
         }
-      LinkComponent->bVisible = false;
+      LinkComponent->SetVisibility(false,false);
       Link->Collisions.Add(LinkComponent);
     }
   else

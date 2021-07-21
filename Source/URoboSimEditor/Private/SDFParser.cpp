@@ -3,7 +3,7 @@
 
 #include "SDFParser.h"
 #include "Conversions.h"
-#include "Paths.h"
+// #include "Paths.h"
 #include "XmlFile.h"
 #include "Factories/FbxFactory.h"
 #include "RStaticMeshEditUtils.h"
