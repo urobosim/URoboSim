@@ -43,6 +43,11 @@ class UROBOSIM_API URGripperControllerParameter : public URControllerParameter
   GENERATED_BODY()
 
 public:
+
+
+  UPROPERTY(EditAnywhere)
+  FGraspComponentSetting GraspCompSetting;
+
   UPROPERTY(EditAnywhere)
   FString RightJointName;
 
@@ -54,6 +59,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   FString LeftFingerTipName;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
 
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;

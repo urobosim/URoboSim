@@ -9,6 +9,8 @@ void URGripperController::SetControllerParameters(URControllerParameter *&Contro
     LeftJointName = GripperControllerParameters->LeftJointName;
     RightFingerTipName = GripperControllerParameters->RightFingerTipName;
     LeftFingerTipName = GripperControllerParameters->LeftFingerTipName;
+    GraspCompSetting = GripperControllerParameters->GraspCompSetting;
+    EnableDrive = GripperControllerParameters->EnableDrive;
     bDisableCollision = GripperControllerParameters->bDisableCollision;
   }
 }
@@ -200,8 +202,8 @@ void URGripperController::Tick(const float &InDeltaTime)
         RightJointValue += Speed;
         LeftJointValue += Speed;
       }
-      RightJointValue = RightFinger->ClampJointStateToConstraintLimit(RightJointValue);
-      LeftJointValue = LeftFinger->ClampJointStateToConstraintLimit(LeftJointValue);
+      // RightJointValue = RightFinger->ClampJointStateToConstraintLimit(RightJointValue);
+      // LeftJointValue = LeftFinger->ClampJointStateToConstraintLimit(LeftJointValue);
     }
     else if (bStalled && (OldPosition - Position >= -0.12))
     {

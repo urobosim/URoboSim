@@ -22,6 +22,10 @@ FRPR2HAGoalSubscriberCallback::FRPR2HAGoalSubscriberCallback(
     const FString &InTopic, const FString &InType, UObject *InController) : FROSBridgeSubscriber(InTopic, InType)
 {
   HeadController = Cast<URPR2HeadTrajectoryController>(InController);
+  if(!HeadController)
+    {
+      UE_LOG(LogRPR2HAGoalSubscriber, Error, TEXT("HeadController not found"));
+    }
 }
 
 TSharedPtr<FROSBridgeMsg> FRPR2HAGoalSubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const
