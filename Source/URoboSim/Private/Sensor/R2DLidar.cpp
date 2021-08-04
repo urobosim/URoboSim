@@ -37,6 +37,8 @@ void UR2DLidar::Init()
     if (Component->GetName().Equals(LidarRef))
     {
       ReferenceLink = Component;
+      AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+      AddRelativeLocation(Offset);
     }
   }
   if (!ReferenceLink)
@@ -58,15 +60,19 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
   FRotator LidarBodyRot;
   if(ReferenceLink)
     {
-      LidarBodyLoc = ReferenceLink->GetComponentLocation() + Offset;
-      LidarBodyRot = ReferenceLink->GetComponentRotation();
+      LidarBodyLoc = GetComponentLocation();
+      LidarBodyRot = GetComponentRotation();
     }
 
   for(int i = 0; i < (int) SCSResolution; i++)
     {
       float Angle = i * FMath::RadiansToDegrees(AngularIncrement);
-      FRotator ResultRot(0, 180 - Angle, 0);
-      FVector EndTrace = MaximumDistance * LidarBodyRot.RotateVector(ResultRot.Vector()) + LidarBodyLoc;
+      FRotator ResultRot = UKismetMathLibrary::ComposeRotators(
+                                                               FRotator(0, 180 - Angle, 0),
+                                                               LidarBodyRot
+                                                               );
+      // FVector EndTrace = MaximumDistance * LidarBodyRot.RotateVector(ResultRot.Vector()) + LidarBodyLoc;
+      FVector EndTrace = MaximumDistance * UKismetMathLibrary::GetForwardVector(ResultRot) + LidarBodyLoc;
       FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("Laser_Trace")), true, GetOwner());
       TraceParams.bTraceComplex = true;
       TraceParams.bReturnPhysicalMaterial = false;
@@ -80,7 +86,14 @@ void UR2DLidar::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompon
                                            TraceParams,
                                            FCollisionResponseParams::DefaultResponseParam
                                            );
-      DistanceMeasurement[i] = HitInfo.Distance/ 100.;
+      if((HitInfo.Distance) > MinimumDistance && (HitInfo.Distance) < MaximumDistance)
+        {
+          DistanceMeasurement[i] = HitInfo.Distance/ 100.;
+        }
+      else
+        {
+          DistanceMeasurement[i] = 0.0;
+        }
     }
   bPublishResult = true;
 }
