@@ -52,6 +52,7 @@ void FRJointStateReplaySubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Ms
 
     TArray<FString> Names = JointState->GetName();
     TArray<double> Positions = JointState->GetPosition();
+    JointController->SetJointNames(Names);
     for (int i = 0; i < Names.Num(); i++)
     {
       float &DesiredJointPosition = JointController->DesiredJointStates.FindOrAdd(Names[i]).JointPosition;
