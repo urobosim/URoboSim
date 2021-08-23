@@ -67,6 +67,9 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
 
     // UPROPERTY()
     // FJointInformation JointInformation;
+    URConstraintComponent();
+  UPROPERTY(VisibleAnywhere)
+    float CurrentJointPos;
 
   UPROPERTY()
     FQuat QInitial;
@@ -92,6 +95,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetPosition(USDFJoint* InJoint){};
   virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
 
+  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
@@ -124,7 +128,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     UREncoder* Encoder;
 
-  UPROPERTY(VisibleAnywhere)
+  UPROPERTY(EditAnywhere)
     FVector RefAxis;
 
   UPROPERTY()
@@ -152,6 +156,9 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   UPROPERTY()
     UStaticMeshComponent* Child;
 
+// #if WITH_EDITOR
+//   virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+// #endif
 };
 
 UCLASS()
@@ -164,7 +171,7 @@ class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
 
 };
 
-UCLASS()
+UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComponent
 {
   GENERATED_BODY()
@@ -207,7 +214,7 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
 };
 
 
-UCLASS()
+UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintComponent
 {
   GENERATED_BODY()
@@ -246,7 +253,7 @@ class UROBOSIM_API URScrewConstraintComponent : public URContinuousConstraintCom
   GENERATED_BODY()
     };
 
-UCLASS()
+UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraintComponent
 {
   GENERATED_BODY()

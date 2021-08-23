@@ -3,6 +3,11 @@
 #include "Physics/RJoint.h"
 #include "Conversions.h"
 
+URConstraintComponent::URConstraintComponent()
+{
+  PrimaryComponentTick.bCanEverTick = true;
+}
+
 float URConstraintComponent::GetUpperLimit()
 {
   if(SoftUpper != 0.0f)
@@ -217,12 +222,30 @@ void URConstraintComponent::BeginPlay()
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
 }
 
+// #if WITH_EDITOR
+// void URConstraintComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+// {
+//   const static FName RotationName("RelativeRotation");
+//   const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : FName();
+//   if (PropertyName == SceneComponentStatics::MobilityName)
+//     {
+//       UpdateAttachedMobility(this);
+//     }
+
+// }
+// #endif
+
+void URConstraintComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+  CurrentJointPos = GetJointPosition();
+}
+
 void URContinuousConstraintComponent::BeginPlay()
 {
+  Super::BeginPlay();
   FQuat ParentOrientation = Parent->GetComponentQuat();
   FQuat ChildOrientation = Child->GetComponentQuat();
   QInitial = ParentOrientation.Inverse() * ChildOrientation;
-  Super::BeginPlay();
 }
 
 void URPrismaticConstraintComponent::BeginPlay()
