@@ -194,7 +194,7 @@ void URContinuousConstraintComponent::UpdateJointVelocity(float InDeltaT)
 }
 
 
-void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild)
+void URConstraintComponent::SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild)
 {
   Parent = InParent;
   Child = InChild;
@@ -203,6 +203,16 @@ void URConstraintComponent::SetParentChild(URStaticMeshComponent* InParent, URSt
 void URConstraintComponent::BeginPlay()
 {
   Super::BeginPlay();
+  if(!Parent)
+    {
+      Parent = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame1));
+    }
+
+  if(!Child)
+    {
+      Child = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame2));
+    }
+
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
 }
@@ -499,7 +509,7 @@ void URPrismaticConstraintComponent::SetJointEffort(float InEffort)
 void URContinuousConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
   Child->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
-		
+
   FQuat DeltaJointRotationInJointFrame = FQuat(RefAxis, -Angle);
   FQuat ChildRotationInJointFrame = DeltaJointRotationInJointFrame * InitChildMeshPoseInJointFrame.GetRotation();
   Child->SetRelativeRotation(ChildRotationInJointFrame);

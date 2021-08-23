@@ -38,7 +38,7 @@ public:
 
   virtual bool UpdateFramePoses();
 
-  virtual void SetLinkPose(URStaticMeshComponent *InChildLink, URStaticMeshComponent *InParentLink, FTransform InPose);
+  virtual void SetLinkPose(UStaticMeshComponent *InChildLink, UStaticMeshComponent *InParentLink, FTransform InPose);
 
   virtual void Tick(const float &InDeltaTime) override;
 

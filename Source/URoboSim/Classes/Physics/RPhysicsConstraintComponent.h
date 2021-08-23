@@ -90,7 +90,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
-  virtual void SetParentChild(URStaticMeshComponent* InParent, URStaticMeshComponent* InChild);
+  virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
 
 
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
@@ -147,10 +147,10 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     float TargetVelocity;
 
   UPROPERTY()
-    URStaticMeshComponent* Parent;
+    UStaticMeshComponent* Parent;
 
   UPROPERTY()
-    URStaticMeshComponent* Child;
+    UStaticMeshComponent* Child;
 
 };
 

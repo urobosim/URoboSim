@@ -29,9 +29,9 @@ public:
 	ARModel* Model;
 
 	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Visuals;
+	TArray<class UStaticMeshComponent*> Visuals;
 	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Collisions;
+	TArray<class UStaticMeshComponent*> Collisions;
 
 	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
 	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
@@ -39,9 +39,9 @@ public:
 	virtual void DisableCollision();
 	virtual void EnableCollision();
 
-	URStaticMeshComponent* GetVisual();
-	URStaticMeshComponent* GetCollision();
-	URStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
+	UStaticMeshComponent* GetVisual();
+	UStaticMeshComponent* GetCollision();
+	UStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
         TArray<class URJoint*> GetJoints();
 
 	float GetNumCollisions();

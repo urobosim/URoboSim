@@ -15,7 +15,7 @@ void URLink::AddJoint(URJoint* InJoint)
 	Joints.Add(InJoint);
 }
 
-URStaticMeshComponent* URLink::GetVisual()
+UStaticMeshComponent* URLink::GetVisual()
 {
 	if(Visuals.Num()>0)
 	{
@@ -57,7 +57,7 @@ void URLink::EnableCollision()
     }
 }
 
-URStaticMeshComponent* URLink::GetCollision()
+UStaticMeshComponent* URLink::GetCollision()
 {
         if(Collisions.Num()>0)
 	{
@@ -69,7 +69,7 @@ URStaticMeshComponent* URLink::GetCollision()
 	}
 }
 
-URStaticMeshComponent* URLink::GetCollision(FString InCollisionName, bool bExactMatch)
+UStaticMeshComponent* URLink::GetCollision(FString InCollisionName, bool bExactMatch)
 {
       if(bExactMatch)
         {

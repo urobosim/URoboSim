@@ -27,11 +27,11 @@ void URCameraController::Init()
   }
 
   TArray<AActor *> FoundActors;
-  TArray<URStaticMeshComponent *> ActorComponents;
-  URStaticMeshComponent *ReferenceLink = nullptr;
+  TArray<UStaticMeshComponent *> ActorComponents;
+  UStaticMeshComponent *ReferenceLink = nullptr;
   GetOwner()->GetComponents(ActorComponents);
 
-  for (URStaticMeshComponent *&Component : ActorComponents)
+  for (UStaticMeshComponent *&Component : ActorComponents)
   {
     if (Component->GetName().Contains(CameraRef))
     {

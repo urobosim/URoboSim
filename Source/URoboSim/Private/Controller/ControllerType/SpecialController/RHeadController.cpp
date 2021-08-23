@@ -65,9 +65,9 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
       ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
     }
 
-    TArray<URStaticMeshComponent *> ActorComponents;
+    TArray<UStaticMeshComponent *> ActorComponents;
     GetOwner()->GetComponents(ActorComponents);
-    URStaticMeshComponent *PointingLink = nullptr;
+    UStaticMeshComponent *PointingLink = nullptr;
     for (auto &Component : ActorComponents)
     {
       if (Component->GetName().Contains(PointingFrame))
@@ -132,9 +132,9 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
   if (GetOwner())
   {
     UE_LOG(LogTemp, Error, TEXT("MoveToNewPosition"));
-    TArray<URStaticMeshComponent *> ActorComponents;
+    TArray<UStaticMeshComponent *> ActorComponents;
     GetOwner()->GetComponents(ActorComponents);
-    URStaticMeshComponent *PointingLink = nullptr;
+    UStaticMeshComponent *PointingLink = nullptr;
     for (auto &Component : ActorComponents)
     {
       if (Component->GetName().Contains(PointingFrame))

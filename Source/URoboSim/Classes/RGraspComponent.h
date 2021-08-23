@@ -19,8 +19,8 @@ class UROBOSIM_API URGraspComponent : public USphereComponent
 public:
 	URGraspComponent();
 
-	virtual void Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2);
-	virtual void Init(URStaticMeshComponent* InGripper);
+	virtual void Init(UStaticMeshComponent* InGripper1, UStaticMeshComponent* InGripper2);
+	virtual void Init(UStaticMeshComponent* InGripper);
 	// virtual void Init();
 
 	virtual void BeginPlay() override;
@@ -54,10 +54,10 @@ protected:
 	float GraspRadius = 10.f;
 
 	UPROPERTY()
-	URStaticMeshComponent* Gripper;
+	UStaticMeshComponent* Gripper;
 
 	UPROPERTY()
-	URStaticMeshComponent* Gripper2;
+	UStaticMeshComponent* Gripper2;
 
         UPROPERTY(EditAnywhere)
           UPhysicsConstraintComponent* Constraint;

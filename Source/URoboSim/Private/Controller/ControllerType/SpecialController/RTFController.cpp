@@ -39,8 +39,8 @@ bool URTFController::UpdateFramePoses()
     {
       FString ChildName = TF.Key;
       FString ParentName = TF.Value.ParentFrame;
-      URStaticMeshComponent *Child = nullptr;
-      URStaticMeshComponent *Parent = nullptr;
+      UStaticMeshComponent *Child = nullptr;
+      UStaticMeshComponent *Parent = nullptr;
       for (auto &Link : GetOwner()->Links)
       {
         if (!Child)
@@ -79,7 +79,7 @@ bool URTFController::UpdateFramePoses()
   return false;
 }
 
-void URTFController::SetLinkPose(URStaticMeshComponent *InChildLink, URStaticMeshComponent *InParentLink, FTransform InPose)
+void URTFController::SetLinkPose(UStaticMeshComponent *InChildLink, UStaticMeshComponent *InParentLink, FTransform InPose)
 {
   if (!InChildLink)
   {

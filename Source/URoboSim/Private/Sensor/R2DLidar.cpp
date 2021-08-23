@@ -29,7 +29,7 @@ void UR2DLidar::Init()
   AngularIncrement = FMath::Abs((ScanAngleMax - ScanAngleMin) / SampleNumber);
   SCSResolution = FMath::CeilToInt(360./ FMath::RadiansToDegrees(AngularIncrement));
   DistanceMeasurement.AddZeroed(SCSResolution);
-  TArray<URStaticMeshComponent*> ActorComponents;
+  TArray<UStaticMeshComponent*> ActorComponents;
   GetOwner()->GetComponents(ActorComponents);
 
   for (auto& Component : ActorComponents)

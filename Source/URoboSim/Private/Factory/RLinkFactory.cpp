@@ -104,7 +104,7 @@ void URLinkBuilder::SetVisuals()
 
 void URLinkBuilder::SetVisual(USDFVisual* InVisual)
 {
-  URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
+  UStaticMeshComponent* LinkComponent = NewObject<UStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
   LinkComponent->RegisterComponent();
 
   FVector LocationOffset = LinkPose.GetRotation().RotateVector(InVisual->Pose.GetLocation());
@@ -148,7 +148,7 @@ void URLinkBuilder::SetCollisions()
 
 void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 {
-  URStaticMeshComponent* LinkComponent = NewObject<URStaticMeshComponent>(Link, FName((InCollision->Name).GetCharArray().GetData()));
+  UStaticMeshComponent* LinkComponent = NewObject<UStaticMeshComponent>(Link, FName((InCollision->Name).GetCharArray().GetData()));
   LinkComponent->CreationMethod = EComponentCreationMethod::Instance;
   LinkComponent->RegisterComponent();
   if(Model->GetRootComponent() == nullptr)
@@ -194,11 +194,11 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
 
 void URLinkBuilder::SetInertial(USDFLinkInertial* InInertial)
 {
-  for(URStaticMeshComponent* Visual : Link->Visuals)
+  for(UStaticMeshComponent* Visual : Link->Visuals)
     {
       Visual->SetMassOverrideInKg(NAME_None, 0.001, true);
     }
-  for(URStaticMeshComponent* Collision : Link->Collisions)
+  for(UStaticMeshComponent* Collision : Link->Collisions)
     {
       Collision->SetMassOverrideInKg(NAME_None, 0.001, true);
     }
@@ -210,13 +210,13 @@ void URLinkBuilder::SetInertial(USDFLinkInertial* InInertial)
 
 void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
 {
-  for(URStaticMeshComponent* Visual : Link->Visuals)
+  for(UStaticMeshComponent* Visual : Link->Visuals)
     {
       Visual->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
       Visual->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     }
 
-  for(URStaticMeshComponent* Collision : Link->Collisions)
+  for(UStaticMeshComponent* Collision : Link->Collisions)
     {
       Collision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
       Collision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
@@ -237,7 +237,7 @@ void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
 
 void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
 {
-  for(URStaticMeshComponent* Collision : Link->Collisions)
+  for(UStaticMeshComponent* Collision : Link->Collisions)
     {
       Collision->SetEnableGravity(false);
     }
@@ -246,7 +246,7 @@ void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
       Link->GetCollision()->SetEnableGravity(InUseGravity);
     }
 
-  for(URStaticMeshComponent* Visual : Link->Visuals)
+  for(UStaticMeshComponent* Visual : Link->Visuals)
     {
       Visual->SetEnableGravity(false);
     }

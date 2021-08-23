@@ -25,7 +25,7 @@ URGraspComponent::URGraspComponent()
   Constraint2->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
 }
 
-void URGraspComponent::Init(URStaticMeshComponent* InGripper)
+void URGraspComponent::Init(UStaticMeshComponent* InGripper)
 {
   Gripper = InGripper;
   bObjectGrasped = false;
@@ -39,7 +39,7 @@ void URGraspComponent::Init(URStaticMeshComponent* InGripper)
 
 }
 
-void URGraspComponent::Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2)
+void URGraspComponent::Init(UStaticMeshComponent* InGripper1, UStaticMeshComponent* InGripper2)
 {
   Gripper = InGripper1;
   Gripper2 = InGripper2;
