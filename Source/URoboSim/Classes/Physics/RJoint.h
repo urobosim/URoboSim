@@ -63,7 +63,6 @@ public:
 
 public:
 
-    virtual void UpdateVelocity(float InDeltaTime);
     virtual void UpdateEncoder();
 
     UPROPERTY(EditAnywhere)
