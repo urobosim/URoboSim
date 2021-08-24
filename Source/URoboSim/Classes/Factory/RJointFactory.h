@@ -8,7 +8,7 @@
 #include "SDF/SDFJoint.h"
 #include "RJointFactory.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable, DefaultToInstanced, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URJointBuilder : public UObject
 {
   GENERATED_BODY()
@@ -38,7 +38,7 @@ protected:
 
 };
 
-UCLASS()
+UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
 class UROBOSIM_API URContiniousJointBuilder : public URJointBuilder
 {
   GENERATED_BODY()
@@ -49,7 +49,7 @@ protected:
 
 };
 
-UCLASS()
+UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
 class UROBOSIM_API URRevoluteJointBuilder : public URContiniousJointBuilder
 {
   GENERATED_BODY()
@@ -59,7 +59,7 @@ protected:
     virtual void CreateConstraint() override;
 };
 
-UCLASS()
+UCLASS(Blueprintable, DefaultToInstanced, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URPrismaticJointBuilder : public URJointBuilder
 {
   GENERATED_BODY()

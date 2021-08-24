@@ -10,7 +10,7 @@
 /**
  *
  */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "SDF", DefaultToInstanced, hidecategories = Object, editinlinenew)
 class UROBOSIM_API USDFJointAxis : public UObject
 {
 	GENERATED_BODY()
