@@ -12,12 +12,17 @@
 class ARModel;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URJoint : public UObject
+class UROBOSIM_API URJoint : public UObject, public FTickableGameObject
 {
 	GENERATED_BODY()
 
 public:
 	URJoint();
+
+        bool IsTickable() const override;
+        void Tick(float DeltaTime) override;
+        TStatId GetStatId() const override;
+	virtual UWorld* GetTickableGameObjectWorld() const override { return GetOuter()->GetWorld(); }
 
         UPROPERTY()
           bool bBreakEnabled;

@@ -13,6 +13,23 @@ URJoint::URJoint()
   bActuate = false;
 }
 
+bool URJoint::IsTickable() const
+{
+  return true;
+}
+
+TStatId URJoint::GetStatId() const
+{
+  return TStatId();
+}
+
+void URJoint::Tick(float DeltaTime)
+{
+  if(Constraint)
+    {
+      UpdateEncoder();
+    }
+}
 
 float URJoint::GetEncoderValue()
 {
@@ -58,8 +75,7 @@ FJointState URJoint::GetJointState()
 
 float URJoint::GetJointPosition()
 {
-	return Constraint->GetJointPosition();
-
+  return Constraint->GetJointPosition();
 }
 
 float URJoint::GetJointPositionInUUnits()
