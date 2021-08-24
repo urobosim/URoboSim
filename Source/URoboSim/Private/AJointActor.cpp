@@ -30,6 +30,45 @@ void AJointActor::Tick(float DeltaTime)
     }
 }
 
+bool AJointActor::CreateJoint()
+{
+  if(JointDescription)
+    {
+      JointDescription->Name = GetName();
+      JointDescription->Axis = Axis;
+      if(!ConstraintActor1 || !ConstraintActor1)
+        {
+          return false;
+        }
+      JointDescription->Parent=ConstraintActor1->GetName();
+      JointDescription->Child=ConstraintActor2->GetName();
+    }
+
+  if(Joint)
+    {
+      Joint->BeginDestroy();
+      Joint = NULL;
+      GEngine->ForceGarbageCollection(true);
+    }
+
+  if(JointType)
+    {
+      JointType->Init(this, JointDescription);
+      Joint = JointType->NewJoint();
+      Joint->SetParentChild(ConstraintActor1, ConstraintActor2);
+      Joint->Constraint->ConnectToComponents();
+      RootComponent = Joint->Constraint;
+    }
+  if(Joint)
+    {
+      return true;
+    }
+  else
+    {
+      return false;
+    }
+}
+
 #if WITH_EDITOR
 void AJointActor::PostEditChangeChainProperty(FPropertyChangedChainEvent& PropertyChangedEvent)
 {
@@ -47,33 +86,7 @@ void AJointActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
 
   if(PropertyName == JointTypeName || MemberPropertyName == JointTypeName)
     {
-      if(JointDescription)
-        {
-          JointDescription->Name = GetName();
-          JointDescription->Axis = Axis;
-          if(!ConstraintActor1 || !ConstraintActor1)
-            {
-              return;
-            }
-          JointDescription->Parent=ConstraintActor1->GetName();
-          JointDescription->Child=ConstraintActor2->GetName();
-        }
-
-      if(Joint)
-        {
-          Joint->BeginDestroy();
-          Joint = NULL;
-          GEngine->ForceGarbageCollection(true);
-        }
-
-      if(JointType)
-        {
-          JointType->Init(this, JointDescription);
-          Joint = JointType->NewJoint();
-          Joint->SetParentChild(ConstraintActor1, ConstraintActor2);
-          Joint->Constraint->ConnectToComponents();
-          RootComponent = Joint->Constraint;
-        }
+      CreateJoint();
     }
 }
 

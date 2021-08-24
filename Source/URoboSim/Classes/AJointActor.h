@@ -28,6 +28,7 @@ public:
   // Called every frame
   virtual void Tick(float DeltaTime) override;
   virtual void BeginPlay() override;
+  virtual bool CreateJoint();
 
   UPROPERTY(VisibleAnywhere)
     float CurrentJointPos;
