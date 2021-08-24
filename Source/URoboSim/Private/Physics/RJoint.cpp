@@ -37,6 +37,15 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
   Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
 
+void URJoint::SetParentChild(AActor* InParent, AActor* InChild)
+{
+  if(!InChild || !InParent)
+    {
+      return;
+    }
+  Constraint->SetParentChild(Cast<UStaticMeshComponent>(InParent->GetRootComponent()), Cast<UStaticMeshComponent>(InChild->GetRootComponent()));
+}
+
 void URJoint::SetMotorJointState(const FJointState &JointState)
 {
   Constraint->SetMotorJointState(JointState.JointPosition, JointState.JointVelocity);

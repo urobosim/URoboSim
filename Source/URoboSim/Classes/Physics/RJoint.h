@@ -29,6 +29,7 @@ public:
           bool bUseParentModelFrame;
 
         virtual void SetParentChild(URLink* Parent, URLink* Child);
+        virtual void SetParentChild(AActor* InParent, AActor* InChild);
 
         UPROPERTY()
           FString ParentName;
