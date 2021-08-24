@@ -68,8 +68,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     // UPROPERTY()
     // FJointInformation JointInformation;
     URConstraintComponent();
-  UPROPERTY(VisibleAnywhere)
-    float CurrentJointPos;
 
   UPROPERTY()
     FQuat QInitial;
@@ -94,8 +92,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
   virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
-
-  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
