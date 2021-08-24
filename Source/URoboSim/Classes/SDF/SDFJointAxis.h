@@ -10,7 +10,7 @@
 /**
  *
  */
-UCLASS(BlueprintType, Category = "SDF")
+UCLASS(BlueprintType, Category = "SDF", DefaultToInstanced, hidecategories = Object, editinlinenew)
 class UROBOSIM_API USDFJointAxis : public UObject
 {
 	GENERATED_BODY()
@@ -19,22 +19,22 @@ public:
 
 	USDFJointAxis();
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis")
+	UPROPERTY(EditAnywhere, Category = "Axis")
 	FVector Xyz;
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis")
+	UPROPERTY(EditAnywhere, Category = "Axis")
 	bool bUseParentModelFrame;
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis|Limit")
+	UPROPERTY(EditAnywhere, Category = "Axis|Limit")
 	float Lower;
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis|Limit")
+	UPROPERTY(EditAnywhere, Category = "Axis|Limit")
 	float Upper;
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis|Limit")
+	UPROPERTY(EditAnywhere, Category = "Axis|Limit")
 	float Effort;
 
-	UPROPERTY(EditAnywhere, Category = "Joint|Axis|Limit")
+	UPROPERTY(EditAnywhere, Category = "Axis|Limit")
 	float Velocity;
 
 	void SetLowerLimitFromSDF(float LowerLimit);

@@ -20,6 +20,8 @@ public class URoboSim : ModuleRules
                             ,"MeshDescription",
                             "RenderCore",
                             "Json",
+                            "UWorldControl",
+                            "UROSControl",
                         }
 			);
 

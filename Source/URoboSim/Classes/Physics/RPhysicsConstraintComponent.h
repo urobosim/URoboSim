@@ -68,8 +68,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     // UPROPERTY()
     // FJointInformation JointInformation;
     URConstraintComponent();
-  UPROPERTY(VisibleAnywhere)
-    float CurrentJointPos;
 
   UPROPERTY()
     FQuat QInitial;
@@ -95,8 +93,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetPosition(USDFJoint* InJoint){};
   virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
 
-  virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
   virtual float GetJointVelocity(){return 0.;};
@@ -112,7 +108,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetJointEffort(float Effort){};
   virtual void SetJointEffortFromROS(float InEffort){};
 
-  virtual void UpdateJointVelocity(float InDeltaT = 0){};
   virtual void UpdateEncoderValue(float InValue);
   virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
 
@@ -205,7 +200,6 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
 
 
  protected:
-  virtual void UpdateJointVelocity(float InDeltaT = 0);
   virtual void ConnectToComponents() override;
  private:
   UPROPERTY()
@@ -244,7 +238,6 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   virtual void BeginPlay() override;
 
 
-  virtual void UpdateJointVelocity(float InDeltaT = 0);
 };
 
 UCLASS()

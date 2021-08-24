@@ -178,10 +178,10 @@ void URJointTrajectoryController::Tick(const float &InDeltaTime)
 {
   if (GetOwner())
   {
-    for (URJoint *&Joint : GetOwner()->GetJoints())
-    {
-      Joint->UpdateEncoder();
-    }
+    // for (URJoint *&Joint : GetOwner()->GetJoints())
+    // {
+    //   Joint->UpdateEncoder();
+    // }
 
     if (State == UJointControllerState::FollowJointTrajectory)
     {

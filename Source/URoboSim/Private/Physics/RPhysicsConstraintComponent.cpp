@@ -5,7 +5,6 @@
 
 URConstraintComponent::URConstraintComponent()
 {
-  PrimaryComponentTick.bCanEverTick = true;
 }
 
 float URConstraintComponent::GetUpperLimit()
@@ -113,29 +112,6 @@ void URConstraintComponent::UpdateEncoderValue(float InValue)
   Encoder->UpdateValue(InValue);
 }
 
-void URPrismaticConstraintComponent::UpdateJointVelocity(float InDeltaT)
-{
-  if(Child && Parent)
-    {
-      float ChildMass = Child->GetMass();
-
-      FQuat JointQuat = GetComponentTransform().GetRotation();
-      FVector TargetJointVelocity = TargetVelocity * RefAxis;
-      TargetJointVelocity = JointQuat.RotateVector(TargetJointVelocity); // Rotation Axis in Global Frame
-
-      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
-
-      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocityAtPoint(COM);
-      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
-
-      FVector TargetChildLinearVelocity = ParentLinearVelocity + TargetJointVelocity;
-
-      Child->SetPhysicsLinearVelocity(TargetChildLinearVelocity);
-      Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity);
-
-    }
-}
-
 FVector UAngularVelocityToROS(FVector InAngularVelocity)
 {
   return FVector(-InAngularVelocity[0], InAngularVelocity[1], -InAngularVelocity[2]);
@@ -145,59 +121,6 @@ FVector ROSAngularVelocityToU(FVector InAngularVelocity)
 {
   return FVector(-InAngularVelocity[0], InAngularVelocity[1], -InAngularVelocity[2]);
 }
-
-void URContinuousConstraintComponent::UpdateJointVelocity(float InDeltaT)
-{
-  if(Child && Parent)
-    {
-      // float ChildMass = Child->GetMass();
-
-      FVector COM = Child->GetBodyInstance()->GetCOMPosition();
-      FVector DistanceJointCOM = COM - GetComponentLocation();
-      FVector DistanceJointParent = GetComponentLocation() - Parent->GetBodyInstance()->GetCOMPosition();
-      FVector COMParentChild = COM - Parent->GetBodyInstance()->GetCOMPosition();
-
-      FRotator JointRotation = GetComponentRotation();
-      FVector TargetJointAngularVelocity = TargetVelocity * RefAxis;
-      TargetJointAngularVelocity = ROSAngularVelocityToU(TargetJointAngularVelocity);
-
-      FVector ParentAngularVelocityDegrees = Parent->GetPhysicsAngularVelocityInDegrees();
-      FRotator ParentAngularVelocityRotator(-ParentAngularVelocityDegrees.Y, ParentAngularVelocityDegrees.Z, -ParentAngularVelocityDegrees.X);
-      ParentAngularVelocityRotator *= InDeltaT;
-
-      FVector TargetJointAngularVelocityWorld = JointRotation.Quaternion().RotateVector(TargetJointAngularVelocity);
-      FRotator TargetJointAngularVelocityRotator(-TargetJointAngularVelocityWorld.Y, TargetJointAngularVelocityWorld.Z, -TargetJointAngularVelocityWorld.X);
-      TargetJointAngularVelocityRotator *= InDeltaT;
-
-      FVector NewDistanceJointCOM = ParentAngularVelocityRotator.Quaternion().RotateVector(DistanceJointCOM);
-      FVector COMTargetVelocity = TargetJointAngularVelocityRotator.Quaternion().RotateVector(NewDistanceJointCOM) - DistanceJointCOM;
-      COMTargetVelocity /= InDeltaT;
-
-      FVector NewCOMParentChild = ParentAngularVelocityRotator.Quaternion().RotateVector(COMParentChild) - COMParentChild;
-      NewCOMParentChild /= InDeltaT;
-
-      // COMTargetVelocity += NewCOMParentChild;
-
-      // FVector COMTargetVelocityOld = FVector::CrossProduct(TargetJointAngularVelocityWorld, DistanceJointCOM);
-
-      FVector ParentLinearVelocity = Parent->GetPhysicsLinearVelocity();
-      if(GetName().Contains("l_elbow_flex"))
-        {
-          // UE_LOG(LogTemp, Error, TEXT("COMParentChild %s NewCOMParentChild %s"), *COMParentChild.ToString(), *NewCOM.ToString());
-          // UE_LOG(LogTemp, Error, TEXT("COM %s ComponenLocation %s"), *COM.ToString(), *Child->GetComponentLocation().ToString());
-          // UE_LOG(LogTemp, Error, TEXT("ParentLinearvelocity %s NewCOMParentChild %s"), *COMTargetVelocityOld.ToString(), *COMTargetVelocity.ToString());
-        }
-
-
-      COMTargetVelocity += ParentLinearVelocity;
-
-
-      FVector ParentAngularVelocity = Parent->GetPhysicsAngularVelocityInRadians();
-      Child->SetPhysicsLinearVelocity(COMTargetVelocity);
-      Child->SetPhysicsAngularVelocityInRadians(ParentAngularVelocity + TargetJointAngularVelocityWorld);
-    }
-}
-
 
 void URConstraintComponent::SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild)
 {
@@ -220,24 +143,6 @@ void URConstraintComponent::BeginPlay()
 
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
-}
-
-// #if WITH_EDITOR
-// void URConstraintComponent::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-// {
-//   const static FName RotationName("RelativeRotation");
-//   const FName PropertyName = PropertyChangedEvent.Property ? PropertyChangedEvent.Property->GetFName() : FName();
-//   if (PropertyName == SceneComponentStatics::MobilityName)
-//     {
-//       UpdateAttachedMobility(this);
-//     }
-
-// }
-// #endif
-
-void URConstraintComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-  CurrentJointPos = GetJointPosition();
 }
 
 void URContinuousConstraintComponent::BeginPlay()

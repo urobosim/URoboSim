@@ -48,8 +48,6 @@ public:
 
 	void AddJoint(class URJoint* InJoint);
 
-	virtual void UpdateVelocity(float InDeltaTime);
-	// virtual void SetNextVelocities();
 
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent *PoseComponent;

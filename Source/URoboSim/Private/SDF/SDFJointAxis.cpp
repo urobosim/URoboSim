@@ -11,12 +11,12 @@ USDFJointAxis::USDFJointAxis()
 
 void USDFJointAxis::SetLowerLimitFromSDF(float LowerLimit)
 {
-  USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
+  // USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
   Lower = LowerLimit;
 }
 
 void USDFJointAxis::SetUpperLimitFromSDF(float UpperLimit)
 {
-  USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
+  // USDFJoint* Owner = Cast<USDFJoint>(GetOuter());
   Upper = UpperLimit;
 }
