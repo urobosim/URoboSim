@@ -14,17 +14,17 @@ UCLASS()
 class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
 {
   GENERATED_BODY()
-
-    virtual void OnStart() override;
-
  public:
-
+    URoboSimGameInstance();
+  virtual void OnStart() override;
   virtual void Tick(float DeltaTime) override;
 
   TArray<AJointActor*> Joints;
 
   TSharedPtr<FROSBridgePublisher> Publisher;
 
+  UPROPERTY(EditAnywhere)
   FString Topic;
+
   FString MessageType ;
 };

@@ -1,11 +1,15 @@
 #include "URoboSimGameInstance.h"
 
+URoboSimGameInstance::URoboSimGameInstance()
+{
+  Topic = TEXT("/joint_states");
+  MessageType = TEXT("sensor_msgs/JointState");
+}
+
 void URoboSimGameInstance::OnStart()
 {
   Super::OnStart();
 
-  Topic = TEXT("/joint_states");
-  MessageType = TEXT("sensor_msgs/JointState");
   Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
 
   if (Publisher.IsValid())
