@@ -112,7 +112,6 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetJointEffort(float Effort){};
   virtual void SetJointEffortFromROS(float InEffort){};
 
-  virtual void UpdateJointVelocity(float InDeltaT = 0){};
   virtual void UpdateEncoderValue(float InValue);
   virtual float CheckPositionRange(float InTargetJointPos){return InTargetJointPos;};
 
@@ -205,7 +204,6 @@ class UROBOSIM_API URPrismaticConstraintComponent : public URFixedConstraintComp
 
 
  protected:
-  virtual void UpdateJointVelocity(float InDeltaT = 0);
   virtual void ConnectToComponents() override;
  private:
   UPROPERTY()
@@ -244,7 +242,6 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
   virtual void BeginPlay() override;
 
 
-  virtual void UpdateJointVelocity(float InDeltaT = 0);
 };
 
 UCLASS()

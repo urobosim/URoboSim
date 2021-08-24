@@ -29,16 +29,6 @@ void URJoint::SetDrive(const FEnableDrive &EnableDrive)
   Constraint->SetDrive(EnableDrive);
 }
 
-void URJoint::UpdateVelocity(float InDeltaTime)
-{
-  if(bActuate)
-  {
-    Constraint->UpdateJointVelocity(InDeltaTime);
-  }
-
-  Child->UpdateVelocity(InDeltaTime);
-}
-
 void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
 {
   Child = InChild;

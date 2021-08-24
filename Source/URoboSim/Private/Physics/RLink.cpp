@@ -113,11 +113,3 @@ float URLink::GetNumCollisions()
 {
 	return Collisions.Num();
 }
-
-void URLink::UpdateVelocity(float InDeltaTime)
-{
-  for(URJoint* Joint : Joints)
-    {
-      Joint->UpdateVelocity(InDeltaTime);
-    }
-}
