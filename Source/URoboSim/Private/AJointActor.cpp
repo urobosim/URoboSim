@@ -8,6 +8,7 @@ AJointActor::AJointActor()
   // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
   PrimaryActorTick.bCanEverTick = true;
   JointDescription = CreateDefaultSubobject<USDFJoint>(FName(*(GetName() + TEXT("_JointDescription"))));
+  Axis = CreateDefaultSubobject<USDFJointAxis>(TEXT("Axis"));
 }
 
 void AJointActor::BeginPlay()
@@ -49,6 +50,7 @@ void AJointActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
       if(JointDescription)
         {
           JointDescription->Name = GetName();
+          JointDescription->Axis = Axis;
           if(!ConstraintActor1 || !ConstraintActor1)
             {
               return;

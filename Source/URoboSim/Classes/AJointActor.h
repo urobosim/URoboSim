@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "Physics/RJoint.h"
 #include "Factory/RJointFactory.h"
+#include "SDF/SDFJointAxis.h"
 #include "AJointActor.generated.h"
 
 
@@ -20,6 +21,9 @@ public:
 
   UPROPERTY(EditInstanceOnly, Category=Constraint)
     AActor* ConstraintActor2;
+
+  UPROPERTY(EditAnywhere, Category=Constraint)
+  USDFJointAxis* Axis;
 
   // Called every frame
   virtual void Tick(float DeltaTime) override;
