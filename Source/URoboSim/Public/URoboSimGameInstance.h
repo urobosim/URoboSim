@@ -22,7 +22,6 @@ class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
   virtual void Tick(float DeltaTime) override;
 
   TArray<AJointActor*> Joints;
-  // TMap<FString, double> JointState;
 
   TSharedPtr<FROSBridgePublisher> Publisher;
 

@@ -12,6 +12,7 @@ AJointActor::AJointActor()
 
 void AJointActor::BeginPlay()
 {
+  Super::BeginPlay();
   URoboSimGameInstance* GI = Cast<URoboSimGameInstance>(UGameplayStatics::GetGameInstance(this));
   if(GI)
     {
@@ -21,7 +22,11 @@ void AJointActor::BeginPlay()
 
 void AJointActor::Tick(float DeltaTime)
 {
-  CurrentJointPos = Joint->GetJointPosition();
+  Super::Tick(DeltaTime);
+  if(Joint)
+    {
+      CurrentJointPos = Joint->GetEncoderValue();
+    }
 }
 
 #if WITH_EDITOR
@@ -43,7 +48,6 @@ void AJointActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
     {
       if(JointDescription)
         {
-          UE_LOG(LogTemp, Error, TEXT("%s JointDescription found and working"), *GetName());
           JointDescription->Name = GetName();
           if(!ConstraintActor1 || !ConstraintActor1)
             {
@@ -51,11 +55,6 @@ void AJointActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
             }
           JointDescription->Parent=ConstraintActor1->GetName();
           JointDescription->Child=ConstraintActor2->GetName();
-        }
-      else
-        {
-          return;
-          UE_LOG(LogTemp, Error, TEXT("%s JointDescription not found"), *GetName());
         }
 
       if(Joint)
@@ -72,8 +71,6 @@ void AJointActor::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedE
           Joint->SetParentChild(ConstraintActor1, ConstraintActor2);
           Joint->Constraint->ConnectToComponents();
           RootComponent = Joint->Constraint;
-          Joint->Constraint->RegisterComponent();
-          // GEngine->EditorUpdateComponents();
         }
     }
 }

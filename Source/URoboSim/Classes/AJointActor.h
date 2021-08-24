@@ -7,10 +7,8 @@
 #include "AJointActor.generated.h"
 
 
-// UCLASS( ClassGroup=Physics, meta=(BlueprintSpawnableComponent), DefaultToInstanced, ConversionRoot, MinimalAPI, ComponentWrapperClass)
-// class AJointActor : public AActor
-UCLASS( ClassGroup=Physics, meta=(BlueprintSpawnableComponent))
-class UROBOSIM_API AJointActor : public AActor
+UCLASS( ClassGroup=Physics, meta=(BlueprintSpawnableComponent), DefaultToInstanced, ConversionRoot, MinimalAPI, ComponentWrapperClass)
+class AJointActor : public AActor
 {
   GENERATED_BODY()
 

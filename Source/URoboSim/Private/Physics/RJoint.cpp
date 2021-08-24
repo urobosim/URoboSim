@@ -15,7 +15,9 @@ URJoint::URJoint()
 
 bool URJoint::IsTickable() const
 {
-  return true;
+  // Tick only if we are both NOT a template and if we are specifically not in-editor-before-beginplay is called.
+  return (!IsTemplate(RF_ClassDefaultObject)) && !(GIsEditor && !GWorld->HasBegunPlay());
+  // return true;
 }
 
 TStatId URJoint::GetStatId() const
@@ -28,11 +30,6 @@ void URJoint::Tick(float DeltaTime)
   if(Constraint)
     {
       UpdateEncoder();
-      UE_LOG(LogTemp, Error, TEXT("%s Constraint  ready"), *GetName());
-    }
-  else
-    {
-      UE_LOG(LogTemp, Error, TEXT("%s Constraint not ready in tick joint"), *GetName());
     }
 }
 
