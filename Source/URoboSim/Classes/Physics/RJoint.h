@@ -69,7 +69,6 @@ public:
 
 public:
 
-    virtual void UpdateEncoder();
 
     UPROPERTY(EditAnywhere)
       FTransform Pose;
@@ -79,4 +78,8 @@ public:
 
     UPROPERTY()
       float AccumulatatedJointMass = 0;
+
+ protected:
+
+    virtual void UpdateEncoder();
 };
