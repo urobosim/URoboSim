@@ -113,10 +113,10 @@ void URJointController::Tick(const float &InDeltaTime)
 {
   if (GetOwner())
   {
-    for (auto &Joint : GetOwner()->Joints)
-    {
-      Joint.Value->UpdateEncoder();
-    }
+    // for (auto &Joint : GetOwner()->Joints)
+    // {
+    //   Joint.Value->UpdateEncoder();
+    // }
 
     MoveJoints(InDeltaTime);
   }

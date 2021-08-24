@@ -28,6 +28,11 @@ void URJoint::Tick(float DeltaTime)
   if(Constraint)
     {
       UpdateEncoder();
+      UE_LOG(LogTemp, Error, TEXT("%s Constraint  ready"), *GetName());
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("%s Constraint not ready in tick joint"), *GetName());
     }
 }
 
