@@ -156,12 +156,18 @@ void URContinuousConstraintComponent::BeginPlay()
 void URPrismaticConstraintComponent::BeginPlay()
 {
   Super::BeginPlay();
-  if(!GetName().Contains("gripper"))
-    {
-      FVector FramePos = ParentChildDistance + Offset;
-      SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
-      SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
-    }
+  FTransform A1Transform = GetBodyTransform(EConstraintFrame::Frame1);
+  A1Transform.RemoveScaling();
+
+  FTransform A2Transform = GetBodyTransform(EConstraintFrame::Frame2);
+  A2Transform.RemoveScaling();
+
+  FQuat JointQuat = GetComponentTransform().GetRotation();
+  FVector FramePos = A1Transform.GetRotation().RotateVector(A2Transform.GetLocation() - A1Transform.GetLocation() + JointQuat.RotateVector(Offset));
+  // FVector FramePos = ParentChildDistance + Offset;
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
+  SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
+
 }
 
 
