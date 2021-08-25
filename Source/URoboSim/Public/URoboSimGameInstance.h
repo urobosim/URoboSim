@@ -26,5 +26,8 @@ class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
   UPROPERTY(EditAnywhere)
   FString Topic;
 
+  UPROPERTY(EditAnywhere)
+  bool bEnableJointStatePublishing;
+
   FString MessageType ;
 };

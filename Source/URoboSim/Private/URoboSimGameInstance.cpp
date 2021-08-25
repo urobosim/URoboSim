@@ -10,12 +10,14 @@ void URoboSimGameInstance::OnStart()
 {
   Super::OnStart();
 
-  Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
-
-  if (Publisher.IsValid())
-  {
-    ROSHandler->AddPublisher(Publisher);
-  }
+  if(bEnableJointStatePublishing)
+    {
+      Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
+      if (Publisher.IsValid())
+        {
+          ROSHandler->AddPublisher(Publisher);
+        }
+    }
 }
 
 
