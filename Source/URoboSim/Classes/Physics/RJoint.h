@@ -23,6 +23,7 @@ public:
         void Tick(float DeltaTime) override;
         TStatId GetStatId() const override;
 	virtual UWorld* GetTickableGameObjectWorld() const override { return GetOuter()->GetWorld(); }
+        virtual void BeginDestroy() override;
 
         UPROPERTY()
           bool bBreakEnabled;

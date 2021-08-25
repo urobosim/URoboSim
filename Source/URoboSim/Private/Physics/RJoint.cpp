@@ -13,6 +13,15 @@ URJoint::URJoint()
   bActuate = false;
 }
 
+void URJoint::BeginDestroy()
+{
+  if(Constraint->IsValidLowLevel())
+    {
+      Constraint->ConditionalBeginDestroy();
+    }
+  Super::BeginDestroy();
+}
+
 bool URJoint::IsTickable() const
 {
   // Tick only if we are both NOT a template and if we are specifically not in-editor-before-beginplay is called.
