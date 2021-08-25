@@ -46,7 +46,7 @@ bool AJointActor::CreateJoint()
 
   if(Joint)
     {
-      Joint->BeginDestroy();
+      Joint->ConditionalBeginDestroy();
       Joint = NULL;
       GEngine->ForceGarbageCollection(true);
     }
