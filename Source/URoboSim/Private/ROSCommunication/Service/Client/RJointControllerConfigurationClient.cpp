@@ -117,7 +117,7 @@ void FRJointLimitControllerConfigurationClient::Callback(TSharedPtr<FROSBridgeSr
             float SoftLowerLimit = FCString::Atof(*ChildNode->GetAttribute("soft_lower_limit"));
             float SoftUpperLimit = FCString::Atof(*ChildNode->GetAttribute("soft_upper_limit"));
 
-            UE_LOG(LogRJointControllerConfigurationClient, Warning, TEXT("%s: Lower %s Upper: %s"), *MyName, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
+            UE_LOG(LogRJointControllerConfigurationClient, Log, TEXT("%s: Lower %s Upper: %s"), *MyName, *ChildNode->GetAttribute("soft_lower_limit"), *ChildNode->GetAttribute("soft_upper_limit"));
 
             if (Model)
             {
