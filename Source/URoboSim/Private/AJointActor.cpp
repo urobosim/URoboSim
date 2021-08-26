@@ -17,7 +17,7 @@ void AJointActor::BeginPlay()
   URoboSimGameInstance* GI = Cast<URoboSimGameInstance>(UGameplayStatics::GetGameInstance(this));
   if(GI)
     {
-      GI->Joints.Add(this);
+      GI->Joints.Add(GetName(), this);
     }
 }
 

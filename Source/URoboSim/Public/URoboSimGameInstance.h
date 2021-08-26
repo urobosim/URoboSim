@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WorldControlGameInstance.h"
 #include "AJointActor.h"
+#include "ROSCommunication/Service/Server/SetEnvironmentJointStatesServer.h"
 #include "URoboSimGameInstance.generated.h"
 
 /**
@@ -19,15 +20,26 @@ class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
   virtual void OnStart() override;
   virtual void Tick(float DeltaTime) override;
 
-  TArray<AJointActor*> Joints;
+  TMap<FString, AJointActor*> Joints;
 
   TSharedPtr<FROSBridgePublisher> Publisher;
+  TSharedPtr<FSetEnvironmentJointStatesServerCallback> ServiceServer;
 
-  UPROPERTY(EditAnywhere)
-  FString Topic;
+  UPROPERTY(EditAnywhere, Category= "Publish Environment Joint State")
+  FString JointStatePublishTopic;
 
-  UPROPERTY(EditAnywhere)
+  UPROPERTY(EditAnywhere, Category= "Publish Environment Joint State")
   bool bEnableJointStatePublishing;
 
-  FString MessageType ;
+  UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
+  bool bEnableSettingJointState;
+
+  UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
+  FEnableDrive EnableDrive;
+
+  UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
+    float ErrorTollerance = 0.01;
+
+  FString JointStatePublisherMessageType;
+  FString SetJointStateServerType;
 };

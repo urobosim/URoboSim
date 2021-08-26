@@ -32,10 +32,11 @@ public:
 
   UPROPERTY(VisibleAnywhere)
     float CurrentJointPos;
-protected:
 
   UPROPERTY(Category = ConstraintActor, VisibleAnywhere, BlueprintReadOnly, meta = (ExposeFunctionCategories = "JointDrive,Physics|Components|PhysicsConstraint", AllowPrivateAccess = "true"))
     URJoint* Joint;
+protected:
+
 
   UPROPERTY()
     USDFJoint* JointDescription;
