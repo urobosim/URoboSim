@@ -161,7 +161,9 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   LinkComponent->BodyInstance.VelocitySolverIterationCount = 8;
 
   FVector LocationOffset = LinkPose.GetRotation().RotateVector(InCollision->Pose.GetLocation());
-  LinkComponent->SetWorldLocation(LocationOffset + LinkPose.GetLocation() + LoadLocation);
+
+  FVector FinalPos = LocationOffset + LinkPose.GetLocation() + LoadLocation;
+  LinkComponent->SetWorldLocation(FinalPos);
 
   //Rotations are added by multiplying the Quaternions
   FQuat RotationOffset = LinkPose.GetRotation() * InCollision->Pose.GetRotation();
@@ -176,7 +178,10 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
       if(Link->Collisions.Num()==0)
         {
           LinkComponent->SetSimulatePhysics(true);
-          LinkComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+          if(LinkComponent != Model->GetRootComponent())
+            {
+              LinkComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+            }
         }
       else
         {
