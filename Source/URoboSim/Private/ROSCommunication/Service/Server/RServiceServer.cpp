@@ -11,6 +11,7 @@ void URServiceServer::SetServiceServerParameters(URServiceServerParameter *&Serv
 
 void URServiceServer::Init()
 {
+  SetOwner(GetOuter());
 	CreateServiceServer();
 	if (Handler.IsValid())
 	{

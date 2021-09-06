@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSCommunication/RROSCommunication.h"
+#include "RobotInterface.h"
 // clang-format off
 #include "RServiceClient.generated.h"
 // clang-format on
@@ -19,27 +20,36 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URServiceClient : public URROSCommunication
+class UROBOSIM_API UServiceClient : public UROSCommunication
 {
   GENERATED_BODY()
 
 public:
   void Tick() override;
 
-public:
   virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
 
   virtual void CallService(){}
 
 protected:
-  virtual void Init() override;
 
   virtual void CreateServiceClient(){}
 
-protected:
+  virtual void Init() override;
+
   UPROPERTY(EditAnywhere)
   FString ServiceName;
 
   UPROPERTY(EditAnywhere)
   FString ServiceType;
+};
+
+UCLASS()
+class UROBOSIM_API URServiceClient : public UServiceClient, public IRobotInterface
+{
+  GENERATED_BODY()
+
+protected:
+  virtual void Init() override;
+
 };

@@ -13,6 +13,7 @@ void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberPar
 
 void URSubscriber::Init()
 {
+  SetOwner(GetOuter());
   CreateSubscriber();
   if (Subscriber.IsValid())
   {

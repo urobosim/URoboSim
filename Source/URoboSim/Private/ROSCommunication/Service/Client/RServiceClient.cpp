@@ -3,7 +3,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRServiceClient, Log, All)
 
-void URServiceClient::SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters)
+void UServiceClient::SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters)
 {
   if (ServiceClientParameters)
   {
@@ -12,15 +12,21 @@ void URServiceClient::SetServiceClientParameters(URServiceClientParameter *&Serv
   }
 }
 
-void URServiceClient::Init()
+void UServiceClient::Init()
 {
   CreateServiceClient();
 }
 
-void URServiceClient::Tick()
+void UServiceClient::Tick()
 {
   if (Handler.IsValid())
   {
     Handler->Process();
   }
+}
+
+void URServiceClient::Init()
+{
+  SetOwner(GetOuter());
+  Super::Init();
 }

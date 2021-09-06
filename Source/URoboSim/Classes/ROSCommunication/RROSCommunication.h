@@ -10,7 +10,7 @@
 // clang-format on
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URROSCommunication : public UObject
+class UROBOSIM_API UROSCommunication : public UObject
 {
   GENERATED_BODY()
 
@@ -21,12 +21,6 @@ public:
 
   void Disconnect();
 
-  ARModel *GetOwner() const { return Owner; }
-
-  void SetOwner(UObject *InOwner){ Owner = Cast<ARModel>(InOwner); }
-
-  void SetOwner();
-
 public:
   virtual void Tick() {}
 
@@ -35,7 +29,4 @@ protected:
 
 protected:
   TSharedPtr<FROSBridgeHandler> Handler;
-
-private:
-  ARModel *Owner;
 };

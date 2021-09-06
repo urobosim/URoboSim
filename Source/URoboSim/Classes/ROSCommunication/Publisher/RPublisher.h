@@ -2,6 +2,7 @@
 
 #include "ROSCommunication/RROSCommunication.h"
 #include "ROSBridgePublisher.h"
+#include "RobotInterface.h"
 // clang-format off
 #include "RPublisher.generated.h"
 // clang-format on
@@ -20,7 +21,14 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URPublisher : public URROSCommunication
+class UROBOSIM_API UPublisher : public UROSCommunication
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS()
+class UROBOSIM_API URPublisher : public UPublisher, public IRobotInterface
 {
   GENERATED_BODY()
 

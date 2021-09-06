@@ -13,6 +13,7 @@ void URActionServer::SetActionServerParameters(URActionServerParameter *&ActionS
 
 void URActionServer::Init()
 {
+  SetOwner(GetOuter());
   CreateActionServer();
   if (GetOwner())
   {
@@ -22,7 +23,7 @@ void URActionServer::Init()
       UE_LOG(LogRActionServer, Error, TEXT("%s not found in %s"), *ControllerName, *GetName())
       return;
     }
-    
+
     if (GoalSubscriber)
     {
       UE_LOG(LogRActionServer, Log, TEXT("Initialize %s of %s"), *GoalSubscriber->GetName(), *GetName())

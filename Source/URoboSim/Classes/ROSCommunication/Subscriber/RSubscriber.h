@@ -3,6 +3,7 @@
 #pragma once
 
 #include "ROSCommunication/RROSCommunication.h"
+#include "RobotInterface.h"
 // clang-format off
 #include "RSubscriber.generated.h"
 // clang-format on
@@ -21,7 +22,14 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URSubscriber : public URROSCommunication
+class UROBOSIM_API USubscriber : public UROSCommunication
+{
+  GENERATED_BODY()
+
+};
+
+UCLASS()
+class UROBOSIM_API URSubscriber : public USubscriber, public IRobotInterface
 {
   GENERATED_BODY()
 

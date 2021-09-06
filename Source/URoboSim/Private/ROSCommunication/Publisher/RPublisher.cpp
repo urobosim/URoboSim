@@ -14,6 +14,7 @@ void URPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameter
 
 void URPublisher::Init()
 {
+  SetOwner(GetOuter());
   CreatePublisher();
   if (Publisher.IsValid())
   {

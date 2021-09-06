@@ -3,6 +3,7 @@
 #include "Controller/RController.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
+#include "RobotInterface.h"
 // clang-format off
 #include "RActionServer.generated.h"
 // clang-format on
@@ -45,7 +46,13 @@ protected:
 };
 
 UCLASS()
-class UROBOSIM_API URActionServer : public URROSCommunication
+class UROBOSIM_API UActionServer : public UROSCommunication
+{
+  GENERATED_BODY()
+};
+
+UCLASS()
+class UROBOSIM_API URActionServer : public UActionServer, public IRobotInterface
 {
   GENERATED_BODY()
 
@@ -54,31 +61,31 @@ public:
 
   virtual void SetActionServerParameters(URActionServerParameter *&ActionServerParameters);
 
-public:
+ public:
   UPROPERTY(EditAnywhere)
-  FString ControllerName;
+    FString ControllerName;
 
-protected:
+ protected:
   virtual void Init() override;
 
   virtual void CreateActionServer() {}
 
-protected:
+ protected:
   UPROPERTY(EditAnywhere)
-  FString ActionName;
+    FString ActionName;
 
   UPROPERTY(VisibleAnywhere)
-  URActionSubscriber *GoalSubscriber;
+    URActionSubscriber *GoalSubscriber;
 
   UPROPERTY(VisibleAnywhere)
-  URActionSubscriber *CancelSubscriber;
+    URActionSubscriber *CancelSubscriber;
 
   UPROPERTY(VisibleAnywhere)
-  URActionPublisher *StatusPublisher;
+    URActionPublisher *StatusPublisher;
 
   UPROPERTY(VisibleAnywhere)
-  URActionPublisher *ResultPublisher;
+    URActionPublisher *ResultPublisher;
 
   UPROPERTY(VisibleAnywhere)
-  URActionPublisher *FeedbackPublisher;
+    URActionPublisher *FeedbackPublisher;
 };
