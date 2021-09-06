@@ -5,6 +5,7 @@ URoboSimGameInstance::URoboSimGameInstance()
   JointStatePublishTopic = TEXT("/joint_states");
   JointStatePublisherMessageType = TEXT("sensor_msgs/JointState");
   SetJointStateServerType = TEXT("urobosim_msgs/SetEnvironmentJointState");
+  // KnowrobInterface = CreateDefaultSubobject<UKnowrobInterface>(FName(GetName() + "_KnowrobInterface"));
 }
 
 void URoboSimGameInstance::OnStart()

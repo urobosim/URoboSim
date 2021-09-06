@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "WorldControlGameInstance.h"
 #include "AJointActor.h"
+// #include "KnowRobInterface.h"
 #include "ROSCommunication/Service/Server/SetEnvironmentJointStatesServer.h"
 #include "URoboSimGameInstance.generated.h"
 
@@ -39,6 +40,9 @@ class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
 
   UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
     float ErrorTollerance = 0.01;
+
+  // UPROPERTY(EditAnywhere, Category= "KnowRob")
+  //   UKnowrobInterface* KnowrobInterface;
 
   FString JointStatePublisherMessageType;
   FString SetJointStateServerType;
