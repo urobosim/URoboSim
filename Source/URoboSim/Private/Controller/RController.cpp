@@ -24,7 +24,7 @@ void URController::SetOwner()
   }
   if (!Owner)
   {
-    UE_LOG(LogRController, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName())
+    UE_LOG(LogRController, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName());
   }
 }
 
