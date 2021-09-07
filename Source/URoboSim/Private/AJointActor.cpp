@@ -1,8 +1,10 @@
 
 #include "AJointActor.h"
 #include "URoboSimGameInstance.h"
-#include "Editor/EditorEngine.h"
 
+#if WITH_EDITOR
+#include "Editor/EditorEngine.h"
+#endif // WITH_EDITOR
 AJointActor::AJointActor()
 {
   // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
