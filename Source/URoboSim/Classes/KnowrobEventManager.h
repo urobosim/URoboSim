@@ -3,7 +3,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-// #include "KnowRobInterface.h"
+#include "ROSCommunication/KnowRobInterface.h"
 #include "KnowrobEventManager.generated.h"
 
 
@@ -15,7 +15,7 @@ class UROBOSIM_API UEventManagerComponent : public UActorComponent
 public:
 
   UPROPERTY(EditAnywhere, Instanced)
-  TArray<UEventManager*> EventMangers;
+  TArray<UEventManager*> EventManagers;
 
   // Called every frame
   virtual void BeginPlay() override;
@@ -31,10 +31,11 @@ class UROBOSIM_API UEventManager: public UObject
 
 public:
   virtual void RegisterEvent(){};
-  // virtual void Init(UKnowrobInterface* InKnowrobInterface){ KnowrobInterface = InKnowrobInterface};
+  virtual void Init(UKnowrobInterface* InKnowrobInterface, UObject* InObject);
+  virtual void SetObject(UObject* InObject){};
 
-  // UPROPERTY()
-  // UKnowrobInterface* KnowrobInterface;
+  UPROPERTY()
+  UKnowrobInterface* KnowrobInterface;
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, hidecategories = Object, editinlinenew)
@@ -44,6 +45,7 @@ class UROBOSIM_API UCollisionEventManager: public UEventManager
 
 public:
   virtual void RegisterEvent();
+  virtual void SetObject(UObject* InObject) override;
 
   UFUNCTION()
   virtual void Callback(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);

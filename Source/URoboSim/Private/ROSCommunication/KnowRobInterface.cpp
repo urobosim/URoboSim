@@ -1,7 +1,7 @@
 
-#include "KnowRobInterface.h"
+#include "ROSCommunication/KnowRobInterface.h"
 
 UKnowrobInterface::UKnowrobInterface()
 {
-  QueryClient = CreateDefaultSubobject<UPrologQueryClient>(FName(*GetOuter()->GetName() + "_PrologQueryClient"));
+  QueryClient = CreateDefaultSubobject<UPrologQueryClient>(FName(*(GetOuter()->GetName() + TEXT("_PrologQueryClient"))));
 }

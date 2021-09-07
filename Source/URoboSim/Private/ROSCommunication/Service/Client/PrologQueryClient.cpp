@@ -16,14 +16,18 @@ void UPrologQueryClient::SetServiceClientParameters(URServiceClientParameter *&S
 
 void UPrologQueryClient::CreateServiceClient()
 {
-    Request = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Request("", Query));
-    // Create an empty response instance
-    Response = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Response());
+  // Request = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Request(std_msgs::Byte(Mode), Id, Query));
+  //   // Create an empty response instance
+  //   Response = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Response());
 }
 
-void UPrologQueryClient::SendQuery(const uint Mode, const FString& Id, const FString& InQuery, FTimerManager& InTimerManager)
+void UPrologQueryClient::SendQuery(const uint8 InMode, const FString& InId, const FString& InQuery, FTimerManager& InTimerManager)
 {
     ServiceClient = MakeShareable<FPrologQueryClient>(new FPrologQueryClient(ServiceName, ServiceType, InQuery));
+
+    Request = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Request(std_msgs::Byte(InMode), InId, InQuery));
+    // Create an empty response instance
+    Response = MakeShareable(new json_prolog_msgs::PrologQuerySrv::Response(bOk, Message));
 
     FTimerHandle MyTimerHandle;
     InTimerManager.SetTimer(MyTimerHandle, this, &UPrologQueryClient::CallService, 1.0f, false);

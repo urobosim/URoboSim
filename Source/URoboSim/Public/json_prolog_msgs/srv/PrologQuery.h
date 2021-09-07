@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ROSBridgeSrv.h"
-// #include "std_msgs/Byte.h"
+#include "std_msgs/Byte.h"
 
 namespace json_prolog_msgs
 {
@@ -17,52 +17,48 @@ namespace json_prolog_msgs
 	   class Request : public SrvRequest
 		{
 	   private:
-                  // std_msgs::Byte mode;
+                  std_msgs::Byte Mode;
                   FString Id;
                   FString Query;
            public:
                   Request(){};
-                  Request(const FString& InId, const FString& InQuery): Id(InId), Query(InQuery){};
+                  Request(const std_msgs::Byte& InMode, const FString& InId, const FString& InQuery): Mode(InMode), Id(InId), Query(InQuery){};
 
-                  //  TArray<FString> GetJointNames()
-		  //  {
-                  //    return JointNames;
-		  //  }
+                  std_msgs::Byte GetMode()
+                  {
+                    return Mode;
+                  }
 
-		  //  void SetJointNames(const TArray<FString>& InNames)
-		  //  {
-		  //          JointNames= InNames;
-		  //  }
+                  void SetMode(const std_msgs::Byte& InMode)
+                  {
+                    Mode = InMode;
+                  }
 
-                  //  TArray<float> GetJointStates()
-		  //  {
-                  //    return JointStates;
-		  //  }
+                   FString GetId()
+		   {
+                     return Id;
+		   }
 
-		  //  void SetJointStates(const TArray<float>& InStates)
-		  //  {
-		  //          JointStates = InStates;
-		  //  }
+		   void SetId(const FString& InId)
+		   {
+		           Id= InId;
+		   }
+
+                   FString GetQuery()
+		   {
+                     return Query;
+		   }
+
+		   void SetQuery(const FString& InQuery)
+		   {
+		           Query= InQuery;
+		   }
 
                   virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
                   {
-
-                  //   TArray<TSharedPtr<FJsonValue>> ValuesPtrArr;
-                  //   JointNames.Empty();
-                  //   ValuesPtrArr = JsonObject->GetArrayField(TEXT("joint_names"));
-                  //   for (auto &ptr : ValuesPtrArr)
-                  //     {
-                  //       FString Names = ptr->AsString();
-                  //       JointNames.Add(Names);
-                  //     }
-
-                  //   ValuesPtrArr = JsonObject->GetArrayField(TEXT("joint_states"));
-                  //   JointStates.Empty();
-                  //   for (auto &ptr : ValuesPtrArr)
-                  //     {
-                  //       float States = ptr->AsNumber();
-                  //       JointStates.Add(States);
-                  //     }
+                    // Mode = std_msgs::Byte::GetFromJson(JsonObject->GetObjectField(TEXT("mode")));
+                    Id = JsonObject->GetStringField("id");
+                    Query = JsonObject->GetStringField("query");
                   }
 
                   static Request GetFromJson(TSharedPtr<FJsonObject> JsonObject)
@@ -81,22 +77,10 @@ namespace json_prolog_msgs
                   {
                     TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
-                  //   TArray<TSharedPtr<FJsonValue>> JointNamesArray;
-                  //   for (auto &Name : JointNames)
-                  //     {
-                  //       TSharedPtr<FJsonValue> Ptr = MakeShareable(new FJsonValueString(Name));
-                  //       JointNamesArray.Add(Ptr);
-                  //     }
-                  //   Object->SetArrayField("joint_names", JointNamesArray);
-
-                  //   TArray<TSharedPtr<FJsonValue>> JointStatesArray;
-                  //   for (auto &States : JointStates)
-                  //     {
-                  //       TSharedPtr<FJsonValue> Ptr = MakeShareable(new FJsonValueNumber(States));
-                  //       JointStatesArray.Add(Ptr);
-                  //     }
-                  //   Object->SetArrayField("joint_states", JointStatesArray);
-
+                    // Object->SetObjectField(TEXT("mode"), Mode.ToJsonObject());
+                    UE_LOG(LogTemp, Error, TEXT("Query %s"), *Query);
+                    Object->SetStringField(TEXT("query"), Query);
+                    Object->SetStringField(TEXT("id"), Id);
                     return Object;
                   }
            };
@@ -112,19 +96,37 @@ namespace json_prolog_msgs
             }
             Response(bool bOutOk, const FString& OutMessage): bOk(bOutOk), Message(OutMessage)  {}
 
-          //   void SetSuccess(bool S)
-          //   {
-          //     bSuccess = S;
-          //   }
+            void SetbOk(bool Ok)
+            {
+              bOk = Ok;
+            }
 
-          //   bool GetSuccess()
-          //   {
-          //     return bSuccess;
-          //   }
+            bool GetbOk()
+            {
+              return bOk;
+            }
 
+            FString GetMessage()
+            {
+              return Message;
+            }
+
+            void SetMessage(const FString& InMessage)
+            {
+              Message = InMessage;
+            }
             virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
             {
-          //     bSuccess = JsonObject->GetBoolField("success");
+              bOk = JsonObject->GetBoolField("ok");
+              Message = JsonObject->GetStringField("message");
+              if(bOk)
+                {
+                  UE_LOG(LogTemp, Error, TEXT("Query ok"));
+                }
+              else
+                {
+                  UE_LOG(LogTemp, Error, TEXT("Message: %s"), *Message);
+                }
             }
 
             static Response GetFromJson(TSharedPtr<FJsonObject> JsonObject)
@@ -142,10 +144,11 @@ namespace json_prolog_msgs
             virtual TSharedPtr<FJsonObject> ToJsonObject() const
             {
               TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
-          //     Object->SetBoolField("success", bSuccess);
+              Object->SetBoolField("ok", bOk);
+              Object->SetStringField(TEXT("message"), Message);
               return Object;
             }
           };
 
-	};
-} // namespace rospy_tutorials " }")
+        };
+}

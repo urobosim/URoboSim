@@ -35,12 +35,16 @@ public:
 
   void CallService() override;
 
-  FString Query;
+  // uint Mode;
+  // FString Query;
+  // FString Id;
+  bool bOk;
+  FString Message;
 protected:
   void CreateServiceClient() override;
 
 public:
-  void SendQuery(const uint Mode, const FString& Id, const FString& InQuery, FTimerManager& InTimerManager);
+  void SendQuery(const uint8 InMode, const FString& InId, const FString& InQuery, FTimerManager& InTimerManager);
 
 public:
 

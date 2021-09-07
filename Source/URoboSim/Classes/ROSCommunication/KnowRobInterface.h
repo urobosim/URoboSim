@@ -6,7 +6,6 @@
 #include "KnowRobInterface.generated.h"
 
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FKnowrobEvent, UObject * /*PerceivedObject*/);
 
 UCLASS()
 class UKnowrobInterface : public UObject
@@ -19,7 +18,4 @@ public:
 
   UPROPERTY()
   UPrologQueryClient* QueryClient;
-
-  FKnowrobEvent OnKnowrobEvent;
-
 };

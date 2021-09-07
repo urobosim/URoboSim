@@ -5,7 +5,7 @@ URoboSimGameInstance::URoboSimGameInstance()
   JointStatePublishTopic = TEXT("/joint_states");
   JointStatePublisherMessageType = TEXT("sensor_msgs/JointState");
   SetJointStateServerType = TEXT("urobosim_msgs/SetEnvironmentJointState");
-  // KnowrobInterface = CreateDefaultSubobject<UKnowrobInterface>(FName(GetName() + "_KnowrobInterface"));
+  KnowrobInterface = CreateDefaultSubobject<UKnowrobInterface>(FName(GetName() + "_KnowrobInterface"));
 }
 
 void URoboSimGameInstance::OnStart()
@@ -29,6 +29,10 @@ void URoboSimGameInstance::OnStart()
           ServiceServer->EnableDrive = EnableDrive;
           ServiceServer->ErrorTollerance = ErrorTollerance;
           ROSHandler->AddServiceServer(ServiceServer);
+        }
+      if(KnowrobInterface)
+        {
+          KnowrobInterface->QueryClient->Connect(ROSHandler);
         }
     }
   else
