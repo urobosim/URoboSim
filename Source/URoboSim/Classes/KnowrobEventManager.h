@@ -20,7 +20,12 @@ public:
   // Called every frame
   virtual void BeginPlay() override;
 
+
+  UPROPERTY(EditAnywhere)
+    float RepitionDelay = 1.;
+
 protected:
+
 
 };
 
@@ -49,6 +54,12 @@ public:
 
   UFUNCTION()
   virtual void Callback(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+
+  UPROPERTY(EditAnywhere)
+    float RepitionDelay = 1.;
+
+  UPROPERTY(EditAnywhere)
+    float LastCallback = 0.;
 
   UPROPERTY()
     AActor* Object;

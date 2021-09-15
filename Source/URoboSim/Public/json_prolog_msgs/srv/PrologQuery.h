@@ -121,7 +121,7 @@ namespace json_prolog_msgs
               Message = JsonObject->GetStringField("message");
               if(bOk)
                 {
-                  UE_LOG(LogTemp, Error, TEXT("Query ok"));
+                  UE_LOG(LogTemp, Log, TEXT("Query ok"));
                 }
               else
                 {
