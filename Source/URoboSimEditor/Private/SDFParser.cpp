@@ -5,6 +5,7 @@
 #include "Conversions.h"
 // #include "Paths.h"
 #include "XmlFile.h"
+#include "GenericPlatform/GenericPlatformMisc.h"
 #include "Factories/FbxFactory.h"
 #include "RStaticMeshEditUtils.h"
 
@@ -13,6 +14,7 @@ FSDFParser::FSDFParser() :  AssetRegistryModule(FModuleManager::LoadModuleChecke
 {
     this->XmlFile=nullptr;
     this->bSDFLoaded=false;
+    GetROSPackagePaths();
 }
 
 // Constructor with load from path
@@ -20,6 +22,7 @@ FSDFParser::FSDFParser(const FString& InFilename) : AssetRegistryModule(FModuleM
 {
   this->XmlFile=nullptr;
   this->bSDFLoaded=false;
+  GetROSPackagePaths();
   LoadSDF(InFilename);
 }
 
@@ -402,7 +405,7 @@ void FSDFParser::SetDirectoryPath(const FString& InFilename)
 
   // TODO rather cut uppermost from URI
   // One dir up --> D:/Models
-  DirPath = FPaths::Combine(DirPath, TEXT("/.."));
+  DirPath = FPaths::Combine(DirPath, TEXT("/../"));
   FPaths::CollapseRelativeDirectories(DirPath);
 }
 
@@ -416,10 +419,24 @@ FString FSDFParser::GetMeshAbsolutePath(const FString& Uri)
       MeshRelativePath = FPaths::ChangeExtension(MeshRelativePath, TEXT("fbx"));
     }
   // Remove package name prefix
-  MeshRelativePath.RemoveFromStart(TEXT("model:/"));
+  MeshRelativePath.RemoveFromStart(TEXT("model://"));
+  TArray<FString> PackageParts;
+  MeshRelativePath.ParseIntoArray(PackageParts, TEXT("/"));
+  FString PackageName = PackageParts[0];
 
-  // Create mesh absolute path
-  return DirPath + MeshRelativePath;
+
+  FString PackagePath = GetROSPackagePath(PackageName);
+
+  if(PackagePath.IsEmpty())
+    {
+      // Create mesh absolute path
+      return DirPath + MeshRelativePath;
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("MeshPath %s"), *(PackagePath + MeshRelativePath));
+      return PackagePath + MeshRelativePath;
+    }
 }
 
 FName FSDFParser::GenerateMeshName(ESDFType InType, FString InName)
@@ -460,6 +477,62 @@ UStaticMesh* FSDFParser::CreateMesh(ESDFType InType, ESDFGeometryType InShape, F
   UStaticMesh* Mesh = RStaticMeshUtils::CreateStaticMesh(Pkg, PackageName, InShape, InParameters);
   CreateCollisionForMesh(Mesh, InShape);
   return Mesh;
+}
+
+void FSDFParser::GetROSPackagePaths()
+{
+  FString TempPath = FPlatformMisc::GetEnvironmentVariable(TEXT("ROS_PACKAGE_PATH"));
+  if (!TempPath.IsEmpty())
+    {
+      ROSPackagePaths.Empty();
+      TArray<FString> TempPathArray;
+      TempPath.ParseIntoArray(TempPathArray, TEXT(":"));
+      for(auto & Path : TempPathArray)
+        {
+          TArray<FString> TempPackageParts;
+          Path.ParseIntoArray(TempPackageParts, TEXT("/"));
+          FString PackageName = TempPackageParts.Top();
+          if(!Path.Contains("opt"))
+            {
+              Path.RemoveFromEnd(PackageName);
+              ROSPackagePaths.Add(PackageName, Path);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("ROS default path %s"), *Path);
+              ROSPackagePaths.Add(TEXT("ROS"), Path + TEXT("/"));
+            }
+        }
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("ROS_PACKAGE_PATH is empty or not set"));
+    }
+}
+
+FString FSDFParser::GetROSPackagePath(const FString& InPackageName)
+{
+  if(ROSPackagePaths.Contains(InPackageName))
+    {
+      return ROSPackagePaths[InPackageName];
+    }
+  else
+    {
+      if(ROSPackagePaths.Contains(TEXT("ROS")))
+        {
+          FString TestPath = FPaths::Combine(ROSPackagePaths[TEXT("ROS")],  InPackageName);
+          if(FPaths::DirectoryExists(TestPath))
+            {
+              return ROSPackagePaths[TEXT("ROS")];
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("[%s] testpath %s does not exist"), *FString(__FUNCTION__), *InPackageName);
+            }
+        }
+      UE_LOG(LogTemp, Error, TEXT("[%s] ROSPackage %s not found"), *FString(__FUNCTION__), *InPackageName);
+      return FString();
+    }
 }
 
 // Import .fbx meshes from data asset

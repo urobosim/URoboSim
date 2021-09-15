@@ -58,6 +58,10 @@ private:
     // Parse <sdf> node
     virtual void ParseSDF() override;
 
+    //Get ROS package path
+    virtual FString GetROSPackagePath(const FString& InPackageName);
+    virtual void GetROSPackagePaths();
+
     // Parse <model> node
     virtual void ParseModel(const FXmlNode* InNode) override;
 
@@ -131,6 +135,7 @@ private:
 
 ////    // Flag if parser is loaded
 //    bool bSDFLoaded;
+    TMap<FString,FString> ROSPackagePaths;
 
 ////    // Pointer to the generated data asset
     USDFDataAsset* DataAsset;
