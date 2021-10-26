@@ -4,6 +4,7 @@
 
 #include "Physics/RModel.h"
 #include "ROSUtilities.h"
+#include "RobotInterface.h"
 // clang-format off
 #include "RController.generated.h"
 // clang-format on
@@ -18,23 +19,18 @@ class UROBOSIM_API URControllerParameter : public UObject
 };
 
 UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URController : public UObject
+class UROBOSIM_API UBasicController : public UObject
 {
   GENERATED_BODY()
 
 public:
+
+  UBasicController(){ControllerName = GetName();};
+
+  virtual void Init(){};
+
   virtual void Tick(const float &InDeltaTime) {}
 
-  virtual void Init();
-
-  URController(){ControllerName = GetName();};
-
-public:
-  ARModel *GetOwner() const { return Owner; }
-
-  void SetOwner(UObject *InOwner) { Owner = Cast<ARModel>(InOwner); }
-
-  void SetOwner();
 
   virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) {}
 
@@ -42,7 +38,6 @@ public:
 
   void AddGoalStatus(const FGoalStatusInfo &GoalStatus) { GoalStatusList.Add(GoalStatus); }
 
-public:
   bool bActive;
 
   bool bCancel = false;
@@ -57,11 +52,23 @@ public:
 protected:
   virtual void CancelAction();
 
-protected:
   TArray<FGoalStatusInfo> GoalStatusList;
 
   double ActionDuration;
 
-private:
-  ARModel *Owner;
+
+
+};
+
+UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URController : public UBasicController, public IRobotInterface
+{
+  GENERATED_BODY()
+
+public:
+
+  virtual void Init() override;
+
+  void SetOwner();
+
 };

@@ -24,6 +24,6 @@ public:
 
   void SetOwner(UObject *InOwner);
 
-private:
+protected:
   ARModel *Owner;
 };

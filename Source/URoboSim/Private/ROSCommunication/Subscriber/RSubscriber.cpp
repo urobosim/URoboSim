@@ -2,7 +2,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRSubscriber, Log, All)
 
-void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
+void USubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
 {
   if (SubscriberParameters)
   {
@@ -11,9 +11,8 @@ void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberPar
   }
 }
 
-void URSubscriber::Init()
+void USubscriber::Init()
 {
-  SetOwner(GetOuter());
   CreateSubscriber();
   if (Subscriber.IsValid())
   {
@@ -21,10 +20,16 @@ void URSubscriber::Init()
   }
 }
 
-void URSubscriber::Tick()
+void USubscriber::Tick()
 {
   if (Handler.IsValid())
   {
     Handler->Process();
   }
+}
+
+void URSubscriber::Init()
+{
+  SetOwner(GetOuter());
+  Super::Init();
 }

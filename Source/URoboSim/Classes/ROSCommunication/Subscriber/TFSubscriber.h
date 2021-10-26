@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Controller/RController.h"
+#include "Controller/ControllerType/SpecialController/RTFController.h"
 #include "RSubscriber.h"
 // clang-format off
 #include "TFSubscriber.generated.h"
@@ -21,6 +22,40 @@ public:
 public:
 	UPROPERTY(EditAnywhere)
 	FString TFControllerName;
+};
+
+// UCLASS()
+// class UROBOSIM_API UTFHander final : public UObject
+// {
+//   GENERATED_BODY()
+
+// public:
+
+
+// protected:
+//   UPROPERTY(EditAnywhere)
+//     FString FixedFrame;
+
+//   UPROPERTY(EditAnywhere)
+//     UTFController* TFController;
+
+// };
+
+UCLASS()
+class UROBOSIM_API UTFSubscriber final : public USubscriber
+{
+	GENERATED_BODY()
+
+public:
+	UTFSubscriber();
+
+        void SetController(UObject* InController);
+protected:
+
+	void CreateSubscriber() override;
+
+private:
+	UTFController *TFController;
 };
 
 UCLASS()
@@ -52,5 +87,5 @@ public:
 	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
 
 private:
-	URTFController *TFController;
+	UTFController *TFController;
 };

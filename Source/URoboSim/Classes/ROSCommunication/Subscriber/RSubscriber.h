@@ -26,6 +26,24 @@ class UROBOSIM_API USubscriber : public UROSCommunication
 {
   GENERATED_BODY()
 
+public:
+
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
+  virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
+
+  virtual void Tick() override;
+
+protected:
+
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+
+  TSharedPtr<FROSBridgeSubscriber> Subscriber;
+  virtual void Init() override;
+
+  virtual void CreateSubscriber() {}
 };
 
 UCLASS()
@@ -33,24 +51,7 @@ class UROBOSIM_API URSubscriber : public USubscriber, public IRobotInterface
 {
   GENERATED_BODY()
 
-public:
-  void Tick() override;
-
-public:
-  virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-
 protected:
   virtual void Init() override;
 
-  virtual void CreateSubscriber() {}
-
-protected:
-  UPROPERTY(VisibleAnywhere)
-  FString MessageType;
-
-  TSharedPtr<FROSBridgeSubscriber> Subscriber;
 };

@@ -3,6 +3,24 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRController, Log, All);
 
+
+void UBasicController::CancelAction()
+{
+  if (bCancel)
+  {
+    if (bActive)
+    {
+      // GoalStatusList.Last().Status = 6;
+      // bActive = false;
+    }
+    else
+    {
+      // GoalStatusList.Last().Status = 2;
+    }
+    // bPublishResult = true;
+  }
+}
+
 void URController::Init()
 {
   SetOwner();
@@ -25,22 +43,5 @@ void URController::SetOwner()
   if (!Owner)
   {
     UE_LOG(LogRController, Error, TEXT("Owner of %s not found, Outer is %s"), *GetName(), *GetOuter()->GetName());
-  }
-}
-
-void URController::CancelAction()
-{
-  if (bCancel)
-  {
-    if (bActive)
-    {
-      // GoalStatusList.Last().Status = 6;
-      // bActive = false;
-    }
-    else
-    {
-      // GoalStatusList.Last().Status = 2;
-    }
-    // bPublishResult = true;
   }
 }

@@ -32,7 +32,7 @@ void URControllerBuilder::Build()
   for (ARModel *&Model : Models)
   {
     URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
-    
+
     for (TPair<FString, URControllerParameter *> ControllerParameters : ControllerConfiguration.ControllerParameters)
     {
       UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerParameters.Key, *Model->GetName());
@@ -62,10 +62,10 @@ URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPa
   {
     return NewObject<URCameraController>(InOwner, *ControllerParameters.Key);
   }
-  else if (Cast<URTFControllerParameter>(ControllerParameters.Value))
-  {
-    return NewObject<URTFController>(InOwner, *ControllerParameters.Key);
-  }
+  // else if (Cast<URTFControllerParameter>(ControllerParameters.Value))
+  // {
+  //   return NewObject<UTFController>(InOwner, *ControllerParameters.Key);
+  // }
   else if (Cast<URJointTrajectoryControllerParameter>(ControllerParameters.Value))
   {
     return NewObject<URJointTrajectoryController>(InOwner, *ControllerParameters.Key);

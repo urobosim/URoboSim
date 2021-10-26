@@ -25,6 +25,27 @@ class UROBOSIM_API UPublisher : public UROSCommunication
 {
   GENERATED_BODY()
 
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
+
+  void Tick() override;
+
+  virtual void Publish() {}
+
+  virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters);
+
+protected:
+
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+
+  TSharedPtr<FROSBridgePublisher> Publisher;
+
+  virtual void Init() override;
+
+  virtual void CreatePublisher();
+
 };
 
 UCLASS()
@@ -32,26 +53,8 @@ class UROBOSIM_API URPublisher : public UPublisher, public IRobotInterface
 {
   GENERATED_BODY()
 
-public:
-  void Tick() override;
-
-public:
-  virtual void Publish() {}
-
-  virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters);
-
 protected:
+
   virtual void Init() override;
 
-  virtual void CreatePublisher();
-
-public:
-  UPROPERTY(EditAnywhere)
-  FString Topic;
-
-protected:
-  UPROPERTY(VisibleAnywhere)
-  FString MessageType;
-
-  TSharedPtr<FROSBridgePublisher> Publisher;
 };

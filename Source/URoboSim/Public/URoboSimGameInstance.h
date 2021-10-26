@@ -6,7 +6,9 @@
 #include "WorldControlGameInstance.h"
 #include "AJointActor.h"
 #include "ROSCommunication/KnowRobInterface.h"
+#include "ROSCommunication/Subscriber/TFSubscriber.h"
 #include "ROSCommunication/Service/Server/SetEnvironmentJointStatesServer.h"
+#include "Controller/ControllerType/SpecialController/RTFController.h"
 #include "URoboSimGameInstance.generated.h"
 
 /**
@@ -43,6 +45,12 @@ class UROBOSIM_API URoboSimGameInstance : public UWorldControlGameInstance
 
   UPROPERTY(EditAnywhere, Category= "KnowRob")
     UKnowrobInterface* KnowrobInterface;
+
+  UPROPERTY(EditAnywhere, Category= "TF REplay")
+    UTFController* TFController;
+
+  UPROPERTY(EditAnywhere, Category= "TF REplay")
+    UTFSubscriber* TFSubscriber;
 
   FString JointStatePublisherMessageType;
   FString SetJointStateServerType;

@@ -3,7 +3,7 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRPublisher, Log, All)
 
-void URPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
+void UPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
 {
   if (PublisherParameters)
   {
@@ -12,9 +12,8 @@ void URPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameter
   }
 }
 
-void URPublisher::Init()
+void UPublisher::Init()
 {
-  SetOwner(GetOuter());
   CreatePublisher();
   if (Publisher.IsValid())
   {
@@ -22,7 +21,7 @@ void URPublisher::Init()
   }
 }
 
-void URPublisher::Tick()
+void UPublisher::Tick()
 {
   if (Handler.IsValid())
   {
@@ -30,7 +29,13 @@ void URPublisher::Tick()
   }
 }
 
-void URPublisher::CreatePublisher()
+void UPublisher::CreatePublisher()
 {
   Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Topic, MessageType));
+}
+
+void URPublisher::Init()
+{
+  SetOwner(GetOuter());
+  Super::Init();
 }

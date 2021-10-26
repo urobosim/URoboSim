@@ -6,6 +6,8 @@ URoboSimGameInstance::URoboSimGameInstance()
   JointStatePublisherMessageType = TEXT("sensor_msgs/JointState");
   SetJointStateServerType = TEXT("urobosim_msgs/SetEnvironmentJointState");
   KnowrobInterface = CreateDefaultSubobject<UKnowrobInterface>(FName(GetName() + "_KnowrobInterface"));
+  TFController = CreateDefaultSubobject<UTFController>(FName(GetName() + "_TFController"));
+  TFSubscriber = CreateDefaultSubobject<UTFSubscriber>(FName(GetName() + "_TFSubscriber"));
 }
 
 void URoboSimGameInstance::OnStart()
@@ -33,6 +35,13 @@ void URoboSimGameInstance::OnStart()
       if(KnowrobInterface)
         {
           KnowrobInterface->QueryClient->Connect(ROSHandler);
+        }
+      if(TFController && TFSubscriber)
+        {
+          TFController->SetWorld(GetWorld());
+          TFController->Init();
+          TFSubscriber->SetController(TFController);
+          TFSubscriber->Connect(ROSHandler);
         }
     }
   else

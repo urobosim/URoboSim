@@ -4,6 +4,37 @@
 
 DEFINE_LOG_CATEGORY_STATIC(LogRTFSubscriber, Log, All)
 
+UTFSubscriber::UTFSubscriber()
+{
+  MessageType = TEXT("tf2_msgs/TFMessage");
+  // TFControllerName = TEXT("TFController");
+}
+
+void UTFSubscriber::SetController(UObject* InController)
+{
+  TFController = Cast<UTFController>(InController);
+}
+
+void UTFSubscriber::CreateSubscriber()
+{
+  if (TFController)
+  {
+    Subscriber = MakeShareable<FRTFSubscriberCallback>(
+        new FRTFSubscriberCallback(Topic, MessageType, TFController));
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
+void URTFSubscriber::CreateSubscriber()
+{
+  if (GetOwner())
+  {
+    Subscriber = MakeShareable<FRTFSubscriberCallback>(
+        new FRTFSubscriberCallback(Topic, MessageType, GetOwner()->GetController(TFControllerName)));
+  }
+}
+
 URTFSubscriber::URTFSubscriber()
 {
   MessageType = TEXT("tf2_msgs/TFMessage");
@@ -20,29 +51,23 @@ void URTFSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberP
   }
 }
 
-void URTFSubscriber::CreateSubscriber()
-{
-  if (GetOwner())
-  {
-    Subscriber = MakeShareable<FRTFSubscriberCallback>(
-        new FRTFSubscriberCallback(Topic, MessageType, GetOwner()->GetController(TFControllerName)));
-  }
-}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 FRTFSubscriberCallback::FRTFSubscriberCallback(
     const FString &InTopic, const FString &InType, UObject *InController) : FROSBridgeSubscriber(InTopic, InType)
 {
-  TFController = Cast<URTFController>(InController);
+  TFController = Cast<UTFController>(InController);
 }
 
 TSharedPtr<FROSBridgeMsg> FRTFSubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const
 {
-  TSharedPtr<tf2_msgs::TFMessage> JointStateMessage =
+  TSharedPtr<tf2_msgs::TFMessage> TfMessage =
       MakeShareable<tf2_msgs::TFMessage>(new tf2_msgs::TFMessage());
 
-  JointStateMessage->FromJson(JsonObject);
+  TfMessage->FromJson(JsonObject);
 
-  return StaticCastSharedPtr<FROSBridgeMsg>(JointStateMessage);
+  return StaticCastSharedPtr<FROSBridgeMsg>(TfMessage);
 }
 
 void FRTFSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
@@ -63,7 +88,9 @@ void FRTFSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 
       TFController->AddTF(ChildFrame, TFInfo);
     }
-    TFController->UpdateFramePoses();
+    AsyncTask(ENamedThreads::GameThread, [this]() {
+        TFController->UpdateFramePoses();
+    });
   }
   else
   {
