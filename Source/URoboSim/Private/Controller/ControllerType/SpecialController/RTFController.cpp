@@ -63,14 +63,15 @@ void UTFHander::UpdateTF(const FString& TFFrame, const FTFInfo& InTFInfo)
   ChildFrame = TFFrame;
   ParentFrame = InTFInfo.ParentFrame;
 
-  if(TFActors.Contains(ChildFrame))
-    {
-      SetPose(InTFInfo.Pose);
-    }
-  else
-    {
-      SearchFrames(InTFInfo.Pose);
-    }
+  // if(TFActors.Contains(ChildFrame))
+  //   {
+  //     SetPose(InTFInfo.Pose);
+  //   }
+  // else
+  //   {
+  //     SearchFrames(InTFInfo.Pose);
+  //   }
+  SearchFrames(InTFInfo.Pose);
 }
 
 void UTFAActorHander::SetPose(const FTransform& InPose)
@@ -306,16 +307,16 @@ void UTFRobotHander::SearchFrames(const FTransform& InPose)
         }
       else
         {
-          // if(bParentFound)
-          //   {
-          //     if(!VirtualFrames.Contains(ChildFrame) && !Frames.Contains(ChildFrame))
-          //       {
-          //         FTFInfo TFInfo;
-          //         TFInfo.ParentFrame = ParentFrame;
-          //         TFInfo.Pose = InPose;
-          //         VirtualFrames.Add(ChildFrame, TFInfo);
-          //       }
-          //   }
+          if(bParentFound)
+            {
+              if(!VirtualFrames.Contains(ChildFrame) && !Frames.Contains(ChildFrame))
+                {
+                  FTFInfo TFInfo;
+                  TFInfo.ParentFrame = ParentFrame;
+                  TFInfo.Pose = InPose;
+                  VirtualFrames.Add(ChildFrame, TFInfo);
+                }
+            }
         }
     }
 
