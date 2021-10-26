@@ -36,7 +36,7 @@ void UTFController::Init()
   for (auto &ActorItr : FoundActors)
     {
       ActorItr->DisableComponentsSimulatePhysics();
-      UE_LOG(LogTemp, Error, TEXT("%s"), *ActorItr->GetName());
+      // UE_LOG(LogTemp, Error, TEXT("%s"), *ActorItr->GetName());
     }
 
   const TArray<ULevelStreaming*>& streamedLevels = GetWorld()->GetStreamingLevels();
@@ -85,6 +85,7 @@ void UTFAActorHander::SetPose(const FTransform& InPose)
   ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
   bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
 
+  UE_LOG(LogTemp, Error, TEXT("SetPoseActor: ChildFrame %s ParentFrame %s Pose %s"), *ChildFrame, *ParentFrame, *InPose.ToString() );
   if(Child)
     {
       if(bParentFound)
@@ -94,15 +95,16 @@ void UTFAActorHander::SetPose(const FTransform& InPose)
               ParentTransform = Parent->GetComponentTransform();
             }
           FHitResult Result;
-          Child->SetRelativeTransform(InPose, false, &Result, ETeleportType::ResetPhysics);
+          // Child->SetRelativeTransform(InPose, false, &Result, ETeleportType::ResetPhysics);
+          Child->SetRelativeLocationAndRotation(InPose.GetLocation(), InPose.GetRotation(), false, &Result, ETeleportType::ResetPhysics);
         }
     }
 }
 
 void UTFAActorHander::SearchFrames(const FTransform& InPose)
 {
-  USceneComponent* Child;
-  USceneComponent* Parent;
+  USceneComponent* Child = nullptr;
+  USceneComponent* Parent = nullptr;
   FTransform ParentTransform;
   bool bParentFound = false;
   TArray<FString> ChildFrameParts;
@@ -111,10 +113,11 @@ void UTFAActorHander::SearchFrames(const FTransform& InPose)
   TArray<FString> ParentFrameParts;
   ParentFrame.ParseIntoArray(ParentFrameParts, TEXT("/"));
 
-  Child = TFActors.FindOrAdd(ChildFrame).Child;
-  Parent = TFActors.FindOrAdd(ChildFrame).Parent;
-  ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
-  bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
+  FTFActors TF = TFActors.FindOrAdd(ChildFrame);
+  // Child = TFActors.FindOrAdd(ChildFrame).Child;
+  // Parent = TFActors.FindOrAdd(ChildFrame).Parent;
+  // ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
+  // bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
 
   if(ParentFrame.Equals(FixedFrame))
     {
@@ -122,6 +125,7 @@ void UTFAActorHander::SearchFrames(const FTransform& InPose)
       bParentFound = true;
     }
 
+  // for (TActorIterator<AStaticMeshActor> ActorItr = TActorIterator<AStaticMeshActor>(World); ActorItr; ++ActorItr)
   for (TActorIterator<AActor> ActorItr = TActorIterator<AActor>(World); ActorItr; ++ActorItr)
     {
       if(ActorItr->GetName().Equals(ChildFrame) || ActorItr->GetName().Equals(ChildFrameParts.Last()))
@@ -135,19 +139,26 @@ void UTFAActorHander::SearchFrames(const FTransform& InPose)
           Parent = ActorItr->GetRootComponent();
           ParentTransform = ActorItr->GetActorTransform();
         }
+      else if(Frames.Contains(ParentFrame) && !bParentFound)
+        {
+          bParentFound = true;
+          ParentTransform = Frames[ParentFrame];
+        }
 
       if(Child)
         {
-          if(Frames.Contains(ParentFrame) && !bParentFound)
-            {
-              bParentFound = true;
-              ParentTransform = Frames[ChildFrame];
-            }
-
           if(bParentFound)
             {
+
+              TF.Child = Child;
+              TF.Parent = Parent;
+              TF.ParentTransform = ParentTransform;
+              TF.bParentFound = bParentFound;
+
               FHitResult Result;
-              Child->SetRelativeTransform(InPose, false, &Result, ETeleportType::ResetPhysics);
+              UE_LOG(LogTemp, Error, TEXT("SearchActor: ChildFrame %s ParentFrame %s Pose"), *ChildFrame, *ParentFrame, *InPose.ToString());
+
+              Child->SetRelativeLocationAndRotation(InPose.GetLocation(), InPose.GetRotation(), false, &Result, ETeleportType::ResetPhysics);
               break;
             }
         }
@@ -156,15 +167,20 @@ void UTFAActorHander::SearchFrames(const FTransform& InPose)
 
 void UTFRobotHander::SetPose(const FTransform& InPose)
 {
-  USceneComponent* Child;
-  USceneComponent* Parent;
+  USceneComponent* Child = nullptr;
+  USceneComponent* Parent = nullptr;
   FTransform ParentTransform;
   bool bParentFound = false;
 
-  Child = TFActors.FindOrAdd(ChildFrame).Child;
-  Parent = TFActors.FindOrAdd(ChildFrame).Parent;
-  ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
-  bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
+  FTFActors TF;
+  if(TFActors.Contains(ChildFrame))
+    {
+      TF = TFActors.FindOrAdd(ChildFrame);
+      Child = TF.Child;
+      Parent = TF.Parent;
+      ParentTransform = TF.ParentTransform;
+      bParentFound = TF.bParentFound;
+    }
 
   if(Child)
     {
@@ -182,104 +198,123 @@ void UTFRobotHander::SetPose(const FTransform& InPose)
           // FTransform Offset = ChildTransform.GetRelativeTransform(RootTransform);
           // ChildTransform.Accumulate(Offset);
 
+          UE_LOG(LogTemp, Error, TEXT("SetPoseRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
           FHitResult Result;
           Child->SetRelativeTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
           // Child->SetWorldTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
         }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Parent not found for %s"), *ChildFrame);
+        }
     }
-
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Child not found for %s"), *ChildFrame);
+    }
 }
 
 void UTFRobotHander::SearchFrames(const FTransform& InPose)
 {
-  USceneComponent* Child;
-  USceneComponent* Parent;
+  USceneComponent* Child = nullptr;
+  USceneComponent* Parent = nullptr;
   FTransform ParentTransform;
   bool bParentFound = false;
 
-  UE_LOG(LogTemp, Error, TEXT("ChildFrame %s ParentFrame %s"), *ChildFrame, *ParentFrame);
+  // UE_LOG(LogTemp, Error, TEXT("ChildFrame %s ParentFrame %s"), *ChildFrame, *ParentFrame);
   TArray<FString> ChildFrameParts;
   ChildFrame.ParseIntoArray(ChildFrameParts, TEXT("/"));
 
   TArray<FString> ParentFrameParts;
   ParentFrame.ParseIntoArray(ParentFrameParts, TEXT("/"));
 
-  Child = TFActors.FindOrAdd(ChildFrame).Child;
-  Parent = TFActors.FindOrAdd(ChildFrame).Parent;
-  ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
-  bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
-
   FTransform ChildTransform;
   URLink* ChildLink;
 
-  if(ParentFrame.Equals(FixedFrame))
-    {
-      ParentTransform = FTransform();
-      bParentFound = true;
-    }
+  FTFActors TF = TFActors.FindOrAdd(ChildFrame);
 
   for (TActorIterator<ARModel> ActorItr = TActorIterator<ARModel>(World); ActorItr; ++ActorItr)
     {
-      if(ActorItr->Links.Contains(ChildFrame) || ActorItr->Links.Contains(ChildFrameParts.Last()))
+      if(ActorItr->Links.Contains(ChildFrame))
         {
           ChildLink = ActorItr->Links[ChildFrame];
           Child = ChildLink->GetCollision();
-          if(!Child)
-            {
-              ChildLink = ActorItr->Links[ChildFrameParts.Last()];
-              Child = ActorItr->Links[ChildFrameParts.Last()]->GetCollision();
-            }
-
-          ChildTransform = ChildLink->PoseComponent->GetComponentTransform();
-          FTransform RootTransform = Child->GetComponentTransform();
-          if(!OffsetList.Contains(ChildFrame))
-            {
-              OffsetList.Add(ChildFrame, ChildTransform.GetRelativeTransform(RootTransform));
-            }
         }
-
-      if(ActorItr->Links.Contains(ParentFrame) || ActorItr->Links.Contains(ParentFrameParts.Last()))
+      else if (ActorItr->Links.Contains(ChildFrameParts.Last()))
         {
-          Parent = ActorItr->Links[ParentFrame]->PoseComponent;
-          if(!Parent)
-            {
-              Parent = ActorItr->Links[ParentFrameParts.Last()]->PoseComponent;
-            }
-          if(Parent)
-            {
-              bParentFound = true;
-              ParentTransform = ActorItr->GetActorTransform();
-            }
+          ChildLink = ActorItr->Links[ChildFrameParts.Last()];
+          Child = ActorItr->Links[ChildFrameParts.Last()]->GetCollision();
         }
 
       if(Child)
         {
-          if(Frames.Contains(ParentFrame) && !bParentFound)
+          ChildTransform = ChildLink->PoseComponent->GetComponentTransform();
+          FTransform RootTransform = Child->GetComponentTransform();
+          if(!OffsetList.Contains(ChildFrame))
             {
-              bParentFound = true;
-              ParentTransform = Frames[ParentFrame];
+              // OffsetList.Add(ChildFrame, ChildTransform.GetRelativeTransformReverse(RootTransform));
+              OffsetList.Add(ChildFrame, ChildTransform.GetRelativeTransform(RootTransform));
             }
+        }
 
+      if(ActorItr->Links.Contains(ParentFrame))
+        {
+          Parent = ActorItr->Links[ParentFrame]->PoseComponent;
+        }
+      else if(ActorItr->Links.Contains(ParentFrameParts.Last()))
+        {
+          Parent = ActorItr->Links[ParentFrameParts.Last()]->PoseComponent;
+        }
+
+      if(Parent)
+        {
+          bParentFound = true;
+          ParentTransform = ActorItr->GetActorTransform();
+        }
+      else if(ParentFrame.Equals(FixedFrame))
+        {
+          ParentTransform = FTransform();
+          bParentFound = true;
+        }
+      else if(Frames.Contains(ParentFrame))
+        {
+          bParentFound = true;
+          ParentTransform = Frames[ParentFrame];
+        }
+      else if(VirtualFrames.Contains(ParentFrame))
+        {
+          bParentFound = true;
+          ParentTransform = VirtualFrames[ParentFrame].Pose;
+        }
+
+      TF.Child = Child;
+      TF.Parent = Parent;
+      TF.ParentTransform = ParentTransform;
+      TF.bParentFound = bParentFound;
+
+      if(Child)
+        {
           if(bParentFound)
             {
-
-              // FTransform NewTransform = ParentTransform;
-              // NewTransform.Accumulate(TF.Value.Pose);
               FHitResult Result;
               FTransform NewChildTransform = InPose;
               NewChildTransform.Accumulate(OffsetList[ChildFrame]);
-              // UE_LOG(LogTemp, Error, TEXT("ChildFrame %s NewChildTransform %s"), *ChildFrame, *NewChildTransform.ToString());
-              // Child->SetWorldTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
               Child->SetRelativeTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
+              UE_LOG(LogTemp, Error, TEXT("SearchRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
               break;
             }
         }
       else
         {
-          // if(bParentFound && !Frames.Contains(ChildFrame))
+          // if(bParentFound)
           //   {
-          //     UE_LOG(LogTemp, Error, TEXT("NewFrame %s"), *ChildFrame);
-          //     Frames.Add(ChildFrame, InPose);
+          //     if(!VirtualFrames.Contains(ChildFrame) && !Frames.Contains(ChildFrame))
+          //       {
+          //         FTFInfo TFInfo;
+          //         TFInfo.ParentFrame = ParentFrame;
+          //         TFInfo.Pose = InPose;
+          //         VirtualFrames.Add(ChildFrame, TFInfo);
+          //       }
           //   }
         }
     }

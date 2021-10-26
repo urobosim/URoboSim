@@ -51,6 +51,7 @@ public:
 
   UPROPERTY(VisibleAnywhere)
   TMap<FString, FTFActors> TFActors;
+
   void UpdateTF(const FString& TFFrame, const FTFInfo& InTFInfo);
 
   void SetWorld(UWorld* InWorld){World = InWorld;};
@@ -102,6 +103,9 @@ public:
 
   UPROPERTY()
     TMap<FString, FTransform> OffsetList;
+
+  UPROPERTY()
+    TMap<FString, FTFInfo> VirtualFrames;
 };
 
 UCLASS()
