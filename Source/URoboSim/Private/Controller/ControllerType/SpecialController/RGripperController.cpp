@@ -194,13 +194,17 @@ void URGripperController::Tick(const float &InDeltaTime)
       float &LeftJointValue = JointController->DesiredJointStates.FindOrAdd(LeftJointName).JointPosition;
       if (Error < 0)
       {
-        RightJointValue -= Speed;
-        LeftJointValue -= Speed;
+        // RightJointValue -= Speed;
+        // LeftJointValue -= Speed;
+        RightJointValue = JointValue - Speed;
+        LeftJointValue = JointValue - Speed;
       }
       else
       {
-        RightJointValue += Speed;
-        LeftJointValue += Speed;
+        // RightJointValue += Speed;
+        // LeftJointValue += Speed;
+        RightJointValue = JointValue + Speed;
+        LeftJointValue = JointValue + Speed;
       }
       // RightJointValue = RightFinger->ClampJointStateToConstraintLimit(RightJointValue);
       // LeftJointValue = LeftFinger->ClampJointStateToConstraintLimit(LeftJointValue);

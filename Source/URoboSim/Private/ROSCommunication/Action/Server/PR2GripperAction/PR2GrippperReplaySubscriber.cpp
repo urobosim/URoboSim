@@ -10,14 +10,20 @@ URPR2GripperReplaySubscriber::URPR2GripperReplaySubscriber()
 
 void URPR2GripperReplaySubscriber::CreateSubscriber()
 {
-  UE_LOG(LogRPR2GripperReplaySubscriber, Warning, TEXT("%s"), *Controller->GetName());
+  if (GetOwner())
+    {
+      if (URGripperController *Controller = Cast<URGripperController>(GetOwner()->GetController(ControllerName)))
+        {
+          UE_LOG(LogRPR2GripperReplaySubscriber, Warning, TEXT("%s"), *Controller->GetName());
 
-  Subscriber = MakeShareable<FRPR2GripperReplaySubscriberCallback>(
-      new FRPR2GripperReplaySubscriberCallback(Topic, MessageType, Controller));
-  if (Subscriber.IsValid())
-  {
-    UE_LOG(LogRPR2GripperReplaySubscriber, Log, TEXT("Subscriber connected to RosBridge"));
-  }
+          Subscriber = MakeShareable<FRPR2GripperReplaySubscriberCallback>(
+                                                                           new FRPR2GripperReplaySubscriberCallback(Topic, MessageType, Controller));
+          if (Subscriber.IsValid())
+            {
+              UE_LOG(LogRPR2GripperReplaySubscriber, Log, TEXT("Subscriber connected to RosBridge"));
+            }
+        }
+    }
 }
 
 FRPR2GripperReplaySubscriberCallback::FRPR2GripperReplaySubscriberCallback(

@@ -10,7 +10,11 @@ struct FTFInfo
 {
   GENERATED_BODY()
 public:
+
+  UPROPERTY(VisibleAnywhere)
   FString ParentFrame;
+
+  UPROPERTY(VisibleAnywhere)
   FTransform Pose;
   // FString ChildFrame;
   // FORCEINLINE FTransform() : ParentFrame(""), Pose(FTransform()){};

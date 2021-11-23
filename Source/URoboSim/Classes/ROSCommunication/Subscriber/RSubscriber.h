@@ -54,4 +54,6 @@ class UROBOSIM_API URSubscriber : public USubscriber, public IRobotInterface
 protected:
   virtual void Init() override;
 
+  UPROPERTY(EditAnywhere)
+    FString ControllerName;
 };

@@ -76,8 +76,8 @@ void UTFHander::UpdateTF(const FString& TFFrame, const FTFInfo& InTFInfo)
 
 void UTFAActorHander::SetPose(const FTransform& InPose)
 {
-  USceneComponent* Child;
-  USceneComponent* Parent;
+  USceneComponent* Child = nullptr;
+  USceneComponent* Parent = nullptr;
   FTransform ParentTransform;
   bool bParentFound = false;
 
@@ -86,7 +86,7 @@ void UTFAActorHander::SetPose(const FTransform& InPose)
   ParentTransform = TFActors.FindOrAdd(ChildFrame).ParentTransform;
   bParentFound = TFActors.FindOrAdd(ChildFrame).bParentFound;
 
-  UE_LOG(LogTemp, Error, TEXT("SetPoseActor: ChildFrame %s ParentFrame %s Pose %s"), *ChildFrame, *ParentFrame, *InPose.ToString() );
+  // UE_LOG(LogTemp, Error, TEXT("SetPoseActor: ChildFrame %s ParentFrame %s Pose %s"), *ChildFrame, *ParentFrame, *InPose.ToString() );
   if(Child)
     {
       if(bParentFound)
@@ -157,7 +157,7 @@ void UTFAActorHander::SearchFrames(const FTransform& InPose)
               TF.bParentFound = bParentFound;
 
               FHitResult Result;
-              UE_LOG(LogTemp, Error, TEXT("SearchActor: ChildFrame %s ParentFrame %s Pose"), *ChildFrame, *ParentFrame, *InPose.ToString());
+              // UE_LOG(LogTemp, Error, TEXT("SearchActor: ChildFrame %s ParentFrame %s Pose"), *ChildFrame, *ParentFrame, *InPose.ToString());
 
               Child->SetRelativeLocationAndRotation(InPose.GetLocation(), InPose.GetRotation(), false, &Result, ETeleportType::ResetPhysics);
               break;
@@ -199,20 +199,20 @@ void UTFRobotHander::SetPose(const FTransform& InPose)
           // FTransform Offset = ChildTransform.GetRelativeTransform(RootTransform);
           // ChildTransform.Accumulate(Offset);
 
-          UE_LOG(LogTemp, Error, TEXT("SetPoseRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
+          // UE_LOG(LogTemp, Error, TEXT("SetPoseRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
           FHitResult Result;
           Child->SetRelativeTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
           // Child->SetWorldTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
         }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Parent not found for %s"), *ChildFrame);
-        }
+      // else
+      //   {
+      //     UE_LOG(LogTemp, Error, TEXT("Parent not found for %s"), *ChildFrame);
+      //   }
     }
-  else
-    {
-      UE_LOG(LogTemp, Error, TEXT("Child not found for %s"), *ChildFrame);
-    }
+  // else
+  //   {
+  //     UE_LOG(LogTemp, Error, TEXT("Child not found for %s"), *ChildFrame);
+  //   }
 }
 
 void UTFRobotHander::SearchFrames(const FTransform& InPose)
@@ -301,7 +301,7 @@ void UTFRobotHander::SearchFrames(const FTransform& InPose)
               FTransform NewChildTransform = InPose;
               NewChildTransform.Accumulate(OffsetList[ChildFrame]);
               Child->SetRelativeTransform(NewChildTransform, false, &Result, ETeleportType::ResetPhysics);
-              UE_LOG(LogTemp, Error, TEXT("SearchRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
+              // UE_LOG(LogTemp, Error, TEXT("SearchRobot: ChildFrame %s ParentFrame %s Pose %s Offset %s"), *ChildFrame, *ParentFrame, *NewChildTransform.ToString(), *OffsetList[ChildFrame].ToString());
               break;
             }
         }

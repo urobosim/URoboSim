@@ -7,7 +7,7 @@
 // clang-format on
 
 UCLASS()
-class UROBOSIM_API URPR2GripperReplaySubscriber final : public URActionSubscriber
+class UROBOSIM_API URPR2GripperReplaySubscriber final : public URSubscriber
 {
 	GENERATED_BODY()
 
@@ -16,6 +16,7 @@ public:
 
 protected:
 	void CreateSubscriber() override;
+
 };
 
 class UROBOSIM_API FRPR2GripperReplaySubscriberCallback final : public FROSBridgeSubscriber
