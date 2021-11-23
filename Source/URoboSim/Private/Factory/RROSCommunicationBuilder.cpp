@@ -18,6 +18,7 @@
 #include "ROSCommunication/Subscriber/OdometrieReplaySubscriber.h"
 #include "ROSCommunication/Subscriber/VelocityCommandSubscriber.h"
 #include "ROSCommunication/Subscriber/TFSubscriber.h"
+#include "ROSCommunication/Subscriber/PR2GripperReplaySubscriber.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationBuilder, Log, All);
 
@@ -166,6 +167,10 @@ URSubscriber *URROSCommunicationBuilder::CreateSubscriber(ARModel *&InOwner, con
   else if (Cast<URTFSubscriberParameter>(SubscriberConfiguration.SubscriberParameters))
   {
     return NewObject<URTFSubscriber>(InOwner);
+  }
+  else if (Cast<URGripperReplayParameter>(SubscriberConfiguration.SubscriberParameters))
+  {
+    return NewObject<URPR2GripperReplaySubscriber>(InOwner);
   }
   else
   {

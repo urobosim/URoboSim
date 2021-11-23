@@ -1,10 +1,27 @@
 #pragma once
 
 #include "Controller/ControllerType/SpecialController/RGripperController.h"
-#include "ROSCommunication/Action/Server/RActionServer.h"
+#include "RSubscriber.h"
 // clang-format off
 #include "PR2GripperReplaySubscriber.generated.h"
 // clang-format on
+
+UCLASS()
+class UROBOSIM_API URGripperReplayParameter : public URSubscriberParameter
+{
+	GENERATED_BODY()
+
+public:
+	URGripperReplayParameter()
+	{
+		MessageType = TEXT("sensor_msgs/JointState");
+		ControllerName = TEXT("GripperController");
+	}
+
+public:
+	UPROPERTY(EditAnywhere)
+	FString ControllerName;
+};
 
 UCLASS()
 class UROBOSIM_API URPR2GripperReplaySubscriber final : public URSubscriber

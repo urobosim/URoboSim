@@ -1,4 +1,4 @@
-#include "ROSCommunication/Action/Server/PR2GripperAction/PR2GripperReplaySubscriber.h"
+#include "ROSCommunication/Subscriber/PR2GripperReplaySubscriber.h"
 #include "pr2_controllers_msgs/PR2GripperCommandActionGoal.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRPR2GripperReplaySubscriber, Log, All)
