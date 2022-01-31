@@ -34,16 +34,16 @@ void URGripperCommandSubscriber::CreateSubscriber()
 }
 
 FRGripperCommandSubscriberCallback::FRGripperCommandSubscriberCallback(
-    const FString &InTopic, const FString &InType, UObject *InController, FString GripperJointLeftName, FString GripperJointRightName, TSoftObjectPtr<AActor> Object) : FROSBridgeSubscriber(InTopic, InType)
+    const FString &InTopic, const FString &InType, UObject *InController, FString InGripperJointLeftName, FString InGripperJointRightName, TSoftObjectPtr<AActor> Object) : FROSBridgeSubscriber(InTopic, InType)
 {
   JointController = Cast<URJointController>(InController);
   FEnableDrive EnableDrive;
   EnableDrive.PositionStrength = 1E5;
   EnableDrive.VelocityStrength = 1E4;
   EnableDrive.MaxForce = 1E10;
-  this->GripperJointLeftName = GripperJointLeftName;
-  this->GripperJointRightName = GripperJointRightName;
-  this->Object = Object;
+  GripperJointLeftName = InGripperJointLeftName;
+  GripperJointRightName = InGripperJointRightName;
+  // this->Object = Object;
   if (URJoint *Joint = JointController->GetOwner()->GetJoint(GripperJointLeftName))
   {
     JointController->DesiredJointStates.FindOrAdd(GripperJointLeftName);
@@ -75,20 +75,20 @@ void FRGripperCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
     UE_LOG(LogRGripperCommandSubscriber, Warning, TEXT("Pos :%f"), Pos)
     if (JointController->DesiredJointStates.Contains(GripperJointLeftName))
     {
-      JointController->DesiredJointStates[GripperJointLeftName].JointPosition = -Pos;
+      JointController->DesiredJointStates[GripperJointLeftName].JointPosition = -Pos/2;
     }
     if (JointController->DesiredJointStates.Contains(GripperJointRightName))
     {
       JointController->DesiredJointStates[GripperJointRightName].JointPosition = Pos;
     }
-    if (Pos < 0.05)
-    {
-      const FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
-      Object->AttachToComponent(JointController->GetOwner()->GetLink(TEXT("ur5_wrist_3_link"))->GetCollision(), AttachmentRules);
-    }
-    else
-    {
-      Object->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-    }
+    // if (Pos < 0.05)
+    // {
+    //   const FAttachmentTransformRules AttachmentRules(EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
+    //   Object->AttachToComponent(JointController->GetOwner()->GetLink(TEXT("ur5_wrist_3_link"))->GetCollision(), AttachmentRules);
+    // }
+    // else
+    // {
+    //   Object->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+    // }
   }
 }

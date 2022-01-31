@@ -64,7 +64,7 @@ public:
 class UROBOSIM_API FRGripperCommandSubscriberCallback final : public FROSBridgeSubscriber
 {
 public:
-  FRGripperCommandSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController, FString GripperJointLeftName, FString GripperJointRightName, TSoftObjectPtr<AActor> Object);
+  FRGripperCommandSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController, FString InGripperJointLeftName, FString InGripperJointRightName, TSoftObjectPtr<AActor> Object);
 
   TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
 
