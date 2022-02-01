@@ -48,6 +48,7 @@ void URJointControllerConfigurationClient::CreateServiceClient()
 
 void URJointControllerConfigurationClient::CallService()
 {
+
   Handler->CallService(JointServiceClient, JointRequest, JointResponse);
   Handler->CallService(JointLimitServiceClient, LimitRequest, LimitResponse);
 }
