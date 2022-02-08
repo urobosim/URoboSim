@@ -1,13 +1,13 @@
 #include "ROSCommunication/Subscriber/GripperCommandSubscriber.h"
 #include "Conversions.h"
-#include "std_msgs/Float32.h"
+#include "iai_wsg_50_msgs/msg/PositionCmd.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGripperCommandSubscriber, Log, All)
 
 URGripperCommandSubscriber::URGripperCommandSubscriber()
 {
-  Topic = TEXT("/gripper_controller/command");
-  MessageType = TEXT("std_msgs/Float32");
+  Topic = TEXT("/goal_position");
+  MessageType = TEXT("iai_wsg_50_msgs/PositionCmd");
   JointControllerName = TEXT("JointController");
 }
 
@@ -58,8 +58,8 @@ FRGripperCommandSubscriberCallback::FRGripperCommandSubscriberCallback(
 
 TSharedPtr<FROSBridgeMsg> FRGripperCommandSubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const
 {
-  TSharedPtr<std_msgs::Float32> GripperPosition =
-      MakeShareable<std_msgs::Float32>(new std_msgs::Float32());
+  TSharedPtr<iai_wsg_50_msgs::PositionCmd> GripperPosition =
+      MakeShareable<iai_wsg_50_msgs::PositionCmd>(new iai_wsg_50_msgs::PositionCmd());
 
   GripperPosition->FromJson(JsonObject);
 
@@ -70,16 +70,16 @@ void FRGripperCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
 {
   if (JointController)
   {
-    TSharedPtr<std_msgs::Float32> GripperPosition = StaticCastSharedPtr<std_msgs::Float32>(Msg);
-    float Pos = GripperPosition->GetData();
+    TSharedPtr<iai_wsg_50_msgs::PositionCmd> GripperPosition = StaticCastSharedPtr<iai_wsg_50_msgs::PositionCmd>(Msg);
+    float Pos = GripperPosition->GetPos();
     UE_LOG(LogRGripperCommandSubscriber, Warning, TEXT("Pos :%f"), Pos)
     if (JointController->DesiredJointStates.Contains(GripperJointLeftName))
     {
-      JointController->DesiredJointStates[GripperJointLeftName].JointPosition = -Pos/2;
+      JointController->DesiredJointStates[GripperJointLeftName].JointPosition = -Pos/2000.;
     }
     if (JointController->DesiredJointStates.Contains(GripperJointRightName))
     {
-      JointController->DesiredJointStates[GripperJointRightName].JointPosition = Pos;
+      JointController->DesiredJointStates[GripperJointRightName].JointPosition = Pos/1000.;
     }
     // if (Pos < 0.05)
     // {

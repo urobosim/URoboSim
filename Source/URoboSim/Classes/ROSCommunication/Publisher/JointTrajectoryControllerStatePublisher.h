@@ -63,4 +63,7 @@ private:
   URJointTrajectoryController *JointTrajectoryController;
 
   URJointStateConfigurationClient *ConfigClient;
+
+  UPROPERTY()
+    TArray<FString> JointList;
 };

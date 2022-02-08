@@ -32,7 +32,7 @@ void URJointTrajectoryControllerStatePublisher::Init()
       ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
       ConfigClient->JointParamTopic = JointParamTopic;
       ConfigClient->Connect(Handler);
-      ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ JointTrajectoryController->SetJointNames(JointNames); });
+      ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){JointList = JointNames;});
     }
   }
 }
@@ -55,22 +55,26 @@ void URJointTrajectoryControllerStatePublisher::Publish()
     TArray<double> DesiredVelocities;
     TArray<double> CurrentVelocities;
     TArray<double> ErrorVelocities;
-    for (const TPair<FString, FJointState> &DesiredJointState : JointTrajectoryController->DesiredJointStates)
+    // for (const TPair<FString, FJointState> &DesiredJointState : JointTrajectoryController->DesiredJointStates)
+    for (const FString  &JointName : JointList)
     {
-      const FString JointName = DesiredJointState.Key;
-      if (URJoint *Joint = GetOwner()->GetJoint(JointName))
-      {
-        JointNames.Add(JointName);
+      if(JointTrajectoryController->DesiredJointStates.Contains(JointName))
+        {
+          FJointState &DesiredJointState = JointTrajectoryController->DesiredJointStates[JointName];
+          if (URJoint *Joint = GetOwner()->GetJoint(JointName))
+            {
+              JointNames.Add(JointName);
 
-        DesiredPositions.Add(DesiredJointState.Value.JointPosition);
-        DesiredVelocities.Add(DesiredJointState.Value.JointVelocity);
+              DesiredPositions.Add(DesiredJointState.JointPosition);
+              DesiredVelocities.Add(DesiredJointState.JointVelocity);
 
-        CurrentPositions.Add(Joint->GetJointState().JointPosition);
-        CurrentVelocities.Add(Joint->GetJointState().JointVelocity);
+              CurrentPositions.Add(Joint->GetJointState().JointPosition);
+              CurrentVelocities.Add(Joint->GetJointState().JointVelocity);
 
-        ErrorPositions.Add(DesiredJointState.Value.JointPosition - Joint->GetJointState().JointPosition);
-        ErrorVelocities.Add(DesiredJointState.Value.JointVelocity - Joint->GetJointState().JointVelocity);
-      }
+              ErrorPositions.Add(DesiredJointState.JointPosition - Joint->GetJointState().JointPosition);
+              ErrorVelocities.Add(DesiredJointState.JointVelocity - Joint->GetJointState().JointVelocity);
+            }
+        }
     }
 
     State->SetJointNames(JointNames);

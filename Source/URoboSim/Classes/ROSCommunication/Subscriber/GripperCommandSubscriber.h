@@ -14,8 +14,8 @@ class UROBOSIM_API URGripperCommandSubscriberParameter : public URSubscriberPara
 public:
   URGripperCommandSubscriberParameter()
   {
-    Topic = TEXT("/gripper_controller/command");
-    MessageType = TEXT("std_msgs/Float32");
+    Topic = TEXT("/goal_position");
+    MessageType = TEXT("iai_wsg_50_msgs/PositionCmd");
     JointControllerName = TEXT("JointController");
   }
 
