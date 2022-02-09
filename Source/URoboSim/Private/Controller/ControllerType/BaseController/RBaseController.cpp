@@ -84,23 +84,31 @@ void URBaseController::TurnTick(float InDeltaTime)
   TargetAngle *= TargetPose.GetRotation().GetRotationAxis().Z;
   float CurrentAngle = BaseRotation.GetRotationAxis().Z * BaseRotation.GetAngle();
 
-  float AngularDistance = TargetAngle - CurrentAngle;
-  //Normalize the AngularDistance in Interval [-pi, pi]
-  while(AngularDistance > PI)
-    {
-      AngularDistance -= 2* PI;
-    }
-  while(AngularDistance < -1 * PI)
-    {
-      AngularDistance += 2* PI;
-    }
+  if (!bIsKinematic)
+  {
+    float AngularDistance = TargetAngle - CurrentAngle;
+    //Normalize the AngularDistance in Interval [-pi, pi]
+    while(AngularDistance > PI)
+      {
+        AngularDistance -= 2* PI;
+      }
+    while(AngularDistance < -1 * PI)
+      {
+        AngularDistance += 2* PI;
+      }
 
-  FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
-  // if(NextVel.Size() > MaxAngularVelocity)
-  //   {
-  //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
-  //   }
-  Base->GetCollision()->SetPhysicsAngularVelocityInRadians(NextVel * HackRotationFactor);
+    FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
+    // if(NextVel.Size() > MaxAngularVelocity)
+    //   {
+    //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
+    //   }
+    Base->GetCollision()->SetPhysicsAngularVelocityInRadians(NextVel * HackRotationFactor);
+  }
+  else
+  {
+    float AngularDistance = (TargetAngle - CurrentAngle) / PI * 180;
+    Base->GetCollision()->AddWorldRotation(FRotator(0.f, FRotator::NormalizeAxis(AngularDistance), 0.f));
+  }
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
@@ -128,12 +136,19 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
       TargetPose.AddToTranslation(VelocityInBaseCoordinates * InDeltaTime);
     }
 
-  //Calculate velocity in order to move from current position to the target position
-  FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
+  if (!bIsKinematic)
+  {
+    //Calculate velocity in order to move from current position to the target position
+    FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
 
-  NextVel /= InDeltaTime;
+    NextVel /= InDeltaTime;
 
-  Base->GetCollision()->SetPhysicsLinearVelocity(NextVel * HackLinearFactor);
+    Base->GetCollision()->SetPhysicsLinearVelocity(NextVel * HackLinearFactor);
+  }
+  else
+  {
+    Base->GetCollision()->AddWorldOffset(TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation());
+  }
 }
 
 void URBaseController::CalculateOdomStates(float InDeltaTime)
