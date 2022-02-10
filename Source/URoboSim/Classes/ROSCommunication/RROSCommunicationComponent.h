@@ -25,7 +25,7 @@ public:
 	FRROSCommunicationContainer(const FString &InWebsocketIPAddr, const uint32 &InWebsocketPort);
 
 public:
-	void Init();
+	void Init(UObject* InOwner);
 
 	void DeInit();
 
@@ -59,6 +59,12 @@ protected:
 	void InitActionServers();
 
 protected:
+	UPROPERTY()
+        UObject* Owner;
+
+	UPROPERTY(EditAnywhere)
+        bool bUseGlobalIP = true;
+
 	TSharedPtr<FROSBridgeHandler> Handler;
 
 	UPROPERTY(EditAnywhere, Instanced)

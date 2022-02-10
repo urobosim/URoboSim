@@ -1,5 +1,7 @@
 #include "ROSCommunication/RROSCommunicationComponent.h"
 #include "Controller/RControllerComponent.h"
+#include "ROSBridgeGameInstance.h"
+#include "Kismet/GameplayStatics.h"
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
@@ -17,12 +19,31 @@ FRROSCommunicationContainer::FRROSCommunicationContainer(const FString &InWebsoc
 {
 }
 
-void FRROSCommunicationContainer::Init()
+void FRROSCommunicationContainer::Init(UObject* InOwner)
 {
-  InitPublishers();
-  InitSubscribers();
-  InitServiceClients();
-  InitActionServers();
+  Owner = InOwner;
+
+  if(Owner)
+    {
+      if(bUseGlobalIP)
+        {
+          UROSBridgeGameInstance* GI = Cast<UROSBridgeGameInstance>(UGameplayStatics::GetGameInstance(Owner));
+          if(GI)
+            {
+              WebsocketIPAddr = GI->ROSBridgeServerHost;
+              WebsocketPort = GI->ROSBridgeServerPort;
+            }
+          else
+            {
+              UE_LOG(LogRROSCommunicationComponent, Log, TEXT("Wrong GameInstance"));
+            }
+
+        }
+      InitPublishers();
+      InitSubscribers();
+      InitServiceClients();
+      InitActionServers();
+    }
 }
 
 void FRROSCommunicationContainer::InitPublishers()
@@ -120,7 +141,7 @@ void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick
 
 void URROSCommunicationComponent::Init()
 {
-  ROSCommunication.Init();
+  ROSCommunication.Init(this);
 }
 
 void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
