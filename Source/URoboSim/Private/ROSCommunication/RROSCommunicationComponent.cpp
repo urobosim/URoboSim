@@ -23,10 +23,13 @@ void FRROSCommunicationContainer::Init(UObject* InOwner)
 {
   Owner = InOwner;
 
+  UE_LOG(LogRROSCommunicationComponent, Error, TEXT("1"));
   if(Owner)
     {
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("2"));
       if(bUseGlobalIP)
         {
+          UE_LOG(LogRROSCommunicationComponent, Error, TEXT("3"));
           UROSBridgeGameInstance* GI = Cast<UROSBridgeGameInstance>(UGameplayStatics::GetGameInstance(Owner));
           if(GI)
             {
@@ -39,10 +42,15 @@ void FRROSCommunicationContainer::Init(UObject* InOwner)
             }
 
         }
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("4"));
       InitPublishers();
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("5"));
       InitSubscribers();
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("6"));
       InitServiceClients();
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("7"));
       InitActionServers();
+      UE_LOG(LogRROSCommunicationComponent, Error, TEXT("7"));
     }
 }
 
@@ -141,7 +149,10 @@ void URROSCommunicationComponent::TickComponent(float DeltaTime, enum ELevelTick
 
 void URROSCommunicationComponent::Init()
 {
+
+  UE_LOG(LogRROSCommunicationComponent, Error, TEXT("Befor Comm Init"));
   ROSCommunication.Init(this);
+  UE_LOG(LogRROSCommunicationComponent, Error, TEXT("After Comm Init"));
 }
 
 void URROSCommunicationComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
