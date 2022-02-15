@@ -11,6 +11,20 @@
 
 class ARModel;
 
+USTRUCT()
+struct FMimicJointParameter
+{
+  GENERATED_BODY()
+  public:
+
+    UPROPERTY(EditAnywhere)
+      URJoint* MimicJoint = nullptr;
+
+    UPROPERTY(EditAnywhere)
+      float Multiplier = 0;
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URJoint : public UObject, public FTickableGameObject
 {
@@ -76,8 +90,11 @@ public:
     UPROPERTY()
       float MaxJointVel = -1;
 
-    UPROPERTY()
-      float AccumulatatedJointMass = 0;
+    UPROPERTY(EditAnywhere)
+      bHasMimic = false;
+
+    UPROPERTY(EditAnywhere)
+      TArray<FMimicJointParameter> MimicJointList;
 
  protected:
 
