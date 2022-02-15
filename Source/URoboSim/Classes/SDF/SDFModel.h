@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Model")
 	TArray<USDFJoint*> Joints;
+
+	UPROPERTY(EditAnywhere, Category = "Model")
+	TArray<USDFPlugin*> Plugins;
 };
