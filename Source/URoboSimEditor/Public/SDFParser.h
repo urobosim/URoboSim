@@ -68,6 +68,7 @@ private:
     // Parse <link> node
     virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
+    virtual void ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel) override;
     // Parse <link> <inertial> node
 //    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
 

@@ -183,6 +183,10 @@ void FSDFParser::ParseModel(const FXmlNode* InNode)
         {
           NewModel->Pose = PoseContentToFTransform(ChildNode->GetContent());
         }
+      else if (ChildNode->GetTag().Equals(TEXT("plugin")))
+        {
+          ParsePlugin(ChildNode, NewModel);
+        }
       else
         {
           UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <model> child <%s> not supported, ignored.."),
@@ -193,6 +197,38 @@ void FSDFParser::ParseModel(const FXmlNode* InNode)
 
   // Add model to the data asset
   DataAsset->Models.Add(NewModel);
+}
+
+void FSDFParser::ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel)
+{
+  // Get "name" from node attribute
+  const FString Name = InNode->GetAttribute(TEXT("name"));
+  NewPlugin = NewObject<USDFPlugin>(OutModel, FName(*Name));
+  NewPlugin->Name = Name;
+  for (const auto& ChildNode : InNode->GetChildrenNodes())
+    {
+
+      if (ChildNode->GetTag().Equals(TEXT("joint")))
+        {
+          NewPlugin->Joint = ChildNode->GetContent();
+        }
+      else if (ChildNode->GetTag().Equals(TEXT("mimicJoint")))
+        {
+          NewPlugin->MimicJoint = ChildNode->GetContent();
+        }
+      else if (ChildNode->GetTag().Equals(TEXT("multiplier")))
+        {
+          NewPlugin->Multiplier = FCString::Atof(*ChildNode->GetContent());
+        }
+      else
+        {
+          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <link> child <%s> not supported, ignored.."),
+                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+          continue;
+        }
+      OutModel->Plugins.Add(NewPlugin);
+    }
+
 }
 
 // Parse <link> node
