@@ -25,6 +25,7 @@ void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel,FVect
       LoadLinks(InLocation);
       LoadJoints();
       BuildKinematicTree();
+      SetupPlugins();
     }
 }
 
@@ -126,5 +127,34 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 
       // InJoint->Constraint->SetPosition(InJoint);
       InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepRelativeTransform);
+    }
+}
+
+void URModelBuilder::SetupPlugins()
+{
+  for(USDFPlugin* Plugin : ModelDescription->Plugins)
+    {
+      URJoint* Joint = Model->Joints[Plugin->Joint];
+
+      if(Joint)
+        {
+          URJoint* MimicJoint = Model->Joints[Plugin->MimicJoint];
+          if(MimicJoint)
+            {
+              FMimicJointParameter MimicJointParameter;
+              MimicJointParameter->MimicJoint = MimicJoint;
+              MimicJointParameter->Multiplier = Plugin->Multiplier;
+              Joint->MimicJointList.Add(MimicJointParameter);
+              Joint->bHasMimic = true;
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("MimicJoint %s not found"), *Plugin->MimicJoint);
+            }
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("Joint  to Mimic %s not found"), *Plugin->Joint);
+        }
     }
 }

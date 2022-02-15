@@ -51,6 +51,7 @@ protected:
   void LoadLinks(FVector InLocation);
   void LoadJoints();
   void BuildKinematicTree();
+  void SetupPlugins();
   void SetConstraintPosition(URJoint* InJoint);
 
   void AddJoint(URJoint* Joint);
