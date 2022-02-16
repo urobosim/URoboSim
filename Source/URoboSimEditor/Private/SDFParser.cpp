@@ -201,6 +201,7 @@ void FSDFParser::ParseModel(const FXmlNode* InNode)
 
 void FSDFParser::ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel)
 {
+  USDFPlugin* NewPlugin = nullptr;
   // Get "name" from node attribute
   const FString Name = InNode->GetAttribute(TEXT("name"));
   NewPlugin = NewObject<USDFPlugin>(OutModel, FName(*Name));

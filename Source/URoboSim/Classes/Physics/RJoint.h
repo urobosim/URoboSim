@@ -91,7 +91,7 @@ public:
       float MaxJointVel = -1;
 
     UPROPERTY(EditAnywhere)
-      bHasMimic = false;
+     bool bHasMimic = false;
 
     UPROPERTY(EditAnywhere)
       TArray<FMimicJointParameter> MimicJointList;

@@ -58,7 +58,7 @@ void URJoint::SetDrive(const FEnableDrive &EnableDrive)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetDrive(EnableDrive);
+          MimicJoint.MimicJoint->SetDrive(EnableDrive);
         }
     }
 }
@@ -88,7 +88,11 @@ void URJoint::SetMotorJointState(const FJointState &JointState)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetMotorJointState(JointState.JointPosition*Multiplier, JointState.JointVelocity*Multiplier);
+          FJointState MimicState;
+          MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
+          MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+
+          MimicJoint.MimicJoint->SetMotorJointState(MimicState);
         }
     }
 }
@@ -122,7 +126,7 @@ void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetJointPosition(Angle*Multiplier, OutSweepHitResult);
+          MimicJoint.MimicJoint->SetJointPosition(Angle*MimicJoint.Multiplier, OutSweepHitResult);
         }
     }
 }
@@ -134,7 +138,7 @@ void URJoint::SetJointVelocity(float Velocity)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetJointVelocity(Velocity*Multiplier);
+          MimicJoint.MimicJoint->SetJointVelocity(Velocity*MimicJoint.Multiplier);
         }
     }
 }
@@ -146,7 +150,7 @@ void URJoint::SetJointVelocityInUUnits(float Velocity)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetJointVelocityInUUnits(Velocity*Multiplier);
+          MimicJoint.MimicJoint->SetJointVelocityInUUnits(Velocity*MimicJoint.Multiplier);
         }
     }
 }
@@ -158,7 +162,7 @@ void URJoint::SetJointEffort(float Effort)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetJointEffort(Effort*Multiplier);
+          MimicJoint.MimicJoint->SetJointEffort(Effort*MimicJoint.Multiplier);
         }
     }
 }
@@ -170,7 +174,7 @@ void URJoint::SetJointEffortFromROS(float Effort)
     {
       for(auto& MimicJoint : MimicJointList)
         {
-          MimicJoint->SetJointEffort(Effort*Multiplier);
+          MimicJoint.MimicJoint->SetJointEffort(Effort*MimicJoint.Multiplier);
         }
     }
 }
