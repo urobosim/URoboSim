@@ -47,6 +47,10 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
                                          ROSCommunicationDataAsset->ServiceServerConfiguration,
                                          ROSCommunicationDataAsset->ServiceClientConfiguration,
                                          ROSCommunicationDataAsset->ActionServerConfiguration);
+
+#if WITH_EDITOR
+        Robot->GetWorld()->MarkPackageDirty();
+#endif // WITH_EDITOR
         }
       }
     }

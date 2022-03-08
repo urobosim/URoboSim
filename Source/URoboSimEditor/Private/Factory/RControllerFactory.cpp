@@ -47,6 +47,9 @@ AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const F
         URControllerBuilder *ControllerBuilder = NewObject<URControllerBuilder>();
         ControllerBuilder->Init(Robots, ControllerDataAsset->ControllerConfiguration);
         ControllerBuilder->Build();
+#if WITH_EDITOR
+        Robots[0]->GetWorld()->MarkPackageDirty();
+#endif // WITH_EDITOR
       }
       else
       {
