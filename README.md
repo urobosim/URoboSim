@@ -31,6 +31,13 @@ See `gzsdf` for converting `URDF` to `SDF`.
 *  [Action Generation](https://github.com/urobosim/UROSActionLib)
 *  [ROS configuration Example](https://github.com/urobosim/urobosim_ros_config)
 
+**Setup Editor**
+
+* open [Editor Settings](https://docs.unrealengine.com/4.27/en-US/Basics/UI/EditorSettings/)
+* search for CPU
+* disable "Use less CPU when in Background"
+
+
 **Importing new Robot Model**
 * convert xacro to urdf:  `rosrun xacro xacro --inorder -o model.urdf model.urdf.xacro`
 * convert urdf to sdf: `gz sdf -v 1.6 -p /my_urdf.urdf > /my_sdf.sdf`
@@ -59,20 +66,47 @@ See `gzsdf` for converting `URDF` to `SDF`.
 
 * Drag and drop the created asset into the world (while dragging wait for the mesh creation to be finished before dropping the model)
 
-**FQA**
+**Setup GameInstance**
 
-*The robot in dynamic mode wobbles/moves strange
-	* Unreal has problems with long kinematic chains
-	* Try optimizing the joint controller parameters 
-	* Try small changes in joint space large changes might lead to overswinging
+* Create Blueprint of RoboSimGameInstance or adjust URoboSimGameInstance of the URoboSim Content
 
-**Creating the robot model**
+<p align="center">
+<img src="Documentation/img/GameInstance.png" height="500">
+</p>
 
-*  import the sdf file (enable: Combine Meshes)
-*  drag and dorp the sdf file into the map 
+* Open the Project Settings (Edit > ProjectSettings)
+
+<p align="center">
+<img src="Documentation/img/ProjectSettings.png" height="500">
+</p>
+
+* In Maps & Modes set
+    * Default GameMode to GameMode
+    * GameInstance to the RoboSimGameInstance
+
+<p align="center">
+<img src="Documentation/img/GameMode.png" height="500">
+</p>
 
 **Add Controller**
 
+* create new data asset, right click into ContentBrowser > Miscellaneous > Data Asset
+
+<p align="center">
+<img src="Documentation/img/NewDataAsset.png" height="500">
+</p>
+
+* search for RControllerDataAsset
+
+<p align="center">
+<img src="Documentation/img/RControllerDataAsset.png" width="500">
+</p>
+
+* double click on the created asset
+* add robot name and controller configurations
+* drag and drop the config file into the world
+
+<!---
 *  add RControllerComponent to the model
 *  add new element to the ControllerList (Left field: Controller Name, Right field: Controller Type)
 *  BaseController:
@@ -93,9 +127,23 @@ See `gzsdf` for converting `URDF` to `SDF`.
     *  Right/LeftJointName:
     *  Right/LeftFingerTipName
     *  GraspComponent: Name of the GraspComponent (GraspComponent has to be added to model)
+--->
 
 **Add ROSCommunication**
 
+* create new data asset, right click into ContentBrowser > Miscellaneous > Data Asset
+* search for RROSCommunicationDataAsset
+
+<p align="center">
+<img src="Documentation/img/RROSCommunicationDataAsset.png" width="500">
+</p>
+
+* double click on the created asset
+* add robot name and communication configurations
+* drag and drop the config file into the world
+
+
+<!---
 * Publisher:
     * OdometriePublisher:
         * Publishes the odometrie of the robot
@@ -155,3 +203,12 @@ See `gzsdf` for converting `URDF` to `SDF`.
 **Example Workflow**
 
 *
+
+--->
+
+**FQA**
+
+*The robot in dynamic mode wobbles/moves strange
+	* Unreal has problems with long kinematic chains
+	* Try optimizing the joint controller parameters 
+	* Try small changes in joint space large changes might lead to overswinging
