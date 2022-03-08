@@ -31,11 +31,45 @@ See `gzsdf` for converting `URDF` to `SDF`.
 *  [Action Generation](https://github.com/urobosim/UROSActionLib)
 *  [ROS configuration Example](https://github.com/urobosim/urobosim_ros_config)
 
+**Importing new Robot Model**
+* convert xacro to urdf:  `rosrun xacro xacro --inorder -o model.urdf model.urdf.xacro`
+* convert urdf to sdf: `gz sdf -v 1.6 -p /my_urdf.urdf > /my_sdf.sdf`
+* replace ' with ": `sed -i "s/'/\"/g" my_sdf.sdf`
+
+* convert .stl and .dae files to .fbx
+    * you can use this blender script (experimental state) [FBX conversion](https://github.com/code-iai/ConvertMeshToFBX)
+
+* Source ROS environment before starting UE4. 
+    * Currently only ros python tool "catkin build" supported (catkin_make creates different ROS_PACKAGE_PATH which unreal uses to finds all ros packages)
+* Start unreal
+* Create [Collision channel](https://docs.unrealengine.com/4.27/en-US/InteractiveExperiences/Physics/Collision/HowTo/AddCustomCollisionType/) Robot in new Projects 
+* Click import
+
+<p align="center">
+<img src="Documentation/img/ImportButton.png" width="500">
+</p>
+
+* Select sdf
+* Tick combine meshes
+* Click ImportAll (if first mesh does not include textures the rest will be loaded without texture. Workaround: click import until mesh with texture is imported) 
+
+<p align="center">
+<img src="Documentation/img/ImportMenu.png" height="500">
+</p>
+
+* Drag and drop the created asset into the world (while dragging wait for the mesh creation to be finished before dropping the model)
+
+**FQA**
+
+*The robot in dynamic mode wobbles/moves strange
+	* Unreal has problems with long kinematic chains
+	* Try optimizing the joint controller parameters 
+	* Try small changes in joint space large changes might lead to overswinging
+
 **Creating the robot model**
 
-*  Create CollisionChannel Robot in new Projects
 *  import the sdf file (enable: Combine Meshes)
-*  drag and dorp the sdf file into the map (while dragging wait for the mesh creation to be finished before dropping the model)
+*  drag and dorp the sdf file into the map 
 
 **Add Controller**
 
