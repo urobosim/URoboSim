@@ -208,7 +208,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
 
 **FQA**
 
-*The robot in dynamic mode wobbles/moves strange
+* The robot in dynamic mode wobbles/moves strange
 	* Unreal has problems with long kinematic chains
 	* Try optimizing the joint controller parameters 
 	* Try small changes in joint space large changes might lead to overswinging
