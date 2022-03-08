@@ -4,8 +4,7 @@
 #include "Physics/RJoint.h"
 #include "Physics/RLink.h"
 #include "Physics/RModel.h"
-#include "RStaticMeshComponent.h"
-
+#include "Physics/RStaticMeshComponent.h"
 
 // Sets default values for this component's properties
 URJoint::URJoint()
@@ -14,6 +13,33 @@ URJoint::URJoint()
   bActuate = false;
 }
 
+void URJoint::BeginDestroy()
+{
+  if(Constraint->IsValidLowLevel())
+    {
+      Constraint->ConditionalBeginDestroy();
+    }
+  Super::BeginDestroy();
+}
+
+bool URJoint::IsTickable() const
+{
+  // Tick only if we are both NOT a template and if we are specifically not in-editor-before-beginplay is called.
+  return (!IsTemplate(RF_ClassDefaultObject)) && !(GIsEditor && !GWorld->HasBegunPlay());
+}
+
+TStatId URJoint::GetStatId() const
+{
+  return TStatId();
+}
+
+void URJoint::Tick(float DeltaTime)
+{
+  if(Constraint)
+    {
+      UpdateEncoder();
+    }
+}
 
 float URJoint::GetEncoderValue()
 {
@@ -25,19 +51,16 @@ void URJoint::UpdateEncoder()
   Constraint->UpdateEncoderValue(GetJointPosition());
 }
 
-void URJoint::EnableMotor(bool InEnable)
+void URJoint::SetDrive(const FEnableDrive &EnableDrive)
 {
-  Constraint->EnableMotor(InEnable);
-}
-
-void URJoint::UpdateVelocity(float InDeltaTime)
-{
-  if(bActuate)
-  {
-    Constraint->UpdateJointVelocity(InDeltaTime);
-  }
-
-  Child->UpdateVelocity(InDeltaTime);
+  Constraint->SetDrive(EnableDrive);
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetDrive(EnableDrive);
+        }
+    }
 }
 
 void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
@@ -48,10 +71,40 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
   Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
 }
 
+void URJoint::SetParentChild(AActor* InParent, AActor* InChild)
+{
+  if(!InChild || !InParent)
+    {
+      return;
+    }
+  Constraint->SetParentChild(Cast<UStaticMeshComponent>(InParent->GetRootComponent()), Cast<UStaticMeshComponent>(InChild->GetRootComponent()));
+}
+
+void URJoint::SetMotorJointState(const FJointState &JointState)
+{
+  Constraint->SetMotorJointState(JointState.JointPosition, JointState.JointVelocity);
+
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          FJointState MimicState;
+          MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
+          MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+
+          MimicJoint.MimicJoint->SetMotorJointState(MimicState);
+        }
+    }
+}
+
+FJointState URJoint::GetJointState()
+{
+  return FJointState(GetJointPosition(), GetJointVelocity());
+}
+
 float URJoint::GetJointPosition()
 {
-	return Constraint->GetJointPosition();
-
+  return Constraint->GetJointPosition();
 }
 
 float URJoint::GetJointPositionInUUnits()
@@ -67,25 +120,61 @@ float URJoint::GetJointVelocity()
 
 void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
 {
-	Constraint->SetJointPosition(Angle, OutSweepHitResult);
+  Constraint->SetJointPosition(Angle, OutSweepHitResult);
+
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetJointPosition(Angle*MimicJoint.Multiplier, OutSweepHitResult);
+        }
+    }
 }
 void URJoint::SetJointVelocity(float Velocity)
 {
-	Constraint->SetJointVelocity(Velocity);
+  Constraint->SetJointVelocity(Velocity);
+
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetJointVelocity(Velocity*MimicJoint.Multiplier);
+        }
+    }
 }
 
 void URJoint::SetJointVelocityInUUnits(float Velocity)
 {
-	Constraint->SetJointVelocityInUUnits(Velocity);
+  Constraint->SetJointVelocityInUUnits(Velocity);
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetJointVelocityInUUnits(Velocity*MimicJoint.Multiplier);
+        }
+    }
 }
 
 void URJoint::SetJointEffort(float Effort)
 {
-	Constraint->SetJointEffort(Effort);
+  Constraint->SetJointEffort(Effort);
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetJointEffort(Effort*MimicJoint.Multiplier);
+        }
+    }
 }
 
 void URJoint::SetJointEffortFromROS(float Effort)
 {
-
-	Constraint->SetJointEffort(Effort);
+  Constraint->SetJointEffort(Effort);
+  if(bHasMimic)
+    {
+      for(auto& MimicJoint : MimicJointList)
+        {
+          MimicJoint.MimicJoint->SetJointEffort(Effort*MimicJoint.Multiplier);
+        }
+    }
 }

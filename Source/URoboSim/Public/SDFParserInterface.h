@@ -10,7 +10,7 @@
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
 #include "AssetRegistryModule.h"
-#include "ObjectMacros.h" // EObjectFlags
+#include "UObject/ObjectMacros.h" // EObjectFlags
 #include "SDFParserInterface.generated.h"
 
 // Forward declaration
@@ -132,5 +132,5 @@ public:
 //        USDFDataAsset* DataAsset;
 
 //        FString CurrentLinkName;
-	
+
 };

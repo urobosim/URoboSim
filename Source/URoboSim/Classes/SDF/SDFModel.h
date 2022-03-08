@@ -7,6 +7,7 @@
 #include "UObject/NoExportTypes.h"
 #include "SDF/SDFLink.h"
 #include "SDF/SDFJoint.h"
+#include "SDF/SDFPlugin.h"
 #include "SDFModel.generated.h"
 
 /**
@@ -32,4 +33,7 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Model")
 	TArray<USDFJoint*> Joints;
+
+	UPROPERTY(EditAnywhere, Category = "Model")
+	TArray<USDFPlugin*> Plugins;
 };

@@ -12,10 +12,6 @@ URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription)
   {
     return nullptr;
   }
-  else
-    {
-      UE_LOG(LogTemp, Error, TEXT("JointFactory: JointBuilder not created because ConstraintType not supported"));
-    }
 
   JointBuilder->Init(InOuter, InJointDescription);
   return JointBuilder->NewJoint();

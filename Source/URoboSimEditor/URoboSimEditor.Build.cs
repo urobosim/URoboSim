@@ -30,12 +30,15 @@ public class URoboSimEditor : ModuleRules
 				"CoreUObject",
 				"Engine",
 				"Slate",
+				"UConversions",
+				"URoboVision",
+				"UROSBridge",
 				"SlateCore",
                                 "XmlParser",
-				"UConversions",
                                 "CustomMeshComponent",
                                 "ProceduralMeshComponent",
                                 "URoboSim",
+                                "URoboVision",
                                 "UnrealEd",
 			}
 			);

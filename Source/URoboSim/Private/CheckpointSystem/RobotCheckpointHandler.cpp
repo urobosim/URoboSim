@@ -1,15 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "CheckpointSystem/RobotCheckpointHandler.h"
-#include "Kismet/GameplayStatics.h"
-#include "Controller/RControllerComponent.h"
+#include "Controller/ControllerType/BaseController/RBaseController.h"
+#include "Controller/ControllerType/JointController/RJointController.h"
 #include "Controller/RController.h"
-#include "Controller/RBaseController.h"
-#include "Controller/RJointController.h"
+#include "Controller/RControllerComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Physics/RModel.h"
 
-USaveGame* URobotCheckpointHandler::CreateSaveGameFile()
+USaveGame *URobotCheckpointHandler::CreateSaveGameFile()
 {
   return UGameplayStatics::CreateSaveGameObject(URobotCheckpointSaveGame::StaticClass());
 }
@@ -17,117 +16,71 @@ USaveGame* URobotCheckpointHandler::CreateSaveGameFile()
 void URobotCheckpointHandler::GetContent()
 {
   Super::GetContent();
-  ARModel* Robot = Cast<ARModel>(SavedObject);
-  if(Robot)
+  ARModel *Robot = Cast<ARModel>(SavedObject);
+  if (Robot)
+  {
+    URJointController *Controller = Cast<URJointController>(Robot->GetController(TEXT("JointController")));
+    if (Controller)
     {
-      if(Robot->Plugins.Contains(TEXT("ControllerComponent")))
-        {
-          URControllerComponent* ControllerComp = Cast<URControllerComponent>(Robot->Plugins[TEXT("ControllerComponent")]);
-          if(ControllerComp)
-            {
-              URJointController* Controller = Cast<URJointController>(ControllerComp->ControllerList(TEXT("JointController")));
-              if(Controller)
-                {
-                  URobotCheckpointSaveGame* RobotState = Cast<URobotCheckpointSaveGame>(SaveGame);
-                  if(RobotState)
-                    {
-                      RobotState->SetJointState(Controller->DesiredJointState);
-                    }
-                }
-              else
-                {
-                  UE_LOG(LogTemp, Error, TEXT("%s: JointController not found"), *GetName());
-                }
-            }
-          else
-            {
-              UE_LOG(LogTemp, Error, TEXT("%s: Controller component not found"), *GetName());
-            }
-        }
+      URobotCheckpointSaveGame *RobotState = Cast<URobotCheckpointSaveGame>(SaveGame);
+      if (RobotState)
+      {
+        RobotState->SetJointState(Controller->DesiredJointStates);
+      }
     }
+  }
   else
-    {
-      UE_LOG(LogTemp, Error, TEXT("%s: SavedObject is not castable into ARModel"), *GetName());
-    }
+  {
+    UE_LOG(LogTemp, Error, TEXT("%s: SavedObject is not castable into ARModel"), *GetName());
+  }
 }
 
-void URobotCheckpointHandler::SetActorState(UActorCheckpointSaveGame* InActorState)
+void URobotCheckpointHandler::SetActorState(UActorCheckpointSaveGame *InActorState)
 {
-  ARModel* Robot = Cast<ARModel>(SavedObject);
-  if(Robot)
+  ARModel *Robot = Cast<ARModel>(SavedObject);
+  if (Robot)
+  {
+    URBaseController *Controller = Cast<URBaseController>(Robot->GetController(TEXT("BaseController")));
+    if (Controller)
     {
-      if(Robot->Plugins.Contains(TEXT("ControllerComponent")))
-        {
-          URControllerComponent* ControllerComp = Cast<URControllerComponent>(Robot->Plugins[TEXT("ControllerComponent")]);
-          if(ControllerComp)
-            {
-              URBaseController* Controller = Cast<URBaseController>(ControllerComp->ControllerList(TEXT("BaseController")));
-              if(Controller)
-                {
-                  if(InActorState)
-                    {
-                      Controller->SetTransform(InActorState->ActorState.Pose);
-                    }
-                }
-              else
-                {
-                  UE_LOG(LogTemp, Error, TEXT("%s: BaseController not found"), *GetName());
-                }
-            }
-          else
-            {
-              UE_LOG(LogTemp, Error, TEXT("%s: Controller component not found"), *GetName());
-            }
-        }
+      if (InActorState)
+      {
+        Controller->SetTransform(InActorState->ActorState.Pose);
+      }
     }
+  }
   else
-    {
-      UE_LOG(LogTemp, Error, TEXT("ResetCheckpoint: SavedObject can not be cast ARModel"));
-    }
+  {
+    UE_LOG(LogTemp, Error, TEXT("ResetCheckpoint: SavedObject can not be cast ARModel"));
+  }
 }
 
 void URobotCheckpointHandler::ResetCheckpoint()
 {
   Super::ResetCheckpoint();
-  URobotCheckpointSaveGame* RobotState = Cast<URobotCheckpointSaveGame>(SaveGame);
+  URobotCheckpointSaveGame *RobotState = Cast<URobotCheckpointSaveGame>(SaveGame);
   SetJointState(RobotState);
 }
 
-void URobotCheckpointHandler::SetJointState(URobotCheckpointSaveGame* InRobotState)
+void URobotCheckpointHandler::SetJointState(URobotCheckpointSaveGame *InRobotState)
 {
-  ARModel* Robot = Cast<ARModel>(SavedObject);
-  if(Robot)
+  ARModel *Robot = Cast<ARModel>(SavedObject);
+  if (Robot)
+  {
+    URJointController *Controller = Cast<URJointController>(Robot->GetController(TEXT("JointController")));
+    if (Controller)
     {
-      if(Robot->Plugins.Contains(TEXT("ControllerComponent")))
+      if (InRobotState)
+      {
+        for (auto &JointState : InRobotState->GetJointStates())
         {
-          URControllerComponent* ControllerComp = Cast<URControllerComponent>(Robot->Plugins[TEXT("ControllerComponent")]);
-          if(ControllerComp)
-            {
-              URJointController* Controller = Cast<URJointController>(ControllerComp->ControllerList(TEXT("JointController")));
-              if(Controller)
-                {
-                  if(InRobotState)
-                    {
-                      for(auto& JointState : InRobotState->GetJointStates())
-                        {
-                          Controller->SetDesiredJointState(JointState.Key, JointState.Value);
-                        }
-                    }
-                }
-              else
-                {
-                  UE_LOG(LogTemp, Error, TEXT("%s: JointController not found"), *GetName());
-                }
-            }
-          else
-            {
-              UE_LOG(LogTemp, Error, TEXT("%s: Controller component not found"), *GetName());
-            }
+          Controller->DesiredJointStates[JointState.Key] = JointState.Value;
         }
+      }
     }
+  }
   else
-    {
-      UE_LOG(LogTemp, Error, TEXT("ResetCheckpoint: SavedObject can not be cast ARModel"));
-    }
-
+  {
+    UE_LOG(LogTemp, Error, TEXT("ResetCheckpoint: SavedObject can not be cast ARModel"));
+  }
 }

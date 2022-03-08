@@ -2,7 +2,8 @@
 #include "RStaticMeshEditUtils.h"
 
 // necessary for Collision creation
-#include "Private/ConvexDecompTool.h"
+// #include "Private/ConvexDecompTool.h"
+#include "Editor/UnrealEd/Private/ConvexDecompTool.h"
 // necessary for Collision creation KDOP
 
 #include "Runtime/Engine/Classes/PhysicsEngine/BodySetup.h"
@@ -12,7 +13,7 @@
 
 #include "Editor/UnrealEd/Private/GeomFitUtils.h"
 #include "Editor/EditorEngine.h"
-
+#include "ProceduralMeshConversion.h"
 #define LOCTEXT_NAMESPACE "StaticMeshEditor"
 #ifndef USE_ASYNC_DECOMP
 #define USE_ASYNC_DECOMP 0
@@ -455,116 +456,7 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
   FName MeshName(*FPackageName::GetLongPackageAssetName(PackageName));
   if (ProcMeshComp != nullptr)
     {
-      FMeshDescription MeshDescription;
-      UStaticMesh::RegisterMeshAttributes(MeshDescription);
-      FStaticMeshDescriptionAttributeGetter AttributeGetter(&MeshDescription);
-      TPolygonGroupAttributesRef<FName> PolygonGroupNames = AttributeGetter.GetPolygonGroupImportedMaterialSlotNames();
-      TVertexAttributesRef<FVector> VertexPositions = AttributeGetter.GetPositions();
-      TVertexInstanceAttributesRef<FVector> Tangents = AttributeGetter.GetTangents();
-      TVertexInstanceAttributesRef<float> BinormalSigns = AttributeGetter.GetBinormalSigns();
-      TVertexInstanceAttributesRef<FVector> Normals = AttributeGetter.GetNormals();
-      TVertexInstanceAttributesRef<FVector4> Colors = AttributeGetter.GetColors();
-      TVertexInstanceAttributesRef<FVector2D> UVs = AttributeGetter.GetUVs();
-      TEdgeAttributesRef<bool> EdgeHardnesses = AttributeGetter.GetEdgeHardnesses();
-      TEdgeAttributesRef<float> EdgeCreaseSharpnesses = AttributeGetter.GetEdgeCreaseSharpnesses();
-
-      // Materials to apply to new mesh
-      const int32 NumSections = ProcMeshComp->GetNumSections();
-      int32 VertexCount = 0;
-      int32 VertexInstanceCount = 0;
-      int32 PolygonCount = 0;
-      TMap<UMaterialInterface*, FPolygonGroupID> UniqueMaterials;
-      UniqueMaterials.Reserve(NumSections);
-      TArray<FPolygonGroupID> MaterialRemap;
-      MaterialRemap.Reserve(NumSections);
-      //Get all the info we need to create the MeshDescription
-      for (int32 SectionIdx = 0; SectionIdx < NumSections; SectionIdx++)
-        {
-          FProcMeshSection* ProcSection = ProcMeshComp->GetProcMeshSection(SectionIdx);
-          VertexCount += ProcSection->ProcVertexBuffer.Num();
-          VertexInstanceCount += ProcSection->ProcIndexBuffer.Num();
-          PolygonCount += ProcSection->ProcIndexBuffer.Num() / 3;
-          UMaterialInterface*Material = ProcMeshComp->GetMaterial(SectionIdx);
-          if (!UniqueMaterials.Contains(Material))
-            {
-              FPolygonGroupID NewPolygonGroup = MeshDescription.CreatePolygonGroup();
-              UniqueMaterials.Add(Material, NewPolygonGroup);
-              PolygonGroupNames[NewPolygonGroup] = Material->GetFName();
-            }
-          FPolygonGroupID* PolygonGroupID = UniqueMaterials.Find(Material);
-          check(PolygonGroupID != nullptr);
-          MaterialRemap.Add(*PolygonGroupID);
-        }
-      MeshDescription.ReserveNewVertices(VertexCount);
-      MeshDescription.ReserveNewVertexInstances(VertexInstanceCount);
-      MeshDescription.ReserveNewPolygons(PolygonCount);
-      MeshDescription.ReserveNewEdges(PolygonCount * 2);
-      UVs.SetNumIndices(4);
-      //Add Vertex and VertexInstance and polygon for each section
-      for (int32 SectionIdx = 0; SectionIdx < NumSections; SectionIdx++)
-        {
-          FProcMeshSection* ProcSection = ProcMeshComp->GetProcMeshSection(SectionIdx);
-          FPolygonGroupID PolygonGroupID = MaterialRemap[SectionIdx];
-          //Create the vertex
-          int32 NumVertex = ProcSection->ProcVertexBuffer.Num();
-          TMap<int32, FVertexID> VertexIndexToVertexID;
-          VertexIndexToVertexID.Reserve(NumVertex);
-          for (int32 VertexIndex = 0; VertexIndex < NumVertex; ++VertexIndex)
-            {
-              FProcMeshVertex& Vert = ProcSection->ProcVertexBuffer[VertexIndex];
-              const FVertexID VertexID = MeshDescription.CreateVertex();
-              VertexPositions[VertexID] = Vert.Position;
-              VertexIndexToVertexID.Add(VertexIndex, VertexID);
-            }
-          //Create the VertexInstance
-          int32 NumIndices = ProcSection->ProcIndexBuffer.Num();
-          int32 NumTri = NumIndices / 3;
-          TMap<int32, FVertexInstanceID> IndiceIndexToVertexInstanceID;
-          IndiceIndexToVertexInstanceID.Reserve(NumVertex);
-          for (int32 IndiceIndex = 0; IndiceIndex < NumIndices; IndiceIndex++)
-            {
-              const int32 VertexIndex = ProcSection->ProcIndexBuffer[IndiceIndex];
-              const FVertexID VertexID = VertexIndexToVertexID[VertexIndex];
-              const FVertexInstanceID VertexInstanceID = MeshDescription.CreateVertexInstance(VertexID);
-              IndiceIndexToVertexInstanceID.Add(IndiceIndex, VertexInstanceID);
-
-              FProcMeshVertex& ProcVertex = ProcSection->ProcVertexBuffer[VertexIndex];
-
-              Tangents[VertexInstanceID] = ProcVertex.Tangent.TangentX;
-              Normals[VertexInstanceID] = ProcVertex.Normal;
-              BinormalSigns[VertexInstanceID] = ProcVertex.Tangent.bFlipTangentY ? -1.f : 1.f;
-
-              Colors[VertexInstanceID] = FLinearColor(ProcVertex.Color);
-
-              UVs.Set(VertexInstanceID, 0, ProcVertex.UV0);
-              UVs.Set(VertexInstanceID, 1, ProcVertex.UV1);
-              UVs.Set(VertexInstanceID, 2, ProcVertex.UV2);
-              UVs.Set(VertexInstanceID, 3, ProcVertex.UV3);
-            }
-
-          //Create the polygons for this section
-          for (int32 TriIdx = 0; TriIdx < NumTri; TriIdx++)
-            {
-              FVertexID VertexIndexes[3];
-              TArray<FVertexInstanceID> VertexInstanceIDs;
-              VertexInstanceIDs.SetNum(3);
-
-              for (int32 CornerIndex = 0; CornerIndex < 3; ++CornerIndex)
-                {
-                  const int32 IndiceIndex = (TriIdx * 3) + CornerIndex;
-                  const int32 VertexIndex = ProcSection->ProcIndexBuffer[IndiceIndex];
-                  VertexIndexes[CornerIndex] = VertexIndexToVertexID[VertexIndex];
-                  VertexInstanceIDs[CornerIndex] = IndiceIndexToVertexInstanceID[IndiceIndex];
-                }
-
-              // Insert a polygon into the mesh
-              const FPolygonID NewPolygonID = MeshDescription.CreatePolygon(PolygonGroupID, VertexInstanceIDs);
-              //Triangulate the polygon
-              FMeshPolygon& Polygon = MeshDescription.GetPolygon(NewPolygonID);
-              MeshDescription.ComputePolygonTriangulation(NewPolygonID, Polygon.Triangles);
-            }
-        }
-
+      FMeshDescription MeshDescription = BuildMeshDescription(ProcMeshComp);
       // If we got some valid data.
       if (MeshDescription.Polygons().Num() > 0)
         {
@@ -596,9 +488,11 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
           StaticMesh->CommitMeshDescription(0);
 
           // Copy materials to new mesh
-          for (auto Kvp : UniqueMaterials)
+          // for (auto Kvp : UniqueMaterials)
+          for (auto Kvp : ProcMeshComp->GetMaterials())
             {
-              UMaterialInterface* Material = Kvp.Key;
+              // UMaterialInterface* Material = Kvp.Key;
+              UMaterialInterface* Material = Kvp;
               StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
             }
 

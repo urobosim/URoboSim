@@ -1,6 +1,7 @@
 #include "Factory/RModelFactory.h"
 #include "Factory/RModelBuilder.h"
 #include "Physics/RModel.h"
+#include "Engine/World.h"
 #include "Editor/EditorEngine.h"
 
 URModelFactory::URModelFactory(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -25,7 +26,7 @@ AActor* URModelFactory::GetDefaultActor(const FAssetData & AssetData)
 
 AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
 {
-    USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(Asset);
+  USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(Asset);
   if(SDFAsset)
     {
       ARModel* NewRobot = nullptr;
@@ -37,7 +38,7 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
               FActorSpawnParameters SpawnInfo;
               SpawnInfo.OverrideLevel = InLevel;
               SpawnInfo.ObjectFlags = InObjectFlags;
-              // SpawnInfo.Name = Name;
+              SpawnInfo.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 
               //TODO fix name of spawned model
               SpawnInfo.Name = FName(*Model->Name);
@@ -47,21 +48,10 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
               URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
               NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo);
-              ModelBuilder->Load(Model, NewRobot);
-              // NewRobot->Load(Model);
-              // URModelFactory::CreateModels(NewRobot, SDFAsset);
-              if ( NewRobot )
-                {
+              ModelBuilder->Load(Model, NewRobot, Transform.GetLocation());
 
-                  // Only do this if the actor wasn't already given a name
-                  // if (Name == NAME_None && Asset)
-                  //   {
-                   //change postion according to transform afer drag and drop
-                  NewRobot->SetActorTransform(Transform);
-                  FActorLabelUtilities::SetActorLabelUnique(NewRobot, Model->Name);
-                  PostSpawnActor(Asset, NewRobot);
-                  //   }
-                }
+              PostSpawnActor(Asset, NewRobot);
+
             }
         }
       return NewRobot;
@@ -78,8 +68,16 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
 }
 
-
-void URModelFactory::CreateModels(ARModel* OutModel, USDFDataAsset* SDFData)
+void URModelFactory::PostSpawnActor( UObject* Asset, AActor* NewActor )
 {
-  // OutModel->Load(Model);
+  USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(Asset);
+  if(SDFAsset)
+    {
+      FActorLabelUtilities::SetActorLabelUnique(NewActor, SDFAsset->Models[0]->Name);
+    }
+}
+
+void URModelFactory::PostCreateBlueprint( UObject* Asset, AActor* CDO )
+{
+
 }

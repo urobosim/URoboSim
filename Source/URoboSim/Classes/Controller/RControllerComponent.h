@@ -2,28 +2,32 @@
 
 #pragma once
 
-#include "RPlugin.h"
+#include "RPluginComponent.h"
 #include "RController.h"
+// clang-format off
 #include "RControllerComponent.generated.h"
+// clang-format on
 
-UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
+UCLASS()
 class UROBOSIM_API URControllerComponent : public URPluginComponent
 {
-    GENERATED_BODY()
+	GENERATED_BODY()
+
 public:
 	URControllerComponent();
-	~URControllerComponent();
 
-	virtual URController* ControllerList(FString ControllerName);
+public:
+	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	virtual void SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities);
+public:
+	void AddController(URController *&Controller) { Controllers.Add(Controller); }
 
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-	UPROPERTY(EditAnywhere)
-	FRControllerContainer Controller;
+	URController* GetController(const FString &ControllerName) const;
 
 protected:
-    virtual void BeginPlay() override;
-    virtual FString GetPluginName() override;
+	void Init() override;
+
+public:
+	UPROPERTY(EditAnywhere, Instanced)
+	TArray<URController *> Controllers;
 };

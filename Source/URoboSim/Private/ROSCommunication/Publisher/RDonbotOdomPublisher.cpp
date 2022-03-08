@@ -4,38 +4,52 @@
 URDonbotOdomPublisher::URDonbotOdomPublisher()
 {
   Topic = TEXT("/joint_states");
-}
-
-void URDonbotOdomPublisher::SetMessageType()
-{
   MessageType = TEXT("sensor_msgs/JointState");
+	OdomFrameXId = TEXT("odom_x_joint");
+	OdomFrameYId = TEXT("odom_y_joint");
+	OdomFrameZId = TEXT("odom_z_joint");
 }
 
-void URDonbotOdomPublisher::SetOwner(UObject* InOwner)
+void URDonbotOdomPublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
 {
-  URControllerComponent* ControllerComp = Cast<URControllerComponent>(Cast<ARModel>(InOwner)->Plugins["ControllerComponent"]);
-  this->Owner = Cast<URBaseController>(ControllerComp->Controller.ControllerList["BaseController"]);
+  if (URDonbotOdomPublisherParameter *DonbotOdomPublisherParameters = Cast<URDonbotOdomPublisherParameter>(PublisherParameters))
+  {
+    Super::SetPublishParameters(PublisherParameters);
+    OdomFrameXId = DonbotOdomPublisherParameters->OdomFrameXId;
+    OdomFrameYId = DonbotOdomPublisherParameters->OdomFrameYId;
+    OdomFrameZId = DonbotOdomPublisherParameters->OdomFrameZId;
+  }
+}
 
-  this->FrameNames.Add(this->OdomFrameXId);
-  this->FrameNames.Add(this->OdomFrameYId);
-  this->FrameNames.Add(this->OdomFrameZId);
+void URDonbotOdomPublisher::Init()
+{
+  Super::Init();
+  if (GetOwner())
+  {
+    BaseController = Cast<URBaseController>(GetOwner()->GetController(TEXT("BaseController")));
+  }
 }
 
 void URDonbotOdomPublisher::Publish()
 {
-  TSharedPtr<sensor_msgs::JointState> JointState =
-    MakeShareable(new sensor_msgs::JointState());
-
-  JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), TEXT("0")));
-  JointState->SetName(FrameNames);
-  if(this->Owner)
+  if (GetOwner() && BaseController)
   {
-    JointState->SetPosition(this->Owner->GetOdomPositionStates());
-    JointState->SetVelocity(this->Owner->GetOdomVelocityStates());
+    static int Seq = 0;
+    TArray<FString> FrameNames;
+    TSharedPtr<sensor_msgs::JointState> JointState =
+        MakeShareable(new sensor_msgs::JointState());
+
+    JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), BaseFrameId));
+    FrameNames.Add(OdomFrameXId);
+    FrameNames.Add(OdomFrameYId);
+    FrameNames.Add(OdomFrameZId);
+    JointState->SetName(FrameNames);
+    JointState->SetPosition(BaseController->GetOdomPositionStates());
+    JointState->SetVelocity(BaseController->GetOdomVelocityStates());
+
+    Seq += 1;
+
+    Handler->PublishMsg(Topic, JointState);
+    Handler->Process();
   }
-
-  Seq += 1;
-
-  Handler->PublishMsg(Topic, JointState);
-  Handler->Process();
 }

@@ -1,21 +1,30 @@
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 
-void URSubscriber::Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic )
+DEFINE_LOG_CATEGORY_STATIC(LogRSubscriber, Log, All)
+
+void URSubscriber::SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters)
 {
-  Model = Cast<ARModel>(InModel);
-  ControllerComponent = Cast<URControllerComponent>(Model->Plugins["ControllerComponent"]);
-
-  Init(InRosTopic);
-  InHandler->AddSubscriber(Subscriber);
-
+  if (SubscriberParameters)
+  {
+    Topic = SubscriberParameters->Topic;
+    MessageType = SubscriberParameters->MessageType;
+  }
 }
 
-void URSubscriber::Init(FString RosTopic)
+void URSubscriber::Init()
 {
-  if(!RosTopic.Equals(""))
-    {
-      Topic = RosTopic;
-    }
-  SetMessageType();
+  SetOwner(GetOuter());
   CreateSubscriber();
+  if (Subscriber.IsValid())
+  {
+    Handler->AddSubscriber(Subscriber);
+  }
+}
+
+void URSubscriber::Tick()
+{
+  if (Handler.IsValid())
+  {
+    Handler->Process();
+  }
 }

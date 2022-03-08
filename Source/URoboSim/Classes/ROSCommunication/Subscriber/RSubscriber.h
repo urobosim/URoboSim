@@ -2,45 +2,55 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
-#include "ROSBridgeHandler.h"
-#include "Controller/RControllerComponent.h"
-#include "Physics/RModel.h"
+#include "ROSCommunication/RROSCommunication.h"
+#include "RobotInterface.h"
+// clang-format off
 #include "RSubscriber.generated.h"
+// clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URSubscriber: public UObject
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URSubscriberParameter : public UObject
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
+
 public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
 
-    UPROPERTY(EditAnywhere)
-      FString Topic;
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+};
 
-    UPROPERTY()
-      ARModel* Model;
+UCLASS()
+class UROBOSIM_API USubscriber : public UROSCommunication
+{
+  GENERATED_BODY()
 
-    UPROPERTY()
-      URControllerComponent* ControllerComponent;
+};
 
-    virtual void Init(UObject* InModel, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic="");
+UCLASS()
+class UROBOSIM_API URSubscriber : public USubscriber, public IRobotInterface
+{
+  GENERATED_BODY()
 
-    virtual void Init(UObject* InModel){};
+public:
+  void Tick() override;
 
-    TSharedPtr<FROSBridgeSubscriber> Subscriber;
+public:
+  virtual void SetSubscriberParameters(URSubscriberParameter *&SubscriberParameters);
 
-    UPROPERTY(EditAnywhere)
-      FString ControllerName;
- protected:
-    virtual void Init(FString RosTopic);
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
 
+protected:
+  virtual void Init() override;
 
-    UPROPERTY()
-      FString MessageType;
+  virtual void CreateSubscriber() {}
 
- private:
+protected:
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
 
-    virtual void SetMessageType(){};
-    virtual void CreateSubscriber(){};
-
+  TSharedPtr<FROSBridgeSubscriber> Subscriber;
 };

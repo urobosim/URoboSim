@@ -4,7 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 #include "RLink.generated.h"
 
 class ARModel;
@@ -29,30 +29,28 @@ public:
 	ARModel* Model;
 
 	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Visuals;
+	TArray<class UStaticMeshComponent*> Visuals;
 	UPROPERTY(EditAnywhere)
-	TArray<class URStaticMeshComponent*> Collisions;
+	TArray<class UStaticMeshComponent*> Collisions;
 
-	virtual void SetPose(FTransform InPose);
-	virtual void SetPose(FVector InLocation, FQuat InRotation);
+	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
+	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
 
 	virtual void DisableCollision();
 	virtual void EnableCollision();
 
-	URStaticMeshComponent* GetVisual();
-	URStaticMeshComponent* GetCollision();
-	URStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
+	UStaticMeshComponent* GetVisual();
+	UStaticMeshComponent* GetCollision();
+	UStaticMeshComponent* GetCollision(FString InCollisionName, bool bExactMatch = false);
         TArray<class URJoint*> GetJoints();
 
 	float GetNumCollisions();
 
 	void AddJoint(class URJoint* InJoint);
 
-	virtual void UpdateVelocity(float InDeltaTime);
-	// virtual void SetNextVelocities();
 
-	UPROPERTY(EditAnywhere)
-	FTransform Pose;
+	UPROPERTY(VisibleAnywhere)
+	USceneComponent *PoseComponent;
 
         UPROPERTY()
         bool bAttachedToParent = false;

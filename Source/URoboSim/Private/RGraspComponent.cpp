@@ -1,6 +1,7 @@
 #include "RGraspComponent.h"
 #include "Physics/RModel.h"
 #include "Physics/RLink.h"
+#include "ROSCommunication/Publisher/RTFPublisher.h"
 
 URGraspComponent::URGraspComponent()
 {
@@ -24,22 +25,29 @@ URGraspComponent::URGraspComponent()
   Constraint2->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
 }
 
-void URGraspComponent::Init(URStaticMeshComponent* InGripper)
+void URGraspComponent::Init(UStaticMeshComponent* InGripper)
 {
   Gripper = InGripper;
   bObjectGrasped = false;
+
+  // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  // TFPublisher->Topic = TEXT("/tf_grasp_test");
+  // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
 
 }
 
-void URGraspComponent::Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2)
+void URGraspComponent::Init(UStaticMeshComponent* InGripper1, UStaticMeshComponent* InGripper2)
 {
   Gripper = InGripper1;
   Gripper2 = InGripper2;
   bObjectGrasped = false;
 
+  // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
+  // TFPublisher->Topic = TEXT("/tf_grasp_test");
+  // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
 
@@ -106,18 +114,25 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
   //If the grasped object is attached to another object (door handle), connecting via constraints moves
   // the gripper to the root object
   bool bParentFound = false;
+  int NumIter = 0;
   while(!bParentFound)
     {
       AStaticMeshActor* TempActor = Cast<AStaticMeshActor>(ConstrainedActor->GetAttachParentActor());
       if(TempActor)
         {
           ConstrainedActor = TempActor;
+          NumIter++;
         }
       else
         {
+          UE_LOG(LogTemp, Error, TEXT("ConstraintActor %s iter %d"),*ConstrainedActor->GetName(), NumIter);
           bParentFound = true;
         }
     }
+  if(NumIter == 0)
+  {
+    ObjectToPublish = Cast<AActor>(ConstrainedActor);
+  }
 
   UStaticMeshComponent* SMC = nullptr;
   SMC = ConstrainedActor->GetStaticMeshComponent();
@@ -181,10 +196,18 @@ void URGraspComponent::TryToDetach()
       Constraint2->BreakConstraint();
     }
 
+  // if(ObjectToPublish)
+  //   {
+  //     UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
+  //     TFPublisher->AddObject(ObjectToPublish);
+  //     TFPublisher->Publish();
+  //   }
+
   if(FixatedObject)
   {
-      FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
-      FixatedObject = nullptr;
-    }
+
+    FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
+    FixatedObject = nullptr;
+  }
   bObjectGrasped = false;
 }

@@ -108,5 +108,5 @@ public:
   TArray<float> DistanceMeasurement;
 
   UPROPERTY()
-  URStaticMeshComponent* ReferenceLink = nullptr;
+  UStaticMeshComponent* ReferenceLink = nullptr;
 };

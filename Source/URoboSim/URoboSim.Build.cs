@@ -20,6 +20,8 @@ public class URoboSim : ModuleRules
                             ,"MeshDescription",
                             "RenderCore",
                             "Json",
+                            "UWorldControl",
+                            "UROSControl",
                         }
 			);
 
@@ -33,6 +35,7 @@ public class URoboSim : ModuleRules
 				"URoboVision",
 				"UROSBridge",
                                 "XmlParser",
+                                "UTFPublisher",
                                 "UCheckpointSystem",
 			}
 			);

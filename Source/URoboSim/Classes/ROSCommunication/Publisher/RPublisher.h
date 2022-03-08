@@ -1,52 +1,57 @@
-
 #pragma once
 
-#include "ROSBridgeHandler.h"
+#include "ROSCommunication/RROSCommunication.h"
 #include "ROSBridgePublisher.h"
-#include "Physics/RModel.h"
-#include "Physics/RJoint.h"
-#include "Physics/RLink.h"
-#include "ROSCommunication/RROSClient.h"
-#include "Controller/RJointController.h"
-#include "Controller/RGripperController.h"
-#include "Controller/RHeadController.h"
-#include "Controller/RController.h"
-#include "Conversions.h"
+#include "RobotInterface.h"
+// clang-format off
 #include "RPublisher.generated.h"
+// clang-format on
 
-UCLASS(Blueprintable, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
-class UROBOSIM_API URPublisher : public UObject
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+class UROBOSIM_API URPublisherParameter : public UObject
 {
-    GENERATED_BODY()
+  GENERATED_BODY()
+
 public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
 
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
+};
 
-    URPublisher();
-    virtual void DeInit();
-    virtual void Publish(){};
+UCLASS()
+class UROBOSIM_API UPublisher : public UROSCommunication
+{
+  GENERATED_BODY()
 
-    // static URPublisher* Init(FString Type, FString RosTopic, UObject* Owner, TSharedPtr<FROSBridgeHandler> InHandler);
+};
 
-    virtual void Init(UObject* InOwner, TSharedPtr<FROSBridgeHandler> InHandler, FString InRosTopic);
-    virtual void Init(FString InHostIp, uint32 InPort, UObject* InOwner);
+UCLASS()
+class UROBOSIM_API URPublisher : public UPublisher, public IRobotInterface
+{
+  GENERATED_BODY()
 
-    TSharedPtr<FROSBridgePublisher> Publisher;
-	int Seq;
+public:
+  void Tick() override;
 
-    UPROPERTY()
-    FString ControllerName;
+public:
+  virtual void Publish() {}
+
+  virtual void SetPublishParameters(URPublisherParameter *&PublisherParameters);
+
 protected:
+  virtual void Init() override;
 
+  virtual void CreatePublisher();
 
-	UPROPERTY(EditAnywhere)
-    FString Topic;
+public:
+  UPROPERTY(EditAnywhere)
+  FString Topic;
 
-	UPROPERTY()
-    FString MessageType;
+protected:
+  UPROPERTY(VisibleAnywhere)
+  FString MessageType;
 
-        TSharedPtr<FROSBridgeHandler> Handler;
-
-	virtual void SetMessageType(){};
-	virtual void SetOwner(UObject* InOwner){};
-	virtual void CreatePublisher();
+  TSharedPtr<FROSBridgePublisher> Publisher;
 };

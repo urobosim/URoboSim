@@ -8,7 +8,7 @@
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
 #include "AssetRegistryModule.h"
-#include "ObjectMacros.h" // EObjectFlags
+#include "UObject/ObjectMacros.h" // EObjectFlags
 //#include "SDFParserBase.h"
 #include "SDFParserInterface.h"
 
@@ -58,12 +58,17 @@ private:
     // Parse <sdf> node
     virtual void ParseSDF() override;
 
+    //Get ROS package path
+    virtual FString GetROSPackagePath(const FString& InPackageName);
+    virtual void GetROSPackagePaths();
+
     // Parse <model> node
     virtual void ParseModel(const FXmlNode* InNode) override;
 
     // Parse <link> node
     virtual void ParseLink(const FXmlNode* InNode, USDFModel*& OutModel) override;
 
+    virtual void ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel) ;
     // Parse <link> <inertial> node
 //    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
@@ -131,6 +136,7 @@ private:
 
 ////    // Flag if parser is loaded
 //    bool bSDFLoaded;
+    TMap<FString,FString> ROSPackagePaths;
 
 ////    // Pointer to the generated data asset
     USDFDataAsset* DataAsset;

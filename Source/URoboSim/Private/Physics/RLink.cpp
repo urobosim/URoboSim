@@ -10,23 +10,12 @@ URLink::URLink()
 {
 }
 
-void URLink::SetPose(FTransform InPose)
-{
-	Pose = InPose;
-}
-
-void URLink::SetPose(FVector InLocation, FQuat InRotation)
-{
-	Pose.SetLocation(InLocation);
-	Pose.SetRotation(InRotation);
-}
-
 void URLink::AddJoint(URJoint* InJoint)
 {
 	Joints.Add(InJoint);
 }
 
-URStaticMeshComponent* URLink::GetVisual()
+UStaticMeshComponent* URLink::GetVisual()
 {
 	if(Visuals.Num()>0)
 	{
@@ -68,7 +57,7 @@ void URLink::EnableCollision()
     }
 }
 
-URStaticMeshComponent* URLink::GetCollision()
+UStaticMeshComponent* URLink::GetCollision()
 {
         if(Collisions.Num()>0)
 	{
@@ -80,7 +69,7 @@ URStaticMeshComponent* URLink::GetCollision()
 	}
 }
 
-URStaticMeshComponent* URLink::GetCollision(FString InCollisionName, bool bExactMatch)
+UStaticMeshComponent* URLink::GetCollision(FString InCollisionName, bool bExactMatch)
 {
       if(bExactMatch)
         {
@@ -123,12 +112,4 @@ TArray<class URJoint*> URLink::GetJoints()
 float URLink::GetNumCollisions()
 {
 	return Collisions.Num();
-}
-
-void URLink::UpdateVelocity(float InDeltaTime)
-{
-  for(URJoint* Joint : Joints)
-    {
-      Joint->UpdateVelocity(InDeltaTime);
-    }
 }

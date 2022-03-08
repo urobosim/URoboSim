@@ -508,16 +508,13 @@ FTransform ISDFParserInterface::PoseContentToFTransform(const FString& InPoseDat
 
   if (ArrSize == 6)
     {
-      // roll [3], pitch [4], yaw [5] --> pitch [4], yaw [5], roll [3]
-      const FRotator Rot(FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[4]) < 0 ? FCString::Atof(*PoseDataArray[4]) + 2*PI : FCString::Atof(*PoseDataArray[4])),	// pitch
-                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[5])< 0 ? FCString::Atof(*PoseDataArray[5]) + 2*PI : FCString::Atof(*PoseDataArray[5])),		// yaw
-                         FMath::RadiansToDegrees(FCString::Atof(*PoseDataArray[3])< 0 ? FCString::Atof(*PoseDataArray[3]) + 2*PI : FCString::Atof(*PoseDataArray[3])));		// roll
+      const FRotator Rot(FConversions::ROSToU(FCString::Atof(*PoseDataArray[3]) , FCString::Atof(*PoseDataArray[4]), FCString::Atof(*PoseDataArray[5])));		// roll
 
       const FVector Loc = FVector(FCString::Atof(*PoseDataArray[0]),
                                   FCString::Atof(*PoseDataArray[1]),
                                   FCString::Atof(*PoseDataArray[2]));
 
-      const FTransform Trans = FConversions::ROSToU(FTransform(Rot, Loc));
+      const FTransform Trans = FTransform(Rot, FConversions::ROSToU(Loc));
 
       return Trans;
     }

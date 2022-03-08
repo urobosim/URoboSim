@@ -2,12 +2,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "RStaticMeshComponent.h"
+#include "Physics/RStaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Engine/StaticMeshActor.h"
 #include "Components/BoxComponent.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
+
+class URTFPublisher;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URGraspComponent : public USphereComponent
@@ -17,8 +19,8 @@ class UROBOSIM_API URGraspComponent : public USphereComponent
 public:
 	URGraspComponent();
 
-	virtual void Init(URStaticMeshComponent* InGripper1, URStaticMeshComponent* InGripper2);
-	virtual void Init(URStaticMeshComponent* InGripper);
+	virtual void Init(UStaticMeshComponent* InGripper1, UStaticMeshComponent* InGripper2);
+	virtual void Init(UStaticMeshComponent* InGripper);
 	// virtual void Init();
 
 	virtual void BeginPlay() override;
@@ -38,19 +40,24 @@ public:
 	AStaticMeshActor* FixatedObject;
 
 	UPROPERTY()
+	AActor* ObjectToPublish;
+
+	UPROPERTY()
 	bool bObjectGrasped;
 
 
 protected:
+        UPROPERTY()
+          URTFPublisher* TFPublisher;
 
 	UPROPERTY(EditAnywhere)
 	float GraspRadius = 10.f;
 
 	UPROPERTY()
-	URStaticMeshComponent* Gripper;
+	UStaticMeshComponent* Gripper;
 
 	UPROPERTY()
-	URStaticMeshComponent* Gripper2;
+	UStaticMeshComponent* Gripper2;
 
         UPROPERTY(EditAnywhere)
           UPhysicsConstraintComponent* Constraint;

@@ -1,6 +1,6 @@
 #pragma once
 #include "ROSBridgeSrv.h"
-#include "Pose.h"
+// #include "Pose.h"
 
 class UROBOSIM_API FROSMoveObjectSrv : public FROSBridgeSrv
 {

@@ -1,69 +1,81 @@
 #include "ROSCommunication/Publisher/JointStatePublisher.h"
-#include "sensor_msgs/JointState.h"
 #include "Physics/RJoint.h"
+#include "sensor_msgs/JointState.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogRJointStatePublisher, Log, All);
 
 URJointStatePublisher::URJointStatePublisher()
 {
   Topic = TEXT("/joint_states");
-  JointParamTopic = TEXT("/hardware_interface/joints");
-}
-
-void URJointStatePublisher::SetMessageType()
-{
   MessageType = TEXT("sensor_msgs/JointState");
+  JointParamTopic = TEXT("/hardware_interface/joints");
+  FrameId = TEXT("odom");
 }
 
-void URJointStatePublisher::SetOwner(UObject* InOwner)
+void URJointStatePublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
 {
-  Owner = Cast<ARModel>(InOwner);
-  ConfigClient = NewObject<URJointStateConfigurationClient>(this);
-  ConfigClient->JointParamTopic = JointParamTopic;
-  ConfigClient->URROSClient::Init(InOwner, &ListJointName, Handler);
+  if (URJointStatePublisherParameter *JointStatePublisherParameter = Cast<URJointStatePublisherParameter>(PublisherParameters))
+  {
+    Super::SetPublishParameters(PublisherParameters);
+    JointParamTopic = JointStatePublisherParameter->JointParamTopic;
+  }
 }
 
-void URJointStatePublisher::CreatePublisher()
+void URJointStatePublisher::Init()
 {
-  Super::CreatePublisher();
+  Super::Init();
+  if (GetOwner())
+  {
+    ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
+    ConfigClient->JointParamTopic = JointParamTopic;
+    ConfigClient->Connect(Handler);
+    ConfigClient->GetJointNames([this](const TArray<FString> &JointNames){ ListJointName = JointNames; });
+  }
 }
 
 void URJointStatePublisher::Publish()
 {
-  ListJointPosition.Empty();
-  ListJointPosition.Reserve(ListJointName.Num());
-  ListJointVelocity.Empty();
-  ListJointVelocity.Reserve(ListJointName.Num());
-  ListJointEffort.Empty();
-  ListJointEffort.Reserve(ListJointName.Num());
+  if (GetOwner())
+  {
+    static int Seq = 0;
+    ListJointPosition.Empty();
+    ListJointPosition.Reserve(ListJointName.Num());
+    ListJointVelocity.Empty();
+    ListJointVelocity.Reserve(ListJointName.Num());
+    ListJointEffort.Empty();
+    ListJointEffort.Reserve(ListJointName.Num());
 
-  for (auto &JointName : ListJointName)
+    for (const FString &JointName : ListJointName)
     {
-      if(Owner->Joints.Contains(JointName))
-        {
-          URJoint* Joint = Owner->Joints[JointName];
-          float JointPosition = Joint->GetEncoderValue();
-          float JointVelocity = Joint->GetJointVelocity();
+      URJoint *Joint = GetOwner()->GetJoint(JointName);
+      if (Joint)
+      {
+        float JointPosition = Joint->GetEncoderValue();
+        float JointVelocity = Joint->GetJointVelocity();
 
-          ListJointPosition.Add(JointPosition);
-          ListJointVelocity.Add(0.0);
-          ListJointEffort.Add(0.0);
-        }
+        ListJointPosition.Add(JointPosition);
+        ListJointVelocity.Add(JointVelocity);
+        ListJointEffort.Add(0.0);
+      }
       else
-        {
-          UE_LOG(LogTemp, Log, TEXT("Joint not in robot: %s"), *JointName);
-        }
+      {
+        UE_LOG(LogRJointStatePublisher, Log, TEXT("Joint not in robot: %s"), *JointName);
+      }
     }
 
-  TSharedPtr<sensor_msgs::JointState> JointState =
-    MakeShareable(new sensor_msgs::JointState());
-  JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), TEXT("0")));
-  JointState->SetName(ListJointName);
-  JointState->SetPosition(ListJointPosition);
-  JointState->SetVelocity(ListJointVelocity);
-  JointState->SetEffort(ListJointEffort);
+    TSharedPtr<sensor_msgs::JointState> JointState =
+        MakeShareable(new sensor_msgs::JointState());
+    JointState->SetHeader(std_msgs::Header(Seq, FROSTime(), FrameId));
+    JointState->SetName(ListJointName);
+    JointState->SetPosition(ListJointPosition);
+    JointState->SetVelocity(ListJointVelocity);
+    JointState->SetEffort(ListJointEffort);
 
-  Handler->PublishMsg(Topic, JointState);
+    Handler->PublishMsg(Topic, JointState);
 
-  Handler->Process();
-  Seq++;
-  // UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
+    Handler->Process();
+
+    Seq++;
+    // UE_LOG(LogTemp, Log, TEXT("JointState = %s"), *JointState->ToString());
+  }
 }

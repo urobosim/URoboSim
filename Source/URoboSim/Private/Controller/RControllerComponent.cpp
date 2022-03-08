@@ -1,60 +1,46 @@
 #include "Controller/RControllerComponent.h"
 
+DEFINE_LOG_CATEGORY_STATIC(LogRControllerComponent, Log, All);
+
 URControllerComponent::URControllerComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
-	PrimaryComponentTick.TickGroup = TG_PrePhysics;
+  PrimaryComponentTick.bCanEverTick = true;
+  PrimaryComponentTick.TickGroup = TG_PrePhysics;
 }
 
-URControllerComponent::~URControllerComponent()
+void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+  for (URController *&Controller : Controllers)
+  {
+    Controller->Tick(DeltaTime);
+  }
 }
 
-FString URControllerComponent::GetPluginName()
+void URControllerComponent::Init()
 {
-  return TEXT("ControllerComponent");
-}
-
-void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-  float realtimeSeconds = FPlatformTime::Seconds();
-  Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-  for(auto& C : Controller.ControllerList)
+  if (ARModel *Owner = Cast<ARModel>(GetOwner()))
+  {
+    for (URController *&Controller : Controllers)
     {
-      C.Value->Tick(DeltaTime);
+      Controller->Init();
     }
-}
-void URControllerComponent::BeginPlay()
-{
-  Super::BeginPlay();
-
-  if(!GetOwner())
-    {
-      UE_LOG(LogTemp, Error, TEXT("Owner is no RModel."));
-    }
+  }
   else
-    {
-      for(auto& C : Controller.ControllerList)
-        {
-          C.Value->SetOwner(GetOwner());
-          C.Value->Init();
-        }
-    }
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("Owner of %s is not ARModel"), *GetName())
+  }
 }
 
-void URControllerComponent::SetJointVelocities(TArray<FString> InJointNames, TArray<float> InJointVelocities)
+URController *URControllerComponent::GetController(const FString &ControllerName) const
 {
-  for(int i = 0; i < InJointNames.Num();i++)
-    {
-      GetOwner()->Joints[InJointNames[i]]->SetJointVelocity(InJointVelocities[i]);
-    }
-}
-
-URController* URControllerComponent::ControllerList(FString ControllerName)
-{
-  if(Controller.ControllerList.Contains(ControllerName))
-    {
-      return Controller.ControllerList[ControllerName];
-    }
-  return nullptr;
+  URController *const *ControllerPtr = Controllers.FindByPredicate([&](URController *Controller){ return Controller->GetName().Contains(ControllerName); });
+  if (ControllerPtr)
+  {
+    return *ControllerPtr;
+  }
+  else
+  {
+    UE_LOG(LogRControllerComponent, Error, TEXT("%s of %s not found"), *ControllerName, *GetName())
+    return nullptr;
+  }
 }
