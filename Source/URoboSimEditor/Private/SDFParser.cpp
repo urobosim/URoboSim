@@ -471,7 +471,6 @@ FString FSDFParser::GetMeshAbsolutePath(const FString& Uri)
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("MeshPath %s"), *(PackagePath + MeshRelativePath));
       return PackagePath + MeshRelativePath;
     }
 }
@@ -536,7 +535,7 @@ void FSDFParser::GetROSPackagePaths()
             }
           else
             {
-              UE_LOG(LogTemp, Error, TEXT("ROS default path %s"), *Path);
+              UE_LOG(LogTemp, Log, TEXT("ROS default path %s"), *Path);
               ROSPackagePaths.Add(TEXT("ROS"), Path + TEXT("/"));
             }
         }

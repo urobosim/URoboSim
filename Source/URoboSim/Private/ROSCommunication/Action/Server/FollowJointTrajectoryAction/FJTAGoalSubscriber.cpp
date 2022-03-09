@@ -59,12 +59,12 @@ void FRFJTAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
     double ActionTimeDiff = ActionStart.GetTimeAsDouble() - FROSTime::Now().GetTimeAsDouble();
     if(ActionTimeDiff <= 0.0f)
       {
-        UE_LOG(LogTemp, Error, TEXT("Start Trajectory Instantly"));
+        UE_LOG(LogTemp, Log, TEXT("Start Trajectory Instantly"));
         JointTrajectoryController->FollowJointTrajectory(ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
       }
     else
       {
-        UE_LOG(LogTemp, Error, TEXT("Start Trajectory Delayed %f"), ActionTimeDiff);
+        UE_LOG(LogTemp, Log, TEXT("Start Trajectory Delayed %f"), ActionTimeDiff);
         FTimerHandle MyTimerHandle;
         FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::CreateUObject( JointTrajectoryController,  &URJointTrajectoryController::FollowJointTrajectory, ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
         // FTimerDelegate StartTrajectoryDelegate = FTimerDelegate::BindUFunction( JointTrajectoryController,  FName("FollowJointTrajectory"), ActionStart.GetTimeAsDouble(), GoalStatusInfo, Trajectory);
@@ -78,5 +78,4 @@ void FRFJTAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
   {
     UE_LOG(LogRFJTAGoalSubscriber, Error, TEXT("JointController not found"))
   }
-  UE_LOG(LogRFJTAGoalSubscriber, Error, TEXT("GoalReceivedFinished"))
 }

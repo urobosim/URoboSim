@@ -42,7 +42,6 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
               //TODO fix name of spawned model
               SpawnInfo.Name = FName(*Model->Name);
-              UE_LOG(LogTemp, Error, TEXT("Create Model %s"), *SpawnInfo.Name.ToString());
 
               // Creates RRobot Actor.
 

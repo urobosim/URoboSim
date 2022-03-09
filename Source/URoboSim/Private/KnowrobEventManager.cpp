@@ -42,7 +42,7 @@ void UCollisionEventManager::Callback(AActor* SelfActor, AActor* OtherActor, FVe
       if(UGameplayStatics::GetTimeSeconds(SelfActor) - LastCallback >= RepitionDelay)
         {
           LastCallback = UGameplayStatics::GetTimeSeconds(SelfActor);
-          UE_LOG(LogTemp, Error, TEXT("Knowrobo callback"));
+          UE_LOG(LogTemp, Log, TEXT("Knowrobo callback"));
 
           FString Query = TEXT("get_time(Now),tell([is_event(E),has_type(E,failure:'PlacementFailure'),is_diagnosis(D), has_type(D, failure:'CollisionWithMovableObject'),has_participant(E, soma:'")
             + SelfActor->GetName() + TEXT("') ,has_participant(E, soma:'") + OtherActor->GetName() +

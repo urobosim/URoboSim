@@ -52,7 +52,6 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
   FVector Direction;
   if (GetOwner())
   {
-  UE_LOG(LogRHeadTrajectoryController, Error, TEXT("CalculateNewViewDirection"));
     FTransform ReferenceLinkTransform;
     if (!FrameId.Equals(TEXT("map")))
     {
@@ -91,7 +90,6 @@ FVector URHeadTrajectoryController::CalculateNewViewDirection()
 
 void URPR2HeadTrajectoryController::UpdateHeadDirection()
 {
-  UE_LOG(LogRHeadTrajectoryController, Error, TEXT("UpdateHeadDirection"));
   if (PointingFrame.Equals("high_def_frame"))
   {
     PointingFrame = TEXT("head_tilt_link");
@@ -105,7 +103,6 @@ void URPR2HeadTrajectoryController::CheckPointHeadState()
 {
   if (GetOwner())
   {
-    UE_LOG(LogTemp, Error, TEXT("CheckPointHeadState"));
     URJoint *AzimuthJoint = GetOwner()->Joints.FindRef("head_pan_joint");
     URJoint *ElevationJoint = GetOwner()->Joints.FindRef("head_tilt_joint");
 
@@ -131,7 +128,6 @@ void URPR2HeadTrajectoryController::MoveToNewPosition(FVector InNewDirection)
 {
   if (GetOwner())
   {
-    UE_LOG(LogTemp, Error, TEXT("MoveToNewPosition"));
     TArray<UStaticMeshComponent *> ActorComponents;
     GetOwner()->GetComponents(ActorComponents);
     UStaticMeshComponent *PointingLink = nullptr;

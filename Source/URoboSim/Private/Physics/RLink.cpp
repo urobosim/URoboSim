@@ -32,7 +32,7 @@ void URLink::DisableCollision()
   for(auto& Collision : Collisions)
     {
 
-      UE_LOG(LogTemp, Error, TEXT("disable collision for %s"), *Collision->GetName());
+      UE_LOG(LogTemp, Log, TEXT("disable collision for %s"), *Collision->GetName());
       Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
       // Collision->SetCollisionProfileName(FName(TEXT("Spectator")));
       // Collision->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);

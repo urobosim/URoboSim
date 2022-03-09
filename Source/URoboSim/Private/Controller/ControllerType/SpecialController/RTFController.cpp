@@ -96,7 +96,6 @@ void URTFController::SetLinkPose(UStaticMeshComponent *InChildLink, UStaticMeshC
   FQuat NewRotation = ParentTransform.GetRotation() * InPose.GetRotation();
 
   FTransform NewTransform = FTransform(NewRotation, NewLocation, FVector(1.0f, 1.0f, 1.0f));
-  UE_LOG(LogTemp, Error, TEXT("ChildName %s NewTransform %s"), *InChildLink->GetName(), *NewTransform.ToString());
   InChildLink->SetWorldTransform(NewTransform, false, nullptr, ETeleportType::TeleportPhysics);
 }
 

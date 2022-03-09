@@ -173,7 +173,6 @@ void URGripperController::Tick(const float &InDeltaTime)
 
     if (GraspComponent->bObjectGrasped && (OldPosition - Position < -0.12))
     {
-      UE_LOG(LogTemp, Error, TEXT("Release: OldPosition %f NewPosition %f"), OldPosition, Position);
       Release();
       RightFinger->bActuate = true;
       LeftFinger->bActuate = true;
@@ -216,7 +215,6 @@ void URGripperController::Tick(const float &InDeltaTime)
       LeftJointValue = LeftFinger->GetEncoderValue();
 
       OldPosition = GripperPosition;
-      UE_LOG(LogTemp, Error, TEXT("Grasp: OldPosition %f NewPosition %f"), OldPosition, Position);
       Grasp();
     }
     else
@@ -224,7 +222,6 @@ void URGripperController::Tick(const float &InDeltaTime)
       RightFinger->bActuate = true;
       LeftFinger->bActuate = true;
       OldPosition = GripperPosition;
-      UE_LOG(LogTemp, Error, TEXT("GripperError %f"), Error);
       // OldPosition = GripperPosition;
       // UE_LOG(LogTemp, Error, TEXT("Release"));
       // Release();

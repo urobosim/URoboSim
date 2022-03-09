@@ -35,10 +35,8 @@ AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, c
 
       for (auto &Actor : WorldActors)
       {
-        UE_LOG(LogTemp, Error, TEXT("Found Model %s"), *Actor->GetName());
         if (Actor->GetName().Contains(ROSCommunicationDataAsset->RobotName))
         {
-          UE_LOG(LogTemp, Error, TEXT("Robot found"));
           ARModel *Robot = Cast<ARModel>(Actor);
           URROSCommunicationBuilder *ROSCommunicationBuilder = NewObject<URROSCommunicationBuilder>();
           ROSCommunicationBuilder->Init(Robot, ROSCommunicationDataAsset->ROSCommunicationConfiguration);
