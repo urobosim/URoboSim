@@ -40,6 +40,6 @@ void URPR2GCAResultPublisher::Publish()
 
     Seq++;
     GripperController->bPublishResult = false;
-    UE_LOG(LogRPR2GCAResultPublisher, Error, TEXT("Publish Result Gripper Action"));
+    UE_LOG(LogRPR2GCAResultPublisher, Log, TEXT("Publish Result Gripper Action"));
   }
 }

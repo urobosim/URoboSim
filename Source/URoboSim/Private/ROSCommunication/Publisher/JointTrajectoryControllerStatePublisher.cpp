@@ -28,7 +28,7 @@ void URJointTrajectoryControllerStatePublisher::Init()
     JointTrajectoryController = Cast<URJointTrajectoryController>(GetOwner()->GetController(JointTrajectoryControllerName));
     if (JointTrajectoryController)
     {
-      UE_LOG(LogTemp, Error, TEXT("Configure JointControllerStatePublisher publisher"));
+      UE_LOG(LogTemp, Log, TEXT("Configure JointControllerStatePublisher publisher"));
       ConfigClient = NewObject<URJointStateConfigurationClient>(GetOwner());
       ConfigClient->JointParamTopic = JointParamTopic;
       ConfigClient->Connect(Handler);

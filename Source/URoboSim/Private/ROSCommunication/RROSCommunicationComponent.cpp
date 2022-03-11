@@ -35,7 +35,7 @@ void FRROSCommunicationContainer::Init(UObject* InOwner)
             }
           else
             {
-              UE_LOG(LogRROSCommunicationComponent, Log, TEXT("Wrong GameInstance"));
+              UE_LOG(LogRROSCommunicationComponent, Error, TEXT("Wrong GameInstance"));
             }
 
         }

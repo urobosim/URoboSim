@@ -66,7 +66,7 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FSetEnvironmentJointStatesServerCallback:
             if(JointActor)
               {
                 float Error= FMath::Abs(JointStates[i] - JointActor->CurrentJointPos);
-                UE_LOG(LogTemp, Error, TEXT("ServiceDuration %f ErrorPer %f toll %f"), ServiceDuration, Error, ErrorTollerance);
+                UE_LOG(LogTemp, Log, TEXT("ServiceDuration %f ErrorPer %f toll %f"), ServiceDuration, Error, ErrorTollerance);
 
                 if(Error <= ErrorTollerance)
                   {

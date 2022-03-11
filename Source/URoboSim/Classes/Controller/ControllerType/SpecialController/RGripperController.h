@@ -49,22 +49,11 @@ public:
   FGraspComponentSetting GraspCompSetting;
 
   UPROPERTY(EditAnywhere)
-  FString RightJointName;
-
-  UPROPERTY(EditAnywhere)
-  FString LeftJointName;
-
-  UPROPERTY(EditAnywhere)
-  FString RightFingerTipName;
-
-  UPROPERTY(EditAnywhere)
-  FString LeftFingerTipName;
+  FString GripperJointName;
 
   UPROPERTY(EditAnywhere)
   FEnableDrive EnableDrive;
 
-  UPROPERTY(EditAnywhere)
-  bool bDisableCollision;
 };
 
 UCLASS()
@@ -106,43 +95,17 @@ public:
 
   bool bStalled;
 
-  UPROPERTY(EditAnywhere)
-  bool bUseMultipleConstraints = true;
-
-  UPROPERTY(EditAnywhere)
-  float GripperSpeedFactor = 0.03;
-
   float PoseOffsetFromJoints = 0;
 
   FGraspResult Result;
 
   UPROPERTY(EditAnywhere)
-  FString RightJointName;
+  FString GripperJointName;
 
-  UPROPERTY(EditAnywhere)
-  FString LeftJointName;
-
-  UPROPERTY(EditAnywhere)
-  FString RightFingerTipName;
-
-  UPROPERTY(EditAnywhere)
-  FString LeftFingerTipName;
-
-  URJoint *RightFinger;
-
-  URJoint *LeftFinger;
-
-  URJoint *RightFingerTip;
-
-  URJoint *LeftFingerTip;
-
-  UPROPERTY(EditAnywhere)
-  bool bDisableCollision;
+  URJoint *GripperJoint;
 
   UPROPERTY(EditAnywhere)
   FEnableDrive EnableDrive;
-protected:
-  virtual void SetGripperCollision(bool InCollisionEnabled);
 
 protected:
   bool bSuccessGrasp = false;

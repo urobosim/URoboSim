@@ -72,7 +72,7 @@ void FRGripperCommandSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
   {
     TSharedPtr<iai_wsg_50_msgs::PositionCmd> GripperPosition = StaticCastSharedPtr<iai_wsg_50_msgs::PositionCmd>(Msg);
     float Pos = GripperPosition->GetPos();
-    UE_LOG(LogRGripperCommandSubscriber, Warning, TEXT("Pos :%f"), Pos)
+    UE_LOG(LogRGripperCommandSubscriber, Log, TEXT("Pos :%f"), Pos)
     if (JointController->DesiredJointStates.Contains(GripperJointLeftName))
     {
       JointController->DesiredJointStates[GripperJointLeftName].JointPosition = -Pos/2000.;

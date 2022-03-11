@@ -125,7 +125,7 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
         }
       else
         {
-          UE_LOG(LogTemp, Error, TEXT("ConstraintActor %s iter %d"),*ConstrainedActor->GetName(), NumIter);
+          UE_LOG(LogTemp, Log, TEXT("ConstraintActor %s iter %d"),*ConstrainedActor->GetName(), NumIter);
           bParentFound = true;
         }
     }

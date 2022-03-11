@@ -20,7 +20,7 @@ void URPR2HAResultPublisher::Publish()
   if (HeadController->bPublishResult)
   {
     static int Seq = 0;
-    UE_LOG(LogRPR2HAResultPublisher, Error, TEXT("Publish Result HeadAction"));
+    UE_LOG(LogRPR2HAResultPublisher, Log, TEXT("Publish Result HeadAction"));
     TSharedPtr<pr2_controllers_msgs::PR2PointHeadActionResult> ActionResult =
         MakeShareable(new pr2_controllers_msgs::PR2PointHeadActionResult());
 

@@ -78,7 +78,7 @@ namespace json_prolog_msgs
                     TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
                     // Object->SetObjectField(TEXT("mode"), Mode.ToJsonObject());
-                    UE_LOG(LogTemp, Error, TEXT("Query %s"), *Query);
+                    UE_LOG(LogTemp, Log, TEXT("Query %s"), *Query);
                     Object->SetStringField(TEXT("query"), Query);
                     Object->SetStringField(TEXT("id"), Id);
                     return Object;
@@ -125,7 +125,7 @@ namespace json_prolog_msgs
                 }
               else
                 {
-                  UE_LOG(LogTemp, Error, TEXT("Message: %s"), *Message);
+                  UE_LOG(LogTemp, Log, TEXT("Message: %s"), *Message);
                 }
             }
 

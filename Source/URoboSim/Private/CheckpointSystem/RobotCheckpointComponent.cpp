@@ -12,7 +12,6 @@ URobotCheckpointComponent::URobotCheckpointComponent()
 
 void URobotCheckpointComponent::BeginPlay()
 {
-  UE_LOG(LogTemp, Error, TEXT("%s BeginPlay"), *GetName());
   FString Name = GetName();
   CheckpointHandler = NewObject<URobotCheckpointHandler>(this, FName(*(Name + TEXT("_CheckpointHandler"))));
 

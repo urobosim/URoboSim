@@ -91,7 +91,6 @@ void URJointController::SetJointNames(const TArray<FString> &JointNames, const F
     {
       DesiredJointStates.Add(JointName, FJointState());
       GetOwner()->GetJoint(JointName)->SetDrive(InEnableDrive);
-      UE_LOG(LogRJointController, Error, TEXT("Enable Drive for %s"), *JointName)
     }
   }
 }

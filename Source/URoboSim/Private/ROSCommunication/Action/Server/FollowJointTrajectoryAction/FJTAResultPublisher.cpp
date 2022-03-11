@@ -19,7 +19,7 @@ void URFJTAResultPublisher::Init()
     JointTrajectoryController->ActionFinished.AddDynamic(this, &URFJTAResultPublisher::PublishResult);
     if( JointTrajectoryController->ActionFinished.IsBound() )
       {
-        UE_LOG(LogTemp, Error, TEXT("Result is bound"));
+        UE_LOG(LogTemp, Log, TEXT("Result is bound"));
       }
   }
 }
@@ -27,12 +27,10 @@ void URFJTAResultPublisher::Init()
 void URFJTAResultPublisher::PublishResult(FGoalStatusInfo InStatusInfo)
 {
   // if(Owner->bPublishResult)
-  UE_LOG(LogTemp, Error, TEXT("Enter publish result"));
   if (GetOwner() && JointTrajectoryController)
   {
     static int Seq = 0;
 
-    UE_LOG(LogTemp, Error, TEXT("Publish Result FollowJointTrajectory"));
     TSharedPtr<control_msgs::FollowJointTrajectoryActionResult> ActionResult =
         MakeShareable(new control_msgs::FollowJointTrajectoryActionResult());
 
@@ -51,7 +49,6 @@ void URFJTAResultPublisher::PublishResult(FGoalStatusInfo InStatusInfo)
     Seq++;
 
     // Owner->GoalStatusList.RemoveSingle(Status);
-    UE_LOG(LogTemp, Error, TEXT("Publish finished"));
 
     // while(IndexArray.Num() != 0)
     //   {

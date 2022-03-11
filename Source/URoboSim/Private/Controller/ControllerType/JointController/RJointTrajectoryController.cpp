@@ -101,14 +101,6 @@ bool URJointTrajectoryController::CheckTrajectoryGoalReached()
     SwitchToNormal();
 
     GoalStatusList.Last().Status = 3;
-    if( ActionFinished.IsBound() )
-      {
-        UE_LOG(LogTemp, Error, TEXT("JointTrjac Result is bound"));
-      }
-    else
-      {
-        UE_LOG(LogTemp, Error, TEXT("JointTrjac Result not bound"));
-      }
 
     ActionFinished.Broadcast(GoalStatusList.Last());
 
@@ -197,7 +189,6 @@ void URJointTrajectoryController::Tick(const float &InDeltaTime)
 
 void URJointTrajectoryController::FollowJointTrajectory(double InActionStartTime, FGoalStatusInfo InGoalInfo, TArray<FTrajectoryPoints> InTrajectory)
 {
-  UE_LOG(LogRJointTrajectoryController, Error, TEXT("FollowTrajectory"));
   Reset();
   SwitchToFollowJointTrajectory();
   for (const TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
