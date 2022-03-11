@@ -43,7 +43,7 @@ public:
 
   void AddLink(URLink *Link);
 
-  bool AddPlugin(URPluginComponent *InPlugin); 
+  bool AddPlugin(URPluginComponent *InPlugin);
 
   URPluginComponent *GetPlugin(const FString &PluginName) const;
 
@@ -56,6 +56,7 @@ public:
   UPROPERTY(EditAnywhere)
   TMap<FString, URLink *> Links;
 
+  UPROPERTY(VisibleAnywhere)
   URLink *BaseLink;
 
   UPROPERTY(VisibleAnywhere)
