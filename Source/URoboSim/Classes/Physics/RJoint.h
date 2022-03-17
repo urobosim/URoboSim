@@ -77,6 +77,8 @@ public:
 	virtual void SetJointEffortFromROS(float Effort);
   virtual void SetDrive(const FEnableDrive &EnableDrive);
 
+  virtual void Break();
+
     UPROPERTY(EditAnywhere)
     URConstraintComponent* Constraint;
 

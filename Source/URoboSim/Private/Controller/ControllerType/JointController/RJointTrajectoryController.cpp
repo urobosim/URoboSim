@@ -100,6 +100,13 @@ bool URJointTrajectoryController::CheckTrajectoryGoalReached()
     // State = UJointControllerState::Normal;
     SwitchToNormal();
 
+
+    for (TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
+      {
+      FJointState &JointState = DesiredJointState.Value;
+      JointState.JointVelocity = 0;
+      }
+
     GoalStatusList.Last().Status = 3;
 
     ActionFinished.Broadcast(GoalStatusList.Last());

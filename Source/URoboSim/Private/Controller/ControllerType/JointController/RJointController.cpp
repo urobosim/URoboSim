@@ -145,6 +145,16 @@ void URJointController::MoveJointsDynamic()
     const FString JointName = DesiredJointState.Key;
     if (URJoint *Joint = GetOwner()->GetJoint(JointName))
     {
+
+      float Error = DesiredJointState.Value.JointPosition - Joint->GetJointState().JointPosition;
+      // if(FMath::Abs(Error) <= ErrorTolerance)
+        // {
+          // Joint->Break();
+        // }
+      // if(JointName.Equals("r_shoulder_pan_joint"))
+        // {
+          // UE_LOG(LogRJointController, Error, TEXT("Error perc %f"), Error);
+        // }
       if (!DesiredJointStates.Contains(JointName))
       {
         Joint->SetDrive(EnableDrive);
