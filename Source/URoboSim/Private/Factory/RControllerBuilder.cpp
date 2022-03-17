@@ -32,7 +32,7 @@ void URControllerBuilder::Build()
   for (ARModel *&Model : Models)
   {
     URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
-    
+
     for (TPair<FString, URControllerParameter *> ControllerParameters : ControllerConfiguration.ControllerParameters)
     {
       UE_LOG(LogRControllerBuilder, Log, TEXT("Create %s of %s"), *ControllerParameters.Key, *Model->GetName());
@@ -49,6 +49,10 @@ URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPa
   if (Cast<URGripperControllerParameter>(ControllerParameters.Value))
   {
     return NewObject<URGripperController>(InOwner, *ControllerParameters.Key);
+  }
+  else if (Cast<URGripperControllerBaseParameter>(ControllerParameters.Value))
+  {
+    return NewObject<URGripperControllerBase>(InOwner, *ControllerParameters.Key);
   }
   else if (Cast<URHeadTrajectoryControllerParameter>(ControllerParameters.Value))
   {

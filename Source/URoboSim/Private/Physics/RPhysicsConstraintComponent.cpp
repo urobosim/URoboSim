@@ -156,18 +156,34 @@ void URContinuousConstraintComponent::BeginPlay()
 void URPrismaticConstraintComponent::BeginPlay()
 {
   Super::BeginPlay();
-  FTransform A1Transform = GetBodyTransform(EConstraintFrame::Frame1);
-  A1Transform.RemoveScaling();
+  // FTransform A1Transform = GetBodyTransform(EConstraintFrame::Frame1);
+  // A1Transform.RemoveScaling();
 
-  FTransform A2Transform = GetBodyTransform(EConstraintFrame::Frame2);
-  A2Transform.RemoveScaling();
+
+
 
   FQuat JointQuat = GetComponentTransform().GetRotation();
-  FVector FramePos = A1Transform.GetRotation().RotateVector(A2Transform.GetLocation() - A1Transform.GetLocation() + JointQuat.RotateVector(Offset));
-  // FVector FramePos = ParentChildDistance + Offset;
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
-  SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
+  // FVector FramePos = A1Transform.GetRotation().RotateVector(A2Transform.GetLocation() - A1Transform.GetLocation() + JointQuat.RotateVector(Offset));
 
+
+  FTransform A1Transform = Parent->GetComponentTransform();
+  FTransform CTransform = GetComponentTransform();
+  FTransform Temp = FTransform(JointQuat.RotateVector(Offset));
+
+  FTransform TempFramePos = CTransform.GetRelativeTransform(A1Transform);
+  FTransform FramePos =  Temp * TempFramePos ;
+
+  SetConstraintReferenceFrame(EConstraintFrame::Type::Frame1, FramePos);
+
+  if(GetName().Contains(TEXT("left_gripper_base_gripper_left_joint_constraint")))
+    {
+      UE_LOG(LogTemp, Error, TEXT("A1Transform %s"), *A1Transform.ToString());
+      UE_LOG(LogTemp, Error, TEXT("Temp %s"), *Temp.ToString());
+      UE_LOG(LogTemp, Error, TEXT("TempFramePos %s"), *TempFramePos.ToString());
+      UE_LOG(LogTemp, Error, TEXT("FramePos %s"), *FramePos.ToString());
+    }
+  // SetConstraintReferencePosition(EConstraintFrame::Type::Frame1, FramePos);
+  // SetConstraintReferencePosition(EConstraintFrame::Type::Frame2, FVector(0.0, 0.0, 0.0));
 }
 
 

@@ -2,11 +2,10 @@
 
 void URGripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
+  Super::SetControllerParameters(ControllerParameters);
   URGripperControllerParameter *GripperControllerParameters = Cast<URGripperControllerParameter>(ControllerParameters);
   if (GripperControllerParameters)
   {
-    GripperJointName = GripperControllerParameters->GripperJointName;
-    GraspCompSetting = GripperControllerParameters->GraspCompSetting;
     EnableDrive = GripperControllerParameters->EnableDrive;
   }
 }
@@ -21,21 +20,7 @@ void URGripperController::Init()
   }
   else
   {
-    TArray<URGraspComponent *> TempGraspComponents;
-    GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
-
-    GripperJoint = GetOwner()->Joints.FindRef(GripperJointName);
-
-    if (!GripperJoint)
-    {
-      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
-      return;
-    }
-
     PoseOffsetFromJoints = GripperJoint->GetJointPositionInUUnits();
-
-    UE_LOG(LogTemp, Error, TEXT("Offset %f"), PoseOffsetFromJoints);
-    JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
 
     if (!JointController)
     {
@@ -47,16 +32,10 @@ void URGripperController::Init()
     JointNames.Add(GripperJointName);
     JointController->SetJointNames(JointNames, EnableDrive);
 
-    for (auto &GraspComp : TempGraspComponents)
+    if (!GripperJoint)
     {
-      if (GraspComp->GetName().Equals(GraspComponentName))
-      {
-        GraspComponent = GraspComp;
-        URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
-        GraspComponent->AttachToComponent(ReferenceLink->GetCollision(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-        GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-        GraspComponent->Init(ReferenceLink->GetCollision());
-      }
+      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
+      return;
     }
     JointValue = GripperJoint->GetJointPosition();
   }
@@ -138,21 +117,4 @@ void URGripperController::Tick(const float &InDeltaTime)
 URGripperController::URGripperController()
 {
   GripperJointName = TEXT("?_gripper_joint");
-}
-
-bool URGripperController::Grasp()
-{
-  if (GraspComponent)
-  {
-    return GraspComponent->TryToFixate();
-  }
-  return false;
-}
-
-void URGripperController::Release()
-{
-  if (GraspComponent)
-  {
-    GraspComponent->TryToDetach();
-  }
 }
