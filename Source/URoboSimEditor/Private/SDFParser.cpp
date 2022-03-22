@@ -227,7 +227,7 @@ void FSDFParser::ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel)
                  *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
           continue;
         }
-      OutModel->Plugins.Add(NewPlugin);
+      OutModel->Plugins.AddUnique(NewPlugin);
     }
 
 }
