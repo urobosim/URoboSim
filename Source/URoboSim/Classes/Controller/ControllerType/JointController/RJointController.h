@@ -83,6 +83,8 @@ protected:
   UPROPERTY(EditAnywhere)
   UJointControllerMode Mode;
 
+  UPROPERTY(EditAnywhere)
+    float ErrorTolerance = 0.1;
 protected:
   void MoveJoints(const float &InDeltaTime);
 

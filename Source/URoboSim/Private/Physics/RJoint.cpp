@@ -28,6 +28,16 @@ bool URJoint::IsTickable() const
   return (!IsTemplate(RF_ClassDefaultObject)) && !(GIsEditor && !GWorld->HasBegunPlay());
 }
 
+void URJoint::Break()
+{
+  Child->GetCollision()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
+  Child->GetCollision()->SetPhysicsAngularVelocity(FVector(0, 0, 0));
+  for(auto &ChildJoint : Child->GetJoints())
+    {
+      ChildJoint->Break();
+    }
+}
+
 TStatId URJoint::GetStatId() const
 {
   return TStatId();
