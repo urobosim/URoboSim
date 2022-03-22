@@ -93,8 +93,6 @@ protected:
 
   virtual bool CheckTrajectoryPoint();
 
-  float CalculateJointVelocity(float InDeltaTime, FString InJointName);
-
   void SetJointVelocities(float InDeltaTime);
 
   virtual bool SwitchToNormal();

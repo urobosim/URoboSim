@@ -33,15 +33,31 @@ void URJointController::Init()
   if (GetOwner())
   {
     SetMode();
-    if (bControllAllJoints)
-    {
-      TArray<FString> JointNames;
-      for (URJoint *&Joint : GetOwner()->GetJoints())
+
+    for (const TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
       {
-        JointNames.Add(Joint->GetName());
+        const FString JointName = DesiredJointState.Key;
+        if (URJoint *Joint = GetOwner()->GetJoint(JointName))
+          {
+            Joint->SetDrive(EnableDrive);
+            Joint->SetMotorJointState(DesiredJointStates.FindRef(JointName));
+          }
+        else
+          {
+            UE_LOG(LogRJointController, Error, TEXT("%s of %s not found"), *JointName, *GetOwner()->GetName());
+          }
       }
-      SetJointNames(JointNames);
-    }
+
+
+    if (bControllAllJoints)
+      {
+        TArray<FString> JointNames;
+        for (URJoint *&Joint : GetOwner()->GetJoints())
+          {
+            JointNames.Add(Joint->GetName());
+          }
+        SetJointNames(JointNames);
+      }
   }
   else
   {
@@ -133,23 +149,22 @@ void URJointController::MoveJoints(const float &InDeltaTime)
     break;
 
   case UJointControllerMode::Dynamic:
-    MoveJointsDynamic();
+    MoveJointsDynamic(InDeltaTime);
     break;
   }
 }
 
-void URJointController::MoveJointsDynamic()
+void URJointController::MoveJointsDynamic(const float &InDeltaTime)
 {
   for (const TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
   {
     const FString JointName = DesiredJointState.Key;
     if (URJoint *Joint = GetOwner()->GetJoint(JointName))
     {
-      if (!DesiredJointStates.Contains(JointName))
-      {
-        Joint->SetDrive(EnableDrive);
-      }
-      Joint->SetMotorJointState(DesiredJointStates.FindOrAdd(JointName));
+      FJointState TempJointState = DesiredJointStates.FindRef(JointName);
+      TempJointState.JointVelocity = CalculateJointVelocity(InDeltaTime, JointName);
+      Joint->SetMotorJointState(TempJointState);
+      // Joint->SetMotorJointState(DesiredJointStates.FindRef(JointName));
     }
     else
     {
@@ -165,11 +180,26 @@ void URJointController::MoveJointsKinematic()
     const FString JointName = DesiredJointState.Key;
     if (URJoint *Joint = GetOwner()->GetJoint(JointName))
     {
-      Joint->SetJointPosition(DesiredJointStates.FindOrAdd(JointName).JointPosition, nullptr);
+      Joint->SetJointPosition(DesiredJointStates.FindRef(JointName).JointPosition, nullptr);
     }
     else
     {
       UE_LOG(LogRJointController, Error, TEXT("%s of %s not found"), *JointName, *GetOwner()->GetName())
     }
   }
+}
+
+float URJointController::CalculateJointVelocity(float InDeltaTime, FString InJointName)
+{
+  float DesiredPos = DesiredJointStates[InJointName].JointPosition;
+  URJoint *Joint = GetOwner()->Joints[InJointName];
+  float CurrentJointPos = Joint->GetEncoderValue();
+  float Diff = DesiredPos - CurrentJointPos;
+
+  // float Vel = Diff / InDeltaTime;
+  float Vel = Diff ;
+
+  // UE_LOG(LogRJointController, Error, TEXT("%s: Diff %f Vel %f"), *InJointName, Diff, Vel);
+  return Vel;
+
 }

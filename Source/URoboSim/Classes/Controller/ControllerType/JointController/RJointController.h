@@ -86,7 +86,9 @@ protected:
 protected:
   void MoveJoints(const float &InDeltaTime);
 
-  virtual void MoveJointsDynamic();
+  virtual void MoveJointsDynamic(const float &InDeltaTime);
 
   virtual void MoveJointsKinematic();
+
+  float CalculateJointVelocity(float InDeltaTime, FString InJointName);
 };

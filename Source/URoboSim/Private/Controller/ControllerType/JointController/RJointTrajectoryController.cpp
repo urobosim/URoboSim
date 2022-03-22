@@ -60,9 +60,9 @@ void URJointTrajectoryController::UpdateDesiredJointAngle(float InDeltaTime)
       if (Trajectory[TrajectoryPointIndex].JointStates.Contains(JointName))
       {
         float DiffJointPosition = Trajectory[TrajectoryPointIndex].JointStates[JointName].JointPosition - OldTrajectoryPoints.JointStates[JointName].JointPosition;
-        float DiffJointVelocity = CalculateJointVelocity(InDeltaTime, JointName);
+        // float DiffJointVelocity = CalculateJointVelocity(InDeltaTime, JointName);
         JointState.JointPosition = DiffJointPosition / DiffTrajectoryTimeStep * (CurrentTimeStep - OldTimeStep) + OldTrajectoryPoints.JointStates[JointName].JointPosition;
-        JointState.JointVelocity = DiffJointVelocity;
+        // JointState.JointVelocity = DiffJointVelocity;
       }
     }
   }
@@ -115,40 +115,6 @@ bool URJointTrajectoryController::CheckTrajectoryGoalReached()
   }
 }
 
-float URJointTrajectoryController::CalculateJointVelocity(float InDeltaTime, FString InJointName)
-{
-  FString Velocity = "";
-
-  float DesiredPos = DesiredJointStates[InJointName].JointPosition;
-  URJoint *Joint = GetOwner()->Joints[InJointName];
-  float CurrentJointPos = Joint->GetEncoderValue();
-  float Diff = DesiredPos - CurrentJointPos;
-  // Diff = Joint->Constraint->CheckPositionRange(Diff);
-
-  // float Vel = Diff / InDeltaTime;
-  float Vel = Diff;
-  float VelSave = Vel;
-  return Vel;
-
-  // for(auto & Joint: GetOwner()->Joints)
-  //   {
-  //     if(DesiredJointState.Contains(Joint.Key))
-  //       {
-  //         Joint.Value->bActuate = true;
-  //         float DesiredPos = 0.0f;
-  //         DesiredPos = DesiredJointState[Joint.Key];
-
-  //         float CurrentJointPos = Joint.Value->GetEncoderValue();
-  //         float Diff = DesiredPos - CurrentJointPos;
-
-  //         Diff = Joint.Value->Constraint->CheckPositionRange(Diff);
-
-  //         float Vel = Diff / InDeltaTime;
-  //         float VelSave = Vel;
-  //         Joint.Value->SetJointVelocity(Vel);
-  //       }
-  //   }
-}
 
 void URJointTrajectoryController::SetDesiredJointState(FString JointName, float InJointState)
 {
