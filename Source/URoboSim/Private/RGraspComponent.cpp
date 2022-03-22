@@ -68,7 +68,6 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
       ObjectsInReach.Emplace(OtherSMA);
-      // UE_LOG(LogTemp, Warning, TEXT("InReach %s"), *OtherSMA->GetName());
     }
 }
 
@@ -95,6 +94,10 @@ bool URGraspComponent::TryToFixate()
 
       // Check if the actor is graspable
       FixateObject(SMA);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Warning, TEXT("%s: No Object to grasp"), *GetName());
     }
 
   //   {
@@ -125,7 +128,6 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
         }
       else
         {
-          UE_LOG(LogTemp, Log, TEXT("ConstraintActor %s iter %d"),*ConstrainedActor->GetName(), NumIter);
           bParentFound = true;
         }
     }
@@ -186,16 +188,6 @@ void URGraspComponent::TryToDetach()
   //   {
   //     Constraint->BreakConstraint();
   //   }
-  if(Gripper)
-    {
-      Constraint->BreakConstraint();
-    }
-
-  if(Gripper2)
-    {
-      Constraint2->BreakConstraint();
-    }
-
   // if(ObjectToPublish)
   //   {
   //     UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
@@ -205,6 +197,16 @@ void URGraspComponent::TryToDetach()
 
   if(FixatedObject)
   {
+
+    if(Gripper)
+      {
+        Constraint->BreakConstraint();
+      }
+
+    if(Gripper2)
+      {
+        Constraint2->BreakConstraint();
+      }
 
     FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
     FixatedObject = nullptr;
