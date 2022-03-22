@@ -38,6 +38,7 @@ void URGripperControllerBase::Init()
       return;
     }
 
+
     OldPosition = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 
     TArray<URGraspComponent *> TempGraspComponents;
@@ -66,32 +67,31 @@ void URGripperControllerBase::Tick(const float &InDeltaTime)
   }
   float JointPos = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 
-  if(JointPos < OldPosition)
+  if(FMath::Abs(JointPos - OldPosition) > 0.01)
     {
-      if(bInvertGraspCondition)
+      if(JointPos < OldPosition)
         {
-          UE_LOG(LogTemp, Error, TEXT("TryReleasing"));
-          Release();
+          if(bInvertGraspCondition)
+            {
+              Release();
+            }
+          else
+            {
+              Grasp();
+            }
         }
-      else
+      else if(JointPos > OldPosition)
         {
-          UE_LOG(LogTemp, Error, TEXT("TryGrasping"));
-          Grasp();
-        }
-    }
-  else if(JointPos > OldPosition)
-    {
-      if(bInvertGraspCondition)
-        {
-          UE_LOG(LogTemp, Error, TEXT("TryGrasping"));
-          Grasp();
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("TryReleasing"));
-          Release();
-        }
+          if(bInvertGraspCondition)
+            {
+              Grasp();
+            }
+          else
+            {
+              Release();
+            }
 
+        }
     }
   OldPosition = JointPos;
 }
@@ -107,6 +107,11 @@ bool URGripperControllerBase::Grasp()
   {
     return GraspComponent->TryToFixate();
   }
+  else
+    {
+
+      UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
+    }
   return false;
 }
 
@@ -116,4 +121,9 @@ void URGripperControllerBase::Release()
   {
     GraspComponent->TryToDetach();
   }
+  else
+    {
+
+      UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
+    }
 }
