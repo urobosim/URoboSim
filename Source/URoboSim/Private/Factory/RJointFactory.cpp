@@ -143,6 +143,7 @@ void URJointBuilder::RotateConstraintToRefAxis()
 float URJointBuilder::CalculateRotationOffset()
 {
   Joint->Constraint->RotationOffset = 0.5 * (JointDescription->Axis->Upper + JointDescription->Axis->Lower);
+
   if (JointDescription->Axis->Xyz[0] == 1 || JointDescription->Axis->Xyz[0] == -1)
     {
       Joint->Constraint->RotationOffset *= -1;
@@ -200,7 +201,7 @@ void URRevoluteJointBuilder::SetAxis()
   else if (Joint->Constraint->RefAxis[1] == 1)
     {
       Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(AngularConstraintMotion, FMath::RadiansToDegrees(Joint->Constraint->Limit));
-      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Pitch = FMath::RadiansToDegrees(Joint->Constraint->RotationOffset);
+      Joint->Constraint->ConstraintInstance.AngularRotationOffset.Pitch = FMath::RadiansToDegrees(-Joint->Constraint->RotationOffset);
     }
   // else if (JointDescription->Axis->Xyz[2] == 1)
   // {
