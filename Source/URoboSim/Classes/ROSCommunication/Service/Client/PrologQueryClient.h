@@ -64,7 +64,7 @@ public:
   void Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse) override;
 
 private:
-  uint Mode;
+  uint32 Mode;
   FString Query;
   FString Id;
 };

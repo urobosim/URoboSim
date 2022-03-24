@@ -70,12 +70,13 @@ public:
         virtual float ClampJointStateToConstraintLimit(float InJointState){return Constraint->ClampJointStateToConstraintLimit(InJointState);};
 
   void SetMotorJointState(const FJointState &JointState);
-	virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
-	virtual void SetJointVelocity(float Velocity);
-	virtual void SetJointVelocityInUUnits(float Velocity);
-	virtual void SetJointEffort(float Effort);
-	virtual void SetJointEffortFromROS(float Effort);
+  virtual void SetJointPosition(float Angle, FHitResult * OutSweepHitResult);
+  virtual void SetJointVelocity(float Velocity);
+  virtual void SetJointVelocityInUUnits(float Velocity);
+  virtual void SetJointEffort(float Effort);
+  virtual void SetJointEffortFromROS(float Effort);
   virtual void SetDrive(const FEnableDrive &EnableDrive);
+  virtual void SetSimulatePhysics(bool bEnablePhysics);
 
   virtual void Break();
 
@@ -93,7 +94,7 @@ public:
       float MaxJointVel = -1;
 
     UPROPERTY(EditAnywhere)
-     bool bHasMimic = false;
+     bool bIsMimic = false;
 
     UPROPERTY(EditAnywhere)
       TArray<FMimicJointParameter> MimicJointList;

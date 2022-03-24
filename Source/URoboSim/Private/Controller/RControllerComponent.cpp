@@ -10,6 +10,8 @@ URControllerComponent::URControllerComponent()
 
 void URControllerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
 {
+
+
   for (URController *&Controller : Controllers)
   {
     Controller->Tick(DeltaTime);
@@ -20,6 +22,12 @@ void URControllerComponent::Init()
 {
   if (ARModel *Owner = Cast<ARModel>(GetOwner()))
   {
+
+    Controllers.Sort([](URController& A, URController& B) {
+                            return A.GetInitPriority() > B.GetInitPriority();
+                          });
+
+
     for (URController *&Controller : Controllers)
     {
       Controller->Init();

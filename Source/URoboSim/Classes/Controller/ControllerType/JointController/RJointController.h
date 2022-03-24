@@ -13,6 +13,22 @@ enum class UJointControllerMode : uint8
   Kinematic
 };
 
+USTRUCT()
+struct FConfigOverwrite
+{
+  GENERATED_BODY()
+  public:
+
+
+  FConfigOverwrite();
+  FConfigOverwrite(const UJointControllerMode& InMode, const FEnableDrive& InEnableDrive);
+
+  UJointControllerMode Mode;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
+};
+
 UCLASS()
 class UROBOSIM_API URJointControllerParameter : public URControllerParameter
 {
@@ -60,9 +76,17 @@ public:
 
   void SetJointNames(const TArray<FString> &JointNames);
   void SetJointNames(const TArray<FString> &JointNames, const FEnableDrive &InEnableDrive);
+
+  void AddConfigOverwrite(const FString& InJointName, const FConfigOverwrite& InConfigOverwrite);
+
+  const UJointControllerMode GetMode();
+
 public:
   UPROPERTY(EditAnywhere)
   TMap<FString, FJointState> DesiredJointStates;
+
+  UPROPERTY(EditAnywhere)
+  TMap<FString, FConfigOverwrite> ConfigOverwrite;
 
 protected:
   UPROPERTY(EditAnywhere)
@@ -76,6 +100,8 @@ protected:
 
 protected:
   void SetMode();
+  void SetPhysics();
+  void SetMode(const UJointControllerMode& InMode);
 
   void SetTargetJointState();
 
@@ -85,12 +111,15 @@ protected:
 
   UPROPERTY(EditAnywhere)
     float ErrorTolerance = 0.1;
+
+  UPROPERTY()
+  bool bEnablePhysics = true;
 protected:
   void MoveJoints(const float &InDeltaTime);
 
-  virtual void MoveJointsDynamic(const float &InDeltaTime);
+  virtual void MoveJointDynamic(const float &InDeltaTime, const FString &InJointName);
 
-  virtual void MoveJointsKinematic();
+  virtual void MoveJointKinematic(const FString &InJointName);
 
   float CalculateJointVelocity(float InDeltaTime, FString InJointName);
 };

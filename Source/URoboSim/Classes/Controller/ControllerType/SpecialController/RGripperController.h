@@ -13,9 +13,6 @@ class UROBOSIM_API URGripperControllerParameter : public URGripperControllerBase
   GENERATED_BODY()
 
 public:
-  UPROPERTY(EditAnywhere)
-  FEnableDrive EnableDrive;
-
 };
 
 USTRUCT()
@@ -68,9 +65,6 @@ public:
   float PoseOffsetFromJoints = 0;
 
   FGraspResult Result;
-
-  UPROPERTY(EditAnywhere)
-  FEnableDrive EnableDrive;
 
 protected:
   bool bSuccessGrasp = false;
