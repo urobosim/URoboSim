@@ -16,13 +16,14 @@ public class URoboSim : ModuleRules
         PublicDependencyModuleNames.AddRange(
 			new string[]
                         {
-                            "Core"
-                            ,"MeshDescription",
+                            "Core",
+							"MeshDescription",
                             "RenderCore",
                             "Json",
                             "UWorldControl",
                             "UROSControl",
-                        }
+							"XmlParser",
+						}
 			);
 
 
@@ -34,9 +35,9 @@ public class URoboSim : ModuleRules
 				"UConversions",
 				"URoboVision",
 				"UROSBridge",
-                                "XmlParser",
-                                "UTFPublisher",
-                                "UCheckpointSystem",
+				"XmlParser",
+				"UTFPublisher",
+				"UCheckpointSystem",
 			}
 			);
 

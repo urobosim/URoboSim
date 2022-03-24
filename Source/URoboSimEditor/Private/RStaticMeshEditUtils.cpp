@@ -97,9 +97,9 @@ UStaticMesh* RStaticMeshUtils::LoadMesh(UStaticMeshComponent* InOwner, UStaticMe
 
 void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHullCount, int32 InMaxHullVerts, uint32 InHullPrecision)
 {
-	if(OutMesh && OutMesh->RenderData)
+	if(OutMesh && OutMesh->GetRenderData())
 	{
-		FStaticMeshLODResources& LODModel = OutMesh->RenderData->LODResources[0];
+		FStaticMeshLODResources& LODModel = OutMesh->GetRenderData()->LODResources[0];
 
 		int32 NumVerts = LODModel.VertexBuffers.StaticMeshVertexBuffer.GetNumVertices();
 		TArray<FVector> Verts;
@@ -130,7 +130,7 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 		FlushRenderingCommands();
 
 		// Get the BodySetup we are going to put the collision into
-		UBodySetup* bs = OutMesh->BodySetup;
+		UBodySetup* bs = OutMesh->GetBodySetup();
 		if(bs)
 		{
 			bs->RemoveSimpleCollision();
@@ -139,7 +139,7 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 		{
 			// Otherwise, create one here.
 			OutMesh->CreateBodySetup();
-			bs = OutMesh->BodySetup;
+			bs = OutMesh->GetBodySetup();
 		}
 
 
@@ -467,7 +467,7 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
           StaticMesh = NewObject<UStaticMesh>(Package, MeshName, RF_Public | RF_Standalone);
           StaticMesh->InitResources();
 
-          StaticMesh->LightingGuid = FGuid::NewGuid();
+          StaticMesh->SetLightingGuid(FGuid::NewGuid());
 
           // Add source to new StaticMesh
           FStaticMeshSourceModel& SrcModel = StaticMesh->AddSourceModel();
@@ -493,7 +493,8 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
             {
               // UMaterialInterface* Material = Kvp.Key;
               UMaterialInterface* Material = Kvp;
-              StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+              //StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+              StaticMesh->GetStaticMaterials().Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
             }
 
           //Set the Imported version before calling the build
