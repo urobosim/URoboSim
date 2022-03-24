@@ -27,7 +27,11 @@ public:
 
   virtual void Init();
 
-  URController(){ControllerName = GetName();};
+  URController()
+    {
+      ControllerName = GetName();
+      SetOwner();
+    };
 
 public:
   ARModel *GetOwner() const { return Owner; }
@@ -54,6 +58,8 @@ public:
   UPROPERTY(VisibleAnywhere)
     FString ControllerName;
 
+  const uint32 GetInitPriority();
+
 protected:
   virtual void CancelAction();
 
@@ -62,6 +68,12 @@ protected:
 
   double ActionDuration;
 
+
+  UPROPERTY(VisibleAnywhere)
+    uint32 InitPriority = 1;
 private:
+
+  UPROPERTY()
   ARModel *Owner;
+
 };

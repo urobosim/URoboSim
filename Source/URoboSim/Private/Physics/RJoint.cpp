@@ -61,6 +61,15 @@ void URJoint::UpdateEncoder()
   Constraint->UpdateEncoderValue(GetJointPosition());
 }
 
+void URJoint::SetSimulatePhysics(bool bEnablePhysics)
+{
+  Child->GetCollision()->SetSimulatePhysics(bEnablePhysics);
+  for(auto& MimicJoint : MimicJointList)
+    {
+      MimicJoint.MimicJoint->SetSimulatePhysics(bEnablePhysics);
+    }
+}
+
 void URJoint::SetDrive(const FEnableDrive &EnableDrive)
 {
   Constraint->SetDrive(EnableDrive);

@@ -141,11 +141,11 @@ void URModelBuilder::SetupPlugins()
           URJoint* MimicJoint = Model->Joints[Plugin->MimicJoint];
           if(MimicJoint)
             {
+              MimicJoint->bIsMimic = true;
               FMimicJointParameter MimicJointParameter;
               MimicJointParameter.MimicJoint = MimicJoint;
               MimicJointParameter.Multiplier = Plugin->Multiplier;
               Joint->MimicJointList.Add(MimicJointParameter);
-              Joint->bHasMimic = true;
             }
           else
             {

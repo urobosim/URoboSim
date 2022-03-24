@@ -3,11 +3,6 @@
 void URGripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
   Super::SetControllerParameters(ControllerParameters);
-  URGripperControllerParameter *GripperControllerParameters = Cast<URGripperControllerParameter>(ControllerParameters);
-  if (GripperControllerParameters)
-  {
-    EnableDrive = GripperControllerParameters->EnableDrive;
-  }
 }
 
 void URGripperController::Init()

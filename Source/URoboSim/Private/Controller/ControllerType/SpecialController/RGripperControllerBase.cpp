@@ -8,6 +8,9 @@ void URGripperControllerBase::SetControllerParameters(URControllerParameter *&Co
     GripperJointName = GripperControllerParameters->GripperJointName;
     GraspCompSetting = GripperControllerParameters->GraspCompSetting;
     GraspComponentName = GripperControllerParameters->GraspComponentName;
+    EnableDrive = GripperControllerParameters->EnableDrive;
+    Mode = GripperControllerParameters->Mode;
+    bOverwriteConfig = GripperControllerParameters->bOverwriteConfig;
   }
 }
 
@@ -38,6 +41,15 @@ void URGripperControllerBase::Init()
       return;
     }
 
+    if(bOverwriteConfig)
+      {
+
+        JointController->AddConfigOverwrite(GripperJoint->GetName(), FConfigOverwrite(Mode, EnableDrive));
+
+        TArray<FString> JointNames;
+        JointNames.Add(GripperJointName);
+        JointController->SetJointNames(JointNames, EnableDrive);
+      }
 
     OldPosition = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 

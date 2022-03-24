@@ -33,6 +33,15 @@ public:
 
   UPROPERTY(EditAnywhere)
   FGraspComponentSetting GraspCompSetting;
+
+  UPROPERTY(EditAnywhere)
+  UJointControllerMode Mode;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
+
+  UPROPERTY(EditAnywhere)
+    bool bOverwriteConfig = true;
 };
 
 UCLASS()
@@ -69,6 +78,16 @@ public:
 
   UPROPERTY(EditAnywhere)
     bool bInvertGraspCondition = false;
+
+  UPROPERTY(EditAnywhere)
+  UJointControllerMode Mode;
+
+  UPROPERTY(EditAnywhere)
+    bool bOverwriteConfig = true;
+
+  UPROPERTY(EditAnywhere)
+  FEnableDrive EnableDrive;
+
 protected:
   URJointController *JointController;
 
