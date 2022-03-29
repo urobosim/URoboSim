@@ -109,5 +109,5 @@ protected:
 
   float ActionStartTime;
 
-  uint32 TrajectoryPointIndex;
+  int32 TrajectoryPointIndex;
 };

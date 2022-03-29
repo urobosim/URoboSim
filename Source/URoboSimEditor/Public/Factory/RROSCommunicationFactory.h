@@ -23,7 +23,8 @@ private:
 	virtual AActor *GetDefaultActor(const FAssetData &AssetData) override;
 
 	/** Spawns the robot */
-	virtual AActor *SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags ObjectFlags, const FName Name) override;
+	//virtual AActor *SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags ObjectFlags, const FName Name) override;
+	virtual AActor* SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams) override;
 
 	bool bDrag;
 };

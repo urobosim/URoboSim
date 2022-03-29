@@ -33,7 +33,8 @@ private:
     virtual AActor* GetDefaultActor(const FAssetData& AssetData) override;
 
     /** Spawns the robot */
-    virtual AActor* SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform& Transform, EObjectFlags ObjectFlags, const FName Name) override;
+    //virtual AActor* SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform& Transform, EObjectFlags ObjectFlags, const FName Name) override;
+    virtual AActor* SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams) override;
 
     /** Subclasses may implement this to modify the actor after it has been spawned
         IMPORTANT: If you override this, you should usually also override PostCreateBlueprint()! */

@@ -6,6 +6,54 @@
 #include "XmlFile.h"
 #include "Conversions.h"
 
+
+// Load sdf from path
+bool ISDFParserInterface::LoadSDF(const FString& InFilename)
+{
+    // todo rm make pure
+    return false;
+}
+
+USDFDataAsset* ISDFParserInterface::ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags)
+{
+    // todo rm make pure
+    return nullptr;
+}
+
+void ISDFParserInterface::ParseSDF()
+{
+    // todo rm make pure
+}
+
+// Parse <model> node
+void ISDFParserInterface::ParseModel(const FXmlNode* InNode)
+{
+    // todo rm make pure
+}
+
+// Parse <link> node
+void ISDFParserInterface::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
+{
+    // todo rm make pure
+}
+
+void ISDFParserInterface::ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink)
+{
+    // todo rm make pure
+}
+
+// Parse <collision> node
+void ISDFParserInterface::ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink)
+{
+    // todo rm make pure
+}
+
+// Parse <geometry> <mesh> node
+void ISDFParserInterface::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
+{
+    // todo rm make pure
+}
+
 // Clear parser
 void ISDFParserInterface::Clear()
 {
