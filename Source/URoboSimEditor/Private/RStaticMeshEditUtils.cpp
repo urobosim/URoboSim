@@ -97,67 +97,84 @@ UStaticMesh* RStaticMeshUtils::LoadMesh(UStaticMeshComponent* InOwner, UStaticMe
 
 void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHullCount, int32 InMaxHullVerts, uint32 InHullPrecision)
 {
-	if(OutMesh && OutMesh->GetRenderData())
-	{
-		FStaticMeshLODResources& LODModel = OutMesh->GetRenderData()->LODResources[0];
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+  if(OutMesh && OutMesh->RenderData)
+    {
+      FStaticMeshLODResources& LODModel = OutMesh->RenderData->LODResources[0];
 
-		int32 NumVerts = LODModel.VertexBuffers.StaticMeshVertexBuffer.GetNumVertices();
-		TArray<FVector> Verts;
+#else
 
-		for(int32 i=0; i<NumVerts; i++)
-		{
-			FVector Vert = LODModel.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
-			Verts.Add(Vert);
-		}
+  if(OutMesh && OutMesh->GetRenderData())
+    {
+      FStaticMeshLODResources& LODModel = OutMesh->GetRenderData()->LODResources[0];
+#endif //Version
 
-		// Grab all indices
-		TArray<uint32> AllIndices;
-		LODModel.IndexBuffer.GetCopy(AllIndices);
+      int32 NumVerts = LODModel.VertexBuffers.StaticMeshVertexBuffer.GetNumVertices();
+      TArray<FVector> Verts;
 
-		// Only copy indices that have collision enabled
-		TArray<uint32> CollidingIndices;
-		for(const FStaticMeshSection& Section : LODModel.Sections)
-		{
-			if(Section.bEnableCollision)
-			{
-				for (uint32 IndexIdx = Section.FirstIndex; IndexIdx < Section.FirstIndex + (Section.NumTriangles * 3); IndexIdx++)
-				{
-					CollidingIndices.Add(AllIndices[IndexIdx]);
-				}
-			}
-		}
+      for(int32 i=0; i<NumVerts; i++)
+        {
+          FVector Vert = LODModel.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
+          Verts.Add(Vert);
+        }
 
-		FlushRenderingCommands();
+      // Grab all indices
+      TArray<uint32> AllIndices;
+      LODModel.IndexBuffer.GetCopy(AllIndices);
 
-		// Get the BodySetup we are going to put the collision into
-		UBodySetup* bs = OutMesh->GetBodySetup();
-		if(bs)
-		{
-			bs->RemoveSimpleCollision();
-		}
-		else
-		{
-			// Otherwise, create one here.
-			OutMesh->CreateBodySetup();
-			bs = OutMesh->GetBodySetup();
-		}
+      // Only copy indices that have collision enabled
+      TArray<uint32> CollidingIndices;
+      for(const FStaticMeshSection& Section : LODModel.Sections)
+        {
+          if(Section.bEnableCollision)
+            {
+              for (uint32 IndexIdx = Section.FirstIndex; IndexIdx < Section.FirstIndex + (Section.NumTriangles * 3); IndexIdx++)
+                {
+                  CollidingIndices.Add(AllIndices[IndexIdx]);
+                }
+            }
+        }
+
+      FlushRenderingCommands();
+
+      // Get the BodySetup we are going to put the collision into
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+      UBodySetup* bs = OutMesh->BodySetup;
+#else
+      UBodySetup* bs = OutMesh->GetBodySetup();
+#endif //Version
+      if(bs)
+        {
+          bs->RemoveSimpleCollision();
+        }
+      else
+        {
+          // Otherwise, create one here.
+          OutMesh->CreateBodySetup();
+
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+          bs = OutMesh->BodySetup;
+#else
+          bs = OutMesh->GetBodySetup();
+#endif //Version
+        }
 
 
-		if(Verts.Num() >= 3 && CollidingIndices.Num() >= 3)
-		{
-			DecomposeMeshToHulls(bs, Verts, CollidingIndices, InHullCount, InMaxHullVerts, InHullPrecision);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("To few Verts or CollidingIndices!"));
-		}
+      if(Verts.Num() >= 3 && CollidingIndices.Num() >= 3)
+        {
+          DecomposeMeshToHulls(bs, Verts, CollidingIndices, InHullCount, InMaxHullVerts, InHullPrecision);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("To few Verts or CollidingIndices!"));
+        }
 
 
-		// refresh collision change back to staticmesh components
-		RefreshCollisionChange(*OutMesh);
+      // refresh collision change back to staticmesh components
+      RefreshCollisionChange(*OutMesh);
 
-		OutMesh->MarkPackageDirty();
-		OutMesh->bCustomizedCollision = true;	//mark the static mesh for collision customization
+      OutMesh->MarkPackageDirty();
+      OutMesh->bCustomizedCollision = true;	//mark the static mesh for collision customization
 	}
 	else
 	{
@@ -467,7 +484,11 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
           StaticMesh = NewObject<UStaticMesh>(Package, MeshName, RF_Public | RF_Standalone);
           StaticMesh->InitResources();
 
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+          StaticMesh->LightingGuid = FGuid::NewGuid();
+#else
           StaticMesh->SetLightingGuid(FGuid::NewGuid());
+#endif //Version
 
           // Add source to new StaticMesh
           FStaticMeshSourceModel& SrcModel = StaticMesh->AddSourceModel();
@@ -493,8 +514,12 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
             {
               // UMaterialInterface* Material = Kvp.Key;
               UMaterialInterface* Material = Kvp;
-              //StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+              StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+#else
               StaticMesh->GetStaticMaterials().Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
+#endif //Version
             }
 
           //Set the Imported version before calling the build

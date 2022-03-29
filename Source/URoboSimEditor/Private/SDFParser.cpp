@@ -509,8 +509,11 @@ UStaticMesh* FSDFParser::CreateMesh(ESDFType InType, ESDFGeometryType InShape, F
   FString PackageName = GeneratePackageName(MeshName);
 
 
-  //UPackage* Pkg = CreatePackage(NULL, *PackageName);
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+  UPackage* Pkg = CreatePackage(NULL, *PackageName);
+#else
   UPackage* Pkg = CreatePackage(*PackageName);
+#endif //Version
   UStaticMesh* Mesh = RStaticMeshUtils::CreateStaticMesh(Pkg, PackageName, InShape, InParameters);
   CreateCollisionForMesh(Mesh, InShape);
   return Mesh;
@@ -591,8 +594,11 @@ UStaticMesh* FSDFParser::ImportMesh(const FString& Uri, ESDFType Type)
   bool bOperationCancelled = false;
 
   FString PackageName = GeneratePackageName(MeshName);
-  //UPackage* Pkg = CreatePackage(NULL, *PackageName);
+#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+  UPackage* Pkg = CreatePackage(NULL, *PackageName);
+#else
   UPackage* Pkg = CreatePackage(*PackageName);
+#endif //Version
   UObject* MeshObj = FbxFactory->ImportObject(
                                               UStaticMesh::StaticClass(), Pkg, MeshName, RF_Transactional | RF_Standalone | RF_Public, MeshAbsolutePath, nullptr, bOperationCancelled);
 
