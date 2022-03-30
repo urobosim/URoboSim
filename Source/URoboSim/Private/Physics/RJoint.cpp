@@ -31,7 +31,7 @@ bool URJoint::IsTickable() const
 void URJoint::Break()
 {
   Child->GetCollision()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
-  Child->GetCollision()->SetPhysicsAngularVelocity(FVector(0, 0, 0));
+  Child->GetCollision()->SetPhysicsAngularVelocityInDegrees(FVector(0, 0, 0));
   for(auto &ChildJoint : Child->GetJoints())
     {
       ChildJoint->Break();
@@ -47,6 +47,7 @@ void URJoint::Tick(float DeltaTime)
 {
   if(Constraint)
     {
+      UpdateVelocity(DeltaTime);
       UpdateEncoder();
     }
 }
@@ -59,6 +60,12 @@ float URJoint::GetEncoderValue()
 void URJoint::UpdateEncoder()
 {
   Constraint->UpdateEncoderValue(GetJointPosition());
+}
+
+void URJoint::UpdateVelocity(float InDeltaTime)
+{
+  JointVelocity = (GetJointPosition() - OldJointValue) / InDeltaTime;
+  OldJointValue = GetJointPosition();
 }
 
 void URJoint::SetSimulatePhysics(bool bEnablePhysics)
@@ -128,7 +135,8 @@ float URJoint::GetJointPositionInUUnits()
 
 float URJoint::GetJointVelocity()
 {
-	return Constraint->GetJointVelocity();
+	// return Constraint->GetJointVelocity();
+	return JointVelocity;
 }
 
 void URJoint::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)

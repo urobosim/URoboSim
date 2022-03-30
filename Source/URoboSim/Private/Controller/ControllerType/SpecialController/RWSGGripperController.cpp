@@ -13,6 +13,7 @@ void URWSGGripperController::SetControllerParameters(URControllerParameter *&Con
 void URWSGGripperController::Tick(const float &InDeltaTime)
 {
   Super::Tick(InDeltaTime);
+
   if(bTimoutActive)
     {
       Timer += InDeltaTime;
@@ -25,7 +26,7 @@ void URWSGGripperController::Tick(const float &InDeltaTime)
             }
           if (JointController->DesiredJointStates.Contains(GripperFingerJointName))
             {
-              JointController->DesiredJointStates[GripperFingerJointName].JointPosition = GripperFingerJoint->GetJointPosition();
+              JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -GripperJoint->GetJointPosition()/2;
             }
           bTimoutActive = false;
           Timer = 0;
@@ -36,6 +37,7 @@ void URWSGGripperController::Tick(const float &InDeltaTime)
 void URWSGGripperController::Init()
 {
   Super::Init();
+
 
   if (!GetOwner())
   {
@@ -51,10 +53,19 @@ void URWSGGripperController::Init()
       return;
     }
 
-    TArray<FString> JointNames;
-    JointNames.Add(GripperJointName);
-    JointNames.Add(GripperFingerJointName);
-    JointController->SetJointNames(JointNames, EnableDrive);
+    if (!JointController)
+    {
+      UE_LOG(LogTemp, Error, TEXT("%s: JointController not found"), *GetName());
+      return;
+    }
+
+    if(bOverwriteConfig)
+      {
+        JointController->AddConfigOverwrite(GripperFingerJoint->GetName(), FConfigOverwrite(Mode, EnableDrive));
+        TArray<FString> JointNames;
+        JointNames.Add(GripperFingerJointName);
+        JointController->SetJointNames(JointNames, EnableDrive);
+      }
   }
 }
 

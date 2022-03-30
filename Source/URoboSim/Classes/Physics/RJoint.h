@@ -102,4 +102,11 @@ public:
  protected:
 
     virtual void UpdateEncoder();
+    virtual void UpdateVelocity(float InDeltaTime);
+
+    UPROPERTY()
+      float OldJointValue = 0;
+
+    UPROPERTY()
+      float JointVelocity = 0;
 };

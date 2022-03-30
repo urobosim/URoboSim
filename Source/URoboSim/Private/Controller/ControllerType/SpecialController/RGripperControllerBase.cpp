@@ -45,7 +45,6 @@ void URGripperControllerBase::Init()
       {
 
         JointController->AddConfigOverwrite(GripperJoint->GetName(), FConfigOverwrite(Mode, EnableDrive));
-
         TArray<FString> JointNames;
         JointNames.Add(GripperJointName);
         JointController->SetJointNames(JointNames, EnableDrive);
