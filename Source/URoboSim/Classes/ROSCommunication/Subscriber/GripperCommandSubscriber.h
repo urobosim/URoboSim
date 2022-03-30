@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/JointController/RJointController.h"
+#include "Controller/ControllerType/SpecialController/RWSGGripperController.h"
 #include "RSubscriber.h"
 // clang-format off
 #include "GripperCommandSubscriber.generated.h"
@@ -16,21 +16,21 @@ public:
   {
     Topic = TEXT("/goal_position");
     MessageType = TEXT("iai_wsg_50_msgs/PositionCmd");
-    JointControllerName = TEXT("JointController");
+    GripperControllerName = TEXT("?GripperController");
   }
 
 public:
   UPROPERTY(EditAnywhere)
-  FString JointControllerName;
+  FString GripperControllerName;
 
-  UPROPERTY(EditAnywhere)
-  FString GripperJointLeftName;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointLeftName;
 
-  UPROPERTY(EditAnywhere)
-  FString GripperJointRightName;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointRightName;
 
-  UPROPERTY(EditAnywhere)
-  TSoftObjectPtr<AActor> Object;
+  // UPROPERTY(EditAnywhere)
+  // TSoftObjectPtr<AActor> Object;
 };
 
 UCLASS()
@@ -49,33 +49,32 @@ protected:
 
 public:
   UPROPERTY(EditAnywhere)
-  FString JointControllerName;
+  FString GripperControllerName;
 
-  UPROPERTY(EditAnywhere)
-  FString GripperJointLeftName;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointLeftName;
 
-  UPROPERTY(EditAnywhere)
-  FString GripperJointRightName;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointRightName;
 
-  UPROPERTY(EditAnywhere)
-  TSoftObjectPtr<AActor> Object;
+  // UPROPERTY(EditAnywhere)
+  // TSoftObjectPtr<AActor> Object;
 };
 
 class UROBOSIM_API FRGripperCommandSubscriberCallback final : public FROSBridgeSubscriber
 {
 public:
-  FRGripperCommandSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController, FString InGripperJointLeftName, FString InGripperJointRightName, TSoftObjectPtr<AActor> Object);
+  FRGripperCommandSubscriberCallback(const FString &InTopic, const FString &InType, UObject *InController);
 
   TSharedPtr<FROSBridgeMsg> ParseMessage(TSharedPtr<FJsonObject> JsonObject) const override;
 
   void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
 
 private:
-  URJointController *JointController;
+  URWSGGripperController *GripperController;
 
-  FString GripperJointLeftName;
+  // FString GripperJointLeftName;
+  // FString GripperJointRightName;
 
-  FString GripperJointRightName;
-
-  TSoftObjectPtr<AActor> Object;
+  // TSoftObjectPtr<AActor> Object;
 };

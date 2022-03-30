@@ -74,6 +74,7 @@ public:
   UPROPERTY(EditAnywhere)
   FString GripperJointName;
 
+  UPROPERTY()
   URJoint *GripperJoint;
 
   UPROPERTY(EditAnywhere)
