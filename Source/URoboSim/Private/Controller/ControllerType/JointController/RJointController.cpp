@@ -107,11 +107,11 @@ void URJointController::SetMode()
         case UJointControllerMode::Dynamic:
           EnableDrive.bPositionDrive = true;
           EnableDrive.bVelocityDrive = true;
-          for (URLink *&Link : GetOwner()->GetLinks())
-            {
-              Link->GetCollision()->SetEnableGravity(false);
-            }
           break;
+        }
+      for (URLink *&Link : GetOwner()->GetLinks())
+        {
+          Link->GetCollision()->SetEnableGravity(false);
         }
   }
 }
@@ -122,7 +122,6 @@ void URJointController::SetPhysics()
     {
       if (bDisableCollision)
         {
-          // Joint->Child->GetCollision()->DisableCollision();
           Joint->Child->DisableCollision();
         }
       FConfigOverwrite* CO = ConfigOverwrite.Find(Joint->GetName());
@@ -147,11 +146,6 @@ void URJointController::SetPhysics()
           Joint->SetSimulatePhysics(bEnablePhysics);
         }
     }
-}
-
-void URJointController::SetMode(const UJointControllerMode& InMode)
-{
-
 }
 
 const UJointControllerMode URJointController::GetMode()

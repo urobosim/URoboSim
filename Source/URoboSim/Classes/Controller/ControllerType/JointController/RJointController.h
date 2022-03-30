@@ -101,7 +101,6 @@ protected:
 protected:
   void SetMode();
   void SetPhysics();
-  void SetMode(const UJointControllerMode& InMode);
 
   void SetTargetJointState();
 
