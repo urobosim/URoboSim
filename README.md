@@ -1,11 +1,36 @@
+![](Documentation/img/robot.png)
+
 # URoboSim
 
-### UE Version: **4.27**
-
-Unreal engine based robot simulator.
-
-Version using `SDF` for loading robots.
+* Unreal Engine 4 based robot simulator with ROS integration
+* UE Version: **4.27**
+* Version using [SDF](http://sdformat.org/) for loading robots.
 See `gzsdf` for converting `URDF` to `SDF`.
+
+## PR2 example: ##
+
+<p align="center">
+    <img src="Documentation/img/PR2.gif" width="600">
+</p>
+
+* drag and drop a compatible `urdf` in the content menu:
+
+<p align="center">
+    <img src="Documentation/img/drag-drop-urdf.png" width="600">
+</p>
+
+* drag and drop the the generated `urdf data asset` file in the world:
+
+<p align="center">
+    <img src="Documentation/img/drag-drop-robot.png" width="600">
+</p>
+
+* resulting generated robot model:
+
+<p align="center">
+    <img src="Documentation/img/robot-tree.png" width="600">
+</p>
+
 
 **Plugin Dependencies**
 
