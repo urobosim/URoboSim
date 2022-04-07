@@ -1,5 +1,10 @@
 #include "Controller/ControllerType/SpecialController/RWSGGripperController.h"
 
+URWSGGripperController::URWSGGripperController()
+{
+  GripperAction = EGripperAction::None;
+}
+
 void URWSGGripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
   Super::SetControllerParameters(ControllerParameters);
@@ -12,7 +17,11 @@ void URWSGGripperController::SetControllerParameters(URControllerParameter *&Con
 
 void URWSGGripperController::Tick(const float &InDeltaTime)
 {
-  Super::Tick(InDeltaTime);
+  if (!GripperJoint)
+  {
+    UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
+    return;
+  }
 
   if(bTimoutActive)
     {
@@ -28,8 +37,20 @@ void URWSGGripperController::Tick(const float &InDeltaTime)
             {
               JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -GripperJoint->GetJointPosition()/2;
             }
+
+          switch(GripperAction)
+            {
+            case EGripperAction::Grasp:
+              Grasp();
+              break;
+            case EGripperAction::Release:
+              Release();
+              break;
+            }
+
           bTimoutActive = false;
           Timer = 0;
+          GripperAction = EGripperAction::None;
         }
     }
 }
@@ -73,14 +94,43 @@ void URWSGGripperController::SetPose(const float& InPose)
 {
   if (JointController)
   {
+    Timer = 0;
     bTimoutActive = true;
+
+    float PoseInM = InPose/1000.;
     if (JointController->DesiredJointStates.Contains(GripperJointName))
     {
-      JointController->DesiredJointStates[GripperJointName].JointPosition = InPose/1000.;
-    }
-    if (JointController->DesiredJointStates.Contains(GripperFingerJointName))
-    {
-      JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -InPose/2000.;
+      OldPosition = JointController->DesiredJointStates[GripperJointName].JointPosition;
+
+      if(PoseInM < OldPosition)
+        {
+          if(bInvertGraspCondition)
+            {
+              GripperAction = EGripperAction::Release;
+            }
+          else
+            {
+              GripperAction = EGripperAction::Grasp;
+            }
+        }
+      else if(PoseInM > OldPosition)
+        {
+          if(bInvertGraspCondition)
+            {
+              GripperAction = EGripperAction::Grasp;
+            }
+          else
+            {
+              GripperAction = EGripperAction::Release;
+            }
+        }
+
+      JointController->DesiredJointStates[GripperJointName].JointPosition = InPose;
+
+      if (JointController->DesiredJointStates.Contains(GripperFingerJointName))
+        {
+          JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -InPose/2.;
+        }
     }
   }
 }

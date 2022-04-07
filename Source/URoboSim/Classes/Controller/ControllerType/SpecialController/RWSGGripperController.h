@@ -7,6 +7,14 @@
 #include "RWSGGripperController.generated.h"
 // clang-format on
 
+UENUM()
+enum class EGripperAction : uint8
+{
+    None,
+    Grasp,
+    Release
+};
+
 UCLASS()
 class UROBOSIM_API URWSGGripperControllerParameter: public URGripperControllerBaseParameter
 {
@@ -24,7 +32,7 @@ class UROBOSIM_API URWSGGripperController: public URGripperControllerBase
   GENERATED_BODY()
 
 public:
-
+    URWSGGripperController();
   virtual void SetControllerParameters(URControllerParameter *&ControllerParameters) override;
   virtual void Init() override;
   virtual void Tick(const float &InDeltaTime) override;
@@ -37,6 +45,9 @@ public:
   URJoint *GripperFingerJoint;
 
  protected:
+
+  UPROPERTY()
+    EGripperAction GripperAction;
 
   UPROPERTY()
     float Timer = 0;
