@@ -217,16 +217,15 @@ void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
 {
   for(UStaticMeshComponent* Visual : Link->Visuals)
     {
-      //Visual->SetCollisionProfileName("NoCollision");
+      // Visual->SetCollisionProfileName("NoCollision");
       //Visual->SetCollisionProfileName("RobotVisualNoCollision");
-      Visual->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+      Visual->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
       Visual->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
     }
 
   for(UStaticMeshComponent* Collision : Link->Collisions)
     {
-      
-      Collision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel1);
+      Collision->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
       Collision->SetCollisionEnabled(ECollisionEnabled::Type::QueryAndPhysics);
       if(Link->Visuals.Num() == 0)
         {
@@ -234,13 +233,13 @@ void URLinkBuilder::SetCollisionProfile(bool InSelfColide)
         }
       else
         {
-          //Collision->SetCollisionProfileName("RobotWithSelfCollision");
-          Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
+          Collision->SetCollisionProfileName("RobotWithSelfCollision");
+          // Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
         }
       if(!InSelfColide)
         {
-          //Collision->SetCollisionProfileName("RobotNoSelfCollision");
-          Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+          Collision->SetCollisionProfileName("RobotNoSelfCollision");
+          // Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Ignore);
         }
     }
 }
