@@ -30,6 +30,9 @@ public:
 	FTransform Pose;
 
 	UPROPERTY(EditAnywhere, Category = "Joint")
+	FString PoseRelativTo;
+
+	UPROPERTY(EditAnywhere, Category = "Joint")
 	FString Parent;
 
 	UPROPERTY(EditAnywhere, Category = "Joint")

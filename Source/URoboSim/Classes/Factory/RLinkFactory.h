@@ -57,12 +57,12 @@ class UROBOSIM_API URLinkFactory : public UObject
   GENERATED_BODY()
  public:
 
-    URLink* Load(UObject* InOuter, USDFLink* InLinkDescription);
-    URLink* Load(UObject* InOuter, USDFLink* InLinkDescription,FVector InLoaction);
+    URLink* Load(UObject* InOuter, USDFLink* InLinkDescription, FString InVersion);
+    URLink* Load(UObject* InOuter, USDFLink* InLinkDescription,FVector InLoaction, FString InVersion);
 
 protected:
 
-  virtual URLinkBuilder* CreateBuilder(USDFLink* InLinkDescription);
+    virtual URLinkBuilder* CreateBuilder(USDFLink* InLinkDescription, FString InVersion);
 
   UPROPERTY()
     URLinkBuilder* LinkBuilder;

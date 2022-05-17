@@ -8,6 +8,7 @@
 #include "RLink.generated.h"
 
 class ARModel;
+class URLinkBuilder;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class UROBOSIM_API URLink : public UObject
@@ -22,6 +23,14 @@ protected:
 
 	UPROPERTY()
 	TArray<class URJoint*> Joints;
+
+        UPROPERTY()
+        FTransform LinkPoseInternal;
+
+        UPROPERTY()
+        FString PoseRelativTo;
+
+        friend class URLinkBuilder;
 
 public:
 
@@ -54,6 +63,7 @@ public:
 
         UPROPERTY()
         bool bAttachedToParent = false;
+
 };
 
 USTRUCT()

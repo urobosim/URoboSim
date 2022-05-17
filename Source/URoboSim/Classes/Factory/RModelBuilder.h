@@ -37,13 +37,16 @@ public:
     URLinkFactory* LinkFactory;
 
   // Load model
-  void Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation);
+  void Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation, FString InVersion);
   void AddController(ARModel* OutModel);
 protected:
   // Called when the game starts or when spawned
 
   UPROPERTY()
   USDFModel* ModelDescription;
+
+  UPROPERTY()
+    FString Version;
 
   UPROPERTY()
   ARModel* Model;

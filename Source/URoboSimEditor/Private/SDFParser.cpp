@@ -232,6 +232,78 @@ void FSDFParser::ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel)
 
 }
 
+// Parse <joint> node
+void FSDFParser::ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel)
+{
+  // Pointer to the new joint
+  USDFJoint* NewJoint = nullptr;
+
+  // Get "name" from node attribute
+  const FString Name = InNode->GetAttribute(TEXT("name"));
+  if (!Name.IsEmpty())
+    {
+      NewJoint = NewObject<USDFJoint>(OutModel, FName(*Name));
+      NewJoint->Name = Name;
+    }
+  else
+    {
+      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"name\" attribute, added a default value.."),
+             *FString(__FUNCTION__), __LINE__);
+      NewJoint = NewObject<USDFJoint>(OutModel/*, FName(TEXT("__default__"))*/);
+      NewJoint->Name = TEXT("__default__");
+    }
+
+  // Get "type" from node attribute
+  const FString Type = InNode->GetAttribute(TEXT("type"));
+  if (!Name.IsEmpty())
+    {
+      NewJoint->Type = Type;
+    }
+  else
+    {
+      UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> has no \"type\" attribute, added a default value.."),
+             *FString(__FUNCTION__), __LINE__);
+      NewJoint->Name = TEXT("__default__");
+    }
+
+  // Iterate <joint> child nodes
+  for (const auto& ChildNode : InNode->GetChildrenNodes())
+    {
+      if (ChildNode->GetTag().Equals(TEXT("parent")))
+        {
+          NewJoint->Parent = ChildNode->GetContent();
+        }
+      else if (ChildNode->GetTag().Equals(TEXT("child")))
+        {
+          NewJoint->Child = ChildNode->GetContent();
+        }
+      else if (ChildNode->GetTag().Equals(TEXT("pose")))
+        {
+          if(FCString::Atof(*DataAsset->Version) > 1.6)
+            {
+              NewJoint->PoseRelativTo = ChildNode->GetAttribute(TEXT("relative_to"));
+            }
+          else
+            {
+              NewJoint->PoseRelativTo = TEXT("Default");
+            }
+          NewJoint->Pose = PoseContentToFTransform(ChildNode->GetContent());
+        }
+      else if (ChildNode->GetTag().Equals(TEXT("axis")))
+        {
+          ParseJointAxis(ChildNode, NewJoint);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <joint> child <%s> not supported, ignored.."),
+                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
+          continue;
+        }
+    }
+
+  // Add link to the data asset
+  OutModel->Joints.Add(NewJoint);
+}
 // Parse <link> node
 void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
 {
@@ -259,6 +331,14 @@ void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
     {
       if (ChildNode->GetTag().Equals(TEXT("pose")))
         {
+          if(FCString::Atof(*DataAsset->Version) > 1.6)
+            {
+              NewLink->PoseRelativTo = ChildNode->GetAttribute(TEXT("relative_to"));
+            }
+          else
+            {
+              NewLink->PoseRelativTo = TEXT("Default");
+            }
           NewLink->Pose = PoseContentToFTransform(ChildNode->GetContent());
         }
       else if (ChildNode->GetTag().Equals(TEXT("inertial")))
@@ -382,6 +462,7 @@ void FSDFParser::ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink)
       if (ChildNode->GetTag().Equals(TEXT("pose")))
         {
           NewCollision->Pose = PoseContentToFTransform(ChildNode->GetContent());
+
         }
       else if (ChildNode->GetTag().Equals(TEXT("geometry")))
         {

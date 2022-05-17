@@ -91,6 +91,9 @@ public:
       FTransform Pose;
 
     UPROPERTY()
+      FString PoseRelativTo;
+
+    UPROPERTY()
       float MaxJointVel = -1;
 
     UPROPERTY(EditAnywhere)

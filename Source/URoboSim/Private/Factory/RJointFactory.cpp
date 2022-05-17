@@ -1,46 +1,51 @@
 #include "Factory/RJointFactory.h"
 
-URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription)
+URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription, FString InVersion)
 {
   if(!InOuter && !InJointDescription)
     {
       return nullptr;
     }
 
-  JointBuilder = CreateBuilder(InJointDescription);
+  JointBuilder = CreateBuilder(InJointDescription, InVersion);
   if(!JointBuilder)
   {
     return nullptr;
   }
+
 
   JointBuilder->Init(InOuter, InJointDescription);
   return JointBuilder->NewJoint();
 
 }
 
-URJointBuilder* URJointFactory::CreateBuilder(USDFJoint* InJointDescription)
+URJointBuilder* URJointFactory::CreateBuilder(USDFJoint* InJointDescription, FString InVersion)
 {
+  URJointBuilder* TempJointBuilder = nullptr;
   if(InJointDescription->Type.Equals("revolute"))
     {
       if((InJointDescription->Axis->Upper > 2 * PI) ||
          (InJointDescription->Axis->Lower < -2 * PI))
         {
-          return NewObject<URContiniousJointBuilder>(this);
+          TempJointBuilder = NewObject<URContiniousJointBuilder>(this);
         }
       else
         {
-          return NewObject<URRevoluteJointBuilder>(this);
+          TempJointBuilder = NewObject<URRevoluteJointBuilder>(this);
         }
     }
   else if(InJointDescription->Type.Equals("prismatic"))
     {
-      return NewObject<URPrismaticJointBuilder>(this);
+      TempJointBuilder = NewObject<URPrismaticJointBuilder>(this);
     }
   else
     {
       UE_LOG(LogTemp, Error, TEXT("%s Constraint Type not supported."), *InJointDescription->Type);
       return nullptr;
     }
+
+  TempJointBuilder->Version = InVersion;
+  return TempJointBuilder;
 }
 
 void URJointBuilder::Init(UObject* InOuter, USDFJoint* InJointDescription)
@@ -71,6 +76,9 @@ void URJointBuilder::SetJointParameters()
   Joint->ChildName = JointDescription->Child;
   Joint->bUseParentModelFrame = JointDescription->Axis->bUseParentModelFrame;
   Joint->Pose = JointDescription->Pose;
+
+  if(JointDescription->PoseRelativTo.Equals(""))
+  Joint->PoseRelativTo = JointDescription->PoseRelativTo;
 }
 
 void URJointBuilder::CreateConstraint()
@@ -106,15 +114,22 @@ void URJointBuilder::RotateConstraintToRefAxis()
   FVector RefAxisInJointFrame;
   FQuat Rotation;
 
-  if(JointDescription->Axis->bUseParentModelFrame)
+  if(FCString::Atof(*Version) > 1.6)
     {
-      Rotation = Joint->Constraint->GetComponentQuat();
-      RefAxisInJointFrame = Rotation.Inverse().RotateVector(Joint->Constraint->RefAxis);
+
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("model frame not used"));
-      RefAxisInJointFrame = Joint->Constraint->RefAxis;
+      if(JointDescription->Axis->bUseParentModelFrame)
+        {
+          Rotation = Joint->Constraint->GetComponentQuat();
+          RefAxisInJointFrame = Rotation.Inverse().RotateVector(Joint->Constraint->RefAxis);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Error, TEXT("model frame not used"));
+          RefAxisInJointFrame = Joint->Constraint->RefAxis;
+        }
     }
 
   RefAxisInJointFrame /= RefAxisInJointFrame.Size();
@@ -125,19 +140,27 @@ void URJointBuilder::RotateConstraintToRefAxis()
     }
   else
     {
-      if(JointDescription->Axis->bUseParentModelFrame)
+      if(FCString::Atof(*Version) > 1.6)
         {
-          CurrentRefAxis = Joint->Constraint->GetComponentQuat().GetAxisZ();
-          FQuat BetweenQuat = FQuat::FindBetweenVectors(CurrentRefAxis, Joint->Constraint->RefAxis);
-          Joint->Constraint->AddLocalRotation(BetweenQuat);
+
         }
       else
         {
-          UE_LOG(LogTemp, Error, TEXT("Usage of JointFrame for axis not implemented"));
+          if(JointDescription->Axis->bUseParentModelFrame)
+            {
+              CurrentRefAxis = Joint->Constraint->GetComponentQuat().GetAxisZ();
+              FQuat BetweenQuat = FQuat::FindBetweenVectors(CurrentRefAxis, Joint->Constraint->RefAxis);
+              Joint->Constraint->AddLocalRotation(BetweenQuat);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("Usage of JointFrame for axis not implemented"));
+            }
         }
 
       Joint->Constraint->RefAxis = FVector(0.0f, 0.0f, 1.0f);
     }
+
 }
 
 float URJointBuilder::CalculateRotationOffset()

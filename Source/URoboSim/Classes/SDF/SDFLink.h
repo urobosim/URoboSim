@@ -28,6 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Link")
 	FTransform Pose;
 
+	UPROPERTY(EditAnywhere, Category = "Joint")
+	FString PoseRelativTo;
+
 	UPROPERTY(EditAnywhere, Category = "Link")
 	bool bSelfCollide;
 

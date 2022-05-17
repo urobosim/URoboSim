@@ -18,6 +18,8 @@ public:
   virtual void Init(UObject* InOuter, USDFJoint* InJointDescription);
   virtual URJoint* NewJoint();
 
+  UPROPERTY()
+    FString Version;
 protected:
 
     virtual void SetAxis();
@@ -76,10 +78,10 @@ class UROBOSIM_API URJointFactory : public UObject
 
 public:
 
-    URJoint* Load(UObject* InOuter, USDFJoint* InJointDescription);
+    URJoint* Load(UObject* InOuter, USDFJoint* InJointDescription, FString InVersion);
 
  protected:
-  URJointBuilder* CreateBuilder(USDFJoint* InJointDescription);
+  URJointBuilder* CreateBuilder(USDFJoint* InJointDescription, FString InVersion);
 
   UPROPERTY()
     URJointBuilder* JointBuilder;
