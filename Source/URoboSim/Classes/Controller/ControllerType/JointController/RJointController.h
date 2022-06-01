@@ -92,6 +92,9 @@ protected:
   UPROPERTY(EditAnywhere)
   FEnableDrive EnableDrive;
 
+  UPROPERTY()
+  FEnableDrive EnableDriveInternal;
+
   UPROPERTY(EditAnywhere)
   bool bDisableCollision;
 

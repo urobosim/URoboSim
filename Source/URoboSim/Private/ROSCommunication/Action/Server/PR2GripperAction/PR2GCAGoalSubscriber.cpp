@@ -45,11 +45,14 @@ void FRPR2GCAGoalSubscriberCallback::Callback(TSharedPtr<FROSBridgeMsg> Msg)
     actionlib_msgs::GoalID Id = Command->GetGoalId();
 
     AsyncTask(ENamedThreads::GameThread, [this, Id, Command]() {
-      float Pos = Command->GetGoal().GetCommand().GetPosition() * 100.0;
-      if (Pos > 8.5)
+      // float Pos = Command->GetGoal().GetCommand().GetPosition() * 100.0;
+      float Pos = Command->GetGoal().GetCommand().GetPosition();
+      // if (Pos > 8.5)
+      if (Pos > 0.085)
       {
-        UE_LOG(LogTemp, Warning, TEXT("%s: DesiredPosition should not exceed 8.5"), *GripperController->GetName());
-        Pos = 8.5;
+        UE_LOG(LogTemp, Warning, TEXT("%s: Received Pos %f DesiredPosition should not exceed 0.085"), *GripperController->GetName(), Pos);
+        // Pos = 8.5;
+        Pos = 0.085f;
       }
 
       GripperController->Position = Pos;
