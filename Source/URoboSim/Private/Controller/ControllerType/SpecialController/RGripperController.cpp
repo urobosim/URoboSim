@@ -15,7 +15,7 @@ void URGripperController::Init()
   }
   else
   {
-    PoseOffsetFromJoints = GripperJoint->GetJointPositionInUUnits();
+    PoseOffsetFromJoints = GripperJoint->GetJointPosition();
 
     if (!JointController)
     {
@@ -25,7 +25,8 @@ void URGripperController::Init()
 
     TArray<FString> JointNames;
     JointNames.Add(GripperJointName);
-    JointController->SetJointNames(JointNames, EnableDrive);
+    // JointController->SetJointNames(JointNames, EnableDrive);
+    JointController->SetJointNames(JointNames);
 
     if (!GripperJoint)
     {
@@ -73,16 +74,19 @@ void URGripperController::Tick(const float &InDeltaTime)
     UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
     return;
   }
-  GripperPosition = (GripperJoint->GetJointPositionInUUnits() - PoseOffsetFromJoints);
+  GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);
   Error = Position - GripperPosition;
 
+
+  // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f"), *GripperJoint->GetName(), GripperPosition, Error);
+  // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s Swing1 %f Swing2 %f Twist %f"), *GripperJoint->GetName(), GripperJoint->Constraint->GetCurrentSwing1(),GripperJoint->Constraint->GetCurrentSwing2(), GripperJoint->Constraint->GetCurrentTwist());
   if (bActive)
   {
 
     bStalled = false;
-    CheckGripperActionResult(Error, 0.1);
+    CheckGripperActionResult(Error, 0.001);
 
-    if (GraspComponent->bObjectGrasped && (OldPosition - Position < -0.12))
+    if (GraspComponent->bObjectGrasped && (OldPosition - Position < -0.0012))
     {
       Release();
     }
@@ -92,11 +96,12 @@ void URGripperController::Tick(const float &InDeltaTime)
       GoalStatusList.Last().Status = 1;
       ActionDuration += InDeltaTime;
 
+      UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f"), *GripperJoint->GetName(), GripperPosition, Error);
       float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
       GripperJointValue = Position;
 
     }
-    else if (bStalled && (OldPosition - Position >= -0.12))
+    else if (bStalled && (OldPosition - Position >= -0.0012))
     {
       float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
       OldPosition = GripperPosition;

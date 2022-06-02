@@ -59,13 +59,13 @@ URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPa
   {
     return NewObject<URGripperControllerBase>(InOwner, *ControllerParameters.Key);
   }
-  else if (Cast<URHeadTrajectoryControllerParameter>(ControllerParameters.Value))
-  {
-    return NewObject<URHeadTrajectoryController>(InOwner, *ControllerParameters.Key);
-  }
   else if (Cast<URPR2HeadTrajectoryControllerParameter>(ControllerParameters.Value))
   {
     return NewObject<URPR2HeadTrajectoryController>(InOwner, *ControllerParameters.Key);
+  }
+  else if (Cast<URHeadTrajectoryControllerParameter>(ControllerParameters.Value))
+  {
+    return NewObject<URHeadTrajectoryController>(InOwner, *ControllerParameters.Key);
   }
   else if (Cast<URCameraControllerParameter>(ControllerParameters.Value))
   {
