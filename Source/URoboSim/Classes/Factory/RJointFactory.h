@@ -52,6 +52,16 @@ protected:
 };
 
 UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
+class UROBOSIM_API URScrewJointBuilder : public URJointBuilder
+{
+  GENERATED_BODY()
+
+protected:
+    virtual void SetAxis() override;
+    virtual void CreateConstraint() override;
+};
+
+UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
 class UROBOSIM_API URRevoluteJointBuilder : public URContiniousJointBuilder
 {
   GENERATED_BODY()

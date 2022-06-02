@@ -91,7 +91,7 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
   virtual void SetTargetPosition(float InTargetPos){};
   virtual float GetConstraintPosition(){return 0;};
   virtual void SetPosition(USDFJoint* InJoint){};
-  virtual void SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild);
+  virtual void SetParentChild(UPrimitiveComponent* InParent, UPrimitiveComponent* InChild);
 
   virtual float ClampJointStateToConstraintLimit(float InJointState){return InJointState;};
   virtual float GetJointPosition(){return 0.;};
@@ -146,10 +146,10 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     float TargetVelocity;
 
   UPROPERTY()
-    UStaticMeshComponent* Parent;
+    UPrimitiveComponent* Parent;
 
   UPROPERTY()
-    UStaticMeshComponent* Child;
+    UPrimitiveComponent* Child;
 
 // #if WITH_EDITOR
 //   virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
@@ -163,6 +163,14 @@ class UROBOSIM_API URFixedConstraintComponent : public URConstraintComponent
     public:
     virtual void ConnectToComponents();
   virtual void SetPosition(USDFJoint *InJoint);
+
+};
+
+UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))
+class UROBOSIM_API URScrewConstraintComponent : public URFixedConstraintComponent
+{
+  GENERATED_BODY()
+    public:
 
 };
 
@@ -239,12 +247,6 @@ class UROBOSIM_API URContinuousConstraintComponent : public URFixedConstraintCom
 
 
 };
-
-UCLASS()
-class UROBOSIM_API URScrewConstraintComponent : public URContinuousConstraintComponent
-{
-  GENERATED_BODY()
-    };
 
 UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URRevoluteConstraintComponent : public URContinuousConstraintComponent

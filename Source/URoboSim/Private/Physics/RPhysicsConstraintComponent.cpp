@@ -122,7 +122,7 @@ FVector ROSAngularVelocityToU(FVector InAngularVelocity)
   return FVector(-InAngularVelocity[0], InAngularVelocity[1], -InAngularVelocity[2]);
 }
 
-void URConstraintComponent::SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild)
+void URConstraintComponent::SetParentChild(UPrimitiveComponent* InParent, UPrimitiveComponent* InChild)
 {
   Parent = InParent;
   Child = InChild;
@@ -133,12 +133,12 @@ void URConstraintComponent::BeginPlay()
   Super::BeginPlay();
   if(!Parent)
     {
-      Parent = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame1));
+      Parent = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame1));
     }
 
   if(!Child)
     {
-      Child = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame2));
+      Child = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame2));
     }
 
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();

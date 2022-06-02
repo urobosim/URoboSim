@@ -36,6 +36,8 @@ public:
   UPROPERTY()
     URLinkFactory* LinkFactory;
 
+  UPROPERTY()
+    FVector LoadLocation;
   // Load model
   void Load(USDFModel* InModelDescription, ARModel* OutModel,FVector InLocation, FString InVersion);
   void AddController(ARModel* OutModel);

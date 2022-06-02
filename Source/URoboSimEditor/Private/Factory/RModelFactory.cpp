@@ -9,6 +9,7 @@ URModelFactory::URModelFactory(const FObjectInitializer& ObjectInitializer) : Su
     // AActor subclass this ActorFactory creates.
     NewActorClassName = FString("ARModel");
     NewActorClass = ARModel::StaticClass();
+    bDrag = false;
 }
 
 bool URModelFactory::CanCreateActorFrom(const FAssetData & AssetData, FText & OutErrorMsg)
@@ -27,44 +28,44 @@ AActor* URModelFactory::GetDefaultActor(const FAssetData & AssetData)
 
 AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
 {
- USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(Asset);
- if(SDFAsset)
-   {
-     ARModel* NewRobot = nullptr;
-     for(USDFModel* Model : SDFAsset->Models)
+     USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(Asset);
+     if(SDFAsset)
        {
-         AActor* DefaultActor = GetDefaultActor(FAssetData(Asset));
-         if (DefaultActor)
+         ARModel* NewRobot = nullptr;
+         for(USDFModel* Model : SDFAsset->Models)
            {
-             FActorSpawnParameters SpawnInfo;
-             SpawnInfo.OverrideLevel = InLevel;
-             SpawnInfo.ObjectFlags = InObjectFlags;
-             SpawnInfo.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
+             AActor* DefaultActor = GetDefaultActor(FAssetData(Asset));
+             if (DefaultActor)
+               {
+                 FActorSpawnParameters SpawnInfo;
+                 SpawnInfo.OverrideLevel = InLevel;
+                 SpawnInfo.ObjectFlags = InObjectFlags;
+                 SpawnInfo.NameMode = FActorSpawnParameters::ESpawnActorNameMode::Requested;
 
-             //TODO fix name of spawned model
-             SpawnInfo.Name = FName(*Model->Name);
-             UE_LOG(LogTemp, Error, TEXT("Create Model %s"), *SpawnInfo.Name.ToString());
+                 //TODO fix name of spawned model
+                 SpawnInfo.Name = FName(*Model->Name);
+                 UE_LOG(LogTemp, Error, TEXT("Create Model %s"), *SpawnInfo.Name.ToString());
 
-             // Creates RRobot Actor.
+                 // Creates RRobot Actor.
 
-             URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
-             NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo);
-             ModelBuilder->Load(Model, NewRobot, Transform.GetLocation(),SDFAsset->Version);
+                 URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
+                 NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &Transform, SpawnInfo);
+                 ModelBuilder->Load(Model, NewRobot, Transform.GetLocation(),SDFAsset->Version);
 
-             PostSpawnActor(Asset, NewRobot);
+                 PostSpawnActor(Asset, NewRobot);
 
+               }
            }
+         return NewRobot;
        }
-     return NewRobot;
-   }
- else
-   {
-     UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
+     else
+       {
+         UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
 
-   }
+       }
 
- // Creates RRobot Actor.
- UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
+     // Creates RRobot Actor.
+     UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
  return nullptr;
 
 }
@@ -72,33 +73,33 @@ AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTrans
 
 AActor* URModelFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams)
 {
-    USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(InAsset);
-    if (SDFAsset)
-    {
-        ARModel* NewRobot = nullptr;
-        for (USDFModel* Model : SDFAsset->Models)
-        {
-            AActor* DefaultActor = GetDefaultActor(FAssetData(InAsset));
-            if (DefaultActor)
-            {
-                // Creates RRobot Actor.
-                URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
-                NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &InTransform, InSpawnParams);
-                ModelBuilder->Load(Model, NewRobot, InTransform.GetLocation());
+     USDFDataAsset* SDFAsset = CastChecked<USDFDataAsset>(InAsset);
+     if (SDFAsset)
+       {
+         ARModel* NewRobot = nullptr;
+         for (USDFModel* Model : SDFAsset->Models)
+           {
+             AActor* DefaultActor = GetDefaultActor(FAssetData(InAsset));
+             if (DefaultActor)
+               {
+                 // Creates RRobot Actor.
+                 URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
+                 NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &InTransform, InSpawnParams);
+                 ModelBuilder->Load(Model, NewRobot, InTransform.GetLocation());
 
-                PostSpawnActor(InAsset, NewRobot);
-            }
-        }
-        return NewRobot;
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
-    }
+                 PostSpawnActor(InAsset, NewRobot);
+               }
+           }
+         return NewRobot;
+       }
+     else
+       {
+         UE_LOG(LogTemp, Error, TEXT("Asset cast to USDFDataAsset failed"));
+       }
 
-    // Creates RRobot Actor.
-    UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
-    return nullptr;
+     // Creates RRobot Actor.
+     UE_LOG(LogTemp, Warning, TEXT("No default Robot Actor available\n"));
+ return nullptr;
 }
 #endif //Version
 

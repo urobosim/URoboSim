@@ -26,6 +26,9 @@ public:
     ARModel* Model;
 
   UPROPERTY()
+    FString Version;
+
+  UPROPERTY()
   FVector LoadLocation;
 protected:
 

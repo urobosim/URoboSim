@@ -5,13 +5,14 @@
 
 #include "CoreMinimal.h"
 #include "Physics/RStaticMeshComponent.h"
+#include "Components/BoxComponent.h"
 #include "RLink.generated.h"
 
 class ARModel;
 class URLinkBuilder;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URLink : public UObject
+class UROBOSIM_API URLink : public UBoxComponent
 {
 	GENERATED_BODY()
 
@@ -31,6 +32,7 @@ protected:
         FString PoseRelativTo;
 
         friend class URLinkBuilder;
+        friend class URModelBuilder;
 
 public:
 
@@ -42,8 +44,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<class UStaticMeshComponent*> Collisions;
 
-	virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
-	virtual const FTransform GetPose() const { return PoseComponent->GetComponentTransform(); }
+	// virtual void SetPoseComponent(USceneComponent *&InPoseComponent) { PoseComponent = InPoseComponent; }
+	virtual const FTransform GetPose() const { return GetComponentTransform(); }
 
 	virtual void DisableCollision();
 	virtual void EnableCollision();
@@ -58,8 +60,8 @@ public:
 	void AddJoint(class URJoint* InJoint);
 
 
-	UPROPERTY(VisibleAnywhere)
-	USceneComponent *PoseComponent;
+	// UPROPERTY(VisibleAnywhere)
+	// USceneComponent *PoseComponent;
 
         UPROPERTY()
         bool bAttachedToParent = false;

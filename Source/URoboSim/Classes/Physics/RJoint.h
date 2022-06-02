@@ -26,17 +26,17 @@ struct FMimicJointParameter
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URJoint : public UObject, public FTickableGameObject
+class UROBOSIM_API URJoint : public USceneComponent
 {
 	GENERATED_BODY()
 
 public:
 	URJoint();
 
-        bool IsTickable() const override;
-        void Tick(float DeltaTime) override;
-        TStatId GetStatId() const override;
-	virtual UWorld* GetTickableGameObjectWorld() const override { return GetOuter()->GetWorld(); }
+        // bool IsTickable() const override;
+        virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+        // TStatId GetStatId() const override;
+	// virtual UWorld* GetTickableGameObjectWorld() const override { return GetOuter()->GetWorld(); }
         virtual void BeginDestroy() override;
 
         UPROPERTY()
@@ -46,7 +46,7 @@ public:
           bool bActuate;
 
         UPROPERTY()
-          bool bUseParentModelFrame;
+          bool bUseParentModelFrame = true;
 
         virtual void SetParentChild(URLink* Parent, URLink* Child);
         virtual void SetParentChild(AActor* InParent, AActor* InChild);
@@ -63,7 +63,7 @@ public:
         UPROPERTY()
           class URLink* Child;
 
-  FJointState GetJointState();
+        FJointState GetJointState();
 	virtual float GetJointPosition();
 	virtual float GetJointPositionInUUnits();
 	virtual float GetJointVelocity();

@@ -40,6 +40,7 @@ private:
     virtual AActor* SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams) override;
 #endif //Version
 
+    bool bDrag;
     /** Subclasses may implement this to modify the actor after it has been spawned
         IMPORTANT: If you override this, you should usually also override PostCreateBlueprint()! */
     virtual void PostSpawnActor( UObject* Asset, AActor* NewActor );

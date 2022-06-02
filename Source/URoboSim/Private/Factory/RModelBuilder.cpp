@@ -20,6 +20,7 @@ void URModelBuilder::Load(USDFModel* InModelDescription, ARModel* OutModel,FVect
 {
   ModelDescription = InModelDescription;
   Version = InVersion;
+  LoadLocation = InLocation;
   if(OutModel)
     {
       Model = OutModel;
@@ -87,11 +88,32 @@ void URModelBuilder::BuildKinematicTree()
 
       Joint.Value->SetParentChild(Parent, Child);
       SetConstraintPosition(Joint.Value);
+
+      if(Child->PoseRelativTo.Equals(TEXT("Default")))
+        {
+          Child->SetWorldTransform(Child->LinkPoseInternal);
+        }
+      else
+        {
+          URJoint* RefJoint = *Model->Joints.Find(Child->PoseRelativTo);
+          if(RefJoint)
+            {
+              Child->SetWorldTransform(RefJoint->GetComponentTransform());
+              Child->AddLocalTransform(Child->LinkPoseInternal);
+            }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("RefJoint %s of %s not found"), *Child->PoseRelativTo, *Child->GetName());
+            }
+        }
+
+
+
       Joint.Value->Constraint->ConnectToComponents();
 
       if(!Child->bAttachedToParent)
         {
-          Child->GetCollision()->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+          Child->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
           // Child->GetCollision()->RegisterComponent();
           // Child->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
           Child->bAttachedToParent = true;
@@ -113,21 +135,44 @@ void URModelBuilder::BuildKinematicTree()
 
 void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 {
-  if(InJoint->bUseParentModelFrame)
+
+  if(InJoint->PoseRelativTo.Equals(TEXT("Default")))
     {
-      InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      InJoint->Constraint->AttachToComponent(InJoint->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      InJoint->Constraint->SetWorldLocation(InJoint->Child->GetCollision()->GetComponentLocation());
-      InJoint->Constraint->AddRelativeLocation(InJoint->Pose.GetLocation());
-      InJoint->Constraint->AddRelativeRotation(InJoint->Pose.GetRotation());
+      if(InJoint->bUseParentModelFrame)
+        {
+          // InJoint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
+          InJoint->SetWorldTransform(InJoint->Parent->GetComponentTransform());
+          InJoint->AddLocalTransform(InJoint->Pose);
+
+          InJoint->AttachToComponent(InJoint->Parent, FAttachmentTransformRules::KeepWorldTransform);
+
+          UE_LOG(LogTemp, Warning, TEXT("Souldn't be used with 1.7"));
+        }
+      else
+        {
+          //TODO Implement and check this case
+          UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame for %s"), *InJoint->GetName());
+
+          // InJoint->Constraint->SetPosition(InJoint);
+          InJoint->AttachToComponent(InJoint->Child, FAttachmentTransformRules::KeepRelativeTransform);
+        }
     }
   else
     {
-      //TODO Implement and check this case
-      UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame"));
-
-      // InJoint->Constraint->SetPosition(InJoint);
-      InJoint->Constraint->AttachToComponent(InJoint->Child->GetCollision(), FAttachmentTransformRules::KeepRelativeTransform);
+      URLink* RefLink = *Model->Links.Find(InJoint->PoseRelativTo);
+      if(IsValid(RefLink))
+        {
+          // UE_LOG(LogTemp, Warning, TEXT("Before"));
+          FTransform TempTransform = RefLink->GetComponentTransform();
+          // UE_LOG(LogTemp, Warning, TEXT("After"));
+          InJoint->SetWorldTransform(TempTransform);
+          InJoint->AddLocalTransform(InJoint->Pose);
+          InJoint->AttachToComponent(InJoint->Parent, FAttachmentTransformRules::KeepWorldTransform);
+        }
+      else
+        {
+          UE_LOG(LogTemp, Warning, TEXT("RefLink not Valid for Joint %s"),*InJoint->GetName());
+        }
     }
 }
 

@@ -125,11 +125,13 @@ void URWSGGripperController::SetPose(const float& InPose)
             }
         }
 
-      JointController->DesiredJointStates[GripperJointName].JointPosition = InPose;
+      JointController->DesiredJointStates[GripperJointName].JointPosition = PoseInM;
+      // JointController->DesiredJointStates[GripperJointName].JointPosition = InPose;
 
       if (JointController->DesiredJointStates.Contains(GripperFingerJointName))
         {
-          JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -InPose/2.;
+          JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -PoseInM/2.;
+          // JointController->DesiredJointStates[GripperFingerJointName].JointPosition = -InPose/2.;
         }
     }
   }

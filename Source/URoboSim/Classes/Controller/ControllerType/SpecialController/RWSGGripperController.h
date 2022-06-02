@@ -53,7 +53,7 @@ public:
     float Timer = 0;
 
   UPROPERTY()
-    float Timeout = 1;
+    float Timeout = 2;
 
   UPROPERTY()
     bool bTimoutActive = false;

@@ -70,6 +70,17 @@ void URLinkBuilder::Init(UObject* InOuter, USDFLink* InLinkDescription)
 URLink* URLinkBuilder::NewLink()
 {
   Link = NewObject<URLink>(Model, FName((LinkDescription->Name).GetCharArray().GetData()));
+  Link->CreationMethod = EComponentCreationMethod::Instance;
+  // Link->RegisterComponent();
+
+  Link->SetBoxExtent(FVector(1,1,1), false);
+  Link->SetSimulatePhysics(true);
+
+  if(Model->GetRootComponent() == nullptr)
+    {
+      Model->SetRootComponent(Link);
+    }
+
   Link->PoseRelativTo = LinkDescription->PoseRelativTo;
   SetPose(LinkDescription->Pose);
 
@@ -87,7 +98,7 @@ URLink* URLinkBuilder::NewLink()
   //Enable or disable gravity for the Link
   SetSimulateGravity(LinkDescription->bGravity);
 
-  SetPoseComponent();
+  // SetPoseComponent();
 
   return Link;
 }
@@ -109,32 +120,37 @@ void URLinkBuilder::SetVisuals()
 void URLinkBuilder::SetVisual(USDFVisual* InVisual)
 {
   UStaticMeshComponent* LinkComponent = NewObject<UStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
+  LinkComponent->CreationMethod = EComponentCreationMethod::Instance;
   LinkComponent->RegisterComponent();
 
-  FVector LocationOffset = Link->LinkPoseInternal.GetRotation().RotateVector(InVisual->Pose.GetLocation());
-  LinkComponent->SetWorldLocation(LocationOffset + Link->LinkPoseInternal.GetLocation() + LoadLocation);
+  // FVector LocationOffset = Link->LinkPoseInternal.GetRotation().RotateVector(InVisual->Pose.GetLocation());
+  // LinkComponent->SetWorldLocation(LocationOffset + Link->LinkPoseInternal.GetLocation() + LoadLocation);
 
-  //Rotations are added by multiplying the Quaternions
-  FQuat RotationOffset = Link->LinkPoseInternal.GetRotation() * InVisual->Pose.GetRotation();
-  LinkComponent->SetWorldRotation(RotationOffset);
+  // //Rotations are added by multiplying the Quaternions
+  // FQuat RotationOffset = Link->LinkPoseInternal.GetRotation() * InVisual->Pose.GetRotation();
+  // LinkComponent->SetWorldRotation(RotationOffset);
+
+  LinkComponent->GetBodyInstance()->bAutoWeld=false;
+  LinkComponent->AttachToComponent(Link, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+  LinkComponent->AddLocalTransform(InVisual->Pose);
+
+  // LinkComponent->SetWorldLocation(InVisual->Pose.GetLocation());
+  // LinkComponent->SetWorldRotation(InVisual->Pose.GetRotation());
 
   UStaticMesh* Visual = InVisual->Geometry->Mesh;
   if(Visual)
     {
       LinkComponent->SetStaticMesh(Visual);
 
-      if(Link->Visuals.Num()==0)
-        {
-          if(Link->Collisions.Num()!=0)
-            {
-              LinkComponent->GetBodyInstance()->bAutoWeld=false;
-              LinkComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
-            }
-        }
-      else
-        {
-          LinkComponent->WeldTo(Link->Visuals[0]);
-        }
+      // if(Link->Visuals.Num()==0)
+      //   {
+      //     LinkComponent->GetBodyInstance()->bAutoWeld=false;
+      //     LinkComponent->AttachToComponent(Link, FAttachmentTransformRules::KeepWorldTransform);
+      //   }
+      // else
+      //   {
+      //     LinkComponent->WeldTo(Link->Visuals[0]);
+      //   }
       Link->Visuals.Add(LinkComponent);
     }
 }
@@ -155,49 +171,36 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   UStaticMeshComponent* LinkComponent = NewObject<UStaticMeshComponent>(Link, FName((InCollision->Name).GetCharArray().GetData()));
   LinkComponent->CreationMethod = EComponentCreationMethod::Instance;
   LinkComponent->RegisterComponent();
-  if(Model->GetRootComponent() == nullptr)
-    {
-      Model->SetRootComponent(LinkComponent);
-    }
 
   LinkComponent->PrimaryComponentTick.TickGroup = TG_PrePhysics;
   LinkComponent->BodyInstance.PositionSolverIterationCount = 20;
   LinkComponent->BodyInstance.VelocitySolverIterationCount = 8;
 
-  FVector LocationOffset = Link->LinkPoseInternal.GetRotation().RotateVector(InCollision->Pose.GetLocation());
+  Link->Collisions.Add(LinkComponent);
 
-  FVector FinalPos = LocationOffset + Link->LinkPoseInternal.GetLocation() + LoadLocation;
-  LinkComponent->SetWorldLocation(FinalPos);
+  // FVector LocationOffset = Link->LinkPoseInternal.GetRotation().RotateVector(InCollision->Pose.GetLocation());
+  // FVector FinalPos = LocationOffset + Link->LinkPoseInternal.GetLocation() + LoadLocation;
+  // LinkComponent->SetWorldLocation(FinalPos);
+
+  LinkComponent->AttachToComponent(Link, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+  LinkComponent->WeldTo(Link);
+
+  LinkComponent->AddLocalTransform(InCollision->Pose);
 
   //Rotations are added by multiplying the Quaternions
-  FQuat RotationOffset = Link->LinkPoseInternal.GetRotation() * InCollision->Pose.GetRotation();
-  LinkComponent->SetWorldRotation(RotationOffset);
+  // FQuat RotationOffset = Link->LinkPoseInternal.GetRotation() * InCollision->Pose.GetRotation();
+  // LinkComponent->SetWorldRotation(InCollision->Pose.GetRotation());
 
   //Static Mesh creation
   UStaticMesh* Collision = InCollision->Geometry->Mesh;
   if(Collision)
     {
       LinkComponent->SetStaticMesh(Collision);
-
-      if(Link->Collisions.Num()==0)
-        {
-          LinkComponent->SetSimulatePhysics(true);
-          if(LinkComponent != Model->GetRootComponent())
-            {
-              LinkComponent->AttachToComponent(Model->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-            }
-        }
-      else
-        {
-          LinkComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
-          LinkComponent->WeldTo(Link->Collisions[0]);
-        }
       LinkComponent->SetVisibility(false,false);
-      Link->Collisions.Add(LinkComponent);
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("Collision Mesh not valid"));
+      UE_LOG(LogTemp, Error, TEXT("Collision Mesh for %s not valid"), *LinkComponent->GetName());
     }
 }
 
@@ -211,9 +214,9 @@ void URLinkBuilder::SetInertial(USDFLinkInertial* InInertial)
     {
       Collision->SetMassOverrideInKg(NAME_None, 0.001, true);
     }
-  if(Link->GetCollision())
+  if(Link)
     {
-      Link->GetCollision()->SetMassOverrideInKg(NAME_None, InInertial->Mass, true);
+      Link->SetMassOverrideInKg(NAME_None, InInertial->Mass, true);
     }
 }
 
@@ -254,9 +257,9 @@ void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
     {
       Collision->SetEnableGravity(false);
     }
-  if(Link->GetCollision())
+  if(Link)
     {
-      Link->GetCollision()->SetEnableGravity(InUseGravity);
+      Link->SetEnableGravity(InUseGravity);
     }
 
   for(UStaticMeshComponent* Visual : Link->Visuals)
@@ -267,9 +270,10 @@ void URLinkBuilder::SetSimulateGravity(bool InUseGravity)
 
 void URLinkBuilder::SetPoseComponent()
 {
-  USceneComponent *PoseComponent = NewObject<USceneComponent>(Link, *(Link->GetName() + TEXT("Pose")));
-  PoseComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
-  PoseComponent->SetWorldLocation(LoadLocation);
-  PoseComponent->AddWorldTransform(Link->LinkPoseInternal);
-  Link->SetPoseComponent(PoseComponent);
+  // USceneComponent *PoseComponent = NewObject<USceneComponent>(Link, *(Link->GetName() + TEXT("Pose")));
+  // PoseComponent->AttachToComponent(Link->Collisions[0], FAttachmentTransformRules::KeepWorldTransform);
+  // // PoseComponent->SetWorldLocation(LoadLocation);
+  // // PoseComponent->AddWorldTransform(Link->LinkPoseInternal);
+  // PoseComponent->SetWorldTransform(Link->LinkPoseInternal);
+  // Link->SetPoseComponent(PoseComponent);
 }

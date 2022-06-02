@@ -7,4 +7,5 @@
 USDFJoint::USDFJoint()
 {
 	Axis = CreateDefaultSubobject<USDFJointAxis>(TEXT("Axis"));
+        PoseRelativTo = TEXT("Default");
 }
