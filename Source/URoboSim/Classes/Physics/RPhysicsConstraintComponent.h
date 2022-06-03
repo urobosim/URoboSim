@@ -172,6 +172,8 @@ class UROBOSIM_API URScrewConstraintComponent : public URFixedConstraintComponen
   GENERATED_BODY()
     public:
 
+    virtual void UpdateEncoderValue(float InValue){};
+
 };
 
 UCLASS(ClassGroup=(URoboSim), meta=(BlueprintSpawnableComponent))

@@ -55,7 +55,14 @@ void URJoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponen
 
 float URJoint::GetEncoderValue()
 {
-  return Constraint->Encoder->GetValue();
+  if(Constraint->Encoder)
+    {
+      return Constraint->Encoder->GetValue();
+    }
+  else
+    {
+      return 0;
+    }
 }
 
 void URJoint::UpdateEncoder()

@@ -109,7 +109,11 @@ float URContinuousConstraintComponent::CheckPositionRange(float InTargetJointPos
 
 void URConstraintComponent::UpdateEncoderValue(float InValue)
 {
-  Encoder->UpdateValue(InValue);
+  UE_LOG(LogTemp, Error, TEXT("Before Encoder %s"), *GetName());
+  if(Encoder)
+    {
+      Encoder->UpdateValue(InValue);
+    }
 }
 
 FVector UAngularVelocityToROS(FVector InAngularVelocity)
