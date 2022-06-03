@@ -219,36 +219,45 @@ void URContinuousConstraintComponent::SetDrive(const FEnableDrive &EnableDrive)
 {
   SetAngularDriveMode(EAngularDriveMode::TwistAndSwing);
   SetAngularDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
-  if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
-  {
-    SetAngularOrientationDrive(false, EnableDrive.bPositionDrive);
-    SetAngularVelocityDrive(false, EnableDrive.bVelocityDrive);
-  }
-  else
-  {
-    SetAngularOrientationDrive(EnableDrive.bPositionDrive, false);
-    SetAngularVelocityDrive(EnableDrive.bVelocityDrive, false);
-  }
+  // if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
+  // {
+  //   SetAngularOrientationDrive(false, EnableDrive.bPositionDrive);
+  //   SetAngularVelocityDrive(false, EnableDrive.bVelocityDrive);
+  // }
+  // else
+  // {
+  //   SetAngularOrientationDrive(EnableDrive.bPositionDrive, false);
+  //   SetAngularVelocityDrive(EnableDrive.bVelocityDrive, false);
+  // }
+
+
+    SetAngularOrientationDrive(EnableDrive.bPositionDrive, EnableDrive.bPositionDrive);
+    SetAngularVelocityDrive(EnableDrive.bVelocityDrive, EnableDrive.bVelocityDrive);
+
+
+
 }
 
 void URPrismaticConstraintComponent::SetDrive(const FEnableDrive &EnableDrive)
 {
   SetLinearDriveParams(EnableDrive.PositionStrength, EnableDrive.VelocityStrength, EnableDrive.MaxForce);
-  if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
-  {
-    SetLinearPositionDrive(EnableDrive.bPositionDrive, false, false);
-    SetLinearVelocityDrive(EnableDrive.bVelocityDrive, false, false);
-  }
-  else if (RefAxis.GetAbs().Equals(FVector::RightVector))
-  {
-    SetLinearPositionDrive(false, EnableDrive.bPositionDrive, false);
-    SetLinearVelocityDrive(false, EnableDrive.bVelocityDrive, false);
-  }
-  else
-  {
-    SetLinearPositionDrive(false, false, EnableDrive.bPositionDrive);
-    SetLinearVelocityDrive(false, false, EnableDrive.bVelocityDrive);
-  }
+  // if (RefAxis.GetAbs().Equals(FVector::ForwardVector))
+  // {
+  //   SetLinearPositionDrive(EnableDrive.bPositionDrive, false, false);
+  //   SetLinearVelocityDrive(EnableDrive.bVelocityDrive, false, false);
+  // }
+  // else if (RefAxis.GetAbs().Equals(FVector::RightVector))
+  // {
+  //   SetLinearPositionDrive(false, EnableDrive.bPositionDrive, false);
+  //   SetLinearVelocityDrive(false, EnableDrive.bVelocityDrive, false);
+  // }
+  // else
+  // {
+  //   SetLinearPositionDrive(false, false, EnableDrive.bPositionDrive);
+  //   SetLinearVelocityDrive(false, false, EnableDrive.bVelocityDrive);
+  // }
+    SetLinearPositionDrive(EnableDrive.bPositionDrive, EnableDrive.bPositionDrive, EnableDrive.bPositionDrive);
+    SetLinearVelocityDrive(EnableDrive.bVelocityDrive, EnableDrive.bVelocityDrive, EnableDrive.bVelocityDrive);
 }
 
 void URFixedConstraintComponent::ConnectToComponents()

@@ -73,7 +73,7 @@ void URJointController::Init()
                   }
                 else
                   {
-                    Joint->SetDrive(EnableDrive);
+                    Joint->SetDrive(EnableDriveInternal);
                     // Joint->SetMotorJointState(DesiredJointStates.FindRef(JointName));
                   }
               }
@@ -99,14 +99,14 @@ void URJointController::SetMode()
       switch (Mode)
         {
         case UJointControllerMode::Kinematic:
-          EnableDrive.bPositionDrive = false;
-          EnableDrive.bVelocityDrive = false;
+          EnableDriveInternal.bPositionDrive = false;
+          EnableDriveInternal.bVelocityDrive = false;
           bEnablePhysics = false;
           break;
 
         case UJointControllerMode::Dynamic:
-          EnableDrive.bPositionDrive = true;
-          EnableDrive.bVelocityDrive = true;
+          EnableDriveInternal.bPositionDrive = EnableDrive.bPositionDrive;
+          EnableDriveInternal.bVelocityDrive = EnableDrive.bVelocityDrive;
           break;
         }
       for (URLink *&Link : GetOwner()->GetLinks())
@@ -169,10 +169,14 @@ void URJointController::SetJointNames(const TArray<FString> &JointNames)
 {
   for (const FString &JointName : JointNames)
   {
+
+    // UE_LOG(LogRJointController, Error, TEXT("%s Pos %s Vel %s"), *JointName, EnableDrive ? "True" : "False", bBlockingHit ? "True" : "False")
+
+
     if (!DesiredJointStates.Contains(JointName) && GetOwner()->GetJoint(JointName))
     {
       DesiredJointStates.Add(JointName, FJointState());
-      GetOwner()->GetJoint(JointName)->SetDrive(EnableDrive);
+      GetOwner()->GetJoint(JointName)->SetDrive(EnableDriveInternal);
     }
   }
 }

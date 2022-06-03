@@ -19,6 +19,7 @@ See `gzsdf` for converting `URDF` to `SDF`.
 *  place the URobosim into the plugin folder of your project
 *  place all plugin dependencies into the plugin folder of your project
 *  add URoboSim as dependency to the *.Build.cs
+*  copy content of Config/RobotCollision.ini into [Project]/Config/DefaultEngine.ini
 
 **ROS requirements**
 
