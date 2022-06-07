@@ -85,7 +85,7 @@ AActor* URModelFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const FTra
                  // Creates RRobot Actor.
                  URModelBuilder* ModelBuilder = NewObject<URModelBuilder>(this);
                  NewRobot = (ARModel*)InLevel->OwningWorld->SpawnActor(DefaultActor->GetClass(), &InTransform, InSpawnParams);
-                 ModelBuilder->Load(Model, NewRobot, InTransform.GetLocation());
+                 ModelBuilder->Load(Model, NewRobot, InTransform.GetLocation(),SDFAsset->Version);
 
                  PostSpawnActor(InAsset, NewRobot);
                }
