@@ -71,6 +71,12 @@ void URModelBuilder::LoadJoints()
 
 void URModelBuilder::BuildKinematicTree()
 {
+  if(!Model)
+    {
+      UE_LOG(LogTemp, Error, TEXT("Model does not exist"));
+      return;
+    }
+
   for(auto& Joint : Model->Joints)
     {
       URLink* Parent = *Model->Links.Find(Joint.Value->ParentName);
@@ -86,6 +92,17 @@ void URModelBuilder::BuildKinematicTree()
           continue;
         }
 
+      if(!Child->bAttachedToParent)
+        {
+          Child->AttachToComponent(Joint.Value->Parent, FAttachmentTransformRules::KeepWorldTransform);
+          // Child->GetCollision()->RegisterComponent();
+          // Child->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
+          Child->bAttachedToParent = true;
+          // if(Joint.Value->Child->GetName().Equals(TEXT("fr_caster_l_wheel_link")))
+          //   {
+          //   }
+          // UE_LOG(LogTemp, Error, TEXT("Joint: %s Parent: %s Child: %s"), *Joint.Value->GetName(), *Joint.Value->Parent->GetCollision()->GetName(), *Joint.Value->Child->GetCollision()->GetName());
+        }
       Joint.Value->SetParentChild(Parent, Child);
       SetConstraintPosition(Joint.Value);
 
@@ -111,24 +128,6 @@ void URModelBuilder::BuildKinematicTree()
 
       Joint.Value->Constraint->ConnectToComponents();
 
-      if(!Child->bAttachedToParent)
-        {
-          Child->AttachToComponent(Joint.Value->Parent->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-          // Child->GetCollision()->RegisterComponent();
-          // Child->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
-          Child->bAttachedToParent = true;
-          // if(Joint.Value->Child->GetName().Equals(TEXT("fr_caster_l_wheel_link")))
-          //   {
-          //   }
-          // UE_LOG(LogTemp, Error, TEXT("Joint: %s Parent: %s Child: %s"), *Joint.Value->GetName(), *Joint.Value->Parent->GetCollision()->GetName(), *Joint.Value->Child->GetCollision()->GetName());
-        }
-      // else if(!Parent->bAttachedToParent)
-      //   {
-      //     Parent->GetCollision()->AttachToComponent(Joint.Value->Child->GetCollision(), FAttachmentTransformRules::KeepWorldTransform);
-      //     // Parent->GetCollision()->RegisterComponent();
-      //     // Parent->GetCollision()->RegisterComponentWithWorld(Model->GetWorld());
-      //     Parent->bAttachedToParent = true;
-      //   }
       Parent->AddJoint(Joint.Value);
     }
 }
@@ -162,9 +161,11 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
       URLink* RefLink = *Model->Links.Find(InJoint->PoseRelativTo);
       if(IsValid(RefLink))
         {
-          // UE_LOG(LogTemp, Warning, TEXT("Before"));
+
+          UE_LOG(LogTemp, Warning, TEXT("RefLink %s"),*RefLink->GetName());
+          UE_LOG(LogTemp, Warning, TEXT("Before"));
           FTransform TempTransform = RefLink->GetComponentTransform();
-          // UE_LOG(LogTemp, Warning, TEXT("After"));
+          UE_LOG(LogTemp, Warning, TEXT("After"));
           InJoint->SetWorldTransform(TempTransform);
           InJoint->AddLocalTransform(InJoint->Pose);
           InJoint->AttachToComponent(InJoint->Parent, FAttachmentTransformRules::KeepWorldTransform);

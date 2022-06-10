@@ -71,7 +71,7 @@ URLink* URLinkBuilder::NewLink()
 {
   Link = NewObject<URLink>(Model, FName((LinkDescription->Name).GetCharArray().GetData()));
   Link->CreationMethod = EComponentCreationMethod::Instance;
-  // Link->RegisterComponent();
+  Link->RegisterComponent();
 
   Link->SetBoxExtent(FVector(1,1,1), false);
   Link->SetSimulatePhysics(true);
