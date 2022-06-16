@@ -6,7 +6,9 @@
 // #include "Paths.h"
 #include "XmlFile.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
+#if WITH_EDITOR
 #include "Factories/FbxFactory.h"
+#endif
 #include "RStaticMeshEditUtils.h"
 
 // Default constructor
@@ -370,7 +372,11 @@ void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
     }
   if(NewLink->Collisions.Num() == 0)
     {
+#if WITH_EDITOR
       USDFCollision* Collision = CreateVirtualCollision(NewLink);
+#else
+#endif
+    
       if(Collision)
         {
           NewLink->Collisions.Add(Collision);
@@ -500,7 +506,12 @@ void FSDFParser::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeo
         {
           // Import mesh, set Uri as the relative path from the asset to the mesh uasset
           OutGeometry->Uri = ChildNode->GetContent();
+#if WITH_EDITOR
           OutGeometry->Mesh = ImportMesh(OutGeometry->Uri, Type);
+#else
+        
+#endif
+        
         }
       else
         {
@@ -530,16 +541,8 @@ void FSDFParser::SetDirectoryPath(const FString& InFilename)
 // Get mesh absolute path
 FString FSDFParser::GetMeshAbsolutePath(const FString& Uri)
 {
-  // Create mesh relative path, add .fbx extension
-  FString MeshRelativePath = Uri;
-  if (!MeshRelativePath.EndsWith(".fbx"))
-    {
-      MeshRelativePath = FPaths::ChangeExtension(MeshRelativePath, TEXT("fbx"));
-    }
-  // Remove package name prefix
-  MeshRelativePath.RemoveFromStart(TEXT("model://"));
   TArray<FString> PackageParts;
-  MeshRelativePath.ParseIntoArray(PackageParts, TEXT("/"));
+  Uri.ParseIntoArray(PackageParts, TEXT("/"));
   FString PackageName = PackageParts[0];
 
 
@@ -548,11 +551,11 @@ FString FSDFParser::GetMeshAbsolutePath(const FString& Uri)
   if(PackagePath.IsEmpty())
     {
       // Create mesh absolute path
-      return DirPath + MeshRelativePath;
+      return DirPath + Uri;
     }
   else
     {
-      return PackagePath + MeshRelativePath;
+      return PackagePath + Uri;
     }
 }
 
@@ -570,11 +573,16 @@ FName FSDFParser::GenerateMeshName(ESDFType InType, FString InName)
   return MeshName;
 }
 
-FString FSDFParser::GeneratePackageName(FName MeshName)
+FString FSDFParser::GeneratePackageName(FName MeshName, FString InPackagePath)
 {
   FString PackageName = "";
   FString Reason = "";
-  FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
+  // FString NewDir = DataAsset->GetOuter()->GetPathName() + "/" + CurrentLinkName;
+
+  int32 Pos = InPackagePath.Find(TEXT("/"),ESearchCase::IgnoreCase,ESearchDir::FromEnd);
+  FString NewDir= TEXT("/Game/Packages/") + InPackagePath.Left(Pos);
+  UE_LOG(LogTemp, Error, TEXT("TestPath %s"), *NewDir);
+  
   if(!FPackageName::TryConvertFilenameToLongPackageName(NewDir + "/" + MeshName.ToString() , PackageName, &Reason))
     {
       UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
@@ -587,7 +595,8 @@ UStaticMesh* FSDFParser::CreateMesh(ESDFType InType, ESDFGeometryType InShape, F
 {
   // FString Path = "";
   FName MeshName = GenerateMeshName(InType, InName);
-  FString PackageName = GeneratePackageName(MeshName);
+ FString NewDir = TEXT("Misc/");
+  FString PackageName = GeneratePackageName(MeshName,NewDir);
 
 
 #if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
@@ -595,8 +604,14 @@ UStaticMesh* FSDFParser::CreateMesh(ESDFType InType, ESDFGeometryType InShape, F
 #else
   UPackage* Pkg = CreatePackage(*PackageName);
 #endif //Version
+
+  
+#if WITH_EDITOR
   UStaticMesh* Mesh = RStaticMeshUtils::CreateStaticMesh(Pkg, PackageName, InShape, InParameters);
   CreateCollisionForMesh(Mesh, InShape);
+#else
+#endif
+  
   return Mesh;
 }
 
@@ -656,10 +671,19 @@ FString FSDFParser::GetROSPackagePath(const FString& InPackageName)
     }
 }
 
+#if WITH_EDITOR
 // Import .fbx meshes from data asset
 UStaticMesh* FSDFParser::ImportMesh(const FString& Uri, ESDFType Type)
 {
-  FString MeshAbsolutePath = GetMeshAbsolutePath(Uri);
+  FString MeshRelativePath = Uri;
+  if (!MeshRelativePath.EndsWith(".fbx"))
+    {
+      MeshRelativePath = FPaths::ChangeExtension(MeshRelativePath, TEXT("fbx"));
+    }
+  // Remove package name prefix
+  MeshRelativePath.RemoveFromStart(TEXT("model://"));
+  
+  FString MeshAbsolutePath = GetMeshAbsolutePath(MeshRelativePath);
   if (!FPaths::FileExists(MeshAbsolutePath))
     {
       UE_LOG(LogTemp, Error, TEXT("[%s] Could not find %s"), *FString(__FUNCTION__), *MeshAbsolutePath);
@@ -674,7 +698,7 @@ UStaticMesh* FSDFParser::ImportMesh(const FString& Uri, ESDFType Type)
   // Import mesh
   bool bOperationCancelled = false;
 
-  FString PackageName = GeneratePackageName(MeshName);
+  FString PackageName = GeneratePackageName(MeshName, MeshRelativePath);
 #if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
   UPackage* Pkg = CreatePackage(NULL, *PackageName);
 #else
@@ -745,3 +769,5 @@ USDFCollision* FSDFParser::CreateVirtualCollision(USDFLink* OutLink)
   NewCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, ESDFGeometryType::Box, CurrentLinkName, RStaticMeshUtils::GetGeometryParameter(NewCollision->Geometry));
   return NewCollision;
 }
+
+#endif

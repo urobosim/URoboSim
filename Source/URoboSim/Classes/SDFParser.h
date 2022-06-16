@@ -7,7 +7,9 @@
 #include "Engine/StaticMesh.h"
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
+#if WITH_EDITOR
 #include "AssetRegistryModule.h"
+#endif
 #include "UObject/ObjectMacros.h" // EObjectFlags
 //#include "SDFParserBase.h"
 #include "SDFParserInterface.h"
@@ -73,8 +75,7 @@ private:
 
     virtual void ParsePlugin(const FXmlNode* InNode, USDFModel*& OutModel) ;
     // Parse <link> <inertial> node
-//    virtual void ParseLinkInertial(const FXmlNode* InNode, USDFLink*& OutLink) override;
-
+    
     // Parse <visual> node
     virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
@@ -82,63 +83,19 @@ private:
     virtual void ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
     // Parse <geometry> node
-//    virtual void ParseGeometry(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
     // Parse <geometry> <mesh> node
     virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
-    // Parse <geometry> <box> node
-//    virtual void ParseGeometryBox(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
-
-    // Parse <geometry> <cylinder> node
-//    virtual void ParseGeometryCylinder(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
-
-    // Parse <geometry> <sphere> node
-//    virtual void ParseGeometrySphere(const FXmlNode* InNode, USDFGeometry*& OutGeometry) override;
-
-    // Parse <joint> node
-//    virtual void ParseJoint(const FXmlNode* InNode, USDFModel*& OutModel) override;
-
-//    // Parse <joint> <axis> node
-//    virtual void ParseJointAxis(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
-
-//    // Parse <joint> <axis> <limit> node
-//    virtual void ParseJointAxisLimit(const FXmlNode* InNode, USDFJoint*& OutJoint) override;
-    /* End parser functions */
-
-
-    /* Begin helper functions */
     // Fix file path
     void SetDirectoryPath(const FString& InFilename);
 
     // Get mesh absolute path
     FString GetMeshAbsolutePath(const FString& Uri);
 
-        FName GenerateMeshName(ESDFType InType, FString InName);
-        FString GeneratePackageName(FName MeshName);
-        bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
-        USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+    FName GenerateMeshName(ESDFType InType, FString InName);
+    FString GeneratePackageName(FName MeshName, FString InPackagePath);
 
-    // Import .fbx meshes from data asset
-    UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
-    UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
-
-    // From <pose>z y z r p y</pose> to FTransform
-//    virtual FTransform PoseContentToFTransform(const FString& InPoseData) override;
-
-//    // From <size>z y z</size> to FVector
-//    virtual FVector SizeToFVector(const FString& InSizeData) override;
-
-//    // From <xzy>z y z</xzy> to FVector
-//    virtual FVector XyzToFVector(const FString& InXyzData) override;
-    /* End helper functions */
-
-
-//    // Reader for the xml file
-//    FXmlFile* XmlFile;
-
-////    // Flag if parser is loaded
-//    bool bSDFLoaded;
     TMap<FString,FString> ROSPackagePaths;
 
 ////    // Pointer to the generated data asset
@@ -149,8 +106,16 @@ private:
 
     FString CurrentLinkName;
 
+#if WITH_EDITOR
     // Fbx factory
     UFbxFactory* FbxFactory;
-
     FAssetRegistryModule& AssetRegistryModule;
+    
+    // Import .fbx meshes from data asset
+    UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
+    UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
+
+    bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
+    USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
+#endif
 };
