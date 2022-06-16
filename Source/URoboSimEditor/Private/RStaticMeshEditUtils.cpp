@@ -3,7 +3,13 @@
 
 // necessary for Collision creation
 // #include "Private/ConvexDecompTool.h"
+
+#if ENGINE_MINOR_VERSION <= 27 && ENGINE_MAJOR_VERSION == 4
 #include "Editor/UnrealEd/Private/ConvexDecompTool.h"
+#else
+#include "ConvexDecompTool.h"
+#endif
+
 // necessary for Collision creation KDOP
 
 #include "Runtime/Engine/Classes/PhysicsEngine/BodySetup.h"

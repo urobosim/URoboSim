@@ -7,9 +7,7 @@
 #include "Engine/StaticMesh.h"
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
-#if WITH_EDITOR
 #include "AssetRegistryModule.h"
-#endif
 #include "UObject/ObjectMacros.h" // EObjectFlags
 //#include "SDFParserBase.h"
 #include "SDFParserInterface.h"
@@ -31,7 +29,7 @@ class USDFCollision;
 /**
 * SDF parser class
 */
-class UROBOSIMEDITOR_API FSDFParser :public ISDFParserInterface //: public FSDFParserBase
+class UROBOSIM_API FSDFParser : public ISDFParserInterface //: public FSDFParserBase
 {
 public:
     // Default constructor
@@ -52,7 +50,7 @@ public:
     // Create data asset and parse sdf data into it
     virtual USDFDataAsset* ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags)override;
 
-private:
+protected:
     /* Begin parser functions */
     // Check if sdf data is valid
     virtual bool IsValidSDF() override;
@@ -78,14 +76,16 @@ private:
     
     // Parse <visual> node
     virtual void ParseVisual(const FXmlNode* InNode, USDFLink*& OutLink) override;
+    // Parse <visual> child node
+    virtual void ParseVisualChild(const FXmlNode* InNode, USDFVisual*& OutVisual);
 
     // Parse <collision> node
     virtual void ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink) override;
 
+    // Parse <Collison> child node
+    virtual void ParseCollisionChild(const FXmlNode* InNode, USDFCollision*& OutCollision);
+    
     // Parse <geometry> node
-
-    // Parse <geometry> <mesh> node
-    virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
     // Fix file path
     void SetDirectoryPath(const FString& InFilename);
@@ -106,16 +106,5 @@ private:
 
     FString CurrentLinkName;
 
-#if WITH_EDITOR
-    // Fbx factory
-    UFbxFactory* FbxFactory;
     FAssetRegistryModule& AssetRegistryModule;
-    
-    // Import .fbx meshes from data asset
-    UStaticMesh* ImportMesh(const FString& Uri, ESDFType Type);
-    UStaticMesh* CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters);
-
-    bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);
-    USDFCollision* CreateVirtualCollision(USDFLink* OutLink);
-#endif
 };

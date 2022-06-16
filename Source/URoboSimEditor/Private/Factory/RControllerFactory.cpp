@@ -23,7 +23,7 @@ AActor *URControllerFactory::GetDefaultActor(const FAssetData &AssetData)
   return NewActorClass->GetDefaultObject<AActor>();
 }
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION == 4
 AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
 {
  if (bDrag)

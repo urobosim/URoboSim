@@ -5,6 +5,7 @@
 #include "SDF/SDFDataAsset.h"
 #include "SDFParser.h"
 #include "Editor.h" // FEditorDelegates
+#include "SDFParserEditor.h"
 
 // Constructor
 USDFDataAssetFactory::USDFDataAssetFactory(const FObjectInitializer& ObjectInitializer)
@@ -51,7 +52,7 @@ UObject* USDFDataAssetFactory::FactoryCreateFile(UClass* InClass, UObject* InPar
 	//FEditorDelegates::OnAssetPreImport.Broadcast(this, InClass, InParent, InName, Parms);
 
 	// Parse the .sdf buffer data into the data asset
-	FSDFParser Parser(Filename);
+	FSDFParserEditor Parser(Filename);
 
 	// Create a new SDFDataAsset
 	USDFDataAsset* NewDataAsset = Parser.ParseToNewDataAsset(InParent, InName, Flags);

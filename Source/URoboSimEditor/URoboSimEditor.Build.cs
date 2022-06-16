@@ -19,7 +19,7 @@ public class URoboSimEditor : ModuleRules
                             "Core"
                             ,"MeshDescription",
                             "RenderCore",
-                            "Json",
+                            "Json", "URoboSim",
                         }
 			);
 

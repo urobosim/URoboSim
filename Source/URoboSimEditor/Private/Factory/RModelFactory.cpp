@@ -24,7 +24,7 @@ AActor* URModelFactory::GetDefaultActor(const FAssetData & AssetData)
     return NewActorClass->GetDefaultObject<ARModel>();
 }
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION == 4
 
 AActor* URModelFactory::SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform & Transform, EObjectFlags InObjectFlags, const FName Name)
 {
