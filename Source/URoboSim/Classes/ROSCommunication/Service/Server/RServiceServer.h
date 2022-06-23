@@ -10,10 +10,10 @@
 UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
 class UROBOSIM_API URServiceServerParameter : public UObject
 {
-  GENERATED_BODY()
+	GENERATED_BODY()
 
 public:
-  UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere)
 	FString Name;
 
 	UPROPERTY(EditAnywhere)
@@ -24,15 +24,6 @@ UCLASS()
 class UROBOSIM_API UServiceServer : public UROSCommunication
 {
 	GENERATED_BODY()
-};
-
-UCLASS()
-class UROBOSIM_API URServiceServer : public UServiceServer, public IRobotInterface
-{
-	GENERATED_BODY()
-
-public:
-	virtual void SetServiceServerParameters(URServiceServerParameter *&ServiceServerParameters);
 
 public:
 	UPROPERTY(EditAnywhere, Category = "ROS Service Server")
@@ -42,12 +33,24 @@ public:
 	FString Type;
 
 protected:
-  virtual void Init() override;
+	virtual void Init() override;
 
-	virtual void CreateServiceServer(){};
-
+	virtual void CreateServiceServer() { };
+	
 protected:
 	TSharedPtr<FROSBridgeSrvServer> ServiceServer;
+};
+
+UCLASS()
+class UROBOSIM_API URServiceServer : public UServiceServer, public IRobotInterface
+{
+	GENERATED_BODY()
+
+public:
+	virtual void SetServiceServerParameters(URServiceServerParameter*& ServiceServerParameters);
+
+protected:
+	virtual void Init() override;
 };
 
 
