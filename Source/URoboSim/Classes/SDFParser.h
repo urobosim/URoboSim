@@ -87,7 +87,7 @@ protected:
     virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
 
     virtual UStaticMesh* GetMesh(const FString& Uri, ESDFType Type);
-
+    
     // Fix file path
     void SetDirectoryPath(const FString& InFilename);
 

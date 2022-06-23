@@ -21,7 +21,7 @@ URGraspComponent::URGraspComponent()
 void URGraspComponent::OnComponentCreated()
 {
   Super::OnComponentCreated();
-
+  
 }
 
 void URGraspComponent::Init(UPrimitiveComponent* InGripper)

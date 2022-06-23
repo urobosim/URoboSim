@@ -11,7 +11,7 @@
 
 class URTFPublisher;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URGraspComponent : public USphereComponent
 {
 	GENERATED_BODY()
@@ -51,8 +51,8 @@ public:
 	UPhysicsConstraintComponent* Constraint;
 
 protected:
-        UPROPERTY()
-          URTFPublisher* TFPublisher;
+	UPROPERTY()
+	URTFPublisher* TFPublisher;
 
 	UPROPERTY(EditAnywhere)
 	float GraspRadius = 10.f;
@@ -64,8 +64,8 @@ protected:
 	UPrimitiveComponent* Gripper2;
 
 
-        UPROPERTY(EditAnywhere)
-          UPhysicsConstraintComponent* Constraint2;
+	UPROPERTY(EditAnywhere)
+	UPhysicsConstraintComponent* Constraint2;
 	// Function called when an item enters the fixation overlap area
 	UFUNCTION()
 	virtual void OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
@@ -75,7 +75,7 @@ protected:
 	// Function called when an item leaves the fixation overlap area
 	UFUNCTION()
 	virtual void OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-		class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// Array of items currently in reach (overlapping the sphere component)
 	TArray<AStaticMeshActor*> ObjectsInReach;
@@ -84,6 +84,6 @@ protected:
 	// Fixate object to hand
 	virtual void FixateObject(AStaticMeshActor* InSMA);
 
-        UPROPERTY()
-          bool bGraspObjectGravity;
+	UPROPERTY()
+	bool bGraspObjectGravity;
 };
