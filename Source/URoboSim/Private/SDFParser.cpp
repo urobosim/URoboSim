@@ -423,6 +423,7 @@ void FSDFParser::ParseCollision(const FXmlNode* InNode, USDFLink*& OutLink)
 
   // Add collision to array
   OutLink->Collisions.Add(NewCollision);
+	OutGeometry->Type = ESDFGeometryType::Mesh;
 }
 
 void FSDFParser::ParseCollisionChild(const FXmlNode* InNode, USDFCollision*& OutCollision)
