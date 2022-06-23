@@ -1,5 +1,8 @@
 #include "KnowrobEventManager.h"
 
+#include "URoboSimGameInstance.h"
+#include "Kismet/GameplayStatics.h"
+
 void UEventManagerComponent::BeginPlay()
 {
   Super::BeginPlay();
