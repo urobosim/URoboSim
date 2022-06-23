@@ -31,8 +31,7 @@ protected:
     virtual void ParseVisualChild(const FXmlNode* InNode, USDFVisual*& OutVisual) override;
     virtual void ParseCollisionChild(const FXmlNode* InNode, USDFCollision*& OutCollision) override;
     
-    // Parse <geometry> <mesh> node
-    virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
+    virtual UStaticMesh* GetMesh(const FString& Uri, ESDFType Type) override;
 
     
     bool CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometryType Type);

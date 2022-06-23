@@ -7,6 +7,7 @@
 #include "KnowrobEventManager.generated.h"
 
 
+class UEventManager;
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class UROBOSIM_API UEventManagerComponent : public UActorComponent
 {

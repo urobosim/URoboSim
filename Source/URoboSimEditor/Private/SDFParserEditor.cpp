@@ -48,6 +48,10 @@ bool FSDFParserEditor::LoadSDF(const FString& InFilename)
   return bSDFLoaded;
 }
 
+UStaticMesh* FSDFParserEditor::GetMesh(const FString& Uri, ESDFType Type)
+{
+	return ImportMesh(Uri, Type);
+}
 
 // Import .fbx meshes from data asset
 UStaticMesh* FSDFParserEditor::ImportMesh(const FString& Uri, ESDFType Type)
@@ -82,7 +86,8 @@ UStaticMesh* FSDFParserEditor::ImportMesh(const FString& Uri, ESDFType Type)
   UPackage* Pkg = CreatePackage(*PackageName);
 #endif //Version
   UObject* MeshObj = FbxFactory->ImportObject(
-                                              UStaticMesh::StaticClass(), Pkg, MeshName, RF_Transactional | RF_Standalone | RF_Public, MeshAbsolutePath, nullptr, bOperationCancelled);
+		UStaticMesh::StaticClass(), Pkg, MeshName, RF_Transactional | RF_Standalone | RF_Public, MeshAbsolutePath,
+		nullptr, bOperationCancelled);
 
   // If import has been cancelled
   if (bOperationCancelled)
@@ -143,7 +148,8 @@ USDFCollision* FSDFParserEditor::CreateVirtualCollision(USDFLink* OutLink)
   NewCollision->Geometry = NewObject<USDFGeometry>(NewCollision);
   NewCollision->Geometry->Type = ESDFGeometryType::Box;
   NewCollision->Geometry->Size = FVector(0.5f, 0.5f, 0.5f);
-  NewCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, ESDFGeometryType::Box, CurrentLinkName, RStaticMeshUtils::GetGeometryParameter(NewCollision->Geometry));
+	NewCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, ESDFGeometryType::Box, CurrentLinkName,
+	                                          RStaticMeshUtils::GetGeometryParameter(NewCollision->Geometry));
   return NewCollision;
 }
 
@@ -156,7 +162,8 @@ void FSDFParserEditor::Clear()
     }
 }
 
-UStaticMesh* FSDFParserEditor::CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName, TArray<float> InParameters)
+UStaticMesh* FSDFParserEditor::CreateMesh(ESDFType InType, ESDFGeometryType InShape, FString InName,
+                                          TArray<float> InParameters)
 {
   // FString Path = "";
   FName MeshName = GenerateMeshName(InType, InName);
@@ -197,79 +204,15 @@ void FSDFParserEditor::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
 
 void FSDFParserEditor::ParseVisualChild(const FXmlNode* InNode, USDFVisual*& OutVisual)
 {
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("pose")))
-        {
-          OutVisual->Pose = PoseContentToFTransform(ChildNode->GetContent());
+	OutVisual->Geometry->Mesh = CreateMesh(ESDFType::Visual, OutVisual->Geometry->Type, OutVisual->Name,
+	                                       RStaticMeshUtils::GetGeometryParameter(OutVisual->Geometry));
         }
-      else if (ChildNode->GetTag().Equals(TEXT("geometry")))
-        {
-          ParseGeometry(ChildNode, OutVisual->Geometry, ESDFType::Visual);
-          if(OutVisual->Geometry->Type == ESDFGeometryType::Box ||
-             OutVisual->Geometry->Type == ESDFGeometryType::Cylinder ||
-             OutVisual->Geometry->Type == ESDFGeometryType::Sphere)
-            {
-              OutVisual->Geometry->Mesh = CreateMesh(ESDFType::Visual, OutVisual->Geometry->Type, OutVisual->Name, RStaticMeshUtils::GetGeometryParameter(OutVisual->Geometry));
-            }
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <link> <visual> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}
+
 void FSDFParserEditor::ParseCollisionChild(const FXmlNode* InNode, USDFCollision*& OutCollision)
-{
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("pose")))
         {
-          OutCollision->Pose = PoseContentToFTransform(ChildNode->GetContent());
+	OutCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, OutCollision->Geometry->Type,
+	                                          OutCollision->Name,
+	                                          RStaticMeshUtils::GetGeometryParameter(
+		                                          OutCollision->Geometry));
+        }
 
-        }
-      else if (ChildNode->GetTag().Equals(TEXT("geometry")))
-        {
-          ParseGeometry(ChildNode, OutCollision->Geometry, ESDFType::Collision);
-          if(OutCollision->Geometry->Type == ESDFGeometryType::Box ||
-             OutCollision->Geometry->Type == ESDFGeometryType::Cylinder ||
-             OutCollision->Geometry->Type == ESDFGeometryType::Sphere)
-            {
-              OutCollision->Geometry->Mesh = CreateMesh(ESDFType::Collision, OutCollision->Geometry->Type, OutCollision->Name, RStaticMeshUtils::GetGeometryParameter(OutCollision->Geometry));
-            }
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <inertial> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-  
-}
-
-// Parse <geometry> <mesh> node
-void FSDFParserEditor::ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type)
-{
-  // Set geometry type
-  OutGeometry->Type = ESDFGeometryType::Mesh;
-
-  // Iterate <geometry> <mesh> child nodes
-  for (const auto& ChildNode : InNode->GetChildrenNodes())
-    {
-      if (ChildNode->GetTag().Equals(TEXT("uri")))
-        {
-          // Import mesh, set Uri as the relative path from the asset to the mesh uasset
-          OutGeometry->Uri = ChildNode->GetContent();
-          OutGeometry->Mesh = ImportMesh(OutGeometry->Uri, Type);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Warning, TEXT("[%s][%d] <geometry> <mesh> child <%s> not supported, ignored.."),
-                 *FString(__FUNCTION__), __LINE__, *ChildNode->GetTag());
-          continue;
-        }
-    }
-}

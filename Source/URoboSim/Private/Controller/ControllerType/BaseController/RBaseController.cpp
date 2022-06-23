@@ -29,8 +29,8 @@ void URBaseController::Init()
   else
     {
       URLink* Base = GetOwner()->Links[BaseName];
-      // Base->GetCollision()->SetSimulatePhysics(false);
-      Base->GetCollision()->SetConstraintMode(EDOFMode::XYPlane);
+      Base->SetSimulatePhysics(true);
+      Base->SetConstraintMode(EDOFMode::XYPlane);
       TargetPose = Base->GetCollision()->GetComponentTransform();
       MaxLinearVelocity = 0.1;
       MaxAngularVelocity = 0.1;

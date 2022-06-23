@@ -24,8 +24,6 @@ class USDFVisual;
 class USDFCollision;
 // class USDFGeometry;
 
-
-
 /**
 * SDF parser class
 */
@@ -85,7 +83,10 @@ protected:
     // Parse <Collison> child node
     virtual void ParseCollisionChild(const FXmlNode* InNode, USDFCollision*& OutCollision);
     
-    // Parse <geometry> node
+    // Parse <geometry> <mesh> node
+    virtual void ParseGeometryMesh(const FXmlNode* InNode, USDFGeometry*& OutGeometry, ESDFType Type) override;
+
+    virtual UStaticMesh* GetMesh(const FString& Uri, ESDFType Type);
 
     // Fix file path
     void SetDirectoryPath(const FString& InFilename);

@@ -5,6 +5,9 @@
 
 URConstraintComponent::URConstraintComponent()
 {
+#if ENGINE_MINOR_VERSION > 27 || ENGINE_MAJOR_VERSION >4
+
+#endif
 }
 
 float URConstraintComponent::GetUpperLimit()

@@ -33,6 +33,7 @@ void URControllerBuilder::Build()
   for (ARModel *&Model : Models)
   {
     URControllerComponent *ControllerComponent = NewObject<URControllerComponent>(Model, TEXT("ControllerComponent"));
+    ControllerComponent->RegisterComponent();
 
     for (TPair<FString, URControllerParameter *> ControllerParameters : ControllerConfiguration.ControllerParameters)
     {
@@ -41,7 +42,6 @@ void URControllerBuilder::Build()
       Controller->SetControllerParameters(ControllerParameters.Value);
       ControllerComponent->AddController(Controller);
     }
-    ControllerComponent->RegisterComponent();
   }
 }
 

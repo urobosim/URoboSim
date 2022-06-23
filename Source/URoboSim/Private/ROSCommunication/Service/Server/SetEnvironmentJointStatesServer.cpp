@@ -1,8 +1,4 @@
 #include "ROSCommunication/Service/Server/SetEnvironmentJointStatesServer.h"
-#include "Controller/RController.h"
-#include "EngineUtils.h"
-#include "Runtime/Engine/Classes/Engine/StaticMeshActor.h"
-#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "srv/SetEnvironmentJointState.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogSetEnvironmentJointStatesServer, Log, All)

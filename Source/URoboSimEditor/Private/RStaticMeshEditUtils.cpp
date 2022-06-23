@@ -20,6 +20,11 @@
 #include "Editor/UnrealEd/Private/GeomFitUtils.h"
 #include "Editor/EditorEngine.h"
 #include "ProceduralMeshConversion.h"
+
+#if  ENGINE_MAJOR_VERSION > 4
+#include "VectorTypes.h"
+#endif
+
 #define LOCTEXT_NAMESPACE "StaticMeshEditor"
 #ifndef USE_ASYNC_DECOMP
 #define USE_ASYNC_DECOMP 0
@@ -103,7 +108,7 @@ UStaticMesh* RStaticMeshUtils::LoadMesh(UStaticMeshComponent* InOwner, UStaticMe
 
 void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHullCount, int32 InMaxHullVerts, uint32 InHullPrecision)
 {
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
   if(OutMesh && OutMesh->RenderData)
     {
       FStaticMeshLODResources& LODModel = OutMesh->RenderData->LODResources[0];
@@ -116,11 +121,19 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 #endif //Version
 
       int32 NumVerts = LODModel.VertexBuffers.StaticMeshVertexBuffer.GetNumVertices();
+#if  ENGINE_MAJOR_VERSION < 5
       TArray<FVector> Verts;
+#else
+      TArray<FVector3f> Verts;
+#endif //Version
 
       for(int32 i=0; i<NumVerts; i++)
         {
+#if  ENGINE_MAJOR_VERSION < 5
           FVector Vert = LODModel.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
+#else
+          FVector3f  Vert = LODModel.VertexBuffers.PositionVertexBuffer.VertexPosition(i);
+#endif //Version
           Verts.Add(Vert);
         }
 
@@ -144,7 +157,7 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
       FlushRenderingCommands();
 
       // Get the BodySetup we are going to put the collision into
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
       UBodySetup* bs = OutMesh->BodySetup;
 #else
       UBodySetup* bs = OutMesh->GetBodySetup();
@@ -158,7 +171,7 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
           // Otherwise, create one here.
           OutMesh->CreateBodySetup();
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
           bs = OutMesh->BodySetup;
 #else
           bs = OutMesh->GetBodySetup();
@@ -168,7 +181,10 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 
       if(Verts.Num() >= 3 && CollidingIndices.Num() >= 3)
         {
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
           DecomposeMeshToHulls(bs, Verts, CollidingIndices, InHullCount, InMaxHullVerts, InHullPrecision);
+#else
+#endif //Version
         }
       else
         {
@@ -490,7 +506,7 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
           StaticMesh = NewObject<UStaticMesh>(Package, MeshName, RF_Public | RF_Standalone);
           StaticMesh->InitResources();
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
           StaticMesh->LightingGuid = FGuid::NewGuid();
 #else
           StaticMesh->SetLightingGuid(FGuid::NewGuid());
@@ -521,7 +537,7 @@ UStaticMesh* RStaticMeshUtils::CreateStaticMesh(UPackage* InPackage, FString InP
               // UMaterialInterface* Material = Kvp.Key;
               UMaterialInterface* Material = Kvp;
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION < 5
               StaticMesh->StaticMaterials.Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));
 #else
               StaticMesh->GetStaticMaterials().Add(FStaticMaterial(Material, Material->GetFName(), Material->GetFName()));

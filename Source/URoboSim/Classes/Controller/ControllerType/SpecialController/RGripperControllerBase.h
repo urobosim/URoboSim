@@ -42,6 +42,9 @@ public:
 
   UPROPERTY(EditAnywhere)
     bool bOverwriteConfig = true;
+  
+  UPROPERTY(EditAnywhere)
+    bool bInvertGraspCondition = false;
 };
 
 UCLASS()

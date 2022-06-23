@@ -118,8 +118,10 @@ void URJoint::SetMotorJointState(const FJointState &JointState)
   for(auto& MimicJoint : MimicJointList)
     {
       FJointState MimicState;
-      MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
-      MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+      // MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
+      // MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+      MimicState.JointPosition = GetJointPosition()*MimicJoint.Multiplier;
+      MimicState.JointVelocity = 0;
 
       MimicJoint.MimicJoint->SetMotorJointState(MimicState);
     }

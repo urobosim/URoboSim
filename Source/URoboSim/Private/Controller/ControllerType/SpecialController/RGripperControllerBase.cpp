@@ -1,8 +1,25 @@
 #include "Controller/ControllerType/SpecialController/RGripperControllerBase.h"
 
+URGripperControllerBase::URGripperControllerBase()
+{
+	GripperJointName = TEXT("?_gripper_joint");
+	// GraspComponent = CreateDefaultSubobject<URGraspComponent>(FName(GetName() + TEXT("_GraspComp")));
+	// GraspComponent->RegisterComponent();
+	// if (GetOwner())
+	// {
+	// 	GraspComponent->AttachToComponent(GetOwner()->GetRootComponent(),
+	// 	                                  FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	// }
+	// else
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("%s not attached to ARModel"), *GetName());
+	// }
+}
+
 void URGripperControllerBase::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
-  URGripperControllerBaseParameter *GripperControllerParameters = Cast<URGripperControllerBaseParameter>(ControllerParameters);
+	URGripperControllerBaseParameter* GripperControllerParameters = Cast<URGripperControllerBaseParameter>(
+		ControllerParameters);
   if (GripperControllerParameters)
   {
     GripperJointName = GripperControllerParameters->GripperJointName;
@@ -11,6 +28,7 @@ void URGripperControllerBase::SetControllerParameters(URControllerParameter *&Co
     EnableDrive = GripperControllerParameters->EnableDrive;
     Mode = GripperControllerParameters->Mode;
     bOverwriteConfig = GripperControllerParameters->bOverwriteConfig;
+		bInvertGraspCondition = GripperControllerParameters->bInvertGraspCondition;
   }
 }
 
@@ -24,14 +42,17 @@ void URGripperControllerBase::Init()
   }
   else
   {
-
     GripperJoint = GetOwner()->Joints.FindRef(GripperJointName);
 
     if (!GripperJoint)
     {
-      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
+			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
       return;
     }
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName);
+		}
 
     JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
 
@@ -55,17 +76,27 @@ void URGripperControllerBase::Init()
     TArray<URGraspComponent *> TempGraspComponents;
     GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
 
-    for (auto &GraspComp : TempGraspComponents)
-    {
-      if (GraspComp->GetName().Equals(GraspComponentName))
-      {
-        GraspComponent = GraspComp;
+		// for (auto &GraspComp : TempGraspComponents)
+		// {
+		//   if (GraspComp->GetName().Equals(GraspComponentName))
+		//   {
+		//     GraspComponent = GraspComp;
+		//     URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
+		//     GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		//     GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
+		//     GraspComponent->Init(ReferenceLink);
+		//   }
+		// }
+
+		GraspComponent = NewObject<URGraspComponent>(GetOwner(), FName(GetName() + TEXT("_GraspComp")));
+		GraspComponent->CreationMethod = EComponentCreationMethod::Instance;
+		GraspComponent->RegisterComponent();
+		
         URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
         GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		GraspComponent->Constraint->AttachToComponent(GraspComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
         GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-        GraspComponent->Init(ReferenceLink->GetCollision());
-      }
-    }
+		GraspComponent->Init(ReferenceLink);
   }
 }
 
@@ -73,7 +104,7 @@ void URGripperControllerBase::Tick(const float &InDeltaTime)
 {
   if (!GripperJoint)
   {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
+		UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s of %s not set"), *GetName(), *GripperJointName);
     return;
   }
   float JointPos = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
@@ -101,15 +132,9 @@ void URGripperControllerBase::Tick(const float &InDeltaTime)
             {
               Release();
             }
-
         }
     }
   OldPosition = JointPos;
-}
-
-URGripperControllerBase::URGripperControllerBase()
-{
-  GripperJointName = TEXT("?_gripper_joint");
 }
 
 bool URGripperControllerBase::Grasp()
@@ -120,7 +145,6 @@ bool URGripperControllerBase::Grasp()
   }
   else
     {
-
       UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
     }
   return false;
@@ -134,7 +158,6 @@ void URGripperControllerBase::Release()
   }
   else
     {
-
       UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
     }
 }

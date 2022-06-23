@@ -74,7 +74,7 @@ URLink* URLinkBuilder::NewLink()
   Link->RegisterComponent();
 
   Link->SetBoxExtent(FVector(1,1,1), false);
-  Link->SetSimulatePhysics(true);
+  Link->SetSimulatePhysics(false);
 
   if(Model->GetRootComponent() == nullptr)
     {
@@ -141,16 +141,17 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
   if(Visual)
     {
       LinkComponent->SetStaticMesh(Visual);
+      int32 Index = InVisual->Name.Find(TEXT("visual"),ESearchCase::CaseSensitive,ESearchDir::FromStart,0);
+      UStaticMeshComponent* MatchCollision = Link->GetCollision(InVisual->Name.Left(Index),false);
 
-      // if(Link->Visuals.Num()==0)
-      //   {
-      //     LinkComponent->GetBodyInstance()->bAutoWeld=false;
-      //     LinkComponent->AttachToComponent(Link, FAttachmentTransformRules::KeepWorldTransform);
-      //   }
-      // else
-      //   {
-      //     LinkComponent->WeldTo(Link->Visuals[0]);
-      //   }
+      if(MatchCollision)
+        {
+          LinkComponent->AttachToComponent(MatchCollision, FAttachmentTransformRules::KeepWorldTransform);
+        }
+      else if(Link->Visuals.Num() > 0)
+        {
+          LinkComponent->AttachToComponent(Link->Visuals[0], FAttachmentTransformRules::KeepWorldTransform);
+        }
       Link->Visuals.Add(LinkComponent);
     }
 }

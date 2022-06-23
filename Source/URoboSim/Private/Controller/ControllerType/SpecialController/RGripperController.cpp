@@ -30,7 +30,7 @@ void URGripperController::Init()
 
     if (!GripperJoint)
     {
-      UE_LOG(LogTemp, Error, TEXT("RightFinger of %s not found"), *GetName());
+      UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
       return;
     }
     JointValue = GripperJoint->GetJointPosition();
@@ -71,7 +71,7 @@ void URGripperController::Tick(const float &InDeltaTime)
 
   if (!GripperJoint)
   {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
+    UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
     return;
   }
   GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);

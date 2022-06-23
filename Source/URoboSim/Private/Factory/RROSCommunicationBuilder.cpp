@@ -41,6 +41,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
                                       const TArray<FRActionServerConfiguration> &ActionServerConfigurations)
 {
   URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
+  ROSCommunicationComponent->RegisterComponent();
   ROSCommunicationComponent->ROSCommunication.WebsocketIPAddr = ROSCommunicationConfiguration.WebsocketIPAddr;
   ROSCommunicationComponent->ROSCommunication.WebsocketPort = ROSCommunicationConfiguration.WebsocketPort;
 
@@ -114,7 +115,6 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
     }
   }
 
-  ROSCommunicationComponent->RegisterComponent();
 }
 
 URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration)

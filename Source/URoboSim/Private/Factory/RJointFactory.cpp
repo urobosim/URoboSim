@@ -89,6 +89,11 @@ void URJointBuilder::CreateConstraint()
 {
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URFixedConstraintComponent>(Joint, FName(*Name));
+  if(Joint->Constraint)
+    {
+
+      //UE_LOG(LogTemp, Error, TEXT("%s: %f"), *Joint->GetName(), Joint->Constraint->ConstraintInstance-);
+    }
 }
 
 void URJointBuilder::SetAxis()
