@@ -39,7 +39,7 @@ public class URoboSimEditor : ModuleRules
                                 "ProceduralMeshComponent",
                                 "URoboSim",
                                 "URoboVision",
-                                "UnrealEd",
+                                "UnrealEd", 
 			}
 			);
 
