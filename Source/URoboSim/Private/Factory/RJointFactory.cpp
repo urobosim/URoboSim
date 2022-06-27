@@ -61,6 +61,8 @@ void URJointBuilder::Init(UObject* InOuter, USDFJoint* InJointDescription)
 URJoint* URJointBuilder::NewJoint()
 {
   Joint = NewObject<URJoint>(Outer, FName((JointDescription->Name).GetCharArray().GetData()));
+  Joint->CreationMethod = EComponentCreationMethod::Instance;
+  Joint->RegisterComponent();
   SetJointParameters();
   CreateConstraint();
   if(Joint->Constraint)

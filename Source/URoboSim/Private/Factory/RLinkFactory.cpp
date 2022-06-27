@@ -75,7 +75,8 @@ URLink* URLinkBuilder::NewLink()
 
   Link->SetBoxExtent(FVector(1,1,1), false);
   Link->SetSimulatePhysics(false);
-
+  Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
+  Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
   if(Model->GetRootComponent() == nullptr)
     {
       Model->SetRootComponent(Link);
@@ -174,8 +175,8 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   LinkComponent->RegisterComponent();
 
   LinkComponent->PrimaryComponentTick.TickGroup = TG_PrePhysics;
-  LinkComponent->BodyInstance.PositionSolverIterationCount = 20;
-  LinkComponent->BodyInstance.VelocitySolverIterationCount = 8;
+  LinkComponent->BodyInstance.PositionSolverIterationCount = 50;
+  LinkComponent->BodyInstance.VelocitySolverIterationCount = 50;
 
   Link->Collisions.Add(LinkComponent);
 

@@ -73,6 +73,7 @@ AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const F
 
 AActor* URControllerFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams)
 {
+	UE_LOG(LogRControllerFactory, Warning, TEXT("Start spawning"));
     if (bDrag)
     {
         URControllerDataAsset* ControllerDataAsset = CastChecked<URControllerDataAsset>(InAsset);
@@ -84,6 +85,7 @@ AActor* URControllerFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const
             TArray<ARModel*> Robots;
             for (AActor*& Actor : WorldActors)
             {
+				UE_LOG(LogRControllerFactory, Warning, TEXT("Robots found %s"), *Actor->GetName())
                 if (ControllerDataAsset->RobotNames.ContainsByPredicate([&](FString RobotName) { return Actor->GetName().Contains(RobotName); }))
                 {
                     UE_LOG(LogRControllerFactory, Log, TEXT("Found ARModel %s in ControllerDataAsset %s"), *Actor->GetName(), *ControllerDataAsset->GetName())
