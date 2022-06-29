@@ -1,5 +1,7 @@
 #include "Controller/ControllerType/SpecialController/RCameraController.h"
 
+#include "Kismet/GameplayStatics.h"
+
 URCameraController::URCameraController()
 {
 
@@ -26,12 +28,12 @@ void URCameraController::Init()
     return;
   }
 
-  TArray<AActor *> FoundActors;
-  TArray<UStaticMeshComponent *> ActorComponents;
-  UStaticMeshComponent *ReferenceLink = nullptr;
+  UPrimitiveComponent *ReferenceLink = nullptr;
+  
+  TArray<UPrimitiveComponent *> ActorComponents;
   GetOwner()->GetComponents(ActorComponents);
 
-  for (UStaticMeshComponent *&Component : ActorComponents)
+  for (UPrimitiveComponent *&Component : ActorComponents)
   {
     if (Component->GetName().Contains(CameraRef))
     {
@@ -44,6 +46,7 @@ void URCameraController::Init()
     return;
   }
 
+  TArray<AActor *> FoundActors;
   UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
 
   for (auto &MyCamera : FoundActors)
