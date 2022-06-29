@@ -111,7 +111,7 @@ void URJointController::SetMode()
         }
       for (URLink *&Link : GetOwner()->GetLinks())
         {
-          Link->GetCollision()->SetEnableGravity(false);
+          Link->SetEnableGravity(false);
         }
   }
 }
