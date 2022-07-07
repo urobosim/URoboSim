@@ -14,7 +14,7 @@ URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription, FVect
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("LinkFactory: LinkBuilder not created because NumCollisions = 0"));
+      UE_LOG(LogTemp, Error, TEXT("[%s] LinkFactory: LinkBuilder not created because NumCollisions = 0"), *FString(__FUNCTION__));
     }
   return LinkBuilder->NewLink();
 }
@@ -40,17 +40,10 @@ URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription, FStri
 
 URLinkBuilder* URLinkFactory::CreateBuilder(USDFLink* InLinkDescription, FString InVersion)
 {
-  URLinkBuilder* TempLinkBuilder = nullptr;
-  if(InLinkDescription->Collisions.Num()>0)
-    {
-      TempLinkBuilder = NewObject<URLinkBuilder>(this);
-      TempLinkBuilder->Version = InVersion;
-      return TempLinkBuilder;
-    }
-  else
-    {
-      return nullptr;
-    }
+    URLinkBuilder* TempLinkBuilder = nullptr;
+    TempLinkBuilder = NewObject<URLinkBuilder>(this);
+    TempLinkBuilder->Version = InVersion;
+    return TempLinkBuilder;
 }
 
 void URLinkBuilder::Init(UObject* InOuter, USDFLink* InLinkDescription,FVector InLocation)
@@ -75,6 +68,7 @@ URLink* URLinkBuilder::NewLink()
 
   Link->SetBoxExtent(FVector(1,1,1), false);
   Link->SetSimulatePhysics(false);
+  Link->SetMassOverrideInKg(NAME_None,0.0000001);
   Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
   Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
   if(Model->GetRootComponent() == nullptr)
@@ -82,7 +76,11 @@ URLink* URLinkBuilder::NewLink()
       Model->SetRootComponent(Link);
     }
 
-  Link->PoseRelativTo = LinkDescription->PoseRelativTo;
+  if(!IsValid(Link))
+  {
+      UE_LOG(LogTemp, Error, TEXT("[%s] Link %s not Valid"), *FString(__FUNCTION__),  *LinkDescription->Name);
+  }
+  Link->PoseRelativeTo = LinkDescription->PoseRelativeTo;
   SetPose(LinkDescription->Pose);
 
   // Add the Collision Components to the Link

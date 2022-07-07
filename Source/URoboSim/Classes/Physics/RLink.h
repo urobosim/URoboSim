@@ -29,7 +29,7 @@ protected:
         FTransform LinkPoseInternal;
 
         UPROPERTY()
-        FString PoseRelativTo;
+        FString PoseRelativeTo;
 
         friend class URLinkBuilder;
         friend class URModelBuilder;

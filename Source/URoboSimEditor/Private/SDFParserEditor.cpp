@@ -187,19 +187,19 @@ UStaticMesh* FSDFParserEditor::CreateMesh(ESDFType InType, ESDFGeometryType InSh
 void FSDFParserEditor::ParseLink(const FXmlNode* InNode, USDFModel*& OutModel)
 {
 	FSDFParser::ParseLink(InNode, OutModel);
-	if (OutModel->Links.Last()->Collisions.Num() == 0)
-	{
-		USDFCollision* Collision = CreateVirtualCollision(OutModel->Links.Last());
-
-		if (Collision)
-		{
-			OutModel->Links.Last()->Collisions.Add(Collision);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Creation of Virtual Link %s failed"), *CurrentLinkName);
-		}
-	}
+	// if (OutModel->Links.Last()->Collisions.Num() == 0)
+	// {
+	// 	USDFCollision* Collision = CreateVirtualCollision(OutModel->Links.Last());
+	//
+	// 	if (Collision)
+	// 	{
+	// 		OutModel->Links.Last()->Collisions.Add(Collision);
+	// 	}
+	// 	else
+	// 	{
+	// 		UE_LOG(LogTemp, Error, TEXT("Creation of Virtual Link %s failed"), *CurrentLinkName);
+	// 	}
+	// }
 }
 
 void FSDFParserEditor::ParseVisualChild(const FXmlNode* InNode, USDFVisual*& OutVisual)

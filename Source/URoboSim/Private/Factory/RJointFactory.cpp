@@ -84,7 +84,7 @@ void URJointBuilder::SetJointParameters()
   Joint->bUseParentModelFrame = JointDescription->Axis->bUseParentModelFrame;
   Joint->Pose = JointDescription->Pose;
 
-  Joint->PoseRelativTo = JointDescription->PoseRelativTo;
+  Joint->PoseRelativeTo = JointDescription->PoseRelativeTo;
 }
 
 void URJointBuilder::CreateConstraint()
@@ -294,5 +294,5 @@ void URScrewJointBuilder::CreateConstraint()
 {
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URScrewConstraintComponent>(Joint, FName(*Name));
-  Joint->PoseRelativTo = JointDescription->Parent;
+  Joint->PoseRelativeTo = JointDescription->Parent;
 }

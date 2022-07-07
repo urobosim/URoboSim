@@ -9,5 +9,5 @@ USDFLink::USDFLink()
 	bGravity = 1;
 	bSelfCollide = 0;
 	Inertial = CreateDefaultSubobject<USDFLinkInertial>(TEXT("Inertial"));
-        PoseRelativTo = TEXT("Default");
+        PoseRelativeTo = TEXT("Default");
 }

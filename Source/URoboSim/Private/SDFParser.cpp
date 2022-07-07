@@ -276,13 +276,15 @@ void FSDFParser::ParseJoint(const FXmlNode* InNode, USDFModel*& NewModel)
 		}
 		else if (ChildNode->GetTag().Equals(TEXT("pose")))
 		{
-			if (FCString::Atof(*DataAsset->Version) > 1.6)
+			FString TempPoseRelativeTo = ChildNode->GetAttribute(TEXT("relative_to"));
+			UE_LOG(LogTemp, Warning, TEXT("PoseRelativeTo %s"), *TempPoseRelativeTo);
+			if (TempPoseRelativeTo.IsEmpty())
 			{
-				NewJoint->PoseRelativTo = ChildNode->GetAttribute(TEXT("relative_to"));
+				NewJoint->PoseRelativeTo = TEXT("Default");
 			}
 			else
 			{
-				NewJoint->PoseRelativTo = TEXT("Default");
+				NewJoint->PoseRelativeTo = TempPoseRelativeTo;
 			}
 			NewJoint->Pose = PoseContentToFTransform(ChildNode->GetContent());
 		}
@@ -329,13 +331,14 @@ void FSDFParser::ParseLink(const FXmlNode* InNode, USDFModel*& NewModel)
 	{
 		if (ChildNode->GetTag().Equals(TEXT("pose")))
 		{
-			if (FCString::Atof(*DataAsset->Version) > 1.6)
+			FString TempPoseRelativeTo = ChildNode->GetAttribute(TEXT("relative_to"));
+			if (TempPoseRelativeTo.IsEmpty())
 			{
-				NewLink->PoseRelativTo = ChildNode->GetAttribute(TEXT("relative_to"));
+				NewLink->PoseRelativeTo = TEXT("Default");
 			}
 			else
 			{
-				NewLink->PoseRelativTo = TEXT("Default");
+				NewLink->PoseRelativeTo = ChildNode->GetAttribute(TEXT("relative_to"));
 			}
 			NewLink->Pose = PoseContentToFTransform(ChildNode->GetContent());
 		}

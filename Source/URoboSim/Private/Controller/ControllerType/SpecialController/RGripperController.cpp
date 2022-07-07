@@ -78,7 +78,7 @@ void URGripperController::Tick(const float &InDeltaTime)
   Error = Position - GripperPosition;
 
 
-  // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f"), *GripperJoint->GetName(), GripperPosition, Error);
+  UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f Vector %s"), *GripperJoint->GetName(), GripperJoint->GetJointPosition(), Error, *GripperJoint->Constraint->DeltaPoseInJointFrame.ToString());
   // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s Swing1 %f Swing2 %f Twist %f"), *GripperJoint->GetName(), GripperJoint->Constraint->GetCurrentSwing1(),GripperJoint->Constraint->GetCurrentSwing2(), GripperJoint->Constraint->GetCurrentTwist());
   if (bActive)
   {
