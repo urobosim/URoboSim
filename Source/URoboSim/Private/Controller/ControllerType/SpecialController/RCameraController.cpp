@@ -51,6 +51,7 @@ void URCameraController::Init()
 
   for (auto &MyCamera : FoundActors)
   {
+    UE_LOG(LogTemp, Log, TEXT("Camera %s found. Check if target"), *MyCamera->GetName());
     if (MyCamera->GetName().Equals(CameraName))
     {
       MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);

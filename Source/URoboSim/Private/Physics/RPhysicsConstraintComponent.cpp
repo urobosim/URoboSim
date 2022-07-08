@@ -36,6 +36,10 @@ float URConstraintComponent::GetLowerLimit()
 
 const FTransform URConstraintComponent::GetChildPoseInJointFrame() const
 {
+  if(!Child)
+  {
+    return FTransform();
+  }
 	FTransform ChildPose = Child->GetComponentTransform();
 	FTransform JointPose = GetComponentTransform();
 	return ChildPose * JointPose.Inverse();
@@ -149,6 +153,8 @@ void URConstraintComponent::BeginPlay()
 
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
+  ParentChildOffset = Child->GetComponentTransform().GetRelativeTransform(Parent->GetComponentTransform());
+  
 }
 
 void URContinuousConstraintComponent::BeginPlay()
@@ -304,8 +310,15 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   // float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
 
   // return JointPosition
-  Super::GetJointPositionInUUnits();
-  return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
+
+
+  
+  // Super::GetJointPositionInUUnits();
+  // return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
+  FVector ParentChild = Child->GetComponentLocation() - Parent->GetComponentLocation() - ParentChildOffset.GetLocation();
+
+  
+  return FVector::DotProduct(ParentChild, GetComponentRotation().RotateVector(RefAxis));
 }
 
 

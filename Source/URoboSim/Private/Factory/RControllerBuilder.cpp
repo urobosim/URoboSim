@@ -3,7 +3,7 @@
 #include "Controller/ControllerType/BaseController/RMIRWheelController.h"
 #include "Controller/ControllerType/BaseController/ROmniwheelController.h"
 #include "Controller/ControllerType/SpecialController/RCameraController.h"
-#include "Controller/ControllerType/SpecialController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/PR2GripperController.h"
 #include "Controller/ControllerType/SpecialController/RWSGGripperController.h"
 #include "Controller/ControllerType/SpecialController/RHeadController.h"
 #include "Controller/ControllerType/SpecialController/RTFController.h"
@@ -49,7 +49,7 @@ URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPa
 {
   if (Cast<URGripperControllerParameter>(ControllerParameters.Value))
   {
-    return NewObject<URGripperController>(InOwner, *ControllerParameters.Key);
+    return NewObject<UPR2GripperController>(InOwner, *ControllerParameters.Key);
   }
   else if (Cast<URWSGGripperControllerParameter>(ControllerParameters.Value))
   {

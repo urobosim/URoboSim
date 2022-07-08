@@ -62,19 +62,19 @@ void URGripperControllerBase::Init()
 			return;
 		}
 
+		TArray<FString> JointNames;
+		JointNames.Add(GripperJointName);
+		JointController->SetJointNames(JointNames, EnableDrive);
 		if (bOverwriteConfig)
 		{
 			JointController->AddConfigOverwrite(GripperJoint->GetName(), FConfigOverwrite(Mode, EnableDrive));
-			TArray<FString> JointNames;
-			JointNames.Add(GripperJointName);
-			JointController->SetJointNames(JointNames, EnableDrive);
 		}
 
 		// OldPosition = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 		OldPosition = 0;
 
-		TArray<URGraspComponent*> TempGraspComponents;
-		GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
+		// TArray<URGraspComponent*> TempGraspComponents;
+		// GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
 
 		// for (auto &GraspComp : TempGraspComponents)
 		// {

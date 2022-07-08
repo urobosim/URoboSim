@@ -57,6 +57,18 @@ void URModelBuilder::LoadJoints()
 {
 	for (USDFJoint* Joint : ModelDescription->Joints)
 	{
+		URLink* Parent = Model->GetLink(Joint->Parent);
+		if(!Parent)
+		{
+			continue;
+		}
+		
+		URLink* Child = Model->GetLink(Joint->Child);
+		if(!Child)
+		{
+			continue;
+		}
+		
 		URJoint* TempJoint = JointFactory->Load(Model, Joint, Version);
 		if (TempJoint)
 		{
@@ -135,6 +147,13 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 			       *InJoint->GetName());
 			return;
 		}
+		
+		if (!InJoint->Child)
+		{
+			UE_LOG(LogTemp, Error, TEXT("[%s] Child of Joint %s not valid"), *FString(__FUNCTION__),
+			       *InJoint->GetName());
+			return;
+		}
 
 		if (InJoint->PoseRelativeTo.Equals(TEXT("Default")))
 		{
@@ -150,8 +169,6 @@ void URModelBuilder::SetConstraintPosition(URJoint* InJoint)
 			}
 			else
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Does't use parent frame for %s"), *InJoint->GetName());
-
 				// InJoint->Constraint->SetPosition(InJoint);
 				InJoint->AttachToComponent(InJoint->Child, FAttachmentTransformRules::KeepRelativeTransform);
 				if(InJoint->Parent->PoseRelativeTo.Equals(TEXT("Default")))

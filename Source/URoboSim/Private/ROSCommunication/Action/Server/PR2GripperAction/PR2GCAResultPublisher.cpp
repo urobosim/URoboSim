@@ -12,7 +12,7 @@ URPR2GCAResultPublisher::URPR2GCAResultPublisher()
 void URPR2GCAResultPublisher::Init()
 {
   Super::Init();
-  GripperController = Cast<URGripperController>(Controller);
+  GripperController = Cast<UPR2GripperController>(Controller);
 }
 
 void URPR2GCAResultPublisher::Publish()

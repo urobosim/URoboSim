@@ -1,11 +1,11 @@
-#include "Controller/ControllerType/SpecialController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/PR2GripperController.h"
 
-void URGripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
+void UPR2GripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
   Super::SetControllerParameters(ControllerParameters);
 }
 
-void URGripperController::Init()
+void UPR2GripperController::Init()
 {
   Super::Init();
 
@@ -23,26 +23,24 @@ void URGripperController::Init()
       return;
     }
 
-    TArray<FString> JointNames;
-    JointNames.Add(GripperJointName);
-    // JointController->SetJointNames(JointNames, EnableDrive);
-    JointController->SetJointNames(JointNames);
-
     if (!GripperJoint)
     {
       UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
       return;
     }
+    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    GripperJoint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 1);
     JointValue = GripperJoint->GetJointPosition();
   }
 }
 
-void URGripperController::UpdateGripper()
+void UPR2GripperController::UpdateGripper()
 {
   bActive = true;
 }
 
-void URGripperController::CheckGripperActionResult(float InError, float InThreshold = 0.5)
+void UPR2GripperController::CheckGripperActionResult(float InError, float InThreshold = 0.5)
 {
   if (FMath::Abs(InError) < InThreshold)
   {
@@ -65,7 +63,7 @@ void URGripperController::CheckGripperActionResult(float InError, float InThresh
   }
 }
 
-void URGripperController::Tick(const float &InDeltaTime)
+void UPR2GripperController::Tick(const float &InDeltaTime)
 {
   float Error = 0;
 
@@ -74,11 +72,12 @@ void URGripperController::Tick(const float &InDeltaTime)
     UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
     return;
   }
-  GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);
+  // GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);
+  GripperPosition = (GripperJoint->GetJointPosition());
   Error = Position - GripperPosition;
 
 
-  UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f Vector %s"), *GripperJoint->GetName(), GripperJoint->GetJointPosition(), Error, *GripperJoint->Constraint->DeltaPoseInJointFrame.ToString());
+  // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f Vector %s"), *GripperJoint->GetName(), GripperJoint->GetJointPosition(), Error, *GripperJoint->Constraint->DeltaPoseInJointFrame.ToString());
   // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s Swing1 %f Swing2 %f Twist %f"), *GripperJoint->GetName(), GripperJoint->Constraint->GetCurrentSwing1(),GripperJoint->Constraint->GetCurrentSwing2(), GripperJoint->Constraint->GetCurrentTwist());
   if (bActive)
   {
@@ -96,7 +95,6 @@ void URGripperController::Tick(const float &InDeltaTime)
       GoalStatusList.Last().Status = 1;
       ActionDuration += InDeltaTime;
 
-      UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f"), *GripperJoint->GetName(), GripperPosition, Error);
       float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
       GripperJointValue = Position;
 
@@ -114,7 +112,7 @@ void URGripperController::Tick(const float &InDeltaTime)
   }
 }
 
-URGripperController::URGripperController()
+UPR2GripperController::UPR2GripperController()
 {
   GripperJointName = TEXT("?_gripper_joint");
 }

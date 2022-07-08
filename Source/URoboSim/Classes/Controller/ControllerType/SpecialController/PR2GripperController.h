@@ -4,7 +4,7 @@
 #include "Controller/ControllerType/JointController/RJointController.h"
 #include "RGripperControllerBase.h"
 // clang-format off
-#include "RGripperController.generated.h"
+#include "PR2GripperController.generated.h"
 // clang-format on
 
 UCLASS()
@@ -35,12 +35,12 @@ public:
 };
 
 UCLASS()
-class UROBOSIM_API URGripperController : public URGripperControllerBase
+class UROBOSIM_API UPR2GripperController : public URGripperControllerBase
 {
   GENERATED_BODY()
 
 public:
-  URGripperController();
+  UPR2GripperController();
 
 public:
   virtual void Init() override;

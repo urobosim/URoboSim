@@ -77,6 +77,7 @@ URJoint* URJointBuilder::NewJoint()
     }
   return Joint;
 }
+
 void URJointBuilder::SetJointParameters()
 {
   Joint->ParentName = JointDescription->Parent;
