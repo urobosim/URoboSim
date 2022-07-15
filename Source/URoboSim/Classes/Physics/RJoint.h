@@ -58,10 +58,10 @@ public:
           FString ChildName;
 
         UPROPERTY()
-          class URLink* Parent;
+          class URLink* Parent = nullptr;
 
         UPROPERTY()
-          class URLink* Child;
+          class URLink* Child = nullptr;
 
         FJointState GetJointState();
 	virtual float GetJointPosition();

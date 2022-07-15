@@ -60,7 +60,7 @@ protected:
 
 protected:
 	UPROPERTY()
-        UObject* Owner;
+        UObject* Owner = nullptr;
 
 	UPROPERTY(EditAnywhere)
         bool bUseGlobalIP = true;
