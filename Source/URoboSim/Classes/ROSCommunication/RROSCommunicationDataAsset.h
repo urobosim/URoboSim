@@ -37,7 +37,7 @@ struct FRPublisherConfiguration
 
 public:
   UPROPERTY(EditAnywhere)
-  URPublisherParameter *PublisherParameters;
+  URPublisherParameter *PublisherParameters = nullptr;
 };
 
 USTRUCT()
@@ -47,7 +47,7 @@ struct FRSubscriberConfiguration
 
 public:
   UPROPERTY(EditAnywhere)
-  URSubscriberParameter *SubscriberParameters;
+  URSubscriberParameter *SubscriberParameters = nullptr;
 };
 
 USTRUCT()
@@ -57,7 +57,7 @@ struct FRServiceServerConfiguration
 
 public:
   UPROPERTY(EditAnywhere)
-  URServiceServerParameter *ServiceServerParameters;
+  URServiceServerParameter *ServiceServerParameters = nullptr;
 };
 
 USTRUCT()
@@ -67,7 +67,7 @@ struct FRServiceClientConfiguration
 
 public:
   UPROPERTY(EditAnywhere)
-  URServiceClientParameter *ServiceClientParameters;
+  URServiceClientParameter *ServiceClientParameters = nullptr;
 };
 
 USTRUCT()
@@ -77,7 +77,7 @@ struct FRActionServerConfiguration
 
 public:
   UPROPERTY(EditAnywhere)
-  URActionServerParameter *ActionServerParameters;
+  URActionServerParameter *ActionServerParameters = nullptr;
 };
 
 UCLASS(BlueprintType, Category = "ROSCommunication")

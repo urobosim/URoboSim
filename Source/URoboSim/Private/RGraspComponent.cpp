@@ -10,12 +10,15 @@ URGraspComponent::URGraspComponent()
   SetEnableGravity(false);
 
   FString ConstraintName = TEXT("Constraint_") + GetName();
-  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName));
-  Constraint->RegisterComponent();
-  Constraint->AttachToComponent(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-  Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  if(GetWorld())
+  {
+    Constraint = NewObject<UPhysicsConstraintComponent>(this, FName(*ConstraintName));
+    // Constraint->RegisterComponent();
+    Constraint->SetupAttachment(this);
+    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  }
 }
 
 void URGraspComponent::OnComponentCreated()

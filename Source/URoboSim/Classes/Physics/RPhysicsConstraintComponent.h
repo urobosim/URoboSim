@@ -41,10 +41,10 @@ struct FJointInformation
 
 
   UPROPERTY()
-  URLink* Parent;
+  URLink* Parent = nullptr;
 
   UPROPERTY()
-  URLink* Child;
+  URLink* Child = nullptr;
 
   UPROPERTY()
   FVector RefAxis;
@@ -149,10 +149,10 @@ class UROBOSIM_API URConstraintComponent : public UPhysicsConstraintComponent
     float TargetVelocity;
 
   UPROPERTY()
-    UPrimitiveComponent* Parent;
+    UPrimitiveComponent* Parent = nullptr;
 
   UPROPERTY()
-    UPrimitiveComponent* Child;
+    UPrimitiveComponent* Child = nullptr;
 
 // #if WITH_EDITOR
 //   virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
