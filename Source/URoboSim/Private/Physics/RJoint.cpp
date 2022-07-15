@@ -83,6 +83,11 @@ void URJoint::SetSimulatePhysics(bool bEnablePhysics)
     {
       MimicJoint.MimicJoint->SetSimulatePhysics(bEnablePhysics);
     }
+
+  if (Cast<UPrimitiveComponent>(Parent->GetAttachParent()))
+		{
+        Parent->SetSimulatePhysics(bEnablePhysics);
+		}
 }
 
 void URJoint::SetDrive(const FEnableDrive &EnableDrive)
