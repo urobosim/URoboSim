@@ -84,7 +84,7 @@ void URGripperController::Tick(const float &InDeltaTime)
   {
 
     bStalled = false;
-    CheckGripperActionResult(Error, 0.001);
+    CheckGripperActionResult(Error, 0.0005);
 
     if (GraspComponent->bObjectGrasped && (OldPosition - Position < -0.0012))
     {

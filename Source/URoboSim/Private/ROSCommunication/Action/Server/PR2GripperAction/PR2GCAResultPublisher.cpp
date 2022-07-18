@@ -40,6 +40,13 @@ void URPR2GCAResultPublisher::Publish()
 
     Seq++;
     GripperController->bPublishResult = false;
-    UE_LOG(LogRPR2GCAResultPublisher, Log, TEXT("Publish Result Gripper Action"));
+    if(GripperController->Result.bStalled)
+    {
+      UE_LOG(LogRPR2GCAResultPublisher, Log, TEXT("Publish Stalled Gripper Action"));
+    }
+    else
+    {
+      UE_LOG(LogRPR2GCAResultPublisher, Log, TEXT("Publish not Stalled Gripper Action"));
+    }
   }
 }
