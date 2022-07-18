@@ -73,21 +73,6 @@ void URGripperControllerBase::Init()
 		// OldPosition = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 		OldPosition = 0;
 
-		// TArray<URGraspComponent*> TempGraspComponents;
-		// GetOwner()->GetComponents<URGraspComponent>(TempGraspComponents);
-
-		// for (auto &GraspComp : TempGraspComponents)
-		// {
-		//   if (GraspComp->GetName().Equals(GraspComponentName))
-		//   {
-		//     GraspComponent = GraspComp;
-		//     URLink *ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
-		//     GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-		//     GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
-		//     GraspComponent->Init(ReferenceLink);
-		//   }
-		// }
-
 		GraspComponent = NewObject<URGraspComponent>(GetOwner(), FName(GetName() + TEXT("_GraspComp")));
 		GraspComponent->CreationMethod = EComponentCreationMethod::Instance;
 		GraspComponent->RegisterComponent();
@@ -97,7 +82,7 @@ void URGripperControllerBase::Init()
 		GraspComponent->Constraint->AttachToComponent(GraspComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
 		GraspComponent->Init(ReferenceLink);
-	}
+ 	}
 }
 
 void URGripperControllerBase::Tick(const float& InDeltaTime)

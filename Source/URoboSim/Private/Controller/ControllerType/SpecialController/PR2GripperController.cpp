@@ -28,9 +28,9 @@ void UPR2GripperController::Init()
       UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
       return;
     }
-    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 1);
-    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 1);
-    GripperJoint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 1);
+    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 1);
+    GripperJoint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 1);
+    GripperJoint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 1);
     JointValue = GripperJoint->GetJointPosition();
   }
 }
@@ -69,11 +69,16 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
 
   if (!GripperJoint)
   {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
+    UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"),  *GripperJointName, *GetName());
     return;
   }
-  // GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);
-  GripperPosition = (GripperJoint->GetJointPosition());
+  if (!GraspComponent)
+  {
+    UE_LOG(LogTemp, Error, TEXT("GraspComponent of %s not found"), *GetName());
+    return;
+  }
+  GripperPosition = (GripperJoint->GetJointPosition() - PoseOffsetFromJoints);
+  // GripperPosition = (GripperJoint->GetJointPosition());
   Error = Position - GripperPosition;
 
 

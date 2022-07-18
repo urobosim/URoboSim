@@ -71,6 +71,7 @@ URLink* URLinkBuilder::NewLink()
   Link->SetMassOverrideInKg(NAME_None,0.0000001);
   Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
   Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+  // Link->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
   if(Model->GetRootComponent() == nullptr)
     {
       Model->SetRootComponent(Link);
@@ -121,7 +122,7 @@ void URLinkBuilder::SetVisual(USDFVisual* InVisual)
   UStaticMeshComponent* LinkComponent = NewObject<UStaticMeshComponent>(Link, FName((InVisual->Name).GetCharArray().GetData()));
   LinkComponent->CreationMethod = EComponentCreationMethod::Instance;
   LinkComponent->RegisterComponent();
-
+  LinkComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
   // FVector LocationOffset = Link->LinkPoseInternal.GetRotation().RotateVector(InVisual->Pose.GetLocation());
   // LinkComponent->SetWorldLocation(LocationOffset + Link->LinkPoseInternal.GetLocation() + LoadLocation);
 
@@ -183,9 +184,9 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   // LinkComponent->SetWorldLocation(FinalPos);
 
   LinkComponent->AttachToComponent(Link, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+  LinkComponent->AddLocalTransform(InCollision->Pose);
   LinkComponent->WeldTo(Link);
 
-  LinkComponent->AddLocalTransform(InCollision->Pose);
 
   //Rotations are added by multiplying the Quaternions
   // FQuat RotationOffset = Link->LinkPoseInternal.GetRotation() * InCollision->Pose.GetRotation();

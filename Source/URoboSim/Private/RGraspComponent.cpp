@@ -8,6 +8,7 @@ URGraspComponent::URGraspComponent()
   InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
+  SetCollisionProfileName("OverlapAll");
 
   FString ConstraintName = TEXT("Constraint_") + GetName();
   if(GetWorld())
