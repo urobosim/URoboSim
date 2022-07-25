@@ -5,14 +5,14 @@
 
 #include "CoreMinimal.h"
 #include "Physics/RStaticMeshComponent.h"
-#include "Components/BoxComponent.h"
+// #include "Components/BoxComponent.h"
 #include "RLink.generated.h"
 
 class ARModel;
 class URLinkBuilder;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class UROBOSIM_API URLink : public UBoxComponent
+class UROBOSIM_API URLink : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 

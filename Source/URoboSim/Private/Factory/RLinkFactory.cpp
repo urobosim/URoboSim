@@ -1,5 +1,18 @@
 #include "Factory/RLinkFactory.h"
 
+URLinkBuilder::URLinkBuilder()
+{
+  static ConstructorHelpers::FObjectFinder<UStaticMesh> LinkMeshTemp(TEXT("/URoboSim/LinkMesh.LinkMesh"));
+  // static ConstructorHelpers::FObjectFinder<UStaticMesh> LinkMesh(TEXT("StaticMesh'/URoboSim/LinkMesh.LinkMesh'"));
+  if (LinkMeshTemp.Succeeded())
+  {
+    LinkMesh = LinkMeshTemp.Object;
+  }
+  else
+  {
+      UE_LOG(LogTemp, Error, TEXT("[%s] LinkFactory: LinkMesh not found."), *FString(__FUNCTION__));
+  }
+}
 URLink* URLinkFactory::Load(UObject* InOuter, USDFLink* InLinkDescription, FVector InLocation, FString InVersion)
 {
   if(!InOuter && !InLinkDescription)
@@ -66,11 +79,20 @@ URLink* URLinkBuilder::NewLink()
   Link->CreationMethod = EComponentCreationMethod::Instance;
   Link->RegisterComponent();
 
-  Link->SetBoxExtent(FVector(1,1,1), false);
+  // Link->SetBoxExtent(FVector(1,1,1), false);
+  Link->SetStaticMesh(LinkMesh);
+  
   Link->SetSimulatePhysics(false);
-  Link->SetMassOverrideInKg(NAME_None,0.0000001);
+// #if WITH_EDITOR
+//   Link->SetSimulatePhysics(true);
+// #else
+//   Link->SetSimulatePhysics(false);
+// #endif
+  
+  // Link->SetMassOverrideInKg(NAME_None,0.0000001);
   Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
   Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+  // Link->SetCollisionProfileName("RobotNoSelfCollision");
   // Link->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
   if(Model->GetRootComponent() == nullptr)
     {
@@ -88,7 +110,7 @@ URLink* URLinkBuilder::NewLink()
   SetCollisions();
 
   // Add the Visual Components to the Link
-  SetVisuals();
+  //SetVisuals();
 
   //Setup selfcollision
   SetCollisionProfile(LinkDescription->bSelfCollide);
@@ -197,7 +219,7 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   if(Collision)
     {
       LinkComponent->SetStaticMesh(Collision);
-      LinkComponent->SetVisibility(false,false);
+      LinkComponent->SetVisibility(true,false);
     }
   else
     {

@@ -17,6 +17,8 @@ class UROBOSIM_API URLinkBuilder : public UObject
 
 public:
 
+  URLinkBuilder();
+  UStaticMesh* LinkMesh = nullptr;
   virtual void  Init(UObject* InOuter, USDFLink* InLinkDescription);
   virtual void Init(UObject* InOuter, USDFLink* InLinkDescription,FVector InLocation);
 //  virtual URLink* NewLink(FVector InLocation);
@@ -60,6 +62,7 @@ class UROBOSIM_API URLinkFactory : public UObject
   GENERATED_BODY()
  public:
 
+  
     URLink* Load(UObject* InOuter, USDFLink* InLinkDescription, FString InVersion);
     URLink* Load(UObject* InOuter, USDFLink* InLinkDescription,FVector InLoaction, FString InVersion);
 
