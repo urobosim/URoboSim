@@ -175,7 +175,6 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
 
-
 }
 
 // Detach fixation
