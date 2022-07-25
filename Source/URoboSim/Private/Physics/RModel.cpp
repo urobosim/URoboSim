@@ -12,6 +12,15 @@ ARModel::ARModel()
   PrimaryActorTick.bCanEverTick = true;
   PrimaryActorTick.TickGroup = TG_PrePhysics;
 }
+void ARModel::PreInitializeComponents()
+{
+  for(auto& Plugin : Plugins)
+  {
+    UE_LOG(LogTemp, Log, TEXT("Initialize %s of %s"), *Plugin.Value->GetName(), *GetName())
+    Plugin.Value->Init();
+  }
+  Super::PreInitializeComponents();
+}
 
 // Called when the game starts or when spawned
 void ARModel::BeginPlay()

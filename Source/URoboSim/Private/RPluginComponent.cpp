@@ -13,8 +13,6 @@ void URPluginComponent::OnComponentCreated()
 void URPluginComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogRPluginComponent, Log, TEXT("Initialize %s of %s"), *GetName(), *GetOwner()->GetName())
-	Init();
 }
 
 ARModel* URPluginComponent::GetOwner() const
