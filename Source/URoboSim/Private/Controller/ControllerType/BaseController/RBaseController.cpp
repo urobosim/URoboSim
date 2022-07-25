@@ -31,7 +31,7 @@ void URBaseController::Init()
       URLink* Base = GetOwner()->Links[BaseName];
       Base->SetSimulatePhysics(true);
       Base->SetConstraintMode(EDOFMode::XYPlane);
-      TargetPose = Base->GetCollision()->GetComponentTransform();
+      TargetPose = Base->GetComponentTransform();
       MaxLinearVelocity = 0.1;
       MaxAngularVelocity = 0.1;
     }
@@ -66,7 +66,7 @@ void URBaseController::Tick(const float &InDeltaTime)
 void URBaseController::TurnTick(float InDeltaTime)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  FQuat BaseRotation = Base->GetCollision()->GetComponentQuat();
+  FQuat BaseRotation = Base->GetComponentQuat();
   FQuat AngularMotion = FQuat(FVector(0.0f, 0.0f, 1.0f), AngularVelocity * InDeltaTime);
   TargetPose.ConcatenateRotation(AngularMotion);
 
@@ -102,19 +102,19 @@ void URBaseController::TurnTick(float InDeltaTime)
     //   {
     //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
     //   }
-    Base->GetCollision()->SetPhysicsAngularVelocityInRadians(NextVel * HackRotationFactor);
+    Base->SetPhysicsAngularVelocityInRadians(NextVel * HackRotationFactor);
   }
   else
   {
     float AngularDistance = (TargetAngle - CurrentAngle) / PI * 180;
-    Base->GetCollision()->AddWorldRotation(FRotator(0.f, FRotator::NormalizeAxis(AngularDistance), 0.f));
+    Base->AddWorldRotation(FRotator(0.f, FRotator::NormalizeAxis(AngularDistance), 0.f));
   }
 }
 
 void URBaseController::MoveLinearTick(float InDeltaTime)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FRotator BaseOrientation = Base->GetComponentRotation();
 
   //Check if AngularVelocity is 0 to avoid divivision by 0
   if(FMath::Abs(AngularVelocity) > 0.0001f)
@@ -139,15 +139,15 @@ void URBaseController::MoveLinearTick(float InDeltaTime)
   if (!bIsKinematic)
   {
     //Calculate velocity in order to move from current position to the target position
-    FVector NextVel = TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation();
+    FVector NextVel = TargetPose.GetLocation() - Base->GetComponentLocation();
 
     NextVel /= InDeltaTime;
 
-    Base->GetCollision()->SetPhysicsLinearVelocity(NextVel * HackLinearFactor);
+    Base->SetPhysicsLinearVelocity(NextVel * HackLinearFactor);
   }
   else
   {
-    Base->GetCollision()->AddWorldOffset(TargetPose.GetLocation() - Base->GetCollision()->GetComponentLocation());
+    Base->AddWorldOffset(TargetPose.GetLocation() - Base->GetComponentLocation());
   }
 }
 
@@ -181,7 +181,7 @@ void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
   if(InVelocity.Size() != 0.f)
     {
       URLink* Base = GetOwner()->Links[BaseName];
-      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FRotator BaseOrientation = Base->GetComponentRotation();
       FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(InVelocity*InDeltaTime);
 
       for(auto& Link : GetOwner()->Links)
@@ -215,31 +215,31 @@ void URBaseController::Turn(float InVelocity, float InDeltaTime)
 
 void URBaseController::AddRelativeLocation(URLink* InLink, FVector InPosition)
 {
-  FVector Position = InLink->GetCollision()->GetComponentLocation();
-  InLink->GetCollision()->SetWorldLocation(InPosition + Position, false, nullptr, ETeleportType::TeleportPhysics);
+  FVector Position = InLink->GetComponentLocation();
+  InLink->SetWorldLocation(InPosition + Position, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
 void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
-  FRotator Orientation = InLink->GetCollision()->GetComponentRotation();
-  FVector Position = InLink->GetCollision()->GetComponentLocation();
+  FRotator BaseOrientation = Base->GetComponentRotation();
+  FVector BasePosition = Base->GetComponentLocation();
+  FRotator Orientation = InLink->GetComponentRotation();
+  FVector Position = InLink->GetComponentLocation();
 
   FQuat NewRot = InRotator.Quaternion() * Orientation.Quaternion() ;
-  InLink->GetCollision()->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
+  InLink->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
 
   FVector LinkBaseOffset = Position - BasePosition;
   FVector NewPosition = InRotator.RotateVector(LinkBaseOffset) + BasePosition;
 
-  InLink->GetCollision()->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
+  InLink->SetWorldLocation(NewPosition, false, nullptr, ETeleportType::TeleportPhysics);
 }
 
 void URBaseController::SetLocation(FVector InPosition)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  // FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  // FVector BasePosition = Base->GetComponentLocation();
   // FVector DistanceTraveld = InPosition - BasePosition;
 
   TargetPose.SetLocation(InPosition);
@@ -252,7 +252,7 @@ void URBaseController::SetRotation(FRotator InRotation)
 {
   URLink* Base = GetOwner()->Links[BaseName];
   TargetPose.SetRotation(InRotation.Quaternion());
-  // FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  // FRotator BaseOrientation = Base->GetComponentRotation();
   // FRotator NewRotation = InRotation - BaseOrientation;
   // NewRotation.Pitch = 0;
   // NewRotation.Roll = 0;
@@ -282,21 +282,21 @@ void URBaseControllerKinematic::TurnTick(float InDeltaTime)
     {
       FRotator TestRotation = FRotator(0.0f, AngularVelocity *InDeltaTime, 0.0f);
       URLink* Base = GetOwner()->Links[BaseName];
-      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
-      FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+      FRotator BaseOrientation = Base->GetComponentRotation();
+      FVector BasePosition = Base->GetComponentLocation();
 
 
       for(auto& Link : GetOwner()->Links)
         {
-          FRotator Orientation = Link.Value->GetCollision()->GetComponentRotation();
-          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
+          FRotator Orientation = Link.Value->GetComponentRotation();
+          FVector Position = Link.Value->GetComponentLocation();
 
           FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
 
           FVector LinkBaseOffset = Position - BasePosition;
           FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
 
-          Link.Value->GetCollision()->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
+          Link.Value->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
         }
     }
 }
@@ -306,13 +306,13 @@ void URBaseControllerKinematic::MoveLinearTick(float InDeltaTime)
   if(LinearVelocity.Size() != 0.f)
     {
       URLink* Base = GetOwner()->Links[BaseName];
-      FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+      FRotator BaseOrientation = Base->GetComponentRotation();
       FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
 
       for(auto& Link : GetOwner()->Links)
         {
-          FVector Position = Link.Value->GetCollision()->GetComponentLocation();
-          Link.Value->GetCollision()->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
+          FVector Position = Link.Value->GetComponentLocation();
+          Link.Value->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
         }
     }
 }
@@ -320,7 +320,7 @@ void URBaseControllerKinematic::MoveLinearTick(float InDeltaTime)
 void URBaseControllerKinematic::SetLocation(FVector InPosition)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  FVector BasePosition = Base->GetCollision()->GetComponentLocation();
+  FVector BasePosition = Base->GetComponentLocation();
   FVector DistanceTraveled = InPosition - BasePosition;
   DistanceTraveled.Z = 0;
 
@@ -336,7 +336,7 @@ void URBaseControllerKinematic::SetRotation(FRotator InRotation)
 {
   URLink* Base = GetOwner()->Links[BaseName];
   // TargetPose.SetRotation(InRotation.Quaternion());
-  FRotator BaseOrientation = Base->GetCollision()->GetComponentRotation();
+  FRotator BaseOrientation = Base->GetComponentRotation();
   FRotator NewRotation = InRotation - BaseOrientation;
   NewRotation.Pitch = 0;
   NewRotation.Roll = 0;

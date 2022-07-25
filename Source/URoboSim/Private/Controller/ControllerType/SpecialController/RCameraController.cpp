@@ -98,7 +98,7 @@ void URCameraController::PerceiveObject()
 
       if(ReferenceLink)
         {
-          FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+          FTransform ReferenceLinkTransform = ReferenceLink->GetComponentTransform();
           FVector Location = ReferenceLinkTransform.GetLocation();
           Location.Z = 0.0f;
           ReferenceLinkTransform.SetLocation(Location);
