@@ -143,11 +143,13 @@ void URConstraintComponent::BeginPlay()
   Super::BeginPlay();
   if(!Parent)
     {
+      UE_LOG(LogTemp, Error, TEXT("Parent of Joint not found on BeginPlay %s"), *GetName());
       Parent = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame1));
     }
 
   if(!Child)
     {
+      UE_LOG(LogTemp, Error, TEXT("Child of Joint not found on BeginPlay %s"), *GetName());
       Child = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame2));
     }
 
@@ -404,6 +406,7 @@ void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPos
   // SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition));
   SetAngularVelocityTarget(RefAxis * TargetJointVelocity / 360.f);
   Child->WakeRigidBody();
+  Parent->WakeRigidBody();
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
@@ -444,6 +447,7 @@ void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosi
   SetLinearPositionTarget(RefAxis * TargetPosition + Offset);
   SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
+  Parent->WakeRigidBody();
 }
 
 void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)
