@@ -66,17 +66,17 @@ public:
 
   FGraspResult Result;
 
-  UPROPERTY(EditAnywhere)
-  FString GripperJointName2;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointName2;
 
-  UPROPERTY()
-  URJoint *GripperJoint2;
+  // UPROPERTY()
+  // URJoint *GripperJoint2;
   
-  UPROPERTY(EditAnywhere)
-  FString GripperJointName3;
+  // UPROPERTY(EditAnywhere)
+  // FString GripperJointName3;
 
-  UPROPERTY()
-  URJoint *GripperJoint3;
+  // UPROPERTY()
+  // URJoint *GripperJoint3;
 protected:
   bool bSuccessGrasp = false;
 

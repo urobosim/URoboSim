@@ -83,13 +83,7 @@ URLink* URLinkBuilder::NewLink()
   Link->SetStaticMesh(LinkMesh);
   
   Link->SetSimulatePhysics(false);
-// #if WITH_EDITOR
-//   Link->SetSimulatePhysics(true);
-// #else
-//   Link->SetSimulatePhysics(false);
-// #endif
-  
-  // Link->SetMassOverrideInKg(NAME_None,0.0000001);
+  Link->SetMassOverrideInKg(NAME_None,0.000000);
   Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
   Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
   // Link->SetCollisionProfileName("RobotNoSelfCollision");

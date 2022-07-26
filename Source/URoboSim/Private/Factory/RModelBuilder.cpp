@@ -63,11 +63,24 @@ void URModelBuilder::LoadJoints()
 			continue;
 		}
 		
+		// if(!Parent->GetCollision())
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("Joint %s Parent %s has no collision. Not supported"), *Joint->GetName(), *Joint->Parent);
+		// 	continue;
+		// }
+		
 		URLink* Child = Model->GetLink(Joint->Child);
 		if(!Child)
 		{
 			continue;
 		}
+		
+		// if (!Child->GetCollision())
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("Joint %s Child %s has no collision. Not supported"), *Joint->GetName(), *Joint->Child);
+		// 	continue;
+		// }
+
 		
 		URJoint* TempJoint = JointFactory->Load(Model, Joint, Version);
 		if (TempJoint)
@@ -95,15 +108,16 @@ void URModelBuilder::BuildKinematicTree()
 		URLink* Child = *Model->Links.Find(Joint.Value->ChildName);
 		if (!Parent)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Parent %s not found"), *Joint.Value->ParentName);
+			UE_LOG(LogTemp, Error, TEXT("Joint %s Parent %s not found"), *Joint.Value->GetName(), *Joint.Value->ParentName);
 			continue;
 		}
+		
 		if (!Child)
 		{
-			UE_LOG(LogTemp, Error, TEXT("Child %s not found"), *Joint.Value->ChildName);
+			UE_LOG(LogTemp, Error, TEXT("Joint %s Child %s not found"), *Joint.Value->GetName(), *Joint.Value->ChildName);
 			continue;
 		}
-
+		
 		if (!Child->bAttachedToParent)
 		{
 			Child->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);

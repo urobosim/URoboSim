@@ -16,8 +16,16 @@ void UPR2GripperController::Init()
   else
   {
 
-		GripperJoint2 = GetOwner()->Joints.FindRef(GripperJointName2);
-		GripperJoint3 = GetOwner()->Joints.FindRef(GripperJointName3);
+    for(auto& Joint : GetOwner()->Joints)
+    {
+      if(Joint.Key.Contains(TEXT("parallel")))
+      {
+        // Joint.Value->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
+        Joint.Value->Constraint->ConstraintInstance.SetAngularBreakable(true, 300);
+      }
+    }
+		// GripperJoint2 = GetOwner()->Joints.FindRef(GripperJointName2);
+		// GripperJoint3 = GetOwner()->Joints.FindRef(GripperJointName3);
 
     if (!JointController)
     {
@@ -31,38 +39,48 @@ void UPR2GripperController::Init()
       return;
     }
     
-		if (!GripperJoint2)
-		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName2);
-			return;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName2);
-		}
-		if (!GripperJoint3)
-		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName3);
-			return;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName3);
-		}
+		// if (!GripperJoint2)
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName2);
+		// 	return;
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName2);
+		// }
+		// if (!GripperJoint3)
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName3);
+		// 	return;
+		// }
+		// else
+		// {
+		// 	UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName3);
+		// }
     
-    PoseOffsetFromJoints = GripperJoint3->GetJointPosition();
+    // PoseOffsetFromJoints = GripperJoint3->GetJointPosition();
     
-		TArray<FString> JointNames;
-		JointNames.Add(GripperJointName2);
-		JointController->SetJointNames(JointNames, EnableDrive);
+		// TArray<FString> JointNames;
+		// JointNames.Add(GripperJointName2);
+		// JointNames.Add(GripperJointName3);
+		// JointController->SetJointNames(JointNames, EnableDrive);
     
-    GripperJoint3->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 1);
-    GripperJoint3->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 1);
-    GripperJoint3->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 1);
-    GripperJoint3->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
-    GripperJoint3->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
+    // GripperJoint3->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    // GripperJoint3->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    // GripperJoint3->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 1);
+    // GripperJoint3->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
+    // GripperJoint3->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
     
-    JointValue = GripperJoint3->GetJointPosition();
+    // JointValue = GripperJoint3->GetJointPosition();
+    
+    // GripperJoint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    // GripperJoint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 1);
+    // GripperJoint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 1);
+    
+    GripperJoint->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
+    GripperJoint->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
+    
+    JointValue = GripperJoint->GetJointPosition();
   }
 }
 
@@ -103,30 +121,30 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
     UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"),  *GripperJointName, *GetName());
     return;
   }
-  if (!GripperJoint2)
-  {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint2 %s of %s not found"),  *GripperJointName2, *GetName());
-    return;
-  }
-  if (!GripperJoint3)
-  {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint3 %s of %s not found"),  *GripperJointName3, *GetName());
-    return;
-  }
+  // if (!GripperJoint2)
+  // {
+  //   UE_LOG(LogTemp, Error, TEXT("GripperJoint2 %s of %s not found"),  *GripperJointName2, *GetName());
+  //   return;
+  // }
+  // if (!GripperJoint3)
+  // {
+  //   UE_LOG(LogTemp, Error, TEXT("GripperJoint3 %s of %s not found"),  *GripperJointName3, *GetName());
+  //   return;
+  // }
   if (!GraspComponent)
   {
     UE_LOG(LogTemp, Error, TEXT("GraspComponent of %s not found"), *GetName());
     return;
   }
-  // GripperPosition = (GripperJoint3->GetJointPosition() - PoseOffsetFromJoints);
-  GripperPosition = (GripperJoint3->GetJointPosition());
+  // GripperPosition = (GripperJoint3->GetJointPosition());
+  GripperPosition = (GripperJoint->GetJointPosition());
   Error = Position - GripperPosition;
 
 
   // UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s Swing1 %f Swing2 %f Twist %f"), *GripperJoint->GetName(), GripperJoint->Constraint->GetCurrentSwing1(),GripperJoint->Constraint->GetCurrentSwing2(), GripperJoint->Constraint->GetCurrentTwist());
   if (bActive)
   {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f PoseOffsetFromJoints %f"), *GripperJoint3->GetName(), GripperJoint3->GetJointPosition(), Error, PoseOffsetFromJoints);
+    UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s GripperPosition %f Error %f"), *GripperJoint->GetName(), GripperJoint->GetJointPosition(), Error);
 
     bStalled = false;
     CheckGripperActionResult(Error, 0.001);
@@ -137,34 +155,25 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
       Release();
     }
 
+    // float Average = (GripperJoint->GetJointPosition() + GripperJoint2->GetJointPosition()) / 2.0;
+    float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
+    // float &GripperJointValue2 = JointController->DesiredJointStates.FindOrAdd(GripperJointName2).JointPosition;
+    // float &GripperJointValue3= JointController->DesiredJointStates.FindOrAdd(GripperJointName3).JointPosition;
+    
     if (bActive)
     {
       GoalStatusList.Last().Status = 1;
       ActionDuration += InDeltaTime;
-      float Speed = 0.01;// + 0.01 * (FMath::Abs(Error) / 0.085);
-      float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
-      float &GripperJointValue2= JointController->DesiredJointStates.FindOrAdd(GripperJointName2).JointPosition;
-      if (Error < 0.)
-       {
-         GripperJointValue -= Speed;
-         GripperJointValue2 -= Speed;
-       }
-       else if(Error > 0.)
-       {
-         GripperJointValue += Speed;
-         GripperJointValue2 += Speed;
-       }     
       
-      // GripperJointValue = Position;
-
+      // GripperJointValue = Average;
+      // GripperJointValue2 = Average;
+      // GripperJointValue3 = Position;
+      GripperJointValue = Position;
     }
     else if (bStalled && (OldPosition - Position >= -0.0012))
     {
-      float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
-      float &GripperJointValue2 = JointController->DesiredJointStates.FindOrAdd(GripperJointName2).JointPosition;
-      float Average = (GripperJoint->GetJointPosition() + GripperJoint2->GetJointPosition()) / 2.0;
-      GripperJointValue = Average;
-      GripperJointValue2 = Average;
+      // GripperJointValue = Average;
+      // GripperJointValue2 = Average;
       
       OldPosition = GripperPosition;
       UE_LOG(LogTemp, Error, TEXT("%s: Grasp"), *GraspComponent->GetName());
