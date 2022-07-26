@@ -20,8 +20,12 @@ void UPR2GripperController::Init()
     {
       if(Joint.Key.Contains(TEXT("parallel")))
       {
-        // Joint.Value->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
-        Joint.Value->Constraint->ConstraintInstance.SetAngularBreakable(true, 300);
+        Joint.Value->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Free, 1.0);
+        Joint.Value->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Free, 1.0);
+        Joint.Value->Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Free, 1.0);
+        Joint.Value->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 1);
+        Joint.Value->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 1);
+        Joint.Value->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 1);
       }
     }
 		// GripperJoint2 = GetOwner()->Joints.FindRef(GripperJointName2);

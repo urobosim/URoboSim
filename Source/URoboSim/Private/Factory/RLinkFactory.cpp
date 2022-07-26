@@ -83,11 +83,12 @@ URLink* URLinkBuilder::NewLink()
   Link->SetStaticMesh(LinkMesh);
   
   Link->SetSimulatePhysics(false);
+  Link->SetVisibility(false);
   Link->SetMassOverrideInKg(NAME_None,0.000000);
   Link->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
   Link->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
   // Link->SetCollisionProfileName("RobotNoSelfCollision");
-  // Link->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+  // Link->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
   if(Model->GetRootComponent() == nullptr)
     {
       Model->SetRootComponent(Link);
@@ -104,7 +105,7 @@ URLink* URLinkBuilder::NewLink()
   SetCollisions();
 
   // Add the Visual Components to the Link
-  //SetVisuals();
+  SetVisuals();
 
   //Setup selfcollision
   SetCollisionProfile(LinkDescription->bSelfCollide);
@@ -213,7 +214,7 @@ void URLinkBuilder::SetCollision(USDFCollision* InCollision)
   if(Collision)
     {
       LinkComponent->SetStaticMesh(Collision);
-      LinkComponent->SetVisibility(true,false);
+      LinkComponent->SetVisibility(false,false);
     }
   else
     {

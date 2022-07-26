@@ -86,8 +86,11 @@ void URJoint::SetSimulatePhysics(bool bEnablePhysics)
 
   if (Cast<UPrimitiveComponent>(Parent->GetAttachParent()))
 		{
-        Parent->SetSimulatePhysics(bEnablePhysics);
-		}
+      if(!Parent->GetCollision())
+        {
+          Parent->SetSimulatePhysics(bEnablePhysics);
+        }
+    }
 }
 
 void URJoint::SetDrive(const FEnableDrive &EnableDrive)
