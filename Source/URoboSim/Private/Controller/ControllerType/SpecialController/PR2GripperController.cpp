@@ -3,6 +3,15 @@
 void UPR2GripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
   Super::SetControllerParameters(ControllerParameters);
+  
+	URGripperControllerParameter* GripperControllerParameters = Cast<URGripperControllerParameter>(
+		ControllerParameters);
+  GripperJointName = GripperControllerParameters->GripperPrefix + GripperControllerParameters->GripperJointName;
+  PassiveJoints = GripperControllerParameters->PassiveJoints;
+	for(auto& PJoint : PassiveJoints)
+	{
+		PJoint = GripperControllerParameters->GripperPrefix + PJoint;
+	}
 }
 
 void UPR2GripperController::Init()
@@ -42,6 +51,34 @@ void UPR2GripperController::Init()
       UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
       return;
     }
+  	
+	if (bOverwriteConfig)
+	{
+		for(auto& PJointName : PassiveJoints)
+		{
+			URJoint* PJoint = GetOwner()->Joints.FindRef(PJointName);
+			if(PJoint)
+			{
+			    UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s enable physics"), *PJointName);
+				FEnableDrive PassiveDrive;
+				PassiveDrive.bPositionDrive = false;
+				PassiveDrive.bVelocityDrive = false;
+				JointController->AddConfigOverwrite(PJointName, FConfigOverwrite(Mode, PassiveDrive));
+				PJoint->SetSimulatePhysics(true);
+				PJoint->Child->WakeRigidBody();
+				if(!PJoint->Child->IsSimulatingPhysics())
+				{
+					UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s did not enable physics"), *PJointName);
+				}
+			}
+			else
+			{
+			  UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s of %s not found"), *PJointName,  *GetName());
+			}
+			
+		}
+		  
+	}
     
 		// if (!GripperJoint2)
 		// {
@@ -85,6 +122,7 @@ void UPR2GripperController::Init()
     GripperJoint->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 1.0);
     
     JointValue = GripperJoint->GetJointPosition();
+    
   }
 }
 
@@ -193,4 +231,8 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
 UPR2GripperController::UPR2GripperController()
 {
   GripperJointName = TEXT("?_gripper_joint");
+  PassiveJoints.Add("_r_finger_joint");
+  PassiveJoints.Add("_l_finger_joint");
+  PassiveJoints.Add("_r_finger_tip_joint");
+  PassiveJoints.Add("_l_finger_tip_joint");
 }
