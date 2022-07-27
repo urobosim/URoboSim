@@ -148,14 +148,6 @@ void URJointTrajectoryController::Tick(const float &InDeltaTime)
     //   Joint->UpdateEncoder();
     // }
 
-    for (URLink *&Link : GetOwner()->GetLinks())
-    {
-        if(Link->IsGravityEnabled())
-        {
-          UE_LOG(LogTemp, Error, TEXT("%s something went wrong disabling physics"), *Link->GetName())
-        }
-    }
-    
     if (State == UJointControllerState::FollowJointTrajectory)
     {
       ActionDuration += SpeedFactor * InDeltaTime;

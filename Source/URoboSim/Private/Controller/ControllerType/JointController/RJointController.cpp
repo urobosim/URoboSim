@@ -150,20 +150,7 @@ void URJointController::SetPhysics()
   {
   for (URLink *&Link : GetOwner()->GetLinks())
     {
-      UE_LOG(LogRJointController, Error, TEXT("%s Physics"), *Link->GetName())
       Link->SetEnableGravity(false);
-      if(Link->IsGravityEnabled())
-      {
-        UE_LOG(LogRJointController, Error, TEXT("%s something went wrong disabling physics"), *Link->GetName())
-      }
-    if(Link->GetBodyInstance())
-    {
-        UE_LOG(LogRJointController, Error, TEXT("%s BodyInstance found"), *Link->GetName())
-    }
-    else
-    {
-        UE_LOG(LogRJointController, Error, TEXT("%s No BodyInstance found"), *Link->GetName())
-    }
     }
   }
   else
