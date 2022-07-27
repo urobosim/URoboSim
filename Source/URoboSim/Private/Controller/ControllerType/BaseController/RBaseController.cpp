@@ -40,20 +40,11 @@ void URBaseController::Init()
 void URBaseController::MoveLinear(FVector InVelocity)
 {
   LinearVelocity = InVelocity;
-  // if(MaxLinearVelocity < InVelocity.Size())
-  //   {
-  //     MaxLinearVelocity = InVelocity.Size();
-  //   }
 }
 
 void URBaseController::Turn(float InVelocity)
 {
   AngularVelocity = -InVelocity;
-
-  // if(MaxAngularVelocity < FMath::Abs(AngularVelocity))
-  //   {
-  //     MaxAngularVelocity = FMath::Abs(AngularVelocity);
-  //   }
 }
 
 void URBaseController::Tick(const float &InDeltaTime)
@@ -98,10 +89,6 @@ void URBaseController::TurnTick(float InDeltaTime)
       }
 
     FVector NextVel = FVector(0.0f, 0.0f, AngularDistance / InDeltaTime);
-    // if(NextVel.Size() > MaxAngularVelocity)
-    //   {
-    //     NextVel = NextVel.GetClampedToMaxSize(MaxAngularVelocity);
-    //   }
     Base->SetPhysicsAngularVelocityInRadians(NextVel * HackRotationFactor);
   }
   else
@@ -222,7 +209,6 @@ void URBaseController::AddRelativeLocation(URLink* InLink, FVector InPosition)
 void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  FRotator BaseOrientation = Base->GetComponentRotation();
   FVector BasePosition = Base->GetComponentLocation();
   FRotator Orientation = InLink->GetComponentRotation();
   FVector Position = InLink->GetComponentLocation();
@@ -239,29 +225,12 @@ void URBaseController::AddRelativeRotation(URLink* InLink, FRotator InRotator)
 void URBaseController::SetLocation(FVector InPosition)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  // FVector BasePosition = Base->GetComponentLocation();
-  // FVector DistanceTraveld = InPosition - BasePosition;
-
   TargetPose.SetLocation(InPosition);
-  // for(auto& Link : GetOwner()->Links)
-  //   {
-  //     AddRelativeLocation(Link.Value, DistanceTraveld);
-  //   }
 }
 void URBaseController::SetRotation(FRotator InRotation)
 {
   URLink* Base = GetOwner()->Links[BaseName];
   TargetPose.SetRotation(InRotation.Quaternion());
-  // FRotator BaseOrientation = Base->GetComponentRotation();
-  // FRotator NewRotation = InRotation - BaseOrientation;
-  // NewRotation.Pitch = 0;
-  // NewRotation.Roll = 0;
-
-  // UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString())
-  // for(auto& Link : GetOwner()->Links)
-  //   {
-  //     AddRelativeRotation(Link.Value, NewRotation);
-  //   }
 }
 
 void URBaseController::SetTransform(FTransform InTransform)
@@ -285,19 +254,8 @@ void URBaseControllerKinematic::TurnTick(float InDeltaTime)
       FRotator BaseOrientation = Base->GetComponentRotation();
       FVector BasePosition = Base->GetComponentLocation();
 
-
-      for(auto& Link : GetOwner()->Links)
-        {
-          FRotator Orientation = Link.Value->GetComponentRotation();
-          FVector Position = Link.Value->GetComponentLocation();
-
-          FQuat NewRot = TestRotation.Quaternion() * Orientation.Quaternion() ;
-
-          FVector LinkBaseOffset = Position - BasePosition;
-          FVector NewPosition = TestRotation.RotateVector(LinkBaseOffset) + BasePosition;
-
-          Link.Value->SetWorldLocationAndRotation(NewPosition, NewRot, false, nullptr, ETeleportType::None);
-        }
+      FQuat NewRot = TestRotation.Quaternion() * BaseOrientation.Quaternion() ;
+      Base->SetWorldRotation(NewRot, false, nullptr, ETeleportType::TeleportPhysics);
     }
 }
 
@@ -309,11 +267,8 @@ void URBaseControllerKinematic::MoveLinearTick(float InDeltaTime)
       FRotator BaseOrientation = Base->GetComponentRotation();
       FVector DistanceTraveld = BaseOrientation.Quaternion().RotateVector(LinearVelocity*InDeltaTime);
 
-      for(auto& Link : GetOwner()->Links)
-        {
-          FVector Position = Link.Value->GetComponentLocation();
-          Link.Value->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
-        }
+      FVector Position = Base->GetComponentLocation();
+      Base->SetWorldLocation(DistanceTraveld + Position, false, nullptr, ETeleportType::TeleportPhysics);
     }
 }
 
@@ -325,26 +280,29 @@ void URBaseControllerKinematic::SetLocation(FVector InPosition)
   DistanceTraveled.Z = 0;
 
   AddRelativeLocation(Base, DistanceTraveled);
-  // TargetPose.SetLocation(InPosition);
-  // for(auto& Link : GetOwner()->Links)
-  //   {
-  //     AddRelativeLocation(Link.Value, DistanceTraveld);
-  //   }
 }
 
 void URBaseControllerKinematic::SetRotation(FRotator InRotation)
 {
   URLink* Base = GetOwner()->Links[BaseName];
-  // TargetPose.SetRotation(InRotation.Quaternion());
   FRotator BaseOrientation = Base->GetComponentRotation();
   FRotator NewRotation = InRotation - BaseOrientation;
   NewRotation.Pitch = 0;
   NewRotation.Roll = 0;
 
-  // UE_LOG(LogTemp, Log, TEXT("BaseOrientation %s, DesRotation %s, Delta %s"), *BaseOrientation.ToString(), *InRotation.ToString(), *NewRotation.ToString());
   AddRelativeRotation(Base, NewRotation);
-  // for(auto& Link : GetOwner()->Links)
-  //   {
-  //     AddRelativeRotation(Link.Value, NewRotation);
-  //   }
+}
+
+void URBaseControllerKinematic::Init()
+{
+  if (!GetOwner())
+  {
+    UE_LOG(LogTemp, Error, TEXT("URBaseController not attached to ARModel"));
+    }
+  else
+    {
+      URLink* Base = GetOwner()->Links[BaseName];
+      Base->SetSimulatePhysics(false);
+      TargetPose = Base->GetComponentTransform();
+    }
 }
