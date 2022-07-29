@@ -12,6 +12,15 @@ ARModel::ARModel()
   PrimaryActorTick.bCanEverTick = true;
   PrimaryActorTick.TickGroup = TG_PrePhysics;
 }
+void ARModel::PreInitializeComponents()
+{
+  for(auto& Plugin : Plugins)
+  {
+    UE_LOG(LogTemp, Log, TEXT("Initialize %s of %s"), *Plugin.Value->GetName(), *GetName())
+    Plugin.Value->Init();
+  }
+  Super::PreInitializeComponents();
+}
 
 // Called when the game starts or when spawned
 void ARModel::BeginPlay()
@@ -53,7 +62,7 @@ URJoint *ARModel::GetJoint(const FString &JointName) const
   }
   else
   {
-    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *JointName, *GetName())
+    UE_LOG(LogRModel, Error, TEXT("[%s] %s not found in %s"), *FString(__FUNCTION__), *JointName, *GetName())
     return nullptr;
   }
 }
@@ -76,16 +85,17 @@ URLink *ARModel::GetLink(const FString &LinkName) const
   }
   else
   {
-    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *LinkName, *GetName())
+    UE_LOG(LogRModel, Error, TEXT("[%s] %s not found in %s"),*FString(__FUNCTION__), *LinkName, *GetName())
     return nullptr;
   }
 }
 
 bool ARModel::AddPlugin(URPluginComponent *InPlugin)
 {
-  if (URPluginComponent *Plugin = GetPlugin(InPlugin->GetName()))
+  if (Plugins.Contains(InPlugin->GetName()))
   {
-    UE_LOG(LogRModel, Warning, TEXT("Plugin %s was found in %s, replace..."), *InPlugin->GetName(), *GetName())
+    URPluginComponent *Plugin = GetPlugin(InPlugin->GetName());
+    UE_LOG(LogRModel, Warning, TEXT("[%s] Plugin %s was found in %s, replace..."),*FString(__FUNCTION__), *InPlugin->GetName(), *GetName())
     Plugin = InPlugin;
     return false;
   }
@@ -104,7 +114,7 @@ URPluginComponent *ARModel::GetPlugin(const FString &PluginName) const
   }
   else
   {
-    UE_LOG(LogRModel, Error, TEXT("%s not found in %s"), *PluginName, *GetName())
+    UE_LOG(LogRModel, Error, TEXT("[%s] %s not found in %s"),*FString(__FUNCTION__), *PluginName, *GetName())
     return nullptr;
   }
 }
@@ -118,6 +128,6 @@ URController *ARModel::GetController(const FString &ControllerName) const
       return ControllerComponent->GetController(ControllerName);
     }
   }
-  UE_LOG(LogRModel, Error, TEXT("ControllerComponent not found in %s"), *GetName())
+  UE_LOG(LogRModel, Error, TEXT("[%s] ControllerComponent not found in %s"), *FString(__FUNCTION__), *GetName())
   return nullptr;
 }

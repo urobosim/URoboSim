@@ -10,7 +10,7 @@ URGCAStatusPublisher::URGCAStatusPublisher()
 void URGCAStatusPublisher::Init()
 {
   Super::Init();
-  GripperController = Cast<URGripperController>(Controller);
+  GripperController = Cast<UPR2GripperController>(Controller);
 }
 
 void URGCAStatusPublisher::Publish()

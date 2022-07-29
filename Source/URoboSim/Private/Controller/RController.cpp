@@ -17,7 +17,7 @@ void URController::SetOwner()
 {
   if(GetWorld())
     {
-      UE_LOG(LogRController, Log, TEXT("Initialize %s"), *GetName())
+      UE_LOG(LogRController, Log, TEXT("SetOwner of %s"), *GetName())
         if (!Owner)
           {
             if (Cast<ARModel>(GetOuter()))
@@ -42,13 +42,13 @@ void URController::CancelAction()
   {
     if (bActive)
     {
-      // GoalStatusList.Last().Status = 6;
-      // bActive = false;
+      GoalStatusList.Last().Status = 6;
+      bActive = false;
     }
     else
     {
-      // GoalStatusList.Last().Status = 2;
+      GoalStatusList.Last().Status = 2;
     }
-    // bPublishResult = true;
+    bPublishResult = true;
   }
 }

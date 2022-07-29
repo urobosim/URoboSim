@@ -12,7 +12,7 @@ URPR2GCAResultPublisher::URPR2GCAResultPublisher()
 void URPR2GCAResultPublisher::Init()
 {
   Super::Init();
-  GripperController = Cast<URGripperController>(Controller);
+  GripperController = Cast<UPR2GripperController>(Controller);
 }
 
 void URPR2GCAResultPublisher::Publish()
@@ -32,7 +32,7 @@ void URPR2GCAResultPublisher::Publish()
 
     //TODO make use of real values
     // pr2_controllers_msgs::PR2GripperCommandResult Result(Owner->Result.Position, Owner->Result.Effort , Owner->Result.bStalled , Owner->Result.bReachedGoal );
-    pr2_controllers_msgs::PR2GripperCommandResult Result(GripperController->Result.Position / 100.0, GripperController->Result.Effort, GripperController->Result.bStalled, GripperController->Result.bReachedGoal);
+    pr2_controllers_msgs::PR2GripperCommandResult Result(GripperController->Result.Position, GripperController->Result.Effort, GripperController->Result.bStalled, GripperController->Result.bReachedGoal);
     ActionResult->SetResult(Result);
 
     Handler->PublishMsg(Topic, ActionResult);

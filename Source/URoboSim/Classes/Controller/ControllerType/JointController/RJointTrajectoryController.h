@@ -22,9 +22,22 @@ public:
   FTrajectoryPoints(const float &InSecs, const float &InNSecs, const TArray<FString> &InJointNames, const TArray<double> &InPositions, const TArray<double> &InVelocities)
   {
     SetTimeStep(InSecs, InNSecs);
+
     for (int32 i = 0; i < InJointNames.Num(); i++)
     {
-      JointStates.Add(InJointNames[i], FJointState(InPositions[i], InVelocities[i]));
+
+      FJointState TempJointState;
+      if (i < InPositions.Num())
+      {
+        TempJointState.JointPosition = InPositions[i];
+      }
+      
+      if (i < InVelocities.Num())
+      {
+        TempJointState.JointVelocity = InVelocities[i];
+      }
+      
+      JointStates.Add(InJointNames[i], TempJointState);
     }
   }
 

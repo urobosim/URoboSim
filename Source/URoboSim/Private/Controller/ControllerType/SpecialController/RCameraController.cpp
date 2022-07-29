@@ -1,5 +1,7 @@
 #include "Controller/ControllerType/SpecialController/RCameraController.h"
 
+#include "Kismet/GameplayStatics.h"
+
 URCameraController::URCameraController()
 {
 
@@ -26,12 +28,12 @@ void URCameraController::Init()
     return;
   }
 
-  TArray<AActor *> FoundActors;
-  TArray<UStaticMeshComponent *> ActorComponents;
-  UStaticMeshComponent *ReferenceLink = nullptr;
+  UPrimitiveComponent *ReferenceLink = nullptr;
+  
+  TArray<UPrimitiveComponent *> ActorComponents;
   GetOwner()->GetComponents(ActorComponents);
 
-  for (UStaticMeshComponent *&Component : ActorComponents)
+  for (UPrimitiveComponent *&Component : ActorComponents)
   {
     if (Component->GetName().Contains(CameraRef))
     {
@@ -44,10 +46,12 @@ void URCameraController::Init()
     return;
   }
 
+  TArray<AActor *> FoundActors;
   UGameplayStatics::GetAllActorsOfClass(GetWorld(), ACameraActor::StaticClass(), FoundActors);
 
   for (auto &MyCamera : FoundActors)
   {
+    UE_LOG(LogTemp, Log, TEXT("Camera %s found. Check if target"), *MyCamera->GetName());
     if (MyCamera->GetName().Equals(CameraName))
     {
       MyCamera->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -94,7 +98,7 @@ void URCameraController::PerceiveObject()
 
       if(ReferenceLink)
         {
-          FTransform ReferenceLinkTransform = ReferenceLink->GetCollision()->GetComponentTransform();
+          FTransform ReferenceLinkTransform = ReferenceLink->GetComponentTransform();
           FVector Location = ReferenceLinkTransform.GetLocation();
           Location.Z = 0.0f;
           ReferenceLinkTransform.SetLocation(Location);

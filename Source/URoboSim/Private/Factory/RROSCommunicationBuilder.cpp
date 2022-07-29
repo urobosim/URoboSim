@@ -7,6 +7,7 @@
 #include "ROSCommunication/Publisher/JointStatePublisher.h"
 #include "ROSCommunication/Publisher/JointTrajectoryControllerStatePublisher.h"
 #include "ROSCommunication/Publisher/RDonbotOdomPublisher.h"
+#include "ROSCommunication/Publisher/RNavOdometryPublisher.h"
 #include "ROSCommunication/Publisher/RTFPublisher.h"
 #include "ROSCommunication/Service/Client/RJointControllerConfigurationClient.h"
 #include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
@@ -41,6 +42,7 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
                                       const TArray<FRActionServerConfiguration> &ActionServerConfigurations)
 {
   URROSCommunicationComponent *ROSCommunicationComponent = NewObject<URROSCommunicationComponent>(Owner, TEXT("ROSCommunicationComponent"));
+  ROSCommunicationComponent->RegisterComponent();
   ROSCommunicationComponent->ROSCommunication.WebsocketIPAddr = ROSCommunicationConfiguration.WebsocketIPAddr;
   ROSCommunicationComponent->ROSCommunication.WebsocketPort = ROSCommunicationConfiguration.WebsocketPort;
 
@@ -114,7 +116,6 @@ void URROSCommunicationBuilder::Build(const TArray<FRPublisherConfiguration> &Pu
     }
   }
 
-  ROSCommunicationComponent->RegisterComponent();
 }
 
 URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const FRPublisherConfiguration &PublisherConfiguration)
@@ -142,6 +143,10 @@ URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const
   else if (Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
     return NewObject<URJointTrajectoryControllerStatePublisher>(InOwner);
+  }
+  else if (Cast<URNavOdometryPublisherParameter>(PublisherConfiguration.PublisherParameters))
+  {
+    return NewObject<URNavOdometryPublisher>(InOwner);
   }
   else
   {

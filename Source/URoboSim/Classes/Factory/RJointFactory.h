@@ -18,6 +18,8 @@ public:
   virtual void Init(UObject* InOuter, USDFJoint* InJointDescription);
   virtual URJoint* NewJoint();
 
+  UPROPERTY()
+    FString Version;
 protected:
 
     virtual void SetAxis();
@@ -50,6 +52,16 @@ protected:
 };
 
 UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
+class UROBOSIM_API URScrewJointBuilder : public URJointBuilder
+{
+  GENERATED_BODY()
+
+protected:
+    virtual void SetAxis() override;
+    virtual void CreateConstraint() override;
+};
+
+UCLASS(Blueprintable, DefaultToInstanced,   hidecategories = Object, editinlinenew)
 class UROBOSIM_API URRevoluteJointBuilder : public URContiniousJointBuilder
 {
   GENERATED_BODY()
@@ -76,10 +88,10 @@ class UROBOSIM_API URJointFactory : public UObject
 
 public:
 
-    URJoint* Load(UObject* InOuter, USDFJoint* InJointDescription);
+    URJoint* Load(UObject* InOuter, USDFJoint* InJointDescription, FString InVersion);
 
  protected:
-  URJointBuilder* CreateBuilder(USDFJoint* InJointDescription);
+  URJointBuilder* CreateBuilder(USDFJoint* InJointDescription, FString InVersion);
 
   UPROPERTY()
     URJointBuilder* JointBuilder;

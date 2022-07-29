@@ -58,6 +58,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FString BaseName;
+
+	FVector GetLinearVel();
+	FVector GetAngularVel();
 protected:
 
 	virtual void TurnTick(float InDeltaTime);
@@ -101,6 +104,7 @@ class UROBOSIM_API URBaseControllerKinematic : public URBaseController
     GENERATED_BODY()
 public:
 
+  virtual void Init() override;
   virtual void TurnTick(float InDeltaTime) override;
   virtual void MoveLinearTick(float InDeltaTime) override;
   virtual void SetLocation(FVector InPosition) override;

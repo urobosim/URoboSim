@@ -1,46 +1,55 @@
 #include "Factory/RJointFactory.h"
 
-URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription)
+URJoint* URJointFactory::Load(UObject* InOuter, USDFJoint* InJointDescription, FString InVersion)
 {
   if(!InOuter && !InJointDescription)
     {
       return nullptr;
     }
 
-  JointBuilder = CreateBuilder(InJointDescription);
+  JointBuilder = CreateBuilder(InJointDescription, InVersion);
   if(!JointBuilder)
   {
     return nullptr;
   }
+
 
   JointBuilder->Init(InOuter, InJointDescription);
   return JointBuilder->NewJoint();
 
 }
 
-URJointBuilder* URJointFactory::CreateBuilder(USDFJoint* InJointDescription)
+URJointBuilder* URJointFactory::CreateBuilder(USDFJoint* InJointDescription, FString InVersion)
 {
+  URJointBuilder* TempJointBuilder = nullptr;
   if(InJointDescription->Type.Equals("revolute"))
     {
       if((InJointDescription->Axis->Upper > 2 * PI) ||
          (InJointDescription->Axis->Lower < -2 * PI))
         {
-          return NewObject<URContiniousJointBuilder>(this);
+          TempJointBuilder = NewObject<URContiniousJointBuilder>(this);
         }
       else
         {
-          return NewObject<URRevoluteJointBuilder>(this);
+          TempJointBuilder = NewObject<URRevoluteJointBuilder>(this);
         }
     }
   else if(InJointDescription->Type.Equals("prismatic"))
     {
-      return NewObject<URPrismaticJointBuilder>(this);
+      TempJointBuilder = NewObject<URPrismaticJointBuilder>(this);
+    }
+  else if(InJointDescription->Type.Equals("screw"))
+    {
+      TempJointBuilder = NewObject<URScrewJointBuilder>(this);
     }
   else
     {
       UE_LOG(LogTemp, Error, TEXT("%s Constraint Type not supported."), *InJointDescription->Type);
       return nullptr;
     }
+
+  TempJointBuilder->Version = InVersion;
+  return TempJointBuilder;
 }
 
 void URJointBuilder::Init(UObject* InOuter, USDFJoint* InJointDescription)
@@ -52,10 +61,13 @@ void URJointBuilder::Init(UObject* InOuter, USDFJoint* InJointDescription)
 URJoint* URJointBuilder::NewJoint()
 {
   Joint = NewObject<URJoint>(Outer, FName((JointDescription->Name).GetCharArray().GetData()));
+  Joint->CreationMethod = EComponentCreationMethod::Instance;
+  Joint->RegisterComponent();
   SetJointParameters();
   CreateConstraint();
   if(Joint->Constraint)
     {
+      Joint->Constraint->AttachToComponent(Joint,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
       SetAxis();
       SetJointLimit();
     }
@@ -65,18 +77,26 @@ URJoint* URJointBuilder::NewJoint()
     }
   return Joint;
 }
+
 void URJointBuilder::SetJointParameters()
 {
   Joint->ParentName = JointDescription->Parent;
   Joint->ChildName = JointDescription->Child;
   Joint->bUseParentModelFrame = JointDescription->Axis->bUseParentModelFrame;
   Joint->Pose = JointDescription->Pose;
+
+  Joint->PoseRelativeTo = JointDescription->PoseRelativeTo;
 }
 
 void URJointBuilder::CreateConstraint()
 {
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URFixedConstraintComponent>(Joint, FName(*Name));
+  if(Joint->Constraint)
+    {
+
+      //UE_LOG(LogTemp, Error, TEXT("%s: %f"), *Joint->GetName(), Joint->Constraint->ConstraintInstance-);
+    }
 }
 
 void URJointBuilder::SetAxis()
@@ -106,16 +126,17 @@ void URJointBuilder::RotateConstraintToRefAxis()
   FVector RefAxisInJointFrame;
   FQuat Rotation;
 
-  if(JointDescription->Axis->bUseParentModelFrame)
+  if(JointDescription->Axis->bUseParentModelFrame || FCString::Atof(*Version) > 1.6)
     {
       Rotation = Joint->Constraint->GetComponentQuat();
       RefAxisInJointFrame = Rotation.Inverse().RotateVector(Joint->Constraint->RefAxis);
     }
   else
     {
-      UE_LOG(LogTemp, Error, TEXT("model frame not used"));
+      UE_LOG(LogTemp, Error, TEXT("model frame not used in Joint %s, Bug if SDF Version > 1.6"), *Joint->GetName());
       RefAxisInJointFrame = Joint->Constraint->RefAxis;
     }
+
 
   RefAxisInJointFrame /= RefAxisInJointFrame.Size();
 
@@ -125,19 +146,13 @@ void URJointBuilder::RotateConstraintToRefAxis()
     }
   else
     {
-      if(JointDescription->Axis->bUseParentModelFrame)
-        {
-          CurrentRefAxis = Joint->Constraint->GetComponentQuat().GetAxisZ();
-          FQuat BetweenQuat = FQuat::FindBetweenVectors(CurrentRefAxis, Joint->Constraint->RefAxis);
-          Joint->Constraint->AddLocalRotation(BetweenQuat);
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("Usage of JointFrame for axis not implemented"));
-        }
+      CurrentRefAxis = Joint->Constraint->GetComponentQuat().GetAxisZ();
+      FQuat BetweenQuat = FQuat::FindBetweenVectors(CurrentRefAxis, Joint->Constraint->RefAxis);
+      Joint->Constraint->AddLocalRotation(BetweenQuat);
 
       Joint->Constraint->RefAxis = FVector(0.0f, 0.0f, 1.0f);
     }
+
 }
 
 float URJointBuilder::CalculateRotationOffset()
@@ -262,4 +277,23 @@ void URPrismaticJointBuilder::CreateConstraint()
 {
   FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
   Joint->Constraint = NewObject<URPrismaticConstraintComponent>(Joint, FName(*Name));
+}
+
+void URScrewJointBuilder::SetAxis()
+{
+  Super::SetAxis();
+
+  Joint->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Free, 0);
+  Joint->Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Free, 0);
+  Joint->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Free, 0);
+  Joint->Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Free, 0);
+  Joint->Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Free, 0);
+  Joint->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 0);
+}
+
+void URScrewJointBuilder::CreateConstraint()
+{
+  FString Name = FString(*JointDescription->Name) + TEXT("_constraint");
+  Joint->Constraint = NewObject<URScrewConstraintComponent>(Joint, FName(*Name));
+  Joint->PoseRelativeTo = JointDescription->Parent;
 }

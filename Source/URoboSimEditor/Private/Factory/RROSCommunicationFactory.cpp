@@ -24,7 +24,7 @@ AActor *URROSCommunicationFactory::GetDefaultActor(const FAssetData &AssetData)
 }
 
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION == 4
 AActor *URROSCommunicationFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
 {
  if (bDrag)

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/SpecialController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/PR2GripperController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "PR2GCAGoalSubscriber.generated.h"
@@ -28,5 +28,5 @@ public:
 	void Callback(TSharedPtr<FROSBridgeMsg> Msg) override;
 
 private:
-	URGripperController *GripperController;
+	UPR2GripperController *GripperController;
 };

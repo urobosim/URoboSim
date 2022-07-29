@@ -17,8 +17,8 @@ public:
 
   ARModel *GetOwner() const;
 
+  virtual void Init() {}
 protected:
   virtual void RegisterPlugin();
 
-  virtual void Init() {}
 };

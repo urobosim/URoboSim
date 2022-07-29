@@ -3,8 +3,6 @@
 #include "CheckpointSystem/RobotCheckpointHandler.h"
 #include "Controller/ControllerType/BaseController/RBaseController.h"
 #include "Controller/ControllerType/JointController/RJointController.h"
-#include "Controller/RController.h"
-#include "Controller/RControllerComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Physics/RModel.h"
 

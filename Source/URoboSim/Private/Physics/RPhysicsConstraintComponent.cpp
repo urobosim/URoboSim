@@ -5,6 +5,9 @@
 
 URConstraintComponent::URConstraintComponent()
 {
+#if ENGINE_MINOR_VERSION > 27 || ENGINE_MAJOR_VERSION >4
+
+#endif
 }
 
 float URConstraintComponent::GetUpperLimit()
@@ -33,6 +36,10 @@ float URConstraintComponent::GetLowerLimit()
 
 const FTransform URConstraintComponent::GetChildPoseInJointFrame() const
 {
+  if(!Child)
+  {
+    return FTransform();
+  }
 	FTransform ChildPose = Child->GetComponentTransform();
 	FTransform JointPose = GetComponentTransform();
 	return ChildPose * JointPose.Inverse();
@@ -109,7 +116,10 @@ float URContinuousConstraintComponent::CheckPositionRange(float InTargetJointPos
 
 void URConstraintComponent::UpdateEncoderValue(float InValue)
 {
-  Encoder->UpdateValue(InValue);
+  if(Encoder)
+    {
+      Encoder->UpdateValue(InValue);
+    }
 }
 
 FVector UAngularVelocityToROS(FVector InAngularVelocity)
@@ -122,7 +132,7 @@ FVector ROSAngularVelocityToU(FVector InAngularVelocity)
   return FVector(-InAngularVelocity[0], InAngularVelocity[1], -InAngularVelocity[2]);
 }
 
-void URConstraintComponent::SetParentChild(UStaticMeshComponent* InParent, UStaticMeshComponent* InChild)
+void URConstraintComponent::SetParentChild(UPrimitiveComponent* InParent, UPrimitiveComponent* InChild)
 {
   Parent = InParent;
   Child = InChild;
@@ -133,16 +143,20 @@ void URConstraintComponent::BeginPlay()
   Super::BeginPlay();
   if(!Parent)
     {
-      Parent = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame1));
+      UE_LOG(LogTemp, Error, TEXT("Parent of Joint not found on BeginPlay %s"), *GetName());
+      Parent = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame1));
     }
 
   if(!Child)
     {
-      Child = Cast<UStaticMeshComponent>(GetComponentInternal(EConstraintFrame::Frame2));
+      UE_LOG(LogTemp, Error, TEXT("Child of Joint not found on BeginPlay %s"), *GetName());
+      Child = Cast<UPrimitiveComponent>(GetComponentInternal(EConstraintFrame::Frame2));
     }
 
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
+  ParentChildOffset = Child->GetComponentTransform().GetRelativeTransform(Parent->GetComponentTransform());
+  
 }
 
 void URContinuousConstraintComponent::BeginPlay()
@@ -298,8 +312,15 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   // float JointPosition = FVector::DotProduct(ChildPosition - ParentPosition, JointAxis) / JointAxis.Size() - FVector::DotProduct(ParentChildDistance, RefAxis) / RefAxis.Size();
 
   // return JointPosition
-  Super::GetJointPositionInUUnits();
-  return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
+
+
+  
+  // Super::GetJointPositionInUUnits();
+  // return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
+  FVector ParentChild = Child->GetComponentLocation() - Parent->GetComponentLocation() - ParentChildOffset.GetLocation();
+
+  
+  return FVector::DotProduct(ParentChild, GetComponentRotation().RotateVector(RefAxis));
 }
 
 
@@ -385,6 +406,7 @@ void URContinuousConstraintComponent::SetMotorJointStateInUUnits(float TargetPos
   // SetAngularOrientationTarget(UKismetMathLibrary::RotatorFromAxisAndAngle(RefAxis, TargetPosition));
   SetAngularVelocityTarget(RefAxis * TargetJointVelocity / 360.f);
   Child->WakeRigidBody();
+  Parent->WakeRigidBody();
 }
 
 float URContinuousConstraintComponent::GetJointPositionInUUnits()
@@ -425,6 +447,7 @@ void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosi
   SetLinearPositionTarget(RefAxis * TargetPosition + Offset);
   SetLinearVelocityTarget(RefAxis * TargetJointVelocity);
   Child->WakeRigidBody();
+  Parent->WakeRigidBody();
 }
 
 void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * OutSweepHitResult)

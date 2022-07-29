@@ -9,6 +9,7 @@
 // Sets default values for this component's properties
 URJoint::URJoint()
 {
+  PrimaryComponentTick.bCanEverTick = true;
   bBreakEnabled = false;
   bActuate = false;
 }
@@ -22,28 +23,28 @@ void URJoint::BeginDestroy()
   Super::BeginDestroy();
 }
 
-bool URJoint::IsTickable() const
-{
-  // Tick only if we are both NOT a template and if we are specifically not in-editor-before-beginplay is called.
-  return (!IsTemplate(RF_ClassDefaultObject)) && !(GIsEditor && !GWorld->HasBegunPlay());
-}
+// bool URJoint::IsTickable() const
+// {
+//   // Tick only if we are both NOT a template and if we are specifically not in-editor-before-beginplay is called.
+//   return (!IsTemplate(RF_ClassDefaultObject)) && !(GIsEditor && !GWorld->HasBegunPlay());
+// }
 
 void URJoint::Break()
 {
-  Child->GetCollision()->SetPhysicsLinearVelocity(FVector(0, 0, 0));
-  Child->GetCollision()->SetPhysicsAngularVelocityInDegrees(FVector(0, 0, 0));
+  Child->SetPhysicsLinearVelocity(FVector(0, 0, 0));
+  Child->SetPhysicsAngularVelocityInDegrees(FVector(0, 0, 0));
   for(auto &ChildJoint : Child->GetJoints())
     {
       ChildJoint->Break();
     }
 }
 
-TStatId URJoint::GetStatId() const
-{
-  return TStatId();
-}
+// TStatId URJoint::GetStatId() const
+// {
+//   return TStatId();
+// }
 
-void URJoint::Tick(float DeltaTime)
+void URJoint::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
   if(Constraint)
     {
@@ -54,7 +55,14 @@ void URJoint::Tick(float DeltaTime)
 
 float URJoint::GetEncoderValue()
 {
-  return Constraint->Encoder->GetValue();
+  if(Constraint->Encoder)
+    {
+      return Constraint->Encoder->GetValue();
+    }
+  else
+    {
+      return 0;
+    }
 }
 
 void URJoint::UpdateEncoder()
@@ -70,10 +78,19 @@ void URJoint::UpdateVelocity(float InDeltaTime)
 
 void URJoint::SetSimulatePhysics(bool bEnablePhysics)
 {
-  Child->GetCollision()->SetSimulatePhysics(bEnablePhysics);
+  Child->SetSimulatePhysics(bEnablePhysics);
+  Constraint->InitComponentConstraint();
   for(auto& MimicJoint : MimicJointList)
     {
       MimicJoint.MimicJoint->SetSimulatePhysics(bEnablePhysics);
+    }
+
+  if (Cast<UPrimitiveComponent>(Parent->GetAttachParent()))
+		{
+      if(!Parent->GetCollision())
+        {
+          Parent->SetSimulatePhysics(bEnablePhysics);
+        }
     }
 }
 
@@ -91,7 +108,7 @@ void URJoint::SetParentChild(URLink* InParent, URLink* InChild)
   Child = InChild;
   Parent = InParent;
 
-  Constraint->SetParentChild(Parent->GetCollision(), Child->GetCollision());
+  Constraint->SetParentChild(Parent, Child);
 }
 
 void URJoint::SetParentChild(AActor* InParent, AActor* InChild)
@@ -110,8 +127,10 @@ void URJoint::SetMotorJointState(const FJointState &JointState)
   for(auto& MimicJoint : MimicJointList)
     {
       FJointState MimicState;
-      MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
-      MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+      // MimicState.JointPosition = JointState.JointPosition*MimicJoint.Multiplier;
+      // MimicState.JointVelocity = JointState.JointVelocity*MimicJoint.Multiplier;
+      MimicState.JointPosition = GetJointPosition()*MimicJoint.Multiplier;
+      MimicState.JointVelocity = 0;
 
       MimicJoint.MimicJoint->SetMotorJointState(MimicState);
     }

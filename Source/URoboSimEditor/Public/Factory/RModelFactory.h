@@ -34,12 +34,13 @@ private:
 
     /** Spawns the robot */
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION == 4
     virtual AActor* SpawnActor(UObject* Asset, ULevel* InLevel, const FTransform& Transform, EObjectFlags ObjectFlags, const FName Name) override;
 #else
     virtual AActor* SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams) override;
 #endif //Version
 
+    bool bDrag;
     /** Subclasses may implement this to modify the actor after it has been spawned
         IMPORTANT: If you override this, you should usually also override PostCreateBlueprint()! */
     virtual void PostSpawnActor( UObject* Asset, AActor* NewActor );

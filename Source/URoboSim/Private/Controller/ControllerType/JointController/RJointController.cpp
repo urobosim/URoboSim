@@ -109,10 +109,10 @@ void URJointController::SetMode()
           EnableDriveInternal.bVelocityDrive = EnableDrive.bVelocityDrive;
           break;
         }
-      for (URLink *&Link : GetOwner()->GetLinks())
-        {
-          Link->GetCollision()->SetEnableGravity(false);
-        }
+  }
+  else
+  {
+    UE_LOG(LogRJointController, Error, TEXT("Could not set Mode because of Owner"));
   }
 }
 
@@ -146,6 +146,18 @@ void URJointController::SetPhysics()
           Joint->SetSimulatePhysics(bEnablePhysics);
         }
     }
+  if (GetOwner())
+  {
+  for (URLink *&Link : GetOwner()->GetLinks())
+    {
+      Link->SetEnableGravity(false);
+    }
+  }
+  else
+  {
+    UE_LOG(LogRJointController, Error, TEXT("Could not set physics for links because of Owner"));
+  }
+  
 }
 
 const UJointControllerMode URJointController::GetMode()

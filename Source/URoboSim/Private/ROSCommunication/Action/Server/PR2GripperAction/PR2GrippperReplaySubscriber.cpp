@@ -23,7 +23,7 @@ void URPR2GripperReplaySubscriber::CreateSubscriber()
 FRPR2GripperReplaySubscriberCallback::FRPR2GripperReplaySubscriberCallback(
     const FString &InTopic, const FString &InType, UObject *InController) : FROSBridgeSubscriber(InTopic, InType)
 {
-  GripperController = Cast<URGripperController>(InController);
+  GripperController = Cast<UPR2GripperController>(InController);
 }
 
 TSharedPtr<FROSBridgeMsg> FRPR2GripperReplaySubscriberCallback::ParseMessage(TSharedPtr<FJsonObject> JsonObject) const

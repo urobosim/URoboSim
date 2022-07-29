@@ -8,24 +8,27 @@ URGraspComponent::URGraspComponent()
   InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
-  FString ConstraintName = TEXT("Constraint_") + GetName();
-  Constraint = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName));
-  Constraint->SetupAttachment(this);
-  Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
-  Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  SetCollisionProfileName("OverlapAll");
 
-  FString ConstraintName2 = TEXT("Constraint2_") + GetName();
-  Constraint2 = CreateDefaultSubobject<UPhysicsConstraintComponent>(FName(*ConstraintName2));
-  Constraint2->SetupAttachment(this);
-  Constraint2->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-  Constraint2->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-  // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 2);
-  Constraint2->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  FString ConstraintName = TEXT("Constraint_") + GetName();
+  if(GetWorld())
+  {
+    Constraint = NewObject<UPhysicsConstraintComponent>(this, FName(*ConstraintName));
+    // Constraint->RegisterComponent();
+    Constraint->SetupAttachment(this);
+    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+  }
 }
 
-void URGraspComponent::Init(UStaticMeshComponent* InGripper)
+void URGraspComponent::OnComponentCreated()
+{
+  Super::OnComponentCreated();
+  
+}
+
+void URGraspComponent::Init(UPrimitiveComponent* InGripper)
 {
   Gripper = InGripper;
   bObjectGrasped = false;
@@ -39,7 +42,7 @@ void URGraspComponent::Init(UStaticMeshComponent* InGripper)
 
 }
 
-void URGraspComponent::Init(UStaticMeshComponent* InGripper1, UStaticMeshComponent* InGripper2)
+void URGraspComponent::Init(UPrimitiveComponent* InGripper1, UPrimitiveComponent* InGripper2)
 {
   Gripper = InGripper1;
   Gripper2 = InGripper2;
@@ -164,14 +167,13 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
     Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
   }
 
-  if(Gripper2)
-    {
-      Constraint2->SetConstrainedComponents(Gripper2, NAME_None, SMC, NAME_None);
-    }
+  // if(Gripper2)
+  //   {
+  //     Constraint2->SetConstrainedComponents(Gripper2, NAME_None, SMC, NAME_None);
+  //   }
   bGraspObjectGravity = SMC->IsGravityEnabled();
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
-
 
 }
 
@@ -203,10 +205,10 @@ void URGraspComponent::TryToDetach()
         Constraint->BreakConstraint();
       }
 
-    if(Gripper2)
-      {
-        Constraint2->BreakConstraint();
-      }
+    // if(Gripper2)
+    //   {
+    //     Constraint2->BreakConstraint();
+    //   }
 
     FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
     FixatedObject = nullptr;

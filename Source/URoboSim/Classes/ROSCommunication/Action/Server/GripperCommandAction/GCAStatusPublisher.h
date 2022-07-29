@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Controller/ControllerType/SpecialController/RGripperController.h"
+#include "Controller/ControllerType/SpecialController/PR2GripperController.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 // clang-format off
 #include "GCAStatusPublisher.generated.h"
@@ -24,5 +24,5 @@ protected:
 	void Init() override;
 
 private:
-	URGripperController *GripperController;
+	UPR2GripperController *GripperController;
 };

@@ -23,7 +23,7 @@ AActor *URControllerFactory::GetDefaultActor(const FAssetData &AssetData)
   return NewActorClass->GetDefaultObject<AActor>();
 }
 
-#if ENGINE_MINOR_VERSION < 27 || ENGINE_MAJOR_VERSION >4
+#if ENGINE_MINOR_VERSION < 27 && ENGINE_MAJOR_VERSION == 4
 AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const FTransform &Transform, EObjectFlags InObjectFlags, const FName Name)
 {
  if (bDrag)
@@ -73,6 +73,7 @@ AActor *URControllerFactory::SpawnActor(UObject *Asset, ULevel *InLevel, const F
 
 AActor* URControllerFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const FTransform& InTransform, const FActorSpawnParameters& InSpawnParams)
 {
+	UE_LOG(LogRControllerFactory, Warning, TEXT("Start spawning"));
     if (bDrag)
     {
         URControllerDataAsset* ControllerDataAsset = CastChecked<URControllerDataAsset>(InAsset);
@@ -84,6 +85,7 @@ AActor* URControllerFactory::SpawnActor(UObject* InAsset, ULevel* InLevel, const
             TArray<ARModel*> Robots;
             for (AActor*& Actor : WorldActors)
             {
+				UE_LOG(LogRControllerFactory, Warning, TEXT("Robots found %s"), *Actor->GetName())
                 if (ControllerDataAsset->RobotNames.ContainsByPredicate([&](FString RobotName) { return Actor->GetName().Contains(RobotName); }))
                 {
                     UE_LOG(LogRControllerFactory, Log, TEXT("Found ARModel %s in ControllerDataAsset %s"), *Actor->GetName(), *ControllerDataAsset->GetName())
