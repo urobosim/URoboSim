@@ -7,6 +7,7 @@
 #include "ROSCommunication/Publisher/JointStatePublisher.h"
 #include "ROSCommunication/Publisher/JointTrajectoryControllerStatePublisher.h"
 #include "ROSCommunication/Publisher/RDonbotOdomPublisher.h"
+#include "ROSCommunication/Publisher/RNavOdometryPublisher.h"
 #include "ROSCommunication/Publisher/RTFPublisher.h"
 #include "ROSCommunication/Service/Client/RJointControllerConfigurationClient.h"
 #include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
@@ -142,6 +143,10 @@ URPublisher *URROSCommunicationBuilder::CreatePublisher(ARModel *&InOwner, const
   else if (Cast<URJointTrajectoryControllerStatePublisherParameter>(PublisherConfiguration.PublisherParameters))
   {
     return NewObject<URJointTrajectoryControllerStatePublisher>(InOwner);
+  }
+  else if (Cast<URNavOdometryPublisherParameter>(PublisherConfiguration.PublisherParameters))
+  {
+    return NewObject<URNavOdometryPublisher>(InOwner);
   }
   else
   {

@@ -58,6 +58,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	FString BaseName;
+
+	FVector GetLinearVel();
+	FVector GetAngularVel();
 protected:
 
 	virtual void TurnTick(float InDeltaTime);

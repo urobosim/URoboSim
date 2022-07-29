@@ -163,6 +163,15 @@ TArray<double> URBaseController::GetOdomVelocityStates()
   return OdomVelocityStates;
 }
 
+FVector URBaseController::GetLinearVel()
+{
+  return FVector(OdomVelocityStates[0], OdomVelocityStates[1], 0);  
+}
+FVector URBaseController::GetAngularVel()
+{
+  return  FVector(0, 0, OdomVelocityStates[2]);
+}
+
 void URBaseController::MoveLinear(FVector InVelocity, float InDeltaTime)
 {
   if(InVelocity.Size() != 0.f)
