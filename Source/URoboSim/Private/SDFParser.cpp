@@ -13,6 +13,8 @@ FSDFParser::FSDFParser() : AssetRegistryModule(
 {
 	this->XmlFile = nullptr;
 	this->bSDFLoaded = false;
+	PackageDirs.AddUnique(TEXT("URoboSim"));
+	PackageDirs.AddUnique(TEXT("Game"));
 	GetROSPackagePaths();
 }
 
@@ -22,6 +24,8 @@ FSDFParser::FSDFParser(const FString& InFilename) : AssetRegistryModule(
 {
 	this->XmlFile = nullptr;
 	this->bSDFLoaded = false;
+	PackageDirs.AddUnique(TEXT("URoboSim"));
+	PackageDirs.AddUnique(TEXT("Game"));
 	GetROSPackagePaths();
 	LoadSDF(InFilename);
 }
@@ -591,14 +595,43 @@ FString FSDFParser::GeneratePackageName(FName MeshName, FString InPackagePath)
 
 	// Remove package name prefix
 	InPackagePath.RemoveFromStart(TEXT("model://"));
-	
 	int32 Pos = InPackagePath.Find(TEXT("/"), ESearchCase::IgnoreCase, ESearchDir::FromEnd);
-	FString NewDir = TEXT("/Game/Packages/") + InPackagePath.Left(Pos);
 
+	//Check if Package is already in URoboSim or Game
+	for(auto& PackageDir : PackageDirs)
+	{
+		FString NewDir = TEXT("/") + PackageDir + TEXT("/Packages/") + InPackagePath.Left(Pos);
+		if (!FPackageName::TryConvertFilenameToLongPackageName(NewDir + "/" + MeshName.ToString(), PackageName, &Reason))
+		{
+			UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
+		}
+		
+		if(FPackageName::DoesPackageExist(PackageName))
+		{
+			return PackageName;
+		}
+	}
+
+	//Not found in URoboSim or Game --> Add new package to ContentDir
+	FString ContentDir = DataAsset->GetPathName();
+	ContentDir.RightChopInline(1);
+	TArray<FString> PathPart;
+	if(ContentDir.ParseIntoArray(PathPart, TEXT("/")) > 0)
+	{
+		ContentDir = PathPart[0];
+	}
+	else
+	{
+		ContentDir = TEXT("Game");
+	}
+	UE_LOG(LogTemp, Log, TEXT("Content Dir : %s"), *ContentDir);
+
+	FString NewDir = TEXT("/") + ContentDir + TEXT("/Packages/") + InPackagePath.Left(Pos);
 	if (!FPackageName::TryConvertFilenameToLongPackageName(NewDir + "/" + MeshName.ToString(), PackageName, &Reason))
 	{
 		UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
 	}
+	
 	AssetRegistryModule.Get().AddPath(NewDir);
 	return PackageName;
 }

@@ -48,6 +48,7 @@ public:
     // Create data asset and parse sdf data into it
     virtual USDFDataAsset* ParseToNewDataAsset(UObject* InParent, FName InName, EObjectFlags InFlags)override;
 
+    TArray<FString> PackageDirs;
 protected:
     /* Begin parser functions */
     // Check if sdf data is valid
