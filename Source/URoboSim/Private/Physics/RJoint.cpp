@@ -79,6 +79,7 @@ void URJoint::UpdateVelocity(float InDeltaTime)
 void URJoint::SetSimulatePhysics(bool bEnablePhysics)
 {
   Child->SetSimulatePhysics(bEnablePhysics);
+  Constraint->InitComponentConstraint();
   for(auto& MimicJoint : MimicJointList)
     {
       MimicJoint.MimicJoint->SetSimulatePhysics(bEnablePhysics);
