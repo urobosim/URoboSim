@@ -17,7 +17,7 @@ void URController::SetOwner()
 {
   if(GetWorld())
     {
-      UE_LOG(LogRController, Log, TEXT("Initialize %s"), *GetName())
+      UE_LOG(LogRController, Log, TEXT("SetOwner of %s"), *GetName())
         if (!Owner)
           {
             if (Cast<ARModel>(GetOuter()))
