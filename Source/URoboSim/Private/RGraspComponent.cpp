@@ -25,17 +25,13 @@ URGraspComponent::URGraspComponent()
 void URGraspComponent::OnComponentCreated()
 {
   Super::OnComponentCreated();
-  
+
 }
 
 void URGraspComponent::Init(UPrimitiveComponent* InGripper)
 {
   Gripper = InGripper;
   bObjectGrasped = false;
-
-  // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
-  // TFPublisher->Topic = TEXT("/tf_grasp_test");
-  // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);

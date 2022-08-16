@@ -25,8 +25,6 @@ void URPOAResultPublisher::Init()
       OnObjectDetected.AddUObject(*Itr, &ATFPublisher::AddObject);
     }
   }
-  // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
-  // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
 }
 
 void URPOAResultPublisher::Publish()
@@ -35,8 +33,6 @@ void URPOAResultPublisher::Publish()
   {
     static int Seq = 0;
 
-    // TFPublisher->SetObjects(CameraController->PerceivedActors);
-    // TFPublisher->Publish();
     for (auto &PerceivedActor : CameraController->PerceivedActors)
     {
       OnObjectDetected.Broadcast(PerceivedActor);
@@ -47,7 +43,6 @@ void URPOAResultPublisher::Publish()
 
     ActionResult->SetHeader(std_msgs::Header(Seq, FROSTime(), ""));
 
-    // uint8 status = Owner->Status;
     FGoalStatusInfo StatusInfo = CameraController->GetGoalStatusList().Last();
     actionlib_msgs::GoalStatus GS(actionlib_msgs::GoalID(FROSTime(StatusInfo.Secs, StatusInfo.NSecs), StatusInfo.Id), StatusInfo.Status, "");
     ActionResult->SetStatus(GS);

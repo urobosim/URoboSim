@@ -317,9 +317,7 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   
   // Super::GetJointPositionInUUnits();
   // return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
-  FVector ParentChild = Child->GetComponentLocation() - Parent->GetComponentLocation() - ParentChildOffset.GetLocation();
-
-  
+  FVector ParentChild = Child->GetComponentLocation() - Parent->GetComponentLocation() - Child->GetComponentRotation().RotateVector(ParentChildOffset.GetLocation());
   return FVector::DotProduct(ParentChild, GetComponentRotation().RotateVector(RefAxis));
 }
 

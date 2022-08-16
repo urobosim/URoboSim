@@ -23,11 +23,11 @@ public:
 
 protected:
   void Init() override;
-  
+
 private:
   URCameraController *CameraController;
 
-  URTFPublisher *TFPublisher;
+  // URTFPublisher *TFPublisher;
 
   FObjectDetection OnObjectDetected;
 };
