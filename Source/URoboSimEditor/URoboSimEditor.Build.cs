@@ -19,6 +19,7 @@ public class URoboSimEditor : ModuleRules
                             "Core"
                             ,"MeshDescription",
                             "RenderCore",
+                            "UIds",
                             "Json", "URoboSim",
                         }
 			);
@@ -39,7 +40,8 @@ public class URoboSimEditor : ModuleRules
                                 "ProceduralMeshComponent",
                                 "URoboSim",
                                 "URoboVision",
-                                "UnrealEd", 
+                                "UnrealEd",
+                                "UIds",
 			}
 			);
 

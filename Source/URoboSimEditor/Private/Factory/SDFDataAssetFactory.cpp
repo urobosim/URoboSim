@@ -3,7 +3,6 @@
 
 #include "Factory/SDFDataAssetFactory.h"
 #include "SDF/SDFDataAsset.h"
-#include "SDFParser.h"
 #include "Editor.h" // FEditorDelegates
 #include "SDFParserEditor.h"
 

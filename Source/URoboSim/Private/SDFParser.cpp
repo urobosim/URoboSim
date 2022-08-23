@@ -3,7 +3,6 @@
 
 #include "SDFParser.h"
 #include "Conversions.h"
-// #include "Paths.h"
 #include "XmlFile.h"
 #include "GenericPlatform/GenericPlatformMisc.h"
 
@@ -424,7 +423,7 @@ void FSDFParser::ParseVisual(const FXmlNode* InNode, USDFLink*& NewLink)
           continue;
         }
     }
-	
+
 	// Add visual to array
 	NewLink->Visuals.Add(NewVisual);
 }
@@ -527,7 +526,7 @@ UStaticMesh* FSDFParser::GetMesh(const FString& Uri, ESDFType Type)
 {
 	FString MeshRelativePath = Uri;
 	FString MeshNameTemp = FPaths::GetBaseFilename(Uri);
-	
+
 	FName MeshName = GenerateMeshName(Type, MeshNameTemp);
 	FString PackageName = GeneratePackageName(MeshName, MeshRelativePath);
 	UE_LOG(LogTemp, Log, TEXT("MeshName %s PackageName %s"), *MeshNameTemp, *PackageName);
@@ -605,7 +604,7 @@ FString FSDFParser::GeneratePackageName(FName MeshName, FString InPackagePath)
 		{
 			UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
 		}
-		
+
 		if(FPackageName::DoesPackageExist(PackageName))
 		{
 			return PackageName;
@@ -631,7 +630,7 @@ FString FSDFParser::GeneratePackageName(FName MeshName, FString InPackagePath)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Packacke name invlaide because : %s"), *Reason);
 	}
-	
+
 	AssetRegistryModule.Get().AddPath(NewDir);
 	return PackageName;
 }

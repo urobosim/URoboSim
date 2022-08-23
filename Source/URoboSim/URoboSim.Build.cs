@@ -38,6 +38,7 @@ public class URoboSim : ModuleRules
 				"XmlParser",
 				"UTFPublisher",
 				"UCheckpointSystem",
+                                "UIds",
 			}
 			);
 

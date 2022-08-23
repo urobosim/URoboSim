@@ -4,15 +4,11 @@
 #include "SpawnRobotServer.h"
 #include "WorldControlGameInstance.h"
 #include "XmlFile.h"
-#include "HAL/FileManagerGeneric.h"
 #include "Ids.h"
-//delete RobotFactory?
 #include "RobotManagerActor.h"
 #include "SDFParser.h"
 #include "Physics/RModel.h"
 #include "Factory/RModelBuilder.h"
-#include "Kismet/KismetStringLibrary.h"
-#include "ThirdParty/SDL2/SDL-gui-backend/include/SDL_thread.h"
 
 void USDFClient::CreateServiceClient()
 {
@@ -128,7 +124,7 @@ void FSDFParamClient::Callback(TSharedPtr<FROSBridgeSrv::SrvResponse> InResponse
 
 	JointString.RemoveFromStart(TEXT("\""));
 	JointString.RemoveFromEnd(TEXT("\""));
-	
+
 	RobotManager->SDFClient->SDFFile = JointString;
 	RobotManager->ParseSDF();
 }
