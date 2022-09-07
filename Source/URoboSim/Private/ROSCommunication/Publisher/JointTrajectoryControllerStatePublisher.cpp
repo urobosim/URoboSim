@@ -6,7 +6,7 @@ URJointTrajectoryControllerStatePublisher::URJointTrajectoryControllerStatePubli
   Topic = TEXT("/whole_body_controller/body/state");
   MessageType = TEXT("control_msgs/JointTrajectoryControllerState");
   JointParamTopic = TEXT("/whole_body_controller/joints");
-  JointTrajectoryControllerName = TEXT("JointTrajectoryController");
+  JointTrajectoryControllerName = TEXT("JointController");
 }
 
 void URJointTrajectoryControllerStatePublisher::SetPublishParameters(URPublisherParameter *&PublisherParameters)
