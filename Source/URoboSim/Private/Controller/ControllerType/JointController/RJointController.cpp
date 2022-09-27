@@ -107,6 +107,8 @@ void URJointController::SetMode()
         case UJointControllerMode::Dynamic:
           EnableDriveInternal.bPositionDrive = EnableDrive.bPositionDrive;
           EnableDriveInternal.bVelocityDrive = EnableDrive.bVelocityDrive;
+          EnableDriveInternal.PositionStrength = EnableDrive.PositionStrength;
+          EnableDriveInternal.VelocityStrength = EnableDrive.VelocityStrength;
           break;
         }
   }
@@ -157,7 +159,7 @@ void URJointController::SetPhysics()
   {
     UE_LOG(LogRJointController, Error, TEXT("Could not set physics for links because of Owner"));
   }
-  
+
 }
 
 const UJointControllerMode URJointController::GetMode()
