@@ -66,6 +66,8 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
     }
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
+
+      UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach"), *OtherSMA->GetName());
       ObjectsInReach.Emplace(OtherSMA);
     }
 }
@@ -76,6 +78,7 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
   // Remove actor from array (if present)
   if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
     {
+      UE_LOG(LogTemp, Log, TEXT("%s: Object in left Reach"), *SMA->GetName());
       ObjectsInReach.Remove(SMA);
     }
 }

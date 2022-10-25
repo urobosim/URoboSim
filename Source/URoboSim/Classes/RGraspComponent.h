@@ -54,7 +54,7 @@ protected:
 	// URTFPublisher* TFPublisher;
 
 	UPROPERTY(EditAnywhere)
-	float GraspRadius = 3.f;
+	float GraspRadius = 5.f;
 
 	UPROPERTY()
 	UPrimitiveComponent* Gripper;
