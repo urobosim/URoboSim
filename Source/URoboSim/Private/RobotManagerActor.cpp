@@ -3,6 +3,7 @@
 
 #include "RobotManagerActor.h"
 #include "ROSBridgeGameInstance.h"
+#include "RosSettings.h"
 #include "SDFParser.h"
 #include "Kismet/GameplayStatics.h"
 #include "SpawnRobotServer.h"
@@ -107,7 +108,7 @@ void URobotManager::ParseSDF()
 				FString ROSConfigPathShort = TEXT("/Game/ROSCom");
 				Reason = "";
 				FString ROSConfigPathLong;
-				
+
 				if (!FPackageName::TryConvertFilenameToLongPackageName(ROSConfigPathShort,
 				                                                       ROSConfigPathLong,
 				                                                       &Reason))
@@ -149,19 +150,12 @@ void URobotManager::Init(FString DefaultNamespace, UWorld* InWorld)
 
 	if (bUseGlobalIP)
 	{
-		UROSBridgeGameInstance* GI = Cast<UROSBridgeGameInstance>(UGameplayStatics::GetGameInstance(this));
-		if (GI)
-		{
-			ServerIP = GI->ROSBridgeServerHost;
-			ServerPORT = GI->ROSBridgeServerPort;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("Wrong GameInstance"));
-		}
-	}
+          const URosSettings* Settings = GetDefault<URosSettings>();
+          ServerIP = Settings->ROSBridgeServerHost;
+          ServerPORT = Settings->ROSBridgeServerPort;
+        }
 
-	SDFClient->Connect(ServerIP, ServerPORT);
+        SDFClient->Connect(ServerIP, ServerPORT);
 	SpawnRobotServer->Connect(ServerIP, ServerPORT);
 
 	//Connect SDFClient to SpawnRobotServer
