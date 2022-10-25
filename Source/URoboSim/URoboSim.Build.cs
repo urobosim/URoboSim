@@ -17,20 +17,21 @@ public class URoboSim : ModuleRules
 			new string[]
                         {
                             "Core",
-							"MeshDescription",
+                            "MeshDescription",
                             "RenderCore",
                             "Json",
                             "UWorldControl",
                             "UROSControl",
-							"XmlParser",
-						}
-			);
+                            "XmlParser",
+                            }
+                        );
 
 
-		PrivateDependencyModuleNames.AddRange(
+                PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
 				"CoreUObject",
+                                "DeveloperSettings",
 				"Engine",
 				"UConversions",
 				"URoboVision",
