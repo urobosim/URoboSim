@@ -1,17 +1,23 @@
 #include "KnowrobEventManager.h"
 
-#include "URoboSimGameInstance.h"
+#include "URoboSimSubsystem.h"
 #include "Kismet/GameplayStatics.h"
 
 void UEventManagerComponent::BeginPlay()
 {
   Super::BeginPlay();
-  URoboSimGameInstance* GI = Cast<URoboSimGameInstance>(UGameplayStatics::GetGameInstance(this));
-  if(GI)
+
+  UURoboSimSubsystem* Subsystem = nullptr;
+  if(UWorld* World = GetWorld())
+    {
+      Subsystem = World->GetSubsystem<UURoboSimSubsystem>();
+    }
+
+  if(Subsystem)
     {
       for(auto& EventManager : EventManagers)
         {
-          EventManager->Init(GI->KnowrobInterface, GetOwner());
+          EventManager->Init(Subsystem->KnowrobInterface, GetOwner());
         }
     }
 }

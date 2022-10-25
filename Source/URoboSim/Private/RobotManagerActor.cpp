@@ -2,7 +2,6 @@
 
 
 #include "RobotManagerActor.h"
-#include "ROSBridgeGameInstance.h"
 #include "RosSettings.h"
 #include "SDFParser.h"
 #include "Kismet/GameplayStatics.h"

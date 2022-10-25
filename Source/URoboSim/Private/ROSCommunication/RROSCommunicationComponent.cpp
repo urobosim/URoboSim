@@ -1,6 +1,5 @@
 #include "ROSCommunication/RROSCommunicationComponent.h"
 #include "Controller/RControllerComponent.h"
-#include "ROSBridgeGameInstance.h"
 #include "RosSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "ROSCommunication/Publisher/RPublisher.h"

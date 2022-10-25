@@ -1,6 +1,6 @@
 
 #include "AJointActor.h"
-#include "URoboSimGameInstance.h"
+#include "URoboSimSubsystem.h"
 
 #if WITH_EDITOR
 #include "Editor/EditorEngine.h"
@@ -16,10 +16,16 @@ AJointActor::AJointActor()
 void AJointActor::BeginPlay()
 {
   Super::BeginPlay();
-  URoboSimGameInstance* GI = Cast<URoboSimGameInstance>(UGameplayStatics::GetGameInstance(this));
-  if(GI)
+
+  UURoboSimSubsystem* Subsystem = nullptr;
+  if(UWorld* World = GetWorld())
     {
-      GI->Joints.Add(GetName(), this);
+      Subsystem = World->GetSubsystem<UURoboSimSubsystem>();
+    }
+
+  if(Subsystem)
+    {
+      Subsystem->Joints.Add(GetName(), this);
     }
 }
 
