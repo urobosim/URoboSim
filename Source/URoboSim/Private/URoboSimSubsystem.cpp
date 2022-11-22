@@ -13,36 +13,42 @@ UURoboSimSubsystem::UURoboSimSubsystem()
 
 void UURoboSimSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
+  // Super::Initialize(Collection);
   const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
-  if (Settings->bEnableURoboSim)
-    {
-      Super::Initialize(Collection);
-      if(ROSHandler.IsValid())
+
+  // if(!GIsEditor || GIsPlayInEditorWorld)
+    // {
+      if (Settings->bEnableURoboSim)
         {
-          if(Settings->bEnableJointStatePublishing)
+          Super::Initialize(Collection);
+          if(ROSHandler.IsValid())
             {
-              Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Settings->JointStatePublishTopic, JointStatePublisherMessageType));
-              if (Publisher.IsValid())
+              if(Settings->bEnableJointStatePublishing)
                 {
-                  ROSHandler->AddPublisher(Publisher);
+                  Publisher = MakeShareable<FROSBridgePublisher>(new FROSBridgePublisher(Settings->JointStatePublishTopic, JointStatePublisherMessageType));
+                  if (Publisher.IsValid())
+                    {
+                      ROSHandler->AddPublisher(Publisher);
+                    }
+                }
+
+              if(Settings->bEnableSettingJointState)
+                {
+                  ServiceServer = MakeShareable<FSetEnvironmentJointStatesServerCallback>(new FSetEnvironmentJointStatesServerCallback(TEXT("UnrealSim/SetEnvJointState"), SetJointStateServerType, &Joints));
+                  ServiceServer->EnableDrive = Settings->EnableDrive;
+                  ServiceServer->ErrorTollerance = Settings->ErrorTollerance;
+                  ROSHandler->AddServiceServer(ServiceServer);
+                }
+              if(KnowrobInterface)
+                {
+                  KnowrobInterface->QueryClient->Connect(ROSHandler);
                 }
             }
+          else
+            {
+              UE_LOG(LogTemp, Error, TEXT("URoboSimSubsystem: Handler not valid"));
+            }
+        }
 
-          if(Settings->bEnableSettingJointState)
-            {
-              ServiceServer = MakeShareable<FSetEnvironmentJointStatesServerCallback>(new FSetEnvironmentJointStatesServerCallback(TEXT("UnrealSim/SetEnvJointState"), SetJointStateServerType, &Joints));
-              ServiceServer->EnableDrive = Settings->EnableDrive;
-              ServiceServer->ErrorTollerance = Settings->ErrorTollerance;
-              ROSHandler->AddServiceServer(ServiceServer);
-            }
-          if(KnowrobInterface)
-            {
-              KnowrobInterface->QueryClient->Connect(ROSHandler);
-            }
-        }
-      else
-        {
-          UE_LOG(LogTemp, Error, TEXT("URoboSimGameInstance: Handler not valid"));
-        }
-    }
+    // }
 }
