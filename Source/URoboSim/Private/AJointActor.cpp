@@ -1,6 +1,8 @@
 
 #include "AJointActor.h"
 #include "URoboSimSubsystem.h"
+#include "Engine/GameInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 #if WITH_EDITOR
 #include "Editor/EditorEngine.h"
@@ -18,9 +20,10 @@ void AJointActor::BeginPlay()
   Super::BeginPlay();
 
   UURoboSimSubsystem* Subsystem = nullptr;
-  if(UWorld* World = GetWorld())
+  UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+  if(GameInstance)
     {
-      Subsystem = World->GetSubsystem<UURoboSimSubsystem>();
+      Subsystem = GameInstance->GetSubsystem<UURoboSimSubsystem>();
     }
 
   if(Subsystem)

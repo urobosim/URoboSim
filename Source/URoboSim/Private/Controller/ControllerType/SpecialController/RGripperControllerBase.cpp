@@ -51,7 +51,7 @@ void URGripperControllerBase::Init()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName);
+			UE_LOG(LogTemp, Log, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName);
 		}
 
 		JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
@@ -76,7 +76,7 @@ void URGripperControllerBase::Init()
 		GraspComponent = NewObject<URGraspComponent>(GetOwner(), FName(GetName() + TEXT("_GraspComp")));
 		GraspComponent->CreationMethod = EComponentCreationMethod::Instance;
 		GraspComponent->RegisterComponent();
-		
+
 		URLink* ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
 		GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->Constraint->AttachToComponent(GraspComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
@@ -130,7 +130,7 @@ bool URGripperControllerBase::Grasp()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("%s: No Grasp Component"), *GetName());
 	}
 	return false;
 }
@@ -143,6 +143,6 @@ void URGripperControllerBase::Release()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s: No Grasp Component"), *GetName());
+		UE_LOG(LogTemp, Log, TEXT("%s: No Grasp Component"), *GetName());
 	}
 }

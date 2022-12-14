@@ -9,6 +9,8 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FObjectGraspedDelegate, AActor*, Object);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FObjectReleasedDelegate, AActor*, Object);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URGraspComponent : public USphereComponent
@@ -49,12 +51,26 @@ public:
 	UPROPERTY(EditAnywhere)
 	UPhysicsConstraintComponent* Constraint;
 
+        FObjectReleasedDelegate OnObjectReleased;
+        FObjectGraspedDelegate OnObjectGrasped;
+
+	UFUNCTION()
+	virtual void OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+	                                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	                                             bool bFromSweep, const FHitResult& SweepResult);
+
+	// Function called when an item leaves the fixation overlap area
+	UFUNCTION()
+	virtual void OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+
 protected:
 	// UPROPERTY()
 	// URTFPublisher* TFPublisher;
 
 	UPROPERTY(EditAnywhere)
-	float GraspRadius = 5.f;
+	float GraspRadius = 3.f;
 
 	UPROPERTY()
 	UPrimitiveComponent* Gripper;
@@ -66,15 +82,6 @@ protected:
 	UPROPERTY(EditAnywhere)
 	UPhysicsConstraintComponent* Constraint2;
 	// Function called when an item enters the fixation overlap area
-	UFUNCTION()
-	virtual void OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-	                                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	                                             bool bFromSweep, const FHitResult& SweepResult);
-
-	// Function called when an item leaves the fixation overlap area
-	UFUNCTION()
-	virtual void OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	// Array of items currently in reach (overlapping the sphere component)
 	TArray<AStaticMeshActor*> ObjectsInReach;

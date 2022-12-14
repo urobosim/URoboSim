@@ -80,7 +80,7 @@ public:
   URActionServerParameter *ActionServerParameters = nullptr;
 };
 
-UCLASS(BlueprintType, Category = "ROSCommunication")
+UCLASS(BlueprintType, Category = "ROSCommunication", Config=Ros)
 class UROBOSIM_API URROSCommunicationDataAsset : public UDataAsset
 {
   GENERATED_BODY()
@@ -99,7 +99,7 @@ public:
   TArray<FRPublisherConfiguration> PublisherConfiguration;
 
   // Subscriber Configuration
-  UPROPERTY(EditAnywhere, Category = "Communication Information")
+  UPROPERTY(EditAnywhere, Category = "Communication Information", Config)
   TArray<FRSubscriberConfiguration> SubscriberConfiguration;
 
   // Service server Configuration

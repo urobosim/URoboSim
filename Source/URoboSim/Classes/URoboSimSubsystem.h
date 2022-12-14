@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "ROSSubsystem.h"
-#include "AJointActor.h"
-#include "ROSCommunication/KnowRobInterface.h"
 #include "ROSCommunication/Service/Server/SetEnvironmentJointStatesServer.h"
 #include "URoboSimSubsystem.generated.h"
 
+class AJointActor;
+class UKnowrobInterface;
 /**
  *
  */
 UCLASS()
-class UROBOSIM_API UURoboSimSubsystem : public UROSWorldSubsystem
+class UROBOSIM_API UURoboSimSubsystem : public UROSGameInstanceSubsystem
 {
 	GENERATED_BODY()
 

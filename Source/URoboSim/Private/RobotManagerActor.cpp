@@ -10,6 +10,8 @@
 #include "Factory/RControllerBuilder.h"
 #include "Factory/RModelBuilder.h"
 #include "Factory/RROSCommunicationBuilder.h"
+#include "TracebotSettings.h"
+#include "Controller/ControllerType/SpecialController/RGripperControllerBase.h"
 
 URobotManager::URobotManager()
 {
@@ -64,10 +66,11 @@ void URobotManager::ParseSDF()
 		EObjectFlags Flags = EObjectFlags();
 		Flags |= RF_Transactional;
 		USDFDataAsset* SDFAsset = Parser.ParseToNewDataAsset(GetWorld(), TEXT(""), Flags);
+                const UTracebotSettings* Settings = GetDefault<UTracebotSettings>();
 
-		if (SDFAsset)
-		{
-			for (USDFModel* Model : SDFAsset->Models)
+                if (SDFAsset)
+                {
+                        for (USDFModel* Model : SDFAsset->Models)
 			{
 				FActorSpawnParameters SpawnParams;
 				SpawnParams.Name = FName(Model->Name);
@@ -99,6 +102,30 @@ void URobotManager::ParseSDF()
 						TArray<ARModel*> Robots;
 						Robots.Add(NewRobot);
 						URControllerBuilder* ControllerBuilder = NewObject<URControllerBuilder>();
+                                                for(auto& ControllerParam : ControllerConfig->ControllerConfiguration.ControllerParameters)
+                                                  {
+                                                    URGripperControllerBaseParameter* CP = Cast<URGripperControllerBaseParameter>(ControllerParam.Value);
+                                                    if(CP)
+                                                      {
+                                                        if(Settings->bDynamicGripper)
+                                                          {
+                                                            CP->Mode = UJointControllerMode::Dynamic;
+                                                          }
+                                                        else
+                                                          {
+                                                            CP->Mode = UJointControllerMode::Kinematic;
+                                                          }
+                                                      }
+                                                    URPumpControllerParameter* PP = Cast<URPumpControllerParameter>(ControllerParam.Value);
+                                                    if(PP)
+                                                      {
+                                                        PP->TrayReferenceLink = Settings->TrayReferenceLink;
+                                                        PP->TrayReferenceFrame = Settings->TrayReferenceFrame;
+                                                        PP->TraySlot1Frame = Settings->TraySlot1Frame;
+                                                        PP->TraySlot2Frame = Settings->TraySlot2Frame;
+                                                      }
+                                                  }
+
 						ControllerBuilder->Init(Robots, ControllerConfig->ControllerConfiguration);
 						ControllerBuilder->Build();
 						NewRobot->GetPlugin(TEXT("ControllerComponent"))->Init();
@@ -120,6 +147,14 @@ void URobotManager::ParseSDF()
 						URROSCommunicationDataAsset::StaticClass(), nullptr, *ROSConfigPathLong));
 					if (ROSConfig)
 					{
+                                          for(auto& Subscriber : ROSConfig->SubscriberConfiguration)
+                                            {
+                                              if(Subscriber.SubscriberParameters->GetClass()->IsChildOf(URJointStateReplaySubscriberParameter::StaticClass()))
+                                                {
+                                                  Subscriber.SubscriberParameters->Topic = Settings->JointStateTopic;
+                                                }
+                                            }
+
 						URROSCommunicationBuilder* ROSCommunicationBuilder = NewObject<URROSCommunicationBuilder>();
 						ROSCommunicationBuilder->Init(NewRobot, ROSConfig->ROSCommunicationConfiguration);
 						ROSCommunicationBuilder->Build(ROSConfig->PublisherConfiguration,

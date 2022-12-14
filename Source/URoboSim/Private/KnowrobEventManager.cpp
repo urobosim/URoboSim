@@ -2,15 +2,17 @@
 
 #include "URoboSimSubsystem.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine/GameInstance.h"
 
 void UEventManagerComponent::BeginPlay()
 {
   Super::BeginPlay();
 
   UURoboSimSubsystem* Subsystem = nullptr;
-  if(UWorld* World = GetWorld())
+  UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(this);
+  if(GameInstance)
     {
-      Subsystem = World->GetSubsystem<UURoboSimSubsystem>();
+      Subsystem = GameInstance->GetSubsystem<UURoboSimSubsystem>();
     }
 
   if(Subsystem)

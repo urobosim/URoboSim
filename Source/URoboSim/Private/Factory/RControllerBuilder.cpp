@@ -95,6 +95,10 @@ URController *URControllerBuilder::CreateController(ARModel *&InOwner, const TPa
   {
     return NewObject<URBaseController>(InOwner, *ControllerParameters.Key);
   }
+  else if (Cast<URPumpControllerParameter>(ControllerParameters.Value))
+  {
+    return NewObject<URPumpController>(InOwner, *ControllerParameters.Key);
+  }
   else
   {
     return NewObject<URController>(InOwner, *ControllerParameters.Key);

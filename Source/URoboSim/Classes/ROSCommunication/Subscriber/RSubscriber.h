@@ -8,13 +8,13 @@
 #include "RSubscriber.generated.h"
 // clang-format on
 
-UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew)
+UCLASS(BlueprintType, DefaultToInstanced, collapsecategories, hidecategories = Object, editinlinenew, Config=Ros, PerObjectConfig)
 class UROBOSIM_API URSubscriberParameter : public UObject
 {
   GENERATED_BODY()
 
 public:
-  UPROPERTY(EditAnywhere)
+    UPROPERTY(EditAnywhere, Config)
   FString Topic;
 
   UPROPERTY(VisibleAnywhere)

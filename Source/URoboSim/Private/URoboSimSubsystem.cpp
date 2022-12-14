@@ -3,6 +3,8 @@
 
 #include "URoboSimSubsystem.h"
 #include "URoboSimSettings.h"
+#include "AJointActor.h"
+#include "ROSCommunication/KnowRobInterface.h"
 
 UURoboSimSubsystem::UURoboSimSubsystem()
 {
@@ -13,14 +15,11 @@ UURoboSimSubsystem::UURoboSimSubsystem()
 
 void UURoboSimSubsystem::Initialize(FSubsystemCollectionBase& Collection)
 {
-  // Super::Initialize(Collection);
-  const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
+  Super::Initialize(Collection);
 
-  // if(!GIsEditor || GIsPlayInEditorWorld)
-    // {
+  const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
       if (Settings->bEnableURoboSim)
         {
-          Super::Initialize(Collection);
           if(ROSHandler.IsValid())
             {
               if(Settings->bEnableJointStatePublishing)
@@ -49,6 +48,4 @@ void UURoboSimSubsystem::Initialize(FSubsystemCollectionBase& Collection)
               UE_LOG(LogTemp, Error, TEXT("URoboSimSubsystem: Handler not valid"));
             }
         }
-
-    // }
 }

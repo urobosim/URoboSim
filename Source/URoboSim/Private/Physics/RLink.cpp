@@ -53,7 +53,7 @@ void URLink::EnableCollision()
       // Collision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
       // Collision->SetCollisionProfileName(FName(TEXT("PhysicsActor")));
       Collision->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Block);
-      Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel1, ECollisionResponse::ECR_Ignore);
+      Collision->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Ignore);
     }
 }
 

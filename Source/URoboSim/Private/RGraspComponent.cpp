@@ -16,6 +16,24 @@ URGraspComponent::URGraspComponent()
     Constraint = NewObject<UPhysicsConstraintComponent>(this, FName(*ConstraintName));
     // Constraint->RegisterComponent();
     Constraint->SetupAttachment(this);
+    // Constraint->ConstraintInstance.SetSoftLinearLimitParams(true, 100, 100, 0., 0.1);
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = true;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Restitution = 0;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Stiffness = 30000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Stiffness = 30000;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Stiffness = 30000;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Damping = 30000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Damping = 30000;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Damping = 30000;
+    // Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 0);
+    // Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Limited, 0);
+    // Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 0);
+    // Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
+    Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
+    Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
@@ -32,7 +50,7 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper)
 {
   Gripper = InGripper;
   bObjectGrasped = false;
-
+  SetSphereRadius(GraspRadius, true);
   OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
 
@@ -44,6 +62,7 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper1, UPrimitiveComponent
   Gripper2 = InGripper2;
   bObjectGrasped = false;
 
+  SetSphereRadius(GraspRadius, true);
   // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
   // TFPublisher->Topic = TEXT("/tf_grasp_test");
   // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
@@ -58,7 +77,8 @@ void URGraspComponent::BeginPlay()
 }
 
 void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-                                                       class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+                                                       class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+                                                       bool bFromSweep, const FHitResult & SweepResult)
 {
   if (ARModel* SMA = Cast<ARModel>(OtherActor))
     {
@@ -67,7 +87,7 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
 
-      UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach"), *OtherSMA->GetName());
+      // UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach"), *OtherSMA->GetName());
       ObjectsInReach.Emplace(OtherSMA);
     }
 }
@@ -78,7 +98,7 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
   // Remove actor from array (if present)
   if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
     {
-      UE_LOG(LogTemp, Log, TEXT("%s: Object in left Reach"), *SMA->GetName());
+      // UE_LOG(LogTemp, Log, TEXT("%s: Object left Reach"), *SMA->GetName());
       ObjectsInReach.Remove(SMA);
     }
 }
@@ -170,10 +190,15 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
   //   {
   //     Constraint2->SetConstrainedComponents(Gripper2, NAME_None, SMC, NAME_None);
   //   }
+
+  if(OnObjectGrasped.IsBound())
+    {
+      OnObjectGrasped.Broadcast(ConstrainedActor);
+    }
   bGraspObjectGravity = SMC->IsGravityEnabled();
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
-
+  // SMC->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Overlap);
 }
 
 // Detach fixation
@@ -208,7 +233,11 @@ void URGraspComponent::TryToDetach()
     //   {
     //     Constraint2->BreakConstraint();
     //   }
-
+    // Cast<UStaticMeshComponent>(FixatedObject->GetRootComponent())->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Block);
+    if(OnObjectGrasped.IsBound())
+    {
+      OnObjectReleased.Broadcast(FixatedObject);
+    }
     FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
     FixatedObject = nullptr;
   }

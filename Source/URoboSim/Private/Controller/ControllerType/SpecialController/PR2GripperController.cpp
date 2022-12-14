@@ -3,7 +3,7 @@
 void UPR2GripperController::SetControllerParameters(URControllerParameter *&ControllerParameters)
 {
   Super::SetControllerParameters(ControllerParameters);
-  
+
 	URGripperControllerParameter* GripperControllerParameters = Cast<URGripperControllerParameter>(
 		ControllerParameters);
   GripperJointName = GripperControllerParameters->GripperPrefix + GripperControllerParameters->GripperJointName;
@@ -37,7 +37,7 @@ void UPR2GripperController::Init()
         Joint.Value->Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Free, 1);
       }
     }
-  	
+
 	GripperJoint2 = GetOwner()->Joints.FindRef(GripperJointName2);
 	GripperJoint3 = GetOwner()->Joints.FindRef(GripperJointName3);
 
@@ -52,7 +52,7 @@ void UPR2GripperController::Init()
       UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
       return;
     }
-  	
+
 	if (bOverwriteConfig)
 	{
 		for(auto& PJointName : PassiveJoints)
@@ -60,7 +60,7 @@ void UPR2GripperController::Init()
 			URJoint* PJoint = GetOwner()->Joints.FindRef(PJointName);
 			if(PJoint)
 			{
-			    UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s enable physics"), *PJointName);
+			    UE_LOG(LogTemp, Log, TEXT("PassiveJoint %s enable physics"), *PJointName);
 				FEnableDrive PassiveDrive;
 				PassiveDrive.bPositionDrive = false;
 				PassiveDrive.bVelocityDrive = false;
@@ -69,18 +69,18 @@ void UPR2GripperController::Init()
 				PJoint->Child->WakeRigidBody();
 				if(!PJoint->Child->IsSimulatingPhysics())
 				{
-					UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s did not enable physics"), *PJointName);
+                                  UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s did not enable physics"), *PJointName);
 				}
 			}
 			else
 			{
 			  UE_LOG(LogTemp, Error, TEXT("PassiveJoint %s of %s not found"), *PJointName,  *GetName());
 			}
-			
+
 		}
-		  
+
 	}
-    
+
 		if (!GripperJoint2)
 		{
 			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName2);
@@ -88,7 +88,7 @@ void UPR2GripperController::Init()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName2);
+			UE_LOG(LogTemp, Log, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName2);
 		}
 		if (!GripperJoint3)
 		{
@@ -97,21 +97,21 @@ void UPR2GripperController::Init()
 		}
 		else
 		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName3);
+			UE_LOG(LogTemp, Log, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName3);
 		}
-    
+
 	TArray<FString> JointNames;
 	JointNames.Add(GripperJointName2);
 	JointController->SetJointNames(JointNames, EnableDrive);
-    
+
     GripperJoint3->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 1);
     GripperJoint3->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 1);
     JointValue = GripperJoint3->GetJointPosition();
-  	
+
     // GripperJoint->Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 0.1);
     // GripperJoint->Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 0.1);
     // JointValue = GripperJoint->GetJointPosition();
-    
+
   }
 }
 
@@ -187,7 +187,7 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
     float Average = (GripperJoint2->GetJointPosition() + GripperJoint->GetJointPosition()) / 2.0;
     float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
     float &GripperJointValue2 = JointController->DesiredJointStates.FindOrAdd(GripperJointName2).JointPosition;
-    
+
     if (bActive)
     {
       GoalStatusList.Last().Status = 1;
@@ -206,29 +206,29 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
 	      GripperJointValue2 += Speed;
 	      GripperJointValue += Speed;
       }
-    
+
       // GripperJointValue = Position;
     }
     else if (bStalled && (OldPosition - Position >= -0.0012))
     {
       GripperJointValue2 = Average;
       GripperJointValue = Average;
-    	
+
 	if(GripperJointValue2 > 0.492)
     	{
     		GripperJointValue2 = 0.492;
     	}
-    	
+
     	if(GripperJointValue2 < 0)
     	{
     		GripperJointValue2 = 0;
     	}
-    	
+
     	if(GripperJointValue > 0.492)
     	{
     		GripperJointValue = 0.492;
     	}
-    	
+
     	if(GripperJointValue < 0)
     	{
     		GripperJointValue = 0;
@@ -251,22 +251,22 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
          	{
          		GripperJointValue2 = 0.492;
          	}
-         	
+
          	if(GripperJointValue2 < 0)
          	{
          		GripperJointValue2 = 0;
          	}
-         	
+
          	if(GripperJointValue > 0.492)
          	{
          		GripperJointValue = 0.492;
          	}
-         	
+
          	if(GripperJointValue < 0)
          	{
          		GripperJointValue = 0;
          	}
-    	
+
     	OldPosition = GripperPosition;
     // 	if(GripperPosition <= 0.085)
     // 	{

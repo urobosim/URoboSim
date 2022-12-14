@@ -133,12 +133,9 @@ void URJointController::SetPhysics()
             {
             case UJointControllerMode::Kinematic:
               Joint->SetSimulatePhysics(false);
-              UE_LOG(LogRJointController, Error, TEXT("%s false"), *Joint->GetName())
               break;
 
             case UJointControllerMode::Dynamic:
-
-              UE_LOG(LogRJointController, Error, TEXT("%s true"), *Joint->GetName())
               Joint->SetSimulatePhysics(true);
               break;
             }
