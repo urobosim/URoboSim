@@ -8,15 +8,15 @@ URGraspComponent::URGraspComponent()
   InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
-  SetCollisionProfileName("OverlapAll");
+  SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
+  SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+  SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Overlap);
 
   FString ConstraintName = TEXT("Constraint_") + GetName();
   if(GetWorld())
   {
     Constraint = NewObject<UPhysicsConstraintComponent>(this, FName(*ConstraintName));
-    // Constraint->RegisterComponent();
     Constraint->SetupAttachment(this);
-    // Constraint->ConstraintInstance.SetSoftLinearLimitParams(true, 100, 100, 0., 0.1);
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = true;
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Restitution = 0;
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Stiffness = 30000;
@@ -25,12 +25,6 @@ URGraspComponent::URGraspComponent()
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Damping = 30000;
     Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Damping = 30000;
     Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Damping = 30000;
-    // Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Limited, 0);
-    // Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Limited, 0);
-    // Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Limited, 0);
-    // Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 0);
-    // Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 0);
-    // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 0);
     Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
@@ -87,8 +81,9 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
 
-      // UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach"), *OtherSMA->GetName());
+      UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach, overlap with %s"), *OtherSMA->GetName(), *OtherComp->GetName());
       ObjectsInReach.Emplace(OtherSMA);
+      ComponentInReach = OtherComp;
     }
 }
 
@@ -98,7 +93,7 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
   // Remove actor from array (if present)
   if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
     {
-      // UE_LOG(LogTemp, Log, TEXT("%s: Object left Reach"), *SMA->GetName());
+      UE_LOG(LogTemp, Log, TEXT("%s: Object left Reach"), *SMA->GetName());
       ObjectsInReach.Remove(SMA);
     }
 }
@@ -115,23 +110,17 @@ bool URGraspComponent::TryToFixate()
       AStaticMeshActor* SMA = ObjectsInReach[0];
 
       // Check if the actor is graspable
-      FixateObject(SMA);
+      FixateObject(SMA, ComponentInReach);
     }
   else
     {
       UE_LOG(LogTemp, Warning, TEXT("%s: No Object to grasp"), *GetName());
     }
-
-  //   {
-  //     bSuccess = true;
-  //   }
-
-  // return bSuccess;
   return bObjectGrasped;
 }
 
 // Fixate object to hand
-void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
+void URGraspComponent::FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent* InSMC)
 {
   // AStaticMeshActor* ConstrainedActor = Cast<AStaticMeshActor>(InSMA->GetAttachParentActor());
   AStaticMeshActor* ConstrainedActor = InSMA;
@@ -153,43 +142,33 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
           bParentFound = true;
         }
     }
+
+  UPrimitiveComponent* SMC = nullptr;
   if(NumIter == 0)
   {
     ObjectToPublish = Cast<AActor>(ConstrainedActor);
+    SMC = InSMC;
   }
+  else
+    {
+      SMC = ConstrainedActor->GetStaticMeshComponent();
+      ComponentInReach = SMC;
+    }
 
-  UStaticMeshComponent* SMC = nullptr;
-  SMC = ConstrainedActor->GetStaticMeshComponent();
 
   if(!SMC)
     {
-      UE_LOG(LogTemp, Error, TEXT("RootComponent of InSMA has no static mesh"));
+      UE_LOG(LogTemp, Error, TEXT("Overlapping or Root component was no static mesh"));
       return;
     }
 
 
-  // if(InSMA == ConstrainedActor)
-  //   {
-  //     // Set the fixated object
-  //     FixatedObject = ConstrainedActor;
-  //     ConstrainedActor->GetStaticMeshComponent()->SetSimulatePhysics(false);
-  //     ConstrainedActor->AttachToComponent(Gripper, FAttachmentTransformRules::KeepWorldTransform);
-  //   }
-  // else
-  //   {
-  //     Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
-  //   }
-
   FixatedObject = ConstrainedActor;
   if(Gripper)
   {
+    Constraint->ConstraintActor2 = ConstrainedActor;
     Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
   }
-
-  // if(Gripper2)
-  //   {
-  //     Constraint2->SetConstrainedComponents(Gripper2, NAME_None, SMC, NAME_None);
-  //   }
 
   if(OnObjectGrasped.IsBound())
     {
@@ -198,29 +177,11 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA)
   bGraspObjectGravity = SMC->IsGravityEnabled();
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
-  // SMC->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Overlap);
 }
 
 // Detach fixation
 void URGraspComponent::TryToDetach()
 {
-  // if(FixatedObject)
-  //   {
-  //     FixatedObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-  //     FixatedObject->GetStaticMeshComponent()->SetSimulatePhysics(true);
-  //     FixatedObject = nullptr;
-  //   }
-  // else
-  //   {
-  //     Constraint->BreakConstraint();
-  //   }
-  // if(ObjectToPublish)
-  //   {
-  //     UE_LOG(LogTemp, Error, TEXT("Start Publishing Object to Publish %s"), *ObjectToPublish->GetName());
-  //     TFPublisher->AddObject(ObjectToPublish);
-  //     TFPublisher->Publish();
-  //   }
-
   if(FixatedObject)
   {
 
@@ -229,16 +190,11 @@ void URGraspComponent::TryToDetach()
         Constraint->BreakConstraint();
       }
 
-    // if(Gripper2)
-    //   {
-    //     Constraint2->BreakConstraint();
-    //   }
-    // Cast<UStaticMeshComponent>(FixatedObject->GetRootComponent())->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Block);
     if(OnObjectGrasped.IsBound())
     {
       OnObjectReleased.Broadcast(FixatedObject);
     }
-    FixatedObject->GetStaticMeshComponent()->SetEnableGravity(bGraspObjectGravity);
+    ComponentInReach->SetEnableGravity(bGraspObjectGravity);
     FixatedObject = nullptr;
   }
   bObjectGrasped = false;

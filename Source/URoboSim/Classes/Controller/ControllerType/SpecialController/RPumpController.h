@@ -61,50 +61,33 @@ public:
     FVector TraySlot2Frame;
 
   UFUNCTION()
-    void SetConstraintTray1(AActor* Object);
+    void ReleaseObject(AActor* Object);
 
   UFUNCTION()
-    void SetConstraintTray2(AActor* Object);
+    void SetObjectTray1(AActor* Object);
 
   UFUNCTION()
-    void ReleaseConstraintTray1(AActor* Object);
+    void SetObjectTray2(AActor* Object);
 
-  UFUNCTION()
-    void ReleaseConstraintTray2(AActor* Object);
 protected:
 
   UFUNCTION()
-  virtual void OnTray1AreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+  virtual void OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
 	                                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                                             bool bFromSweep, const FHitResult& SweepResult);
 
   // Function called when an item leaves the fixation overlap area
   UFUNCTION()
-    void OnTray1AreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
+    void OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
 	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-  UFUNCTION()
-    void OnTray2AreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-	                                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	                                             bool bFromSweep, const FHitResult& SweepResult);
-
-  // Function called when an item leaves the fixation overlap area
-  UFUNCTION()
-    void OnTray2AreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
+  virtual USphereComponent* SetupOverlap(const FName& InName, const FVector& InOffset);
 
   UPROPERTY(VisibleAnywhere)
     USphereComponent* Tray1Overlap;
 
   UPROPERTY(VisibleAnywhere)
     USphereComponent* Tray2Overlap;
-
-  UPROPERTY(VisibleAnywhere)
-    UPhysicsConstraintComponent* Tray1Constaint;
-
-  UPROPERTY(VisibleAnywhere)
-    UPhysicsConstraintComponent* Tray2Constaint;
 
   UPROPERTY(VisibleAnywhere)
     TArray<URGraspComponent*> GraspComps;

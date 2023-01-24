@@ -86,9 +86,10 @@ protected:
 	// Array of items currently in reach (overlapping the sphere component)
 	TArray<AStaticMeshActor*> ObjectsInReach;
 
+        UPrimitiveComponent* ComponentInReach = nullptr;
 
 	// Fixate object to hand
-	virtual void FixateObject(AStaticMeshActor* InSMA);
+	virtual void FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent* InSMC);
 
 	UPROPERTY()
 	bool bGraspObjectGravity;
