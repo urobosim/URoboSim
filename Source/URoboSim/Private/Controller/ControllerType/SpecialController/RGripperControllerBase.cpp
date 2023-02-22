@@ -77,7 +77,7 @@ void URGripperControllerBase::Init()
 		GraspComponent->CreationMethod = EComponentCreationMethod::Instance;
 		GraspComponent->RegisterComponent();
 
-		URLink* ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
+		ReferenceLink = GetOwner()->Links[GraspCompSetting.GripperName];
 		GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->Constraint->AttachToComponent(GraspComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);

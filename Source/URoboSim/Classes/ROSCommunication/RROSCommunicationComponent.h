@@ -56,6 +56,8 @@ protected:
 
 	void InitServiceClients();
 
+	void InitServiceServers();
+
 	void InitActionServers();
 
 protected:

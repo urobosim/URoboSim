@@ -70,6 +70,15 @@ void URGraspComponent::BeginPlay()
   Super::BeginPlay();
 }
 
+void URGraspComponent::OverrideObjectInReach(AActor* InActor)
+{
+  if(AStaticMeshActor* Actor = Cast<AStaticMeshActor>(InActor))
+    {
+      ObjectsInReach.Emplace(Actor);
+      ComponentInReach = Cast<UPrimitiveComponent>(Actor->GetRootComponent());
+    }
+}
+
 void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
                                                        class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
                                                        bool bFromSweep, const FHitResult & SweepResult)

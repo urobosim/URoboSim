@@ -34,6 +34,7 @@ void FRROSCommunicationContainer::Init(UObject* InOwner)
       InitPublishers();
       InitSubscribers();
       InitServiceClients();
+      InitServiceServers();
       InitActionServers();
     }
 }
@@ -51,6 +52,14 @@ void FRROSCommunicationContainer::InitSubscribers()
   for (URSubscriber *&Subscriber : Subscribers)
   {
     Subscriber->Connect(WebsocketIPAddr, WebsocketPort);
+  }
+}
+
+void FRROSCommunicationContainer::InitServiceServers()
+{
+  for (URServiceServer *&ServiceServer : ServiceServers)
+  {
+    ServiceServer->Connect(WebsocketIPAddr, WebsocketPort);
   }
 }
 

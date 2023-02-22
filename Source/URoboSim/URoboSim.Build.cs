@@ -40,6 +40,7 @@ public class URoboSim : ModuleRules
 				"UTFPublisher",
 				"UCheckpointSystem",
                                 "UIds",
+                                "UTags",
 			}
 			);
 
