@@ -392,7 +392,13 @@ float URContinuousConstraintComponent::GetJointVelocityInUUnits()
 
 void URPrismaticConstraintComponent::SetMotorJointState(float TargetPosition, float TargetJointVelocity)
 {
-  SetMotorJointStateInUUnits(-FConversions::MToCm((float)ClampJointStateToConstraintLimit(TargetPosition)), -FConversions::MToCm((float)TargetJointVelocity));
+  /**
+       - There are two versions of FConversions::MToCm, one that returns a value (which we want to use) and one acts as a procedure.
+           In order to call the first one, we need to match its signature, we can see that the first one takes a 'const reference' while the second one
+              takes just a 'reference', so we used static_cast<const float&> to match the signature of the first one to be called. so MSVC compiler will be satisfied.
+   */
+
+  SetMotorJointStateInUUnits(-FConversions::MToCm<float>(static_cast<const float&>(ClampJointStateToConstraintLimit(TargetPosition))), -FConversions::MToCm<float>(static_cast<const float&>(TargetJointVelocity)));
 }
 
 void URPrismaticConstraintComponent::SetMotorJointStateInUUnits(float TargetPosition, float TargetJointVelocity)
