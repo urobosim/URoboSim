@@ -412,7 +412,7 @@ void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * 
 {
   Child->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
 
-  FVector DeltaJointLocationInJointFrame = RefAxis * FConversions::MToCm((float)Angle);
+  FVector DeltaJointLocationInJointFrame = RefAxis * FConversions::MToCm<float>(static_cast<const float&>(Angle));
   FVector ChildLocationInJointFrame = DeltaJointLocationInJointFrame + InitChildMeshPoseInJointFrame.GetTranslation();
   Child->SetRelativeLocation(ChildLocationInJointFrame);
 
