@@ -54,6 +54,8 @@ public:
         FObjectReleasedDelegate OnObjectReleased;
         FObjectGraspedDelegate OnObjectGrasped;
 
+        void OverrideObjectInReach(AActor* InActor);
+
 	UFUNCTION()
 	virtual void OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
 	                                             class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,

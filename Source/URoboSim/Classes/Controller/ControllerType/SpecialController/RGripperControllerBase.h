@@ -42,7 +42,7 @@ public:
 
   UPROPERTY(EditAnywhere)
     bool bOverwriteConfig = true;
-  
+
   UPROPERTY(EditAnywhere)
     bool bInvertGraspCondition = false;
 };
@@ -71,6 +71,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   FGraspComponentSetting GraspCompSetting;
+
+  UPROPERTY(EditAnywhere)
+  URLink* ReferenceLink;
 
   float OldPosition;
 
