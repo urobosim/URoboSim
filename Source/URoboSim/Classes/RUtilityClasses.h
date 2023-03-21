@@ -25,6 +25,28 @@ public:
 };
 
 USTRUCT()
+struct FEnableDrive
+{
+  GENERATED_BODY()
+
+public:
+  UPROPERTY(EditAnywhere)
+  bool bPositionDrive = true;
+
+  UPROPERTY(EditAnywhere)
+  bool bVelocityDrive = true;
+
+  UPROPERTY(EditAnywhere)
+  float PositionStrength = 1E5;
+
+  UPROPERTY(EditAnywhere)
+  float VelocityStrength = 1E5;
+
+  UPROPERTY(EditAnywhere)
+  float MaxForce = 1E10;
+};
+
+USTRUCT()
 struct FJointState
 {
   GENERATED_BODY()
