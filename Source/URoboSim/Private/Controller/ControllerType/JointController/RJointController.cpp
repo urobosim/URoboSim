@@ -170,8 +170,8 @@ void URJointController::SetJointNames(const TArray<FString> &JointNames, const F
   {
     if (!DesiredJointStates.Contains(JointName) && GetOwner()->GetJoint(JointName))
     {
-      DesiredJointStates.Add(JointName, FJointState());
       GetOwner()->GetJoint(JointName)->SetDrive(InEnableDrive);
+      DesiredJointStates.Add(JointName, FJointState());
     }
   }
 }
@@ -186,8 +186,8 @@ void URJointController::SetJointNames(const TArray<FString> &JointNames)
 
     if (!DesiredJointStates.Contains(JointName) && GetOwner()->GetJoint(JointName))
     {
-      DesiredJointStates.Add(JointName, FJointState());
       GetOwner()->GetJoint(JointName)->SetDrive(EnableDriveInternal);
+      DesiredJointStates.Add(JointName, FJointState());
     }
   }
 }
@@ -198,7 +198,7 @@ void URJointController::Tick(const float &InDeltaTime)
   {
     // for (auto &Joint : GetOwner()->Joints)
     // {
-    //   Joint.Value->UpdateEncoder();
+    //   // Joint.Value->UpdateEncoder();
     // }
 
     MoveJoints(InDeltaTime);
