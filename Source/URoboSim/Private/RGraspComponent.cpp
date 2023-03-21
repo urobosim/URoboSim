@@ -81,7 +81,7 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
   if (AStaticMeshActor* OtherSMA = Cast<AStaticMeshActor>(OtherActor))
     {
 
-      UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach, overlap with %s"), *OtherSMA->GetName(), *OtherComp->GetName());
+      UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach, overlap with %s / %s"), *GetName(), *OtherSMA->GetName(), *OtherComp->GetName());
       ObjectsInReach.Emplace(OtherSMA);
       ComponentInReach = OtherComp;
     }
@@ -93,7 +93,7 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
   // Remove actor from array (if present)
   if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
     {
-      UE_LOG(LogTemp, Log, TEXT("%s: Object left Reach"), *SMA->GetName());
+      UE_LOG(LogTemp, Log, TEXT("%s: Object %s left Reach"), *GetName(), *SMA->GetName());
       ObjectsInReach.Remove(SMA);
     }
 }
@@ -104,13 +104,18 @@ bool URGraspComponent::TryToFixate()
   bool bSuccess = false;
 
   // if(bObjectGrasped)
-  if(!bObjectGrasped && ObjectsInReach.Num() > 0)
+  if(ObjectsInReach.Num() > 0)
     {
-      // Pop a SMA
-      AStaticMeshActor* SMA = ObjectsInReach[0];
+      if(!bObjectGrasped)
+        {
+          // Pop a SMA
+          AStaticMeshActor* SMA = ObjectsInReach[0];
 
-      // Check if the actor is graspable
-      FixateObject(SMA, ComponentInReach);
+          // Check if the actor is graspable
+          FixateObject(SMA, ComponentInReach);
+
+          UE_LOG(LogTemp, Log, TEXT("%s: Fixate Object %s / %s"), *GetName(), *SMA->GetName(), *ComponentInReach->GetName());
+        }
     }
   else
     {
