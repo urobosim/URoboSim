@@ -28,9 +28,9 @@ void URControllerComponent::Init()
                           });
 
 
-    UE_LOG(LogRControllerComponent, Log, TEXT("Init Controller"))
     for (URController *&Controller : Controllers)
     {
+      UE_LOG(LogRControllerComponent, Log, TEXT("Init Controller %s"), *Controller->GetName())
       Controller->Init();
     }
   }
