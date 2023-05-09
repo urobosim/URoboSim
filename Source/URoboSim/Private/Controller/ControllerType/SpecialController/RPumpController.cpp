@@ -218,7 +218,7 @@ void URPumpController::SetObjectTray1(AActor* Object)
   Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
   Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
 
-  Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray1Overlap->GetComponentLocation(), FVector(1.0, 1.0, 1.0)));
+  Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray1Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 }
 
 void URPumpController::SetObjectTray2(AActor* Object)
@@ -235,5 +235,5 @@ void URPumpController::SetObjectTray2(AActor* Object)
 
   Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
   Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
-  Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray2Overlap->GetComponentLocation(), FVector(1.0, 1.0, 1.0)));
+  Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray2Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 }
