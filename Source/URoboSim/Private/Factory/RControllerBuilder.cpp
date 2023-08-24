@@ -7,6 +7,7 @@
 #include "Controller/ControllerType/SpecialController/RWSGGripperController.h"
 #include "Controller/ControllerType/SpecialController/RHeadController.h"
 #include "Controller/ControllerType/SpecialController/RTFController.h"
+#include "Controller/ControllerType/SpecialController/RPumpController.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRControllerBuilder, Log, All);
 
