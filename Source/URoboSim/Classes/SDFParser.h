@@ -7,7 +7,7 @@
 #include "Engine/StaticMesh.h"
 #include "SDF/SDFDataAsset.h"
 #include "SDF/SDFGeometry.h"
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 #include "UObject/ObjectMacros.h" // EObjectFlags
 //#include "SDFParserBase.h"
 #include "SDFParserInterface.h"

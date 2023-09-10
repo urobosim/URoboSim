@@ -28,7 +28,7 @@
 #include "StaticMeshDescription.h"
 #include "KismetProceduralMeshLibrary.h"
 #include "ProceduralMeshComponent.h"
-#include "AssetRegistryModule.h"
+#include "AssetRegistry/AssetRegistryModule.h"
 
 
 class AActor;
