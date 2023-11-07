@@ -204,17 +204,37 @@ void RStaticMeshUtils::CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHul
 	}
 }
 
-void RStaticMeshUtils::GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirections, uint32 InNumInDirections)
+void RStaticMeshUtils::GeneratePrimitiveCollision(UStaticMesh* OutMesh, FString InType)
 {
+  //TODO check if GEditor is required
 
-    TArray<FVector>	DirArray;
-    for(uint32 DirectionIndex = 0;DirectionIndex < InNumInDirections;DirectionIndex++)
-    {
-        DirArray.Add(InDirections[DirectionIndex]);
-    }
 
     GEditor->BeginTransaction(LOCTEXT("FStaticMeshEditor_GenerateKDop", "Create Convex Collision"));
-    const int32 PrimIndex = GenerateKDopAsSimpleCollision(OutMesh, DirArray);
+    int32 PrimIndex = 0;
+
+
+    if(InType.Equals(TEXT("Box")))
+      {
+       PrimIndex =  GenerateBoxAsSimpleCollision(OutMesh);
+      }
+    else if (InType.Equals(TEXT("Sphere")))
+      {
+       PrimIndex =  GenerateSphereAsSimpleCollision(OutMesh);
+      }
+    else if (InType.Equals(TEXT("Capsule")))
+      {
+       PrimIndex =  GenerateSphylAsSimpleCollision(OutMesh);
+      }
+    else if(InType.Equals(TEXT("Cylinder")))
+      {
+        TArray<FVector>	DirArray;
+        for(uint32 DirectionIndex = 0;DirectionIndex < 10 ; DirectionIndex++)
+          {
+            DirArray.Add(KDopDir10Z[DirectionIndex]);
+          }
+        PrimIndex = GenerateKDopAsSimpleCollision(OutMesh, DirArray);
+      }
+
     GEditor->EndTransaction();
     if (PrimIndex != INDEX_NONE)
     {
@@ -226,34 +246,6 @@ void RStaticMeshUtils::GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirec
         // Don't 'nudge' KDop prims, as they are fitted specifically around the geometry
     }
 }
-
-void RStaticMeshUtils::GenerateKDop(UStaticMesh* OutMesh, ECollisionType InCollisionType)
-{
-    switch(InCollisionType)
-    {
-        case ECollisionType::None :
-            break;
-        case ECollisionType::DopX10 :
-            RStaticMeshUtils::GenerateKDop(OutMesh, KDopDir10X, 10);
-            break;
-        case ECollisionType::DopY10 :
-            RStaticMeshUtils::GenerateKDop(OutMesh, KDopDir10Y, 10);
-            break;
-        case ECollisionType::DopZ10 :
-            RStaticMeshUtils::GenerateKDop(OutMesh, KDopDir10Z, 10);
-            break;
-        case ECollisionType::DopSC18 :
-            RStaticMeshUtils::GenerateKDop(OutMesh, KDopDir18, 18);
-            break;
-        case ECollisionType::DopSC26 :
-            RStaticMeshUtils::GenerateKDop(OutMesh, KDopDir26, 26);
-            break;
-        default :
-            UE_LOG(LogTemp, Error, TEXT("Collision Type not supportet."));
-            break;
-    }
-}
-
 
 TArray<float> RStaticMeshUtils::GetGeometryParameter(USDFGeometry* InGeometry)
 {

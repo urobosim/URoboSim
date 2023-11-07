@@ -126,13 +126,13 @@ bool FSDFParserEditor::CreateCollisionForMesh(UStaticMesh* OutMesh, ESDFGeometry
 	case ESDFGeometryType::Mesh:
 		return true;
 	case ESDFGeometryType::Box:
-		RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopX10);
-		return true;
+                RStaticMeshUtils::GeneratePrimitiveCollision(OutMesh, TEXT("Box"));
+                return true;
 	case ESDFGeometryType::Cylinder:
-		RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopZ10);
+                RStaticMeshUtils::GeneratePrimitiveCollision(OutMesh, TEXT("Cylinder"));
 		return true;
 	case ESDFGeometryType::Sphere:
-		RStaticMeshUtils::GenerateKDop(OutMesh, ECollisionType::DopX10);
+                RStaticMeshUtils::GeneratePrimitiveCollision(OutMesh, TEXT("Sphere"));
 		return true;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("GeometryType not supportet for %s."), *OutMesh->GetName());
@@ -215,4 +215,3 @@ void FSDFParserEditor::ParseCollisionChild(const FXmlNode* InNode, USDFCollision
 	                                          RStaticMeshUtils::GetGeometryParameter(
 		                                          OutCollision->Geometry));
 }
-

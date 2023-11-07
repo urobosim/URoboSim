@@ -60,8 +60,8 @@ public:
     static void CreateComplexCollision(UStaticMesh* OutMesh, uint32 InHullCount, int32 InMaxHullVerts, uint32 InHullPrecision);
 
 	static void CleanUp(FString InName);
-    static void GenerateKDop(UStaticMesh* OutMesh, ECollisionType InCollisionType);
-    static void GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirections, uint32 InNumInDirections);
+    static void GeneratePrimitiveCollision(UStaticMesh* OutMesh, FString InType);
+    // static void GenerateKDop(UStaticMesh* OutMesh, const FVector* InDirections, uint32 InNumInDirections);
     static TArray<float> GetGeometryParameter(USDFGeometry* InGeometry);
 
     static UStaticMesh* CreateStaticMesh(UPackage* InPackage, FString InPackageName, ESDFGeometryType InShape, TArray<float> InParameters);
