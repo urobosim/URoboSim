@@ -15,16 +15,45 @@ void URPumpController::SetControllerParameters(URControllerParameter*& Controlle
           TrayReferenceLink = PumpControllerParameters->TrayReferenceLink;
           TraySlot1Frame = PumpControllerParameters->TraySlot1Frame;
           TraySlot2Frame = PumpControllerParameters->TraySlot2Frame;
+          HolderReferenceFrame = PumpControllerParameters->HolderReferenceFrame;
 	}
+}
+
+UPrimitiveComponent* URPumpController::ParseChildFramesForRef(TArray<USceneComponent*> InChildFrames, FString RefName)
+{
+  UPrimitiveComponent* TempRef = nullptr;
+
+  for(auto& ChildFrame : InChildFrames)
+    {
+
+      UE_LOG(LogTemp, Warning, TEXT("[%s]: Found ChildFrames %s"), *FString(__FUNCTION__), *ChildFrame->GetName());
+      if(ChildFrame->GetName().Contains(RefName))
+        {
+          UE_LOG(LogTemp, Error, TEXT("[%s]: Referenceframe %s"), *FString(__FUNCTION__), *ChildFrame->GetName());
+          TempRef = Cast<UPrimitiveComponent>(ChildFrame);
+        }
+      else
+        {
+          TArray<USceneComponent*> ChildChildFrames = ChildFrame->GetAttachChildren();
+          TempRef = ParseChildFramesForRef(ChildChildFrames, RefName);
+        }
+      if(TempRef)
+        {
+          break;
+        }
+    }
+
+  return TempRef;
 }
 
 void URPumpController::Init()
 {
-	Super::Init();
+        Super::Init();
 
-	if (!GetOwner())
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s not attached to ARModel"), *GetName());
+
+        if (!GetOwner())
+        {
+                UE_LOG(LogTemp, Error, TEXT("%s not attached to ARModel"), *GetName());
 	}
 	else
 	{
@@ -42,23 +71,29 @@ void URPumpController::Init()
 		}
 
                 TArray<USceneComponent*> ChildFrames = Pump->GetAttachChildren();
-                for(auto& ChildFrame : ChildFrames)
-                  {
-                    if(ChildFrame->GetName().Contains(TrayReferenceFrame))
-                      {
-                        Ref = Cast<UPrimitiveComponent>(ChildFrame);
-                      }
-                  }
+                Ref = ParseChildFramesForRef(ChildFrames, TrayReferenceFrame);
 
                 if(!Ref)
                   {
-                    UE_LOG(LogTemp, Error, TEXT("[%s]: Referenceframe %s not found"), *FString(__FUNCTION__), *TrayReferenceFrame);
+                    UE_LOG(LogTemp, Error, TEXT("[%s]: TrayReferenceframe %s not found"), *FString(__FUNCTION__), *TrayReferenceFrame);
                     return;
                   }
                 else
                   {
+                    Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+                    Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+                  }
 
-                    UE_LOG(LogTemp, Log, TEXT("[%s]: Referenceframe %s"), *FString(__FUNCTION__), *TrayReferenceFrame);
+                HolderRef = ParseChildFramesForRef(ChildFrames, HolderReferenceFrame);
+                if(!HolderRef)
+                  {
+                    UE_LOG(LogTemp, Error, TEXT("[%s]: HolderReferenceframe %s not found"), *FString(__FUNCTION__), *HolderReferenceFrame);
+                    return;
+                  }
+                else
+                  {
+                    HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+                    HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
                   }
 
                 PumpHandler = NewObject<URPumpControllerHandler>(this);
@@ -68,8 +103,10 @@ void URPumpController::Init()
                     return;
                   }
 
-                Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame);
-                Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame);
+                Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref);
+                Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref);
+                HolderOverlap = SetupOverlap(FName(GetName() + TEXT("_HolderOverlap")), HolderFrame, HolderRef, 5.0);
+
 
                 TArray<UActorComponent*> TempComp;
                 GetOwner()->GetComponents(URGraspComponent::StaticClass(), TempComp, true);
@@ -81,22 +118,22 @@ void URPumpController::Init()
  	}
 }
 
-USphereComponent* URPumpController::SetupOverlap(const FName& InName, const FVector& InOffset)
+USphereComponent* URPumpController::SetupOverlap(const FName& InName, const FVector& InOffset, UPrimitiveComponent* InReference, float InRadius)
 {
-  USphereComponent* TrayOverlap = NewObject<USphereComponent>(GetOwner(), InName);
-  TrayOverlap->CreationMethod = EComponentCreationMethod::Instance;
-  TrayOverlap->RegisterComponent();
-  TrayOverlap->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
-  TrayOverlap->SetGenerateOverlapEvents(true);
-  TrayOverlap->AttachToComponent(Ref, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-  TrayOverlap->AddRelativeLocation(InOffset);
-  TrayOverlap->SetSphereRadius(2.2, true);
-  TrayOverlap->SetHiddenInGame(false , false);
-  TrayOverlap->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Ignore);
-  TrayOverlap->OnComponentBeginOverlap.AddDynamic(this, &URPumpController::OnTrayAreaBeginOverlap);
-  TrayOverlap->OnComponentEndOverlap.AddDynamic(this, &URPumpController::OnTrayAreaEndOverlap);
+  USphereComponent* Overlap = NewObject<USphereComponent>(GetOwner(), InName);
+  Overlap->CreationMethod = EComponentCreationMethod::Instance;
+  Overlap->RegisterComponent();
+  Overlap->SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
+  Overlap->SetGenerateOverlapEvents(true);
+  Overlap->AttachToComponent(InReference, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+  Overlap->AddRelativeLocation(InOffset);
+  Overlap->SetSphereRadius(InRadius, true);
+  Overlap->SetHiddenInGame(false , false);
+  Overlap->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Ignore);
+  Overlap->OnComponentBeginOverlap.AddDynamic(this, &URPumpController::OnTrayAreaBeginOverlap);
+  Overlap->OnComponentEndOverlap.AddDynamic(this, &URPumpController::OnTrayAreaEndOverlap);
 
-  return TrayOverlap;
+  return Overlap;
 }
 
 void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
@@ -107,11 +144,11 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
     {
       UE_LOG(LogTemp, Log, TEXT("[%s]: Overlap with %s"), *FString(__FUNCTION__), *HitComp->GetName());
 
-      if(Ref)
-        {
-          Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-          Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
-        }
+      // if(Ref)
+      //   {
+      //     Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+      //     Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+      //   }
 
       if(!Tray1Overlap)
         {
@@ -135,6 +172,10 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             {
               GraspComp->OnObjectReleased.AddDynamic(this, &URPumpController::SetObjectTray2);
             }
+          else if(HitComp->GetName().Equals(HolderOverlap->GetName()))
+            {
+              GraspComp->OnObjectReleased.AddDynamic(this, &URPumpController::SetObjectHolder);
+            }
           else
             {
               UE_LOG(LogTemp, Error, TEXT("[%s]: Overlap neither Tray1 or Tray2 but %s"), *FString(__FUNCTION__), *HitComp->GetName());
@@ -150,8 +191,8 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
     {
       UE_LOG(LogTemp, Log, TEXT("[%s]: End overlap with %s"), *FString(__FUNCTION__), *HitComp->GetName());
 
-      Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
-      Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
+      // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+      // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
 
       UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(OtherActor->GetRootComponent());
       if(Root)
@@ -187,8 +228,8 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
 void URPumpController::ReleaseObject(AActor* Object)
 {
 
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Block);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Block);
 
   UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
   if(Root)
@@ -215,8 +256,8 @@ void URPumpController::SetObjectTray1(AActor* Object)
       return;
     }
 
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
 
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray1Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 }
@@ -233,7 +274,24 @@ void URPumpController::SetObjectTray2(AActor* Object)
       UE_LOG(LogTemp, Error, TEXT("Root of %s not a StaticMesh"), *Object->GetName());
     }
 
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-  Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray2Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
+}
+
+void URPumpController::SetObjectHolder(AActor* Object)
+{
+  UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
+  if(Root)
+    {
+      Root->SetSimulatePhysics(false);
+    }
+  else
+    {
+      UE_LOG(LogTemp, Error, TEXT("Root of %s not a StaticMesh"), *Object->GetName());
+    }
+
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+  // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+  Object->SetActorTransform(FTransform( FRotator(180, 0 , 0), HolderOverlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 }
