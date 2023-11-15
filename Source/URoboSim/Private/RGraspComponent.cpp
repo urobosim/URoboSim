@@ -8,7 +8,9 @@ URGraspComponent::URGraspComponent()
   InitSphereRadius(GraspRadius);
   SetGenerateOverlapEvents(true);
   SetEnableGravity(false);
-  SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
+
+  // SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel18);
+  SetCollisionObjectType(ECollisionChannel::ECC_GameTraceChannel3);
   SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
   SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Overlap);
 
@@ -68,6 +70,7 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper1, UPrimitiveComponent
 void URGraspComponent::BeginPlay()
 {
   Super::BeginPlay();
+  ComponentInReach = nullptr;
 }
 
 void URGraspComponent::OverrideObjectInReach(AActor* InActor)

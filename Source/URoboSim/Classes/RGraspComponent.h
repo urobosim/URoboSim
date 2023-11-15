@@ -66,13 +66,13 @@ public:
 	virtual void OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
 	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	UPROPERTY(EditAnywhere)
+	float GraspRadius = 3.f;
+
 
 protected:
 	// UPROPERTY()
 	// URTFPublisher* TFPublisher;
-
-	UPROPERTY(EditAnywhere)
-	float GraspRadius = 3.f;
 
 	UPROPERTY()
 	UPrimitiveComponent* Gripper;
