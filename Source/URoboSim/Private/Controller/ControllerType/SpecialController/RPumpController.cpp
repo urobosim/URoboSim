@@ -76,37 +76,36 @@ void URPumpController::Init()
                 if(!Ref)
                   {
                     UE_LOG(LogTemp, Error, TEXT("[%s]: TrayReferenceframe %s not found"), *FString(__FUNCTION__), *TrayReferenceFrame);
-                    return;
                   }
                 else
                   {
-                    Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-                    Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+                    // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+                    // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+
+                    Ref->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+                    Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref);
+                    Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref);
                   }
 
                 HolderRef = ParseChildFramesForRef(ChildFrames, HolderReferenceFrame);
                 if(!HolderRef)
                   {
                     UE_LOG(LogTemp, Error, TEXT("[%s]: HolderReferenceframe %s not found"), *FString(__FUNCTION__), *HolderReferenceFrame);
-                    return;
                   }
                 else
                   {
-                    HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
-                    HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+                    // HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
+                    // HolderRef->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
+
+                    HolderRef->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+                    HolderOverlap = SetupOverlap(FName(GetName() + TEXT("_HolderOverlap")), HolderFrame, HolderRef, 5.0);
                   }
 
-                PumpHandler = NewObject<URPumpControllerHandler>(this);
-                if(!PumpHandler)
-                  {
-                    UE_LOG(LogTemp, Error, TEXT("[%s]: No Pump Handler"), *FString(__FUNCTION__));
-                    return;
-                  }
-
-                Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref);
-                Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref);
-                HolderOverlap = SetupOverlap(FName(GetName() + TEXT("_HolderOverlap")), HolderFrame, HolderRef, 5.0);
-
+                // PumpHandler = NewObject<URPumpControllerHandler>(this);
+                // if(!PumpHandler)
+                //   {
+                //     UE_LOG(LogTemp, Error, TEXT("[%s]: No Pump Handler"), *FString(__FUNCTION__));
+                //   }
 
                 TArray<UActorComponent*> TempComp;
                 GetOwner()->GetComponents(URGraspComponent::StaticClass(), TempComp, true);

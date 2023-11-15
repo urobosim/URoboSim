@@ -81,6 +81,7 @@ void URGripperControllerBase::Init()
 		GraspComponent->AttachToComponent(ReferenceLink, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->Constraint->AttachToComponent(GraspComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		GraspComponent->AddRelativeLocation(GraspCompSetting.ToolCenterPoint);
+                GraspComponent->GraspRadius = GraspCompSetting.Radius;
 		GraspComponent->Init(ReferenceLink);
  	}
 }

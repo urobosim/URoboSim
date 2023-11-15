@@ -7,12 +7,12 @@
 #include "RPumpController.generated.h"
 // clang-format on
 
-UCLASS()
-class UROBOSIM_API URPumpControllerHandler : public UObject
-{
-  GENERATED_BODY()
+// UCLASS()
+// class UROBOSIM_API URPumpControllerHandler : public UObject
+// {
+//   GENERATED_BODY()
 
-};
+// };
 
 UCLASS()
 class UROBOSIM_API URPumpControllerParameter : public URControllerParameter
@@ -117,6 +117,6 @@ protected:
   UPROPERTY(VisibleAnywhere)
     UPrimitiveComponent* HolderRef = nullptr;
 
-  UPROPERTY(VisibleAnywhere)
-    URPumpControllerHandler* PumpHandler = nullptr;
+  // UPROPERTY(VisibleAnywhere)
+    // URPumpControllerHandler* PumpHandler = nullptr;
 };

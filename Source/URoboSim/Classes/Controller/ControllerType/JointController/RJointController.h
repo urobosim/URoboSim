@@ -23,6 +23,7 @@ struct FConfigOverwrite
   FConfigOverwrite();
   FConfigOverwrite(const UJointControllerMode& InMode, const FEnableDrive& InEnableDrive);
 
+  UPROPERTY(EditAnywhere)
   UJointControllerMode Mode;
 
   UPROPERTY(EditAnywhere)
@@ -43,6 +44,7 @@ public:
     EnableDrive.PositionStrength = 1E5;
     EnableDrive.VelocityStrength = 1E4;
     EnableDrive.MaxForce = 1E10;
+
   }
 
 public:
@@ -57,6 +59,9 @@ public:
 
   UPROPERTY(EditAnywhere)
   bool bControllAllJoints;
+
+  UPROPERTY(EditAnywhere)
+    TMap<FString, FConfigOverwrite> ConfigOverwrite;
 };
 
 UCLASS()

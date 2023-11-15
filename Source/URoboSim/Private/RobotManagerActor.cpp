@@ -83,7 +83,7 @@ void URobotManager::ParseSDF()
 				ModelBuilder->Load(Model, NewRobot, Model->Pose.GetLocation(), SDFAsset->Version);
 
 
-				FString ControllerConfigPathShort = TEXT("/Game/ControllerConfig");
+				FString ControllerConfigPathShort = Settings->ControllerConfigFile;
 				FString Reason = "";
 				FString ControllerConfigPathLong;
 
@@ -131,7 +131,7 @@ void URobotManager::ParseSDF()
 						NewRobot->GetPlugin(TEXT("ControllerComponent"))->Init();
 					}
 				}
-				FString ROSConfigPathShort = TEXT("/Game/ROSCom");
+				FString ROSConfigPathShort = Settings->RosComConfigFile;
 				Reason = "";
 				FString ROSConfigPathLong;
 

@@ -38,6 +38,11 @@ void URJointController::SetControllerParameters(URControllerParameter *&Controll
     bDisableCollision = JointControllerParameters->bDisableCollision;
     bControllAllJoints = JointControllerParameters->bControllAllJoints;
     EnableDrive = JointControllerParameters->EnableDrive;
+
+    for(auto & Override : JointControllerParameters->ConfigOverwrite)
+      {
+        ConfigOverwrite.Add(Override);
+      }
   }
 }
 
@@ -62,6 +67,10 @@ void URJointController::Init()
       }
     else
       {
+        for(auto & Override : ConfigOverwrite)
+          {
+            DesiredJointStates.Add(Override.Key);
+          }
         for (const TPair<FString, FJointState> &DesiredJointState : DesiredJointStates)
           {
             const FString JointName = DesiredJointState.Key;

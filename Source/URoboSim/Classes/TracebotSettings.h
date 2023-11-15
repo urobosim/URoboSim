@@ -33,4 +33,10 @@ public:
 
         UPROPERTY(EditAnywhere, Config)
         FVector TraySlot2Frame = FVector(1.15, 1.9, 1.7);
+
+        UPROPERTY(EditAnywhere, Config)
+        FString ControllerConfigFile = "/Game/ControllerConfig";
+
+        UPROPERTY(EditAnywhere, Config)
+        FString RosComConfigFile = "/Game/ROSCom";
 };

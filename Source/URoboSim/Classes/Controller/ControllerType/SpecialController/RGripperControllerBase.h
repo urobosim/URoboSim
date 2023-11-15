@@ -17,6 +17,8 @@ public:
   UPROPERTY(EditAnywhere)
   FVector ToolCenterPoint = FVector(15.0f, 0.0f, 0.0f);
 
+  UPROPERTY(EditAnywhere)
+  float Radius = 3.0;
 };
 
 UCLASS()
