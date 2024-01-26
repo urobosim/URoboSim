@@ -19,20 +19,24 @@ URGraspComponent::URGraspComponent()
   {
     Constraint = NewObject<UPhysicsConstraintComponent>(this, FName(*ConstraintName));
     Constraint->SetupAttachment(this);
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = true;
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Restitution = 0;
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Stiffness = 30000;
-    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Stiffness = 30000;
-    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Stiffness = 30000;
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Damping = 30000;
-    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Damping = 30000;
-    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Damping = 30000;
     Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
     Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = true;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Restitution = 0;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Stiffness = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Stiffness = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Stiffness = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Damping = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Damping = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Damping = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.ContactDistance = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.ContactDistance = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.ContactDistance = 3000000;
+
   }
 }
 
@@ -47,8 +51,8 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper)
   Gripper = InGripper;
   bObjectGrasped = false;
   SetSphereRadius(GraspRadius, true);
-  OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
-  OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
+  OnComponentBeginOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
+  OnComponentEndOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
 
 }
 
@@ -62,8 +66,8 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper1, UPrimitiveComponent
   // TFPublisher = NewObject<URTFPublisher>(this, FName(*(GetName() + TEXT("_TFPublisher"))));
   // TFPublisher->Topic = TEXT("/tf_grasp_test");
   // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
-  OnComponentBeginOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
-  OnComponentEndOverlap.AddDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
+  OnComponentBeginOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
+  OnComponentEndOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
 
 }
 

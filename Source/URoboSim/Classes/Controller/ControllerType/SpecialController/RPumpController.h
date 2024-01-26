@@ -37,6 +37,9 @@ public:
 
   UPROPERTY(EditAnywhere)
     FVector HolderFrame;
+
+  UPROPERTY(EditAnywhere)
+    TArray<FString> TrayPartNames;
 };
 
 UCLASS()
@@ -73,6 +76,12 @@ public:
   UPROPERTY(EditAnywhere)
     FVector HolderFrame;
 
+  UPROPERTY(EditAnywhere)
+    TArray<FString> TrayPartNames;
+
+  UPROPERTY(EditAnywhere)
+    TArray<UPrimitiveComponent*> TrayParts;
+
   UFUNCTION()
     void ReleaseObject(AActor* Object);
 
@@ -97,6 +106,9 @@ protected:
 	                                           class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
   virtual USphereComponent* SetupOverlap(const FName& InName, const FVector& InOffset, UPrimitiveComponent* InReference, float InRadius = 2.2);
+
+  void DisableTrayCollision();
+  void EnableTrayCollision();
 
   UPROPERTY(VisibleAnywhere)
     USphereComponent* Tray1Overlap;
