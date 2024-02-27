@@ -2,6 +2,7 @@
 
 #include "Controller/RController.h"
 #include "RGBDCamera.h"
+#include "TracebotSettings.h"
 // clang-format off
 #include "RCameraController.generated.h"
 // clang-format on

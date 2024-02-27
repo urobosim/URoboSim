@@ -12,9 +12,20 @@ void URCameraController::SetControllerParameters(URControllerParameter *&Control
   URCameraControllerParameter *CameraControllerParameters = Cast<URCameraControllerParameter>(ControllerParameters);
   if (CameraControllerParameters)
   {
-    CameraRef = CameraControllerParameters->CameraRef;
+
+    const UTracebotSettings* Settings = GetDefault<UTracebotSettings>();
+
+    if(Settings->bOverwriteConfig)
+      {
+        CameraRef = Settings->CameraRef;
+        PoseOffset = Settings->PoseOffset;
+      }
+    else
+      {
+        CameraRef = CameraControllerParameters->CameraRef;
+        PoseOffset = CameraControllerParameters->PoseOffset;
+      }
     CameraName = CameraControllerParameters->CameraName;
-    PoseOffset = CameraControllerParameters->PoseOffset;
   }
 }
 
@@ -29,7 +40,7 @@ void URCameraController::Init()
   }
 
   UPrimitiveComponent *ReferenceLink = nullptr;
-  
+
   TArray<UPrimitiveComponent *> ActorComponents;
   GetOwner()->GetComponents(ActorComponents);
 

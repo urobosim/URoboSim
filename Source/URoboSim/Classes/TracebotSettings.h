@@ -39,4 +39,13 @@ public:
 
         UPROPERTY(EditAnywhere, Config)
         FString RosComConfigFile = "/Game/ROSCom";
+
+        UPROPERTY(EditAnywhere, Config)
+        bool bOverwriteConfig = false;
+
+        UPROPERTY(EditAnywhere, Config)
+        FString CameraRef;
+
+        UPROPERTY(EditAnywhere, Config)
+        FTransform PoseOffset;
 };
