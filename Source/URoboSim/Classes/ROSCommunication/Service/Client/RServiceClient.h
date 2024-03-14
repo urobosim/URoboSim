@@ -29,7 +29,9 @@ public:
 
   virtual void SetServiceClientParameters(URServiceClientParameter *&ServiceClientParameters);
 
+  virtual void SetRequest(TSharedPtr<FROSBridgeSrv::SrvRequest> InRequest){}
   virtual void CallService(){}
+
 
 protected:
 
