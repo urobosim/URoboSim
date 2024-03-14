@@ -1,42 +1,41 @@
 #pragma once
 
 #include "ROSBridgeSrv.h"
-#include "geometry_msgs/PoseStamped.h"
 
 
 namespace urobosim_msgs
 {
-	class GraspObject : public FROSBridgeSrv
+	class CheckVisibility : public FROSBridgeSrv
 	{
 	public:
-		GraspObject()
+		CheckVisibility()
 		{
-			SrvType = TEXT("urobosim_msgs/GraspObject");
+			SrvType = TEXT("urobosim_msgs/CheckVisibility");
 		}
 
 		class Request : public SrvRequest
 		{
 		private:
-			geometry_msgs::PoseStamped Pose;
+			FString ObjectName;
 					
 		public:
 			Request(){ }
-			Request(geometry_msgs::PoseStamped InPose)
+			Request(FString InObjectName)
 				:
-				Pose(InPose) { }
+				ObjectName(InObjectName) { }
 			
 			
 			// Getters 
-			geometry_msgs::PoseStamped GetPose() const { return Pose; }
+			FString GetObjectName() const { return ObjectName; }
 			
 			
 			// Setters 
-			void SetPose(geometry_msgs::PoseStamped InPose) { Pose = InPose; }
+			void SetObjectName(FString InObjectName) { ObjectName = InObjectName; }
 			
 			
 			virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
 			{
-				Pose = geometry_msgs::PoseStamped::GetFromJson(JsonObject->GetObjectField(TEXT("pose")));
+				ObjectName = JsonObject->GetStringField(TEXT("object_name"));
 
 			}
 			
@@ -50,7 +49,7 @@ namespace urobosim_msgs
 			virtual FString ToString() const override
 			{
 									
-				return TEXT("GraspObject::Request { pose = ") + Pose.ToString() +
+				return TEXT("CheckVisibility::Request { object_name = ") + ObjectName +
 					TEXT(" } ");
 
 			}			
@@ -59,7 +58,7 @@ namespace urobosim_msgs
 			{
 				TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
-				Object->SetObjectField(TEXT("pose"), Pose.ToJsonObject());
+				Object->SetStringField(TEXT("object_name"), ObjectName);
 
 				return Object;
 
@@ -69,27 +68,27 @@ namespace urobosim_msgs
 		class Response : public SrvResponse
 		{
 		private:
-			bool Success;
+			bool Visible;
 			
 			
 		public:
 			Response(){ }
-			Response(bool InSuccess)
+			Response(bool InVisible)
 				:
-				Success(InSuccess) { }
+				Visible(InVisible) { }
 			
 			
 			// Getters 
-			bool GetSuccess() const { return Success; }
+			bool GetVisible() const { return Visible; }
 			
 			
 			// Setters 
-			void SetSuccess(bool InSuccess) { Success = InSuccess; }
+			void SetVisible(bool InVisible) { Visible = InVisible; }
 			
 			
 			virtual void FromJson(TSharedPtr<FJsonObject> JsonObject) override
 			{
-				Success = JsonObject->GetBoolField(TEXT("success"));
+				Visible = JsonObject->GetBoolField(TEXT("visible"));
 
 			}
 			
@@ -103,7 +102,7 @@ namespace urobosim_msgs
 			virtual FString ToString() const override
 			{
 									
-				return TEXT("GraspObject::Response { success = ") + FString::FromInt(Success) +
+				return TEXT("CheckVisibility::Response { visible = ") + FString::FromInt(Visible) +
 					TEXT(" } ");
 
 			}
@@ -112,7 +111,7 @@ namespace urobosim_msgs
 			{
 				TSharedPtr<FJsonObject> Object = MakeShareable<FJsonObject>(new FJsonObject());
 
-				Object->SetBoolField(TEXT("success"), Success);
+				Object->SetBoolField(TEXT("visible"), Visible);
 
 				return Object;
 
