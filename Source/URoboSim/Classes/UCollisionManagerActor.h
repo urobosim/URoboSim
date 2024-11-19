@@ -122,7 +122,14 @@ class ACollisionManagerActor : public AActor
 
     if(Client)
       {
-        Client->SetRequest(MakeShareable(new urobosim_msgs::CollisionDetection::Request(HitComp->GetOwner()->GetName(),
+        
+        FString SemlogId = FTags::GetValue(HitComp->GetOwner()->Tags, TEXT("SemLog"), TEXT("Id"));
+        if(SemlogId == "")
+        {
+          UE_LOG(LogTemp, Error, TEXT("SemlogId for %s empty, use actor Name"), *HitComp->GetOwner()->GetName());
+          SemlogId = HitComp->GetOwner()->GetName();
+        }
+        Client->SetRequest(MakeShareable(new urobosim_msgs::CollisionDetection::Request(SemlogId,
                                                                                         HitComp->GetName(),
                                                                                         OtherActor->GetName(),
                                                                                         OtherComp->GetName(),
