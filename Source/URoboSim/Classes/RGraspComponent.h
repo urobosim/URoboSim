@@ -43,6 +43,9 @@ public:
 	AStaticMeshActor* FixatedObject;
 
 	UPROPERTY()
+    UPrimitiveComponent* FixatedComponent;
+
+	UPROPERTY()
 	AActor* ObjectToPublish;
 
 	UPROPERTY()

@@ -187,6 +187,7 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent
 
 
   FixatedObject = ConstrainedActor;
+  FixatedComponent = SMC;
   if(Gripper)
   {
     Constraint->ConstraintActor2 = ConstrainedActor;
@@ -220,6 +221,7 @@ void URGraspComponent::TryToDetach()
     //TODO: Fix bug where gravity is not enabled if left reach
     ComponentInReach->SetEnableGravity(bGraspObjectGravity);
     FixatedObject = nullptr;
+    FixatedComponent = nullptr;
   }
   bObjectGrasped = false;
 }
