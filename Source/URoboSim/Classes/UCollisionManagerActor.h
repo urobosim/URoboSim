@@ -97,9 +97,10 @@ class ACollisionManagerActor : public AActor
         Actor->GetComponents(ActorComponents);
         for(auto& Comp : ActorComponents)
           {
+            Comp->BodyInstance.SetInstanceNotifyRBCollision(true);
             Comp->OnComponentHit.AddDynamic(this, &ACollisionManagerActor::CallCollisionService);
           }
-        // UE_LOG(LogTemp, Display, TEXT("Actor %s assertet and startet to track"), *Actor->GetName());
+         //UE_LOG(LogTemp, Display, TEXT("Actor %s assertet and startet to track"), *Actor->GetName());
       }
     else
       {
@@ -133,6 +134,7 @@ class ACollisionManagerActor : public AActor
                                                                                                             geometry_msgs::Quaternion(FConversions::UToROS(OtherComp->GetComponentQuat()))),
                                                                                         geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactPoint)),
                                                                                         geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactNormal)))));
+
         Client->CallService();
       }
   };
