@@ -10,7 +10,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogRGetGraspedObjectServer, Log, All)
 
 URGetGraspedObjectServer::URGetGraspedObjectServer()
 {
-  Type = TEXT("urobosim_msgs/get_grasped_object");
+  Type = TEXT("urobosim_msgs/GetGraspedObject");
 }
 
 void URGetGraspedObjectServer::CreateServiceServer()
@@ -38,7 +38,7 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRGetGraspedObjectServerCallback::Callbac
       StaticCastSharedPtr<urobosim_msgs::GetGraspedObjectSrv::Request>(Request);
 
   FString Gripper = GetGraspedObjectRequest->GetGripper();
-  FString ObjectId = FString(TEXT("failure"));
+  FString ObjectId = FString(TEXT("NoObject"));
   if (Owner)
   {
     URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(Gripper));

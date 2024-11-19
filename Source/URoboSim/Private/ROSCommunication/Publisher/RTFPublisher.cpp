@@ -9,7 +9,7 @@ DEFINE_LOG_CATEGORY_STATIC(LogRTFPublisher, Log, All)
 
 URTFPublisher::URTFPublisher()
 {
-  Topic = TEXT("/tf");
+  Topic = TEXT("/tf_dt");
   MessageType = TEXT("tf2_msgs/TFMessage");
   MapFrameId = TEXT("map");
 }

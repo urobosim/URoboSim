@@ -17,7 +17,6 @@ void UCollisionDetectionClient::SetServiceClientParameters(URServiceClientParame
 void UCollisionDetectionClient::CreateServiceClient()
 {
 
-      UE_LOG(LogTemp, Error, TEXT("Create Collision Client"));
   ServiceClient = MakeShareable<FCollisionDetectionClient>(new FCollisionDetectionClient(ServiceName, ServiceType));
   // Request = MakeShareable(new urobosim_msgs::CollisionDetection::Request(ObjectA, ComponentA, ObjectB, ComponentB, ImpactPoint, ImpactNormal));
   Request = MakeShareable(new urobosim_msgs::CollisionDetection::Request());
@@ -29,7 +28,7 @@ void UCollisionDetectionClient::CallService()
 {
   if(Request.IsValid())
     {
-       UE_LOG(LogTemp, Error, TEXT("Call Service with Request %s"), *Request->ToString());
+     //  UE_LOG(LogTemp, Error, TEXT("Call Service with Request %s"), *Request->ToString());
     }
   Handler->CallService(ServiceClient, Request, Response);
 }

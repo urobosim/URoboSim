@@ -13,7 +13,7 @@ class UROBOSIM_API URGetGraspedObjectServerParameter final : public URServiceSer
 public:
   URGetGraspedObjectServerParameter()
   {
-    Type = TEXT("urobosim_msgs/get_grasped_object");
+    Type = TEXT("urobosim_msgs/GetGraspedObject");
   }
 };
 

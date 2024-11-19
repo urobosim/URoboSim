@@ -10,7 +10,7 @@ namespace urobosim_msgs
    public:
 	   GetGraspedObjectSrv()
 	   {
-		   SrvType = TEXT("urobosim_msgs/get_grasped_object");
+		   SrvType = TEXT("urobosim_msgs/GetGraspedObject");
 	   }
 
 	   class Request : public SrvRequest
@@ -66,7 +66,7 @@ namespace urobosim_msgs
             }
             Response(const FString& InObjectId) : ObjectId(InObjectId){};
 
-            void SetObjectI(FString S)
+            void SetObjectId(const FString& S)
             {
               ObjectId = S;
             }

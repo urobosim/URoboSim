@@ -12,6 +12,7 @@
 #include "ROSCommunication/Service/Client/RJointControllerConfigurationClient.h"
 #include "ROSCommunication/Service/Client/RJointStateConfigurationClient.h"
 #include "ROSCommunication/Service/Server/CheckVisibilityServer.h"
+#include "ROSCommunication/Service/Server/GetGraspedObjectServer.h"
 #include "ROSCommunication/Service/Server/GraspObjectServer.h"
 #include "ROSCommunication/Service/Server/RRegistrationServer.h"
 #include "ROSCommunication/Service/Server/RSimulationCommandsServer.h"
@@ -194,6 +195,10 @@ URServiceServer *URROSCommunicationBuilder::CreateServiceServer(ARModel *&InOwne
   else if (Cast<URGraspObjectServerParameter>(ServiceServerConfiguration.ServiceServerParameters))
   {
     return NewObject<URGraspObjectServer>(InOwner);
+  }
+  else if (Cast<URGetGraspedObjectServerParameter>(ServiceServerConfiguration.ServiceServerParameters))
+  {
+    return NewObject<URGetGraspedObjectServer>(InOwner);
   }
   else if (Cast<URCheckVisibilityServerParameter>(ServiceServerConfiguration.ServiceServerParameters))
   {
