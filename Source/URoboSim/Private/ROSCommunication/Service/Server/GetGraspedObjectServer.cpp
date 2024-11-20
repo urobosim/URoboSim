@@ -39,9 +39,31 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRGetGraspedObjectServerCallback::Callbac
 
   FString Gripper = GetGraspedObjectRequest->GetGripper();
   FString ObjectId = FString(TEXT("NoObject"));
+  TArray<FString> RightGripperController;
+  RightGripperController.Add(TEXT("RGripperController"));
+  RightGripperController.Add(TEXT("R1GripperController"));
+  RightGripperController.Add(TEXT("R2GripperController"));
+  RightGripperController.Add(TEXT("R3GripperController"));
+  RightGripperController.Add(TEXT("R4GripperController"));
+  TArray<FString> LeftGripperController;
+  LeftGripperController.Add(TEXT("LGripperController"));
+  LeftGripperController.Add(TEXT("L1GripperController"));
+  LeftGripperController.Add(TEXT("L2GripperController"));
+  LeftGripperController.Add(TEXT("L3GripperController"));
+  LeftGripperController.Add(TEXT("L4GripperController"));
+  TArray<FString> ActiveControllerList;
+  if(Gripper.Equals(TEXT("right")))
+    {
+      ActiveControllerList = RightGripperController;
+    }
+  else if(Gripper.Equals(TEXT("left")))
+    {
+      ActiveControllerList = LeftGripperController;
+    }
+
   if (Owner)
   {
-    URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(Gripper));
+
       if (!World)
       {
         UE_LOG(LogRGetGraspedObjectServer, Error, TEXT("World not found"));
@@ -50,27 +72,36 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRGetGraspedObjectServerCallback::Callbac
       {
         // Execute on game thread
         FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]() {
-        if (GripperController)
-        {
-			AStaticMeshActor* FixatedObject = GripperController->GraspComponent->FixatedObject;
-            UPrimitiveComponent* FixatedComponent = GripperController->GraspComponent->FixatedComponent ;
-			if(FixatedObject)
-				{	
-                    if(FixatedComponent == FixatedObject->GetRootComponent())
-                        {
 
-                            FString SemlogId = FTags::GetValue(FixatedObject->Tags, TEXT("SemLog"), TEXT("Id"));
-                            ObjectId = SemlogId;
-                        }
+        for(auto& GC: ActiveControllerList)
+          {
+            URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(GC));
+            if (GripperController)
+              {
+                UE_LOG(LogRGetGraspedObjectServer, Error, TEXT("%s"), *GC);
+                AStaticMeshActor* FixatedObject = GripperController->GraspComponent->FixatedObject;
+                UPrimitiveComponent* FixatedComponent = GripperController->GraspComponent->FixatedComponent ;
+                if(FixatedObject)
+                  {
+                    if(FixatedComponent == FixatedObject->GetRootComponent())
+                      {
+                        FString SemlogId = FTags::GetValue(FixatedObject->Tags, TEXT("SemLog"), TEXT("Id"));
+                        ObjectId = SemlogId;
+                      }
                     else
-                        {
-                            FString SemlogId = FTags::GetValue(FixatedComponent->ComponentTags, TEXT("SemLog"), TEXT("Id"));
-                            ObjectId = SemlogId;
-                        }
-                }
-        }
-        },
-                                                                             TStatId(), nullptr, ENamedThreads::GameThread);
+                      {
+                        FString SemlogId = FTags::GetValue(FixatedComponent->ComponentTags, TEXT("SemLog"), TEXT("Id"));
+                        ObjectId = SemlogId;
+                      }
+                  }
+              }
+            if(!ObjectId.Equals(TEXT("NoObject")))
+              {
+                break;
+              }
+          }
+                                                                             },
+          TStatId(), nullptr, ENamedThreads::GameThread);
 
         //wait code above to complete
         FTaskGraphInterface::Get().WaitUntilTaskCompletes(Task);

@@ -34,7 +34,7 @@ public:
   UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
     float ErrorTollerance = 0.01;
 
-  UPROPERTY(EditAnywhere, Category= "EventPerception")
+  UPROPERTY(Config, EditAnywhere, Category= "EventPerception")
   bool bEnableEventPerception;
 
 };
