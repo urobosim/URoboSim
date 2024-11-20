@@ -4,6 +4,7 @@
 #include "CoreMinimal.h"
 #include "ROSCommunication/Service/Client/CollisionDetectionClient.h"
 #include "RosSettings.h"
+#include "URoboSimSettings.h"
 #include "WorldControlSubsystem.h"
 #include "SrvCallbacks/SpawnModelsServer.h"
 #include "Conversions.h"
@@ -18,16 +19,17 @@ struct FCollisionInfo
 public:
 
   UPROPERTY()
-  AActor* SelfActor;
+  AActor* SelfActor = nullptr;
 
   UPROPERTY()
-  AActor* OtherActor;
+  AActor* OtherActor = nullptr;
 
   UPROPERTY()
   FVector NormalImpulse;
 
   UPROPERTY()
   FHitResult HitResult;
+
 };
 
 UCLASS( ClassGroup=Physics, meta=(BlueprintSpawnableComponent), DefaultToInstanced, ConversionRoot, MinimalAPI, ComponentWrapperClass)
@@ -36,6 +38,9 @@ class ACollisionManagerActor : public AActor
   GENERATED_BODY()
   public:
 
+  UPROPERTY()
+  bool bEventPerception = false;
+
   ACollisionManagerActor(){
 
     Client = CreateDefaultSubobject<UCollisionDetectionClient>(FName(*(GetOuter()->GetName() + TEXT("_CollisionDetectionClient"))));
@@ -43,6 +48,8 @@ class ACollisionManagerActor : public AActor
 
   virtual void BeginPlay() override
   {
+    const UURoboSimSettings* URoboSimSettings = GetDefault<UURoboSimSettings>();
+	bEventPerception = URoboSimSettings->bEnableEventPerception;
     const URosSettings* Settings = GetDefault<URosSettings>();
     FString WebsocketIPAddr = Settings->ROSBridgeServerHost;
     uint32 WebsocketPort = Settings->ROSBridgeServerPort;
@@ -88,30 +95,26 @@ class ACollisionManagerActor : public AActor
 
   UFUNCTION()
   void AddObjectToCollisionCheck(UObject * InObject){
-    AActor* Actor = Cast<AActor>(InObject);
-
-    if(Actor)
-      {
-
-        TArray<UStaticMeshComponent*> ActorComponents;
-        Actor->GetComponents(ActorComponents);
-        for(auto& Comp : ActorComponents)
+	if(bEventPerception)
+    {
+        AActor* Actor = Cast<AActor>(InObject);
+        if(Actor)
           {
-            Comp->BodyInstance.SetInstanceNotifyRBCollision(true);
-            Comp->OnComponentHit.AddDynamic(this, &ACollisionManagerActor::CallCollisionService);
+
+            TArray<UStaticMeshComponent*> ActorComponents;
+            Actor->GetComponents(ActorComponents);
+            for(auto& Comp : ActorComponents)
+              {
+                Comp->BodyInstance.SetInstanceNotifyRBCollision(true);
+                Comp->OnComponentHit.AddDynamic(this, &ACollisionManagerActor::CallCollisionService);
+              }
+             //UE_LOG(LogTemp, Display, TEXT("Actor %s assertet and startet to track"), *Actor->GetName());
           }
-         //UE_LOG(LogTemp, Display, TEXT("Actor %s assertet and startet to track"), *Actor->GetName());
-      }
-    else
-      {
-        UE_LOG(LogTemp, Error, TEXT("Object %s not suported"), *InObject->GetName());
-      }
-    // OnComponentBeginOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
-    //OnComponentEndOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
-    // void UCollisionEventManager::Callback(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
-    // void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent* HitComp, class AActor* OtherActor,
-    //                                                        class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-    //                                                        bool bFromSweep, const FHitResult & SweepResult)
+        else
+          {
+            UE_LOG(LogTemp, Error, TEXT("Object %s not suported"), *InObject->GetName());
+          }
+    }
   };
 
   UFUNCTION()
