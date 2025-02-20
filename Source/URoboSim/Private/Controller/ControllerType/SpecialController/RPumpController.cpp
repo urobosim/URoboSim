@@ -1,5 +1,6 @@
 #include "Controller/ControllerType/SpecialController/RPumpController.h"
 #include "RGraspComponent.h"
+#include "URoboSimSettings.h"
 
 URPumpController::URPumpController()
 {
@@ -57,6 +58,12 @@ void URPumpController::Init()
 	}
 	else
 	{
+
+          const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
+          if(Settings)
+            {
+              bDebugMode = Settings->bDebugMode;
+            }
 		URLink* Pump = GetOwner()->Links.FindRef(TrayReferenceLink);
 
 
@@ -83,8 +90,8 @@ void URPumpController::Init()
                     // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
 
                     Ref->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-                    Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref);
-                    Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref);
+                    Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref, RadiusTrayOverlap);
+                    Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref, RadiusTrayOverlap);
                   }
 
                 HolderRef = ParseChildFramesForRef(ChildFrames, HolderReferenceFrame);
@@ -166,9 +173,19 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             }
           else if (HitComp->GetName().Equals(Tray1Overlap->GetName()))
             {
+              if(bDebugMode)
+                {
+                  UE_LOG(LogTemp, Log, TEXT("[%s:%s:%d]: Setup on Overlap for %s"), *GetName(), *FString(__FUNCTION__), __LINE__, *GraspComp->GetName());
+                }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectTray1);
+              // GraspComp->OnObjectReleased.AddDynamic(this, &URPumpController::SetObjectTray1);
+              if(bDebugMode)
+                {
+                  UE_LOG(LogTemp, Log, TEXT("[%s:%s:%d]: OnObjectReleased bound"), *GetName(), *FString(__FUNCTION__), __LINE__);
+                }
+
               DisableTrayCollision();
-              break;
+              continue;
             }
 
           if(!Tray2Overlap)
@@ -177,9 +194,13 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             }
           else if(HitComp->GetName().Equals(Tray2Overlap->GetName()))
             {
+              if(bDebugMode)
+                {
+                  UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]: Setup on Overlap"), *GetName(), *FString(__FUNCTION__), __LINE__);
+                }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectTray2);
               DisableTrayCollision();
-              break;
+              continue;
             }
 
           if(!HolderOverlap)
@@ -188,8 +209,12 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             }
           else if(HitComp->GetName().Equals(HolderOverlap->GetName()))
             {
+              if(bDebugMode)
+                {
+                  UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]: Setup on Overlap"), *GetName(), *FString(__FUNCTION__), __LINE__);
+                }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectHolder);
-              break;
+              continue;
             }
 
           UE_LOG(LogTemp, Error, TEXT("[%s]: Overlap neither Tray1, Tray2 or Holder but %s"), *FString(__FUNCTION__), *HitComp->GetName());
@@ -226,9 +251,9 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
             }
           else if(HitComp->GetName().Equals(Tray1Overlap->GetName()))
             {
-              EnableTrayCollision();
+              // EnableTrayCollision();
               GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray1")));
-              break;
+              continue;
             }
 
           if(!Tray2Overlap)
@@ -238,9 +263,9 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
           else if(HitComp->GetName().Equals(Tray2Overlap->GetName()))
             {
 
-              EnableTrayCollision();
+              // EnableTrayCollision();
               GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray2")));
-              break;
+              continue;
             }
 
           if(!HolderOverlap)
@@ -250,7 +275,7 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
           else if(HitComp->GetName().Equals(HolderOverlap->GetName()))
             {
               GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectHolder")));
-              break;
+              continue;
             }
 
           UE_LOG(LogTemp, Error, TEXT("[%s]: Overlap neither Tray1, Tray2 or Holder but %s"), *FString(__FUNCTION__), *HitComp->GetName());
@@ -275,6 +300,10 @@ void URPumpController::ReleaseObject(AActor* Object)
 
 void URPumpController::SetObjectTray1(AActor* Object)
 {
+  if(bDebugMode)
+    {
+      UE_LOG(LogTemp, Log, TEXT("%s: SetObjectTray1"), *GetName());
+    }
   UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
   if(Root)
     {
@@ -290,6 +319,10 @@ void URPumpController::SetObjectTray1(AActor* Object)
 
 void URPumpController::SetObjectTray2(AActor* Object)
 {
+  if(bDebugMode)
+    {
+      UE_LOG(LogTemp, Log, TEXT("%s: SetObjectTray2"), *GetName());
+    }
   UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
   if(Root)
     {

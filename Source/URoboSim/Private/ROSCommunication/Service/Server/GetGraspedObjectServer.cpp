@@ -78,7 +78,6 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRGetGraspedObjectServerCallback::Callbac
             URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(GC));
             if (GripperController)
               {
-                UE_LOG(LogRGetGraspedObjectServer, Error, TEXT("%s"), *GC);
                 AStaticMeshActor* FixatedObject = GripperController->GraspComponent->FixatedObject;
                 UPrimitiveComponent* FixatedComponent = GripperController->GraspComponent->FixatedComponent ;
                 if(FixatedObject)

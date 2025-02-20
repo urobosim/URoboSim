@@ -76,6 +76,8 @@ public:
 protected:
 	// UPROPERTY()
 	// URTFPublisher* TFPublisher;
+        UFUNCTION()
+          void PrintBroadcastRelease(AActor* InActor);
 
 	UPROPERTY()
 	UPrimitiveComponent* Gripper;
@@ -89,8 +91,10 @@ protected:
 	// Function called when an item enters the fixation overlap area
 
 	// Array of items currently in reach (overlapping the sphere component)
+	UPROPERTY(VisibleAnywhere)
 	TArray<AStaticMeshActor*> ObjectsInReach;
 
+	UPROPERTY(VisibleAnywhere)
         UPrimitiveComponent* ComponentInReach = nullptr;
 
 	// Fixate object to hand
@@ -98,4 +102,7 @@ protected:
 
 	UPROPERTY()
 	bool bGraspObjectGravity;
+
+        UPROPERTY()
+          bool bDebugMode = false;
 };

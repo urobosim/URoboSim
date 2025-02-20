@@ -1,8 +1,10 @@
 #include "Controller/ControllerType/SpecialController/RGripperControllerBase.h"
+#include "URoboSimSettings.h"
 
 URGripperControllerBase::URGripperControllerBase()
 {
 	GripperJointName = TEXT("?_gripper_joint");
+        InitPriority = 2;
 	// GraspComponent = CreateDefaultSubobject<URGraspComponent>(FName(GetName() + TEXT("_GraspComp")));
 	// GraspComponent->RegisterComponent();
 	// if (GetOwner())
@@ -42,6 +44,12 @@ void URGripperControllerBase::Init()
 	}
 	else
 	{
+
+          const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
+          if(Settings)
+            {
+              bDebugMode = Settings->bDebugMode;
+            }
 		GripperJoint = GetOwner()->Joints.FindRef(GripperJointName);
 
 		if (!GripperJoint)
@@ -95,7 +103,12 @@ void URGripperControllerBase::Tick(const float& InDeltaTime)
 	}
 	float JointPos = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
 
-	if (FMath::Abs(JointPos - OldPosition) > 0.01)
+        float diff = FMath::Abs(JointPos - OldPosition);
+        if(bDebugMode)
+          {
+            UE_LOG(LogTemp, Log, TEXT("%s: Diff %f"), *GetName(), diff);
+          }
+	if (diff > 0.05)
 	{
 		if (JointPos < OldPosition)
 		{
@@ -125,6 +138,10 @@ void URGripperControllerBase::Tick(const float& InDeltaTime)
 
 bool URGripperControllerBase::Grasp()
 {
+  if(bDebugMode)
+    {
+      UE_LOG(LogTemp, Log, TEXT("%s: Grasp"), *GetName());
+    }
 	if (GraspComponent)
 	{
 		return GraspComponent->TryToFixate();
@@ -138,6 +155,11 @@ bool URGripperControllerBase::Grasp()
 
 void URGripperControllerBase::Release()
 {
+  if(bDebugMode)
+    {
+      UE_LOG(LogTemp, Log, TEXT("%s: Release"), *GetName());
+    }
+
 	if (GraspComponent)
 	{
 		GraspComponent->TryToDetach();

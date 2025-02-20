@@ -34,6 +34,9 @@ public:
   UPROPERTY(EditAnywhere, Category= "Set Environment Joint State")
     float ErrorTollerance = 0.01;
 
+  UPROPERTY(Config, EditAnywhere, BlueprintReadOnly, Category = "General")
+    bool bDebugMode = false;
+
   UPROPERTY(Config, EditAnywhere, Category= "EventPerception")
   bool bEnableEventPerception;
 

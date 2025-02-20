@@ -59,10 +59,7 @@ void FRROSCommunicationContainer::InitServiceServers()
 {
   for (URServiceServer *&ServiceServer : ServiceServers)
   {
-  
-  UE_LOG(LogTemp, Error, TEXT("StartServerInit"));
     ServiceServer->Connect(WebsocketIPAddr, WebsocketPort);
-  UE_LOG(LogTemp, Error, TEXT("fin server init"));
   }
 }
 

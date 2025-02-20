@@ -103,6 +103,9 @@ protected:
   UPROPERTY(EditAnywhere)
   FString GraspComponentName;
 
+  UPROPERTY()
+    bool bDebugMode = false;
+
   int GraspInversion = 1;
 
 };

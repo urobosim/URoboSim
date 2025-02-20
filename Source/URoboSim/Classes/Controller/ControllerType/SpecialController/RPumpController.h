@@ -82,6 +82,9 @@ public:
   UPROPERTY(EditAnywhere)
     TArray<UPrimitiveComponent*> TrayParts;
 
+  UPROPERTY(EditAnywhere)
+    float RadiusTrayOverlap = 1;
+
   UFUNCTION()
     void ReleaseObject(AActor* Object);
 
@@ -131,4 +134,9 @@ protected:
 
   // UPROPERTY(VisibleAnywhere)
     // URPumpControllerHandler* PumpHandler = nullptr;
+
+  UPROPERTY()
+    bool bDebugMode = false;
+  UPROPERTY()
+    int index = 0;
 };

@@ -8,8 +8,10 @@
 #include "WorldControlSubsystem.h"
 #include "SrvCallbacks/SpawnModelsServer.h"
 #include "Conversions.h"
+#include "RPluginComponent.h"
+#include "Physics/RModel.h"
+#include "Controller/RControllerComponent.h"
 #include "UCollisionManagerActor.generated.h"
-
 
 
 USTRUCT()
@@ -121,31 +123,53 @@ class ACollisionManagerActor : public AActor
   void CallCollisionService(UPrimitiveComponent* HitComp, AActor* OtherActor,
                             UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
   {
+    bool bIsAttached = false;
 
 
     if(Client)
       {
-        
-        FString SemlogId = FTags::GetValue(HitComp->GetOwner()->Tags, TEXT("SemLog"), TEXT("Id"));
-        if(SemlogId == "")
-        {
-          UE_LOG(LogTemp, Error, TEXT("SemlogId for %s empty, use actor Name"), *HitComp->GetOwner()->GetName());
-          SemlogId = HitComp->GetOwner()->GetName();
-        }
-        Client->SetRequest(MakeShareable(new urobosim_msgs::CollisionDetection::Request(SemlogId,
-                                                                                        HitComp->GetName(),
-                                                                                        OtherActor->GetName(),
-                                                                                        OtherComp->GetName(),
-                                                                                        geometry_msgs::Vector3(HitComp->GetPhysicsLinearVelocity()),
-                                                                                        geometry_msgs::Vector3(OtherComp->GetPhysicsLinearVelocity()),
-                                                                                        geometry_msgs::Pose(geometry_msgs::Point(FConversions::UToROS(HitComp->GetComponentLocation())),
-                                                                                                            geometry_msgs::Quaternion(FConversions::UToROS(HitComp->GetComponentQuat()))),
-                                                                                        geometry_msgs::Pose(geometry_msgs::Point(FConversions::UToROS(OtherComp->GetComponentLocation())),
-                                                                                                            geometry_msgs::Quaternion(FConversions::UToROS(OtherComp->GetComponentQuat()))),
-                                                                                        geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactPoint)),
-                                                                                        geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactNormal)))));
+        if(ARModel* Model = Cast<ARModel>(OtherActor))
+          {
+            URControllerComponent* ControllerComp = Cast<URControllerComponent>(Model->GetPlugin(TEXT("ControllerComponent")));
+            if(ControllerComp)
+              {
+                for(auto& Controller: ControllerComp->Controllers)
+                  {
+                    URGripperControllerBase* GripperCont = Cast<URGripperControllerBase>(Controller);
+                    if(GripperCont)
+                      {
+                        if(GripperCont->GraspComponent->FixatedComponent == HitComp)
+                          {
+                            bIsAttached = true;
+                          }
+                      }
+                  }
+              }
+          }
 
-        Client->CallService();
+        if(!bIsAttached)
+          {
+            FString SemlogId = FTags::GetValue(HitComp->GetOwner()->Tags, TEXT("SemLog"), TEXT("Id"));
+            if(SemlogId == "")
+              {
+                UE_LOG(LogTemp, Error, TEXT("SemlogId for %s empty, use actor Name"), *HitComp->GetOwner()->GetName());
+                SemlogId = HitComp->GetOwner()->GetName();
+              }
+            Client->SetRequest(MakeShareable(new urobosim_msgs::CollisionDetection::Request(SemlogId,
+                                                                                            HitComp->GetName(),
+                                                                                            OtherActor->GetName(),
+                                                                                            OtherComp->GetName(),
+                                                                                            geometry_msgs::Vector3(HitComp->GetPhysicsLinearVelocity()),
+                                                                                            geometry_msgs::Vector3(OtherComp->GetPhysicsLinearVelocity()),
+                                                                                            geometry_msgs::Pose(geometry_msgs::Point(FConversions::UToROS(HitComp->GetComponentLocation())),
+                                                                                                                geometry_msgs::Quaternion(FConversions::UToROS(HitComp->GetComponentQuat()))),
+                                                                                            geometry_msgs::Pose(geometry_msgs::Point(FConversions::UToROS(OtherComp->GetComponentLocation())),
+                                                                                                                geometry_msgs::Quaternion(FConversions::UToROS(OtherComp->GetComponentQuat()))),
+                                                                                            geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactPoint)),
+                                                                                            geometry_msgs::Vector3(FConversions::UToROS(Hit.ImpactNormal)))));
+
+            Client->CallService();
+          }
       }
   };
 

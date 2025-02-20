@@ -2,6 +2,7 @@
 #include "Physics/RModel.h"
 #include "Physics/RLink.h"
 #include "ROSCommunication/Publisher/RTFPublisher.h"
+#include "URoboSimSettings.h"
 
 URGraspComponent::URGraspComponent()
 {
@@ -40,6 +41,14 @@ URGraspComponent::URGraspComponent()
   }
 }
 
+void URGraspComponent::PrintBroadcastRelease(AActor* InActor)
+{
+    if(bDebugMode)
+      {
+        UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]"), *GetName(), *FString(__FUNCTION__), __LINE__);
+      }
+}
+
 void URGraspComponent::OnComponentCreated()
 {
   Super::OnComponentCreated();
@@ -53,6 +62,12 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper)
   SetSphereRadius(GraspRadius, true);
   OnComponentBeginOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
+  const UURoboSimSettings* Settings = GetDefault<UURoboSimSettings>();
+  if(Settings)
+    {
+      bDebugMode = Settings->bDebugMode;
+    }
+  OnObjectReleased.AddUniqueDynamic(this, &URGraspComponent::PrintBroadcastRelease);
 
 }
 
@@ -68,7 +83,7 @@ void URGraspComponent::Init(UPrimitiveComponent* InGripper1, UPrimitiveComponent
   // TFPublisher->Init(TEXT("127.0.0.1"), 9090, this);
   OnComponentBeginOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaBeginOverlap);
   OnComponentEndOverlap.AddUniqueDynamic(this, &URGraspComponent::OnFixationGraspAreaEndOverlap);
-
+  OnObjectReleased.AddUniqueDynamic(this, &URGraspComponent::PrintBroadcastRelease);
 }
 
 void URGraspComponent::BeginPlay()
@@ -98,9 +113,20 @@ void URGraspComponent::OnFixationGraspAreaBeginOverlap(class UPrimitiveComponent
     {
       if(!FixatedObject)
         {
-          UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach, overlap with %s / %s"), *GetName(), *OtherSMA->GetName(), *OtherComp->GetName());
+
+          if(bDebugMode)
+            {
+              UE_LOG(LogTemp, Log, TEXT("%s: Object in Reach, overlap with %s / %s"), *GetName(), *OtherSMA->GetName(), *OtherComp->GetName());
+            }
           ObjectsInReach.Emplace(OtherSMA);
-          ComponentInReach = OtherComp;
+          if(ComponentInReach == nullptr)
+            {
+              if(bDebugMode)
+                {
+                  UE_LOG(LogTemp, Log, TEXT("%s: Set ComponentInReach to %s"), *GetName(), *OtherComp->GetName());
+                }
+              ComponentInReach = OtherComp;
+            }
         }
     }
 }
@@ -111,8 +137,15 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
   // Remove actor from array (if present)
   if (AStaticMeshActor* SMA = Cast<AStaticMeshActor>(OtherActor))
     {
-      UE_LOG(LogTemp, Log, TEXT("%s: Object %s / %s left Reach"), *GetName(), *SMA->GetName(), *OtherComp->GetName());
+      if(bDebugMode)
+        {
+          UE_LOG(LogTemp, Log, TEXT("%s: Object %s / %s left Reach"), *GetName(), *SMA->GetName(), *OtherComp->GetName());
+        }
       ObjectsInReach.Remove(SMA);
+      if(ComponentInReach == OtherComp)
+        {
+          ComponentInReach = nullptr;
+        }
     }
 }
 
@@ -132,12 +165,18 @@ bool URGraspComponent::TryToFixate()
           // Check if the actor is graspable
           FixateObject(SMA, ComponentInReach);
 
-          UE_LOG(LogTemp, Log, TEXT("%s: Fixate Object %s / %s"), *GetName(), *SMA->GetName(), *ComponentInReach->GetName());
+          if(bDebugMode)
+            {
+              UE_LOG(LogTemp, Log, TEXT("%s: Fixate Object %s / %s"), *GetName(), *SMA->GetName(), *ComponentInReach->GetName());
+            }
         }
     }
   else
     {
-      UE_LOG(LogTemp, Warning, TEXT("%s: No Object to grasp"), *GetName());
+      if(bDebugMode)
+        {
+          UE_LOG(LogTemp, Warning, TEXT("%s: No Object to grasp"), *GetName());
+        }
     }
   return bObjectGrasped;
 }
@@ -194,10 +233,10 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent
     Constraint->SetConstrainedComponents(Gripper, NAME_None, SMC, NAME_None);
   }
 
-  if(OnObjectGrasped.IsBound())
-    {
-      OnObjectGrasped.Broadcast(ConstrainedActor);
-    }
+  // if(OnObjectGrasped.IsBound())
+  //   {
+  //   }
+  OnObjectGrasped.Broadcast(ConstrainedActor);
   bGraspObjectGravity = SMC->IsGravityEnabled();
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
@@ -206,20 +245,34 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent
 // Detach fixation
 void URGraspComponent::TryToDetach()
 {
+  if(bDebugMode)
+    {
+      UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]"), *GetName(), *FString(__FUNCTION__), __LINE__);
+    }
   if(FixatedObject)
   {
-
+    if(bDebugMode)
+      {
+        UE_LOG(LogTemp, Log, TEXT("%s[%s:%d] asdf"), *GetName(), *FString(__FUNCTION__), __LINE__);
+      }
     if(Gripper)
       {
         Constraint->BreakConstraint();
       }
 
-    if(OnObjectGrasped.IsBound())
-    {
-      OnObjectReleased.Broadcast(FixatedObject);
-    }
+    // if(OnObjectReleased.IsBound())
+    // {
+
+    // }
+    OnObjectReleased.Broadcast(FixatedObject);
+    if(bDebugMode)
+      {
+        UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]"), *GetName(), *FString(__FUNCTION__), __LINE__);
+      }
     //TODO: Fix bug where gravity is not enabled if left reach
-    ComponentInReach->SetEnableGravity(bGraspObjectGravity);
+    // ComponentInReach->SetEnableGravity(bGraspObjectGravity);
+    //bug if grasped by multiple graspcomp, Gravity can already be disabled bEnableGravity is then false
+    ComponentInReach->SetEnableGravity(true);
     FixatedObject = nullptr;
     FixatedComponent = nullptr;
   }
