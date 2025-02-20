@@ -15,7 +15,8 @@ class UROBOSIM_API URGripperControllerParameter : public URGripperControllerBase
   URGripperControllerParameter()
   {
     GripperPrefix = TEXT("r/l");
-    GripperJointName = TEXT("_gripper_joint");
+    GripperJointNames.Empty();
+    GripperJointNames.Add(TEXT("_gripper_joint"));
     PassiveJoints.Add("_gripper_r_finger_joint");
     PassiveJoints.Add("_gripper_l_finger_joint");
     PassiveJoints.Add("_gripper_r_finger_tip_joint");
@@ -24,11 +25,11 @@ class UROBOSIM_API URGripperControllerParameter : public URGripperControllerBase
     PassiveJoints.Add("_gripper_r_parallel_tip_joint");
   }
 public:
-  
+
   /** Prefix used to complete the joint names */
   UPROPERTY(EditAnywhere)
   FString GripperPrefix;
-  
+
   /** Joints that have to be simulated physically but not actuated*/
   UPROPERTY(EditAnywhere)
   TArray<FString> PassiveJoints;
@@ -87,18 +88,21 @@ public:
 
   UPROPERTY(EditAnywhere)
   TArray<FString> PassiveJoints;
-  
+
   UPROPERTY(EditAnywhere)
   FString GripperJointName2;
 
   UPROPERTY()
   URJoint *GripperJoint2;
-  
+
   UPROPERTY(EditAnywhere)
   FString GripperJointName3;
 
   UPROPERTY()
   URJoint *GripperJoint3;
+
+  UPROPERTY()
+  float OldPosition = 0;
 protected:
   bool bSuccessGrasp = false;
 

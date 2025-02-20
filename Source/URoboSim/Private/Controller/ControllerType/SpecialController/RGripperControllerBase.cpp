@@ -3,7 +3,8 @@
 
 URGripperControllerBase::URGripperControllerBase()
 {
-	GripperJointName = TEXT("?_gripper_joint");
+  GripperJointNames.Empty();
+	GripperJointNames.Add(TEXT("?_gripper_joint"));
         InitPriority = 2;
 	// GraspComponent = CreateDefaultSubobject<URGraspComponent>(FName(GetName() + TEXT("_GraspComp")));
 	// GraspComponent->RegisterComponent();
@@ -24,7 +25,7 @@ void URGripperControllerBase::SetControllerParameters(URControllerParameter*& Co
 		ControllerParameters);
 	if (GripperControllerParameters)
 	{
-		GripperJointName = GripperControllerParameters->GripperJointName;
+		GripperJointNames = GripperControllerParameters->GripperJointNames;
 		GraspCompSetting = GripperControllerParameters->GraspCompSetting;
 		GraspComponentName = GripperControllerParameters->GraspComponentName;
 		EnableDrive = GripperControllerParameters->EnableDrive;
@@ -50,19 +51,25 @@ void URGripperControllerBase::Init()
             {
               bDebugMode = Settings->bDebugMode;
             }
-		GripperJoint = GetOwner()->Joints.FindRef(GripperJointName);
 
-		if (!GripperJoint)
-		{
-			UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
-			return;
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName);
-		}
+          for(auto & GripperJointName: GripperJointNames)
+            {
+              URJoint* GripperJoint = GetOwner()->Joints.FindRef(GripperJointName);
 
-		JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
+              if (!GripperJoint)
+		{
+                  UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"), *GetName(), *GripperJointName);
+                  return;
+		}
+              else
+		{
+                  UE_LOG(LogTemp, Log, TEXT("GripperJoint %s of %s found"), *GetName(), *GripperJointName);
+		}
+              GripperJoints.Add(GripperJoint);
+              OldPositions.Add(GripperJointName,0);
+            }
+
+          JointController = Cast<URJointController>(GetOwner()->GetController(TEXT("JointController")));
 
 		if (!JointController)
 		{
@@ -71,15 +78,17 @@ void URGripperControllerBase::Init()
 		}
 
 		TArray<FString> JointNames;
-		JointNames.Add(GripperJointName);
+		JointNames.Append(GripperJointNames);
 		JointController->SetJointNames(JointNames, EnableDrive);
 		if (bOverwriteConfig)
 		{
+                  for(auto & GripperJoint: GripperJoints)
+                    {
 			JointController->AddConfigOverwrite(GripperJoint->GetName(), FConfigOverwrite(Mode, EnableDrive));
+                    }
 		}
 
 		// OldPosition = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
-		OldPosition = 0;
 
 		GraspComponent = NewObject<URGraspComponent>(GetOwner(), FName(GetName() + TEXT("_GraspComp")));
 		GraspComponent->CreationMethod = EComponentCreationMethod::Instance;
@@ -96,19 +105,33 @@ void URGripperControllerBase::Init()
 
 void URGripperControllerBase::Tick(const float& InDeltaTime)
 {
-	if (!GripperJoint)
-	{
-		UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s of %s not set"), *GetName(), *GripperJointName);
-		return;
-	}
-	float JointPos = JointController->DesiredJointStates.FindRef(GripperJointName).JointPosition;
+  float Diff = 0;
+  float JointPos = 0;
+  float OldPosition = 0;
+  for(auto& GripperJoint : GripperJoints)
+    {
+      // if (GripperJoint)
+      //   {
+      //     UE_LOG(LogTemp, Error, TEXT("GripperJoint: %s of %s not set"), *GetName(), *GripperJointNames[0]);
+      //     return;
+      //   }
+      float TempPos = JointController->DesiredJointStates.FindRef(GripperJoint->GetName()).JointPosition;
 
-        float diff = FMath::Abs(JointPos - OldPosition);
-        if(bDebugMode)
-          {
-            UE_LOG(LogTemp, Log, TEXT("%s: Diff %f"), *GetName(), diff);
-          }
-	if (diff > 0.05)
+      float JointDiff = FMath::Abs(TempPos - OldPositions[GripperJoint->GetName()]);
+      if(JointDiff > Diff)
+        {
+          Diff = JointDiff;
+          JointPos = TempPos;
+          OldPosition = OldPositions[GripperJoint->GetName()];
+        }
+      if(bDebugMode)
+        {
+          UE_LOG(LogTemp, Log, TEXT("%s: Diff %f   %f      %f"), *GripperJoint->GetName(), JointDiff, TempPos, OldPositions[GripperJoint->GetName()]);
+        }
+      OldPositions[GripperJoint->GetName()] = TempPos;
+    }
+
+  if (Diff > 0.01)
 	{
 		if (JointPos < OldPosition)
 		{
@@ -133,7 +156,7 @@ void URGripperControllerBase::Tick(const float& InDeltaTime)
 			}
 		}
 	}
-	OldPosition = JointPos;
+	// OldPosition = JointPos;
 }
 
 bool URGripperControllerBase::Grasp()

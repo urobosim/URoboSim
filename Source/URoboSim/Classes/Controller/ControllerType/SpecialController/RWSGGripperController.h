@@ -47,6 +47,9 @@ public:
  protected:
 
   UPROPERTY()
+  float OldPosition = 0;
+
+  UPROPERTY()
     EGripperAction GripperAction;
 
   UPROPERTY()

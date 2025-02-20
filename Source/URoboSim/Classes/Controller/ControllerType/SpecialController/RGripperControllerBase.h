@@ -26,9 +26,9 @@ class UROBOSIM_API URGripperControllerBaseParameter : public URControllerParamet
 {
   GENERATED_BODY()
 public:
-
+    //tracebot_right_gripper_joint_intermediate_1
   UPROPERTY(EditAnywhere)
-  FString GripperJointName;
+  TArray<FString> GripperJointNames;
 
   UPROPERTY(EditAnywhere)
   FString GraspComponentName;
@@ -77,13 +77,13 @@ public:
   UPROPERTY(EditAnywhere)
   URLink* ReferenceLink;
 
-  float OldPosition;
+  TMap<FString,float> OldPositions;
 
   UPROPERTY(EditAnywhere)
-  FString GripperJointName;
+    TArray<FString> GripperJointNames;
 
   UPROPERTY()
-  URJoint *GripperJoint;
+  TArray<URJoint*> GripperJoints;
 
   UPROPERTY(EditAnywhere)
     bool bInvertGraspCondition = false;
