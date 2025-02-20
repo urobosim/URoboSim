@@ -108,7 +108,7 @@ void URGripperControllerBase::Tick(const float& InDeltaTime)
           {
             UE_LOG(LogTemp, Log, TEXT("%s: Diff %f"), *GetName(), diff);
           }
-	if (diff > 0.05)
+	if (diff > 0.01)
 	{
 		if (JointPos < OldPosition)
 		{
