@@ -254,7 +254,8 @@ void URJointController::MoveJointDynamic(const float &InDeltaTime, const FString
   if (URJoint *Joint = GetOwner()->GetJoint(InJointName))
     {
       FJointState TempJointState = DesiredJointStates.FindRef(InJointName);
-      TempJointState.JointVelocity = CalculateJointVelocity(InDeltaTime, InJointName);
+      // TempJointState.JointVelocity = CalculateJointVelocity(InDeltaTime, InJointName);
+      TempJointState.JointVelocity = 0;
       Joint->SetMotorJointState(TempJointState);
     }
   else
