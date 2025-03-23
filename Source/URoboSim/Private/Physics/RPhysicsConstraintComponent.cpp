@@ -156,7 +156,7 @@ void URConstraintComponent::BeginPlay()
   InitChildPoseInJointFrame = GetChildPoseInJointFrame();
   InitChildMeshPoseInJointFrame = Child->GetComponentTransform().GetRelativeTransform(this->GetComponentTransform());
   ParentChildOffset = Child->GetComponentTransform().GetRelativeTransform(Parent->GetComponentTransform());
-  
+
 }
 
 void URContinuousConstraintComponent::BeginPlay()
@@ -314,7 +314,7 @@ float URPrismaticConstraintComponent::GetJointPositionInUUnits()
   // return JointPosition
 
 
-  
+
   // Super::GetJointPositionInUUnits();
   // return FVector::DotProduct(DeltaPoseInJointFrame.GetLocation(), RefAxis);
   FVector ParentChild = Child->GetComponentLocation() - Parent->GetComponentLocation() - Child->GetComponentRotation().RotateVector(ParentChildOffset.GetLocation());
@@ -460,7 +460,7 @@ void URPrismaticConstraintComponent::SetJointPosition(float Angle, FHitResult * 
 
   FVector DeltaJointLocationInJointFrame = RefAxis * FConversions::MToCm<float>(static_cast<const float&>(Angle));
   FVector ChildLocationInJointFrame = DeltaJointLocationInJointFrame + InitChildMeshPoseInJointFrame.GetTranslation();
-  Child->SetRelativeLocation(ChildLocationInJointFrame);
+  Child->SetRelativeLocation(ChildLocationInJointFrame, true, NULL, ETeleportType::None);
 
   Child->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
 
@@ -498,7 +498,7 @@ void URContinuousConstraintComponent::SetJointPosition(float Angle, FHitResult *
 
   FQuat DeltaJointRotationInJointFrame = FQuat(RefAxis, -Angle);
   FQuat ChildRotationInJointFrame = DeltaJointRotationInJointFrame * InitChildMeshPoseInJointFrame.GetRotation();
-  Child->SetRelativeRotation(ChildRotationInJointFrame);
+  Child->SetRelativeRotation(ChildRotationInJointFrame, true, NULL, ETeleportType::None);
 
   Child->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
 
