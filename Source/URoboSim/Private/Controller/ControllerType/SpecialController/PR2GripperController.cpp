@@ -6,8 +6,11 @@ void UPR2GripperController::SetControllerParameters(URControllerParameter *&Cont
 
 	URGripperControllerParameter* GripperControllerParameters = Cast<URGripperControllerParameter>(
 		ControllerParameters);
-  GripperJointName = GripperControllerParameters->GripperPrefix + GripperControllerParameters->GripperJointName;
-  PassiveJoints = GripperControllerParameters->PassiveJoints;
+        for(auto& GripperJointName : GripperControllerParameters->GripperJointNames)
+          {
+            GripperJointNames.Add(GripperControllerParameters->GripperPrefix + GripperJointName);
+          }
+        PassiveJoints = GripperControllerParameters->PassiveJoints;
 	for(auto& PJoint : PassiveJoints)
 	{
 		PJoint = GripperControllerParameters->GripperPrefix + PJoint;
@@ -47,11 +50,14 @@ void UPR2GripperController::Init()
       return;
     }
 
-    if (!GripperJoint)
-    {
-      UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
-      return;
-    }
+    for(auto& GripperJoint : GripperJoints)
+      {
+        if (!GripperJoint)
+          {
+            UE_LOG(LogTemp, Error, TEXT("GripperJoint of %s not found"), *GetName());
+            return;
+          }
+      }
 
 	if (bOverwriteConfig)
 	{
@@ -147,12 +153,15 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
 {
   float Error = 0;
 
-  if (!GripperJoint)
-  {
-    UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"),  *GripperJointName, *GetName());
-    return;
-  }
-  if (!GripperJoint2)
+    for(auto& GripperJoint : GripperJoints)
+      {
+        if (!GripperJoint)
+          {
+            UE_LOG(LogTemp, Error, TEXT("GripperJoint %s of %s not found"),  *GripperJointNames[0], *GetName());
+            return;
+          }
+      }
+    if (!GripperJoint2)
   {
     UE_LOG(LogTemp, Error, TEXT("GripperJoint2 %s of %s not found"),  *GripperJointName2, *GetName());
     return;
@@ -184,8 +193,8 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
       Release();
     }
 
-    float Average = (GripperJoint2->GetJointPosition() + GripperJoint->GetJointPosition()) / 2.0;
-    float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointName).JointPosition;
+    float Average = (GripperJoint2->GetJointPosition() + GripperJoints[0]->GetJointPosition()) / 2.0;
+    float &GripperJointValue = JointController->DesiredJointStates.FindOrAdd(GripperJointNames[0]).JointPosition;
     float &GripperJointValue2 = JointController->DesiredJointStates.FindOrAdd(GripperJointName2).JointPosition;
 
     if (bActive)
@@ -282,7 +291,8 @@ void UPR2GripperController::Tick(const float &InDeltaTime)
 
 UPR2GripperController::UPR2GripperController()
 {
-  GripperJointName = TEXT("?_gripper_joint");
+  GripperJointNames.Empty();
+  GripperJointNames.Add(TEXT("?_gripper_joint"));
   GripperJointName2 = TEXT("_r_finger_joint");
   GripperJointName3 = TEXT("_l_finger_joint");
   // PassiveJoints.Add("_r_finger_joint");

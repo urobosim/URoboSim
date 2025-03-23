@@ -7,6 +7,77 @@
 // clang-format on
 
 USTRUCT()
+struct FGripperParts
+{
+  GENERATED_BODY()
+public:
+
+  UPROPERTY(EditAnywhere)
+  TArray<FString> GripperPartNames;
+};
+
+USTRUCT()
+struct FGraspObjects
+{
+  GENERATED_BODY()
+public:
+
+  //Components of the gripper that collided with the grasp object
+  UPROPERTY(VisibleAnywhere)
+  TArray<UPrimitiveComponent*> HitComps;
+};
+
+USTRUCT()
+struct FGraspingParts
+{
+  GENERATED_BODY()
+public:
+  FGraspingParts(){};
+
+  FGraspingParts(UPrimitiveComponent* InPart1, UPrimitiveComponent* InPart2) :
+  Part1(InPart1), Part2(InPart2)
+  {
+    if(!InPart2 && !InPart1)
+      {
+        UE_LOG(LogTemp, Error, TEXT("Part1 or Part2 nullptr"));
+        return;
+      }
+  };
+
+  float GetDistance()
+  {
+    if(!Part2 && !Part1)
+      {
+        UE_LOG(LogTemp, Error, TEXT("GraspingParts: Part1 or Part2 nullptr"));
+        return -1;
+      }
+    FVector DistV = Part1->GetComponentLocation() - Part2->GetComponentLocation();
+    return FMath::Abs(DistV.Size());
+  };
+
+  UPROPERTY(VisibleAnywhere)
+  UPrimitiveComponent* Part1 = nullptr;
+
+  UPROPERTY(VisibleAnywhere)
+  UPrimitiveComponent* Part2 = nullptr;
+};
+
+USTRUCT()
+struct FGripperJointAssociation
+{
+  GENERATED_BODY()
+public:
+  UPROPERTY(VisibleAnywhere)
+  TArray<URLink*> ReferenceFrames;
+
+  UPROPERTY(EditAnywhere)
+  TArray<FString> ReferenceFrameNames;
+
+  bool InitRefLinks(ARModel* Model);
+
+};
+
+USTRUCT()
 struct FGraspComponentSetting
 {
   GENERATED_BODY()
@@ -26,12 +97,21 @@ class UROBOSIM_API URGripperControllerBaseParameter : public URControllerParamet
 {
   GENERATED_BODY()
 public:
+    //tracebot_right_gripper_joint_intermediate_1
+    //tracebot_left_gripper_distal_phalanx_4
+    //tracebot_left_gripper_intermediate_phalanx_4
+    //tracebot_left_gripper_proximal_phalanx_4
+  UPROPERTY(EditAnywhere)
+  TArray<FString> GripperJointNames;
 
   UPROPERTY(EditAnywhere)
-  FString GripperJointName;
+    TMap<FString,FGripperJointAssociation> GripperJointReferenceFrames;
 
   UPROPERTY(EditAnywhere)
   FString GraspComponentName;
+
+  UPROPERTY(EditAnywhere)
+    TMap<FString,FGripperParts> GraspPartNames;
 
   UPROPERTY(EditAnywhere)
   FGraspComponentSetting GraspCompSetting;
@@ -80,10 +160,26 @@ public:
   float OldPosition;
 
   UPROPERTY(EditAnywhere)
-  FString GripperJointName;
+    TArray<FString> GripperJointNames;
+
+  UPROPERTY(EditAnywhere)
+    TMap<FString,FGripperParts> GraspPartNames;
+
+  UPROPERTY(VisibleAnywhere)
+    TMap<UPrimitiveComponent*, FString> GraspParts;
+
+  UPROPERTY(VisibleAnywhere)
+    FGraspingParts GraspingParts;
+
+  //Objects that were hit by the gripper
+  UPROPERTY(VisibleAnywhere)
+    TMap<UPrimitiveComponent*, FGraspObjects> HitObjects;
+
+  UPROPERTY(EditAnywhere)
+    TMap<FString,FGripperJointAssociation> GripperJointReferenceFrames;
 
   UPROPERTY()
-  URJoint *GripperJoint;
+  TArray<URJoint*> GripperJoints;
 
   UPROPERTY(EditAnywhere)
     bool bInvertGraspCondition = false;
@@ -108,4 +204,7 @@ protected:
 
   int GraspInversion = 1;
 
+  UFUNCTION()
+    void GraspHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
+                            UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };
