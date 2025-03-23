@@ -164,6 +164,11 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
 
       for(auto& GraspComp : GraspComps)
         {
+          if(GraspComp->FixatedComponent != OtherComp)
+            {
+              continue;
+            }
+
           GraspComp->OnObjectGrasped.AddUniqueDynamic(this, &URPumpController::ReleaseObject);
 
 
@@ -315,6 +320,11 @@ void URPumpController::SetObjectTray1(AActor* Object)
       return;
     }
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray1Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
+
+  for(auto& GraspComp : GraspComps)
+    {
+      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectTray1")));
+    }
 }
 
 void URPumpController::SetObjectTray2(AActor* Object)
@@ -334,6 +344,11 @@ void URPumpController::SetObjectTray2(AActor* Object)
     }
 
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray2Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
+
+  for(auto& GraspComp : GraspComps)
+    {
+      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectTray2")));
+    }
 }
 
 void URPumpController::SetObjectHolder(AActor* Object)
@@ -349,6 +364,11 @@ void URPumpController::SetObjectHolder(AActor* Object)
     }
 
   Object->SetActorTransform(FTransform( FRotator(180, 0 , 0), HolderOverlap->GetComponentLocation() + FVector(0, 0, 2.0), FVector(1.0, 1.0, 1.0)));
+
+  for(auto& GraspComp : GraspComps)
+    {
+      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectHolder")));
+    }
 }
 
 void URPumpController::DisableTrayCollision()
