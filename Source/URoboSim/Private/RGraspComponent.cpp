@@ -23,14 +23,21 @@ URGraspComponent::URGraspComponent()
     Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
-    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = true;
-    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Restitution = 0;
+    // Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 0);
+    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = false;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = true;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = true;
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Stiffness = 3000000;
-    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Stiffness = 3000000;
-    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Stiffness = 3000000;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Stiffness = 300;
+
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Restitution = 0;
+    Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Restitution = 0;
+    Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Stiffness = 300;
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.Damping = 3000000;
     Constraint->ConstraintInstance.ProfileInstance.TwistLimit.Damping = 3000000;
     Constraint->ConstraintInstance.ProfileInstance.ConeLimit.Damping = 3000000;
@@ -161,7 +168,6 @@ bool URGraspComponent::TryToFixate()
         {
           // Pop a SMA
           AStaticMeshActor* SMA = ObjectsInReach[0];
-
           // Check if the actor is graspable
           FixateObject(SMA, ComponentInReach);
 
@@ -272,7 +278,14 @@ void URGraspComponent::TryToDetach()
     //TODO: Fix bug where gravity is not enabled if left reach
     // ComponentInReach->SetEnableGravity(bGraspObjectGravity);
     //bug if grasped by multiple graspcomp, Gravity can already be disabled bEnableGravity is then false
-    ComponentInReach->SetEnableGravity(true);
+    if(FixatedComponent)
+      {
+        FixatedComponent->SetEnableGravity(true);
+      }
+    else
+      {
+        UE_LOG(LogTemp, Error, TEXT("%s [%s:%d]: ComponentInReach was nullptr"), *GetName(), *FString(__FUNCTION__), __LINE__);
+      }
     FixatedObject = nullptr;
     FixatedComponent = nullptr;
   }
