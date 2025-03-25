@@ -23,12 +23,12 @@ URGraspComponent::URGraspComponent()
     Constraint->ConstraintInstance.SetLinearXLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearYLimit(ELinearConstraintMotion::LCM_Locked, 0);
     Constraint->ConstraintInstance.SetLinearZLimit(ELinearConstraintMotion::LCM_Locked, 0);
-    // Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
-    // Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
-    // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
-    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 0);
-    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 0);
-    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Locked, 0);
+    // Constraint->ConstraintInstance.SetAngularTwistLimit(EAngularConstraintMotion::ACM_Limited, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing2Limit(EAngularConstraintMotion::ACM_Limited, 0);
+    // Constraint->ConstraintInstance.SetAngularSwing1Limit(EAngularConstraintMotion::ACM_Limited, 0);
     Constraint->ConstraintInstance.ProfileInstance.LinearLimit.bSoftConstraint = false;
     Constraint->ConstraintInstance.ProfileInstance.TwistLimit.bSoftConstraint = true;
     Constraint->ConstraintInstance.ProfileInstance.ConeLimit.bSoftConstraint = true;
@@ -48,7 +48,7 @@ URGraspComponent::URGraspComponent()
   }
 }
 
-void URGraspComponent::PrintBroadcastRelease(AActor* InActor)
+void URGraspComponent::PrintBroadcastRelease(AActor* InActor, URGraspComponent* GraspComp)
 {
     if(bDebugMode)
       {
@@ -148,10 +148,15 @@ void URGraspComponent::OnFixationGraspAreaEndOverlap(class UPrimitiveComponent* 
         {
           UE_LOG(LogTemp, Log, TEXT("%s: Object %s / %s left Reach"), *GetName(), *SMA->GetName(), *OtherComp->GetName());
         }
-      ObjectsInReach.Remove(SMA);
+
       if(ComponentInReach == OtherComp)
         {
           ComponentInReach = nullptr;
+        }
+
+      if(ComponentInReach == nullptr)
+        {
+          ObjectsInReach.Remove(SMA);
         }
     }
 }
@@ -242,7 +247,7 @@ void URGraspComponent::FixateObject(AStaticMeshActor* InSMA, UPrimitiveComponent
   // if(OnObjectGrasped.IsBound())
   //   {
   //   }
-  OnObjectGrasped.Broadcast(ConstrainedActor);
+  OnObjectGrasped.Broadcast(ConstrainedActor,this);
   bGraspObjectGravity = SMC->IsGravityEnabled();
   bObjectGrasped = true;
   SMC->SetEnableGravity(false);
@@ -270,7 +275,7 @@ void URGraspComponent::TryToDetach()
     // {
 
     // }
-    OnObjectReleased.Broadcast(FixatedObject);
+    OnObjectReleased.Broadcast(FixatedObject, this);
     if(bDebugMode)
       {
         UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]"), *GetName(), *FString(__FUNCTION__), __LINE__);

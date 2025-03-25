@@ -183,6 +183,7 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
                   UE_LOG(LogTemp, Log, TEXT("[%s:%s:%d]: Setup on Overlap for %s"), *GetName(), *FString(__FUNCTION__), __LINE__, *GraspComp->GetName());
                 }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectTray1);
+              ObjectInTray1 = OtherActor->GetName();
               // GraspComp->OnObjectReleased.AddDynamic(this, &URPumpController::SetObjectTray1);
               if(bDebugMode)
                 {
@@ -201,9 +202,10 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             {
               if(bDebugMode)
                 {
-                  UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]: Setup on Overlap"), *GetName(), *FString(__FUNCTION__), __LINE__);
+                  UE_LOG(LogTemp, Log, TEXT("[%s:%s:%d]: Setup on Overlap for %s"), *GetName(), *FString(__FUNCTION__), __LINE__, *GraspComp->GetName());
                 }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectTray2);
+              ObjectInTray2 = OtherActor->GetName();
               DisableTrayCollision();
               continue;
             }
@@ -216,7 +218,7 @@ void URPumpController::OnTrayAreaBeginOverlap(class UPrimitiveComponent* HitComp
             {
               if(bDebugMode)
                 {
-                  UE_LOG(LogTemp, Log, TEXT("%s[%s:%d]: Setup on Overlap"), *GetName(), *FString(__FUNCTION__), __LINE__);
+                  UE_LOG(LogTemp, Log, TEXT("[%s:%s:%d]: Setup on Overlap for %s"), *GetName(), *FString(__FUNCTION__), __LINE__, *GraspComp->GetName());
                 }
               GraspComp->OnObjectReleased.AddUniqueDynamic(this, &URPumpController::SetObjectHolder);
               continue;
@@ -233,7 +235,6 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
   if(Cast<UStaticMeshComponent>(OtherComp))
     {
       UE_LOG(LogTemp, Log, TEXT("[%s]: End overlap with %s"), *FString(__FUNCTION__), *HitComp->GetName());
-
       UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(OtherActor->GetRootComponent());
       if(Root)
         {
@@ -247,6 +248,12 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
 
       for(auto& GraspComp : GraspComps)
         {
+
+
+          if(GraspComp->FixatedComponent != OtherComp)
+            {
+              continue;
+            }
           GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("ReleaseObject")));
 
 
@@ -257,6 +264,8 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
           else if(HitComp->GetName().Equals(Tray1Overlap->GetName()))
             {
               // EnableTrayCollision();
+
+              ObjectInTray1 = "";
               GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray1")));
               continue;
             }
@@ -269,6 +278,7 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
             {
 
               // EnableTrayCollision();
+              ObjectInTray2 = "";
               GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray2")));
               continue;
             }
@@ -289,7 +299,7 @@ void URPumpController::OnTrayAreaEndOverlap(class UPrimitiveComponent* HitComp, 
     }
 }
 
-void URPumpController::ReleaseObject(AActor* Object)
+void URPumpController::ReleaseObject(AActor* Object, URGraspComponent* GraspComp)
 {
   UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
   if(Root)
@@ -303,7 +313,37 @@ void URPumpController::ReleaseObject(AActor* Object)
     }
 }
 
-void URPumpController::SetObjectTray1(AActor* Object)
+void URPumpController::CheckObjectTray1(AActor* Object, URGraspComponent* GraspComp)
+{
+  if(Object)
+    {
+      UE_LOG(LogTemp, Log, TEXT("Object Name %s ObjectInTray1 %s"), **Object->GetName(), *ObjectInTray1);
+      if(!Object->GetName().Equals(ObjectInTray1))
+        {
+          // for(auto& GraspComp : GraspComps)
+          //   {
+              GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray1")));
+            // }
+        }
+    }
+}
+
+void URPumpController::CheckObjectTray2(AActor* Object, URGraspComponent* GraspComp)
+{
+  if(Object)
+    {
+      UE_LOG(LogTemp, Log, TEXT("Object Name %s ObjectInTray2 %s"), *Object->GetName(), *ObjectInTray2);
+      if(!Object->GetName().Equals(ObjectInTray2))
+        {
+          // for(auto& GraspComp : GraspComps)
+          //   {
+          GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray2")));
+            // }
+        }
+    }
+}
+
+void URPumpController::SetObjectTray1(AActor* Object, URGraspComponent* GraspComp)
 {
   if(bDebugMode)
     {
@@ -321,13 +361,15 @@ void URPumpController::SetObjectTray1(AActor* Object)
     }
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray1Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 
-  for(auto& GraspComp : GraspComps)
-    {
-      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectTray1")));
-    }
+  // for(auto& GraspComp : GraspComps)
+  //   {
+      // GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray1")));
+      // GraspComp->OnObjectGrasped.AddUniqueDynamic(this, FName(TEXT("CheckObjectTray1")));
+      GraspComp->OnObjectGrasped.AddUniqueDynamic(this, &URPumpController::CheckObjectTray1);
+    // }
 }
 
-void URPumpController::SetObjectTray2(AActor* Object)
+void URPumpController::SetObjectTray2(AActor* Object, URGraspComponent* GraspComp)
 {
   if(bDebugMode)
     {
@@ -345,13 +387,15 @@ void URPumpController::SetObjectTray2(AActor* Object)
 
   Object->SetActorTransform(FTransform( FRotator(0, 0 , 0), Tray2Overlap->GetComponentLocation() + FVector(0, 0, 4.8), FVector(1.0, 1.0, 1.0)));
 
-  for(auto& GraspComp : GraspComps)
-    {
-      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectTray2")));
-    }
+  // for(auto& GraspComp : GraspComps)
+    // {
+      // GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectTray2")));
+      // GraspComp->OnObjectGrasped.AddUniqueDynamic(this, FName(TEXT("CheckObjectTray2")));
+      GraspComp->OnObjectGrasped.AddUniqueDynamic(this, &URPumpController::CheckObjectTray2);
+    // }
 }
 
-void URPumpController::SetObjectHolder(AActor* Object)
+void URPumpController::SetObjectHolder(AActor* Object, URGraspComponent* GraspComp)
 {
   UStaticMeshComponent* Root = Cast<UStaticMeshComponent>(Object->GetRootComponent());
   if(Root)
@@ -365,10 +409,10 @@ void URPumpController::SetObjectHolder(AActor* Object)
 
   Object->SetActorTransform(FTransform( FRotator(180, 0 , 0), HolderOverlap->GetComponentLocation() + FVector(0, 0, 2.0), FVector(1.0, 1.0, 1.0)));
 
-  for(auto& GraspComp : GraspComps)
-    {
-      GraspComp->OnObjectGrasped.Remove(this, FName(TEXT("SetObjectHolder")));
-    }
+  // for(auto& GraspComp : GraspComps)
+  //   {
+      GraspComp->OnObjectReleased.Remove(this, FName(TEXT("SetObjectHolder")));
+    // }
 }
 
 void URPumpController::DisableTrayCollision()

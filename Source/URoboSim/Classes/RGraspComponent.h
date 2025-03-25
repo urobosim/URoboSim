@@ -9,8 +9,8 @@
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 #include "RGraspComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FObjectGraspedDelegate, AActor*, Object);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FObjectReleasedDelegate, AActor*, Object);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FObjectGraspedDelegate, AActor*, Object, URGraspComponent*, GraspComp);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FObjectReleasedDelegate, AActor*, Object, URGraspComponent*, GraspComp);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class UROBOSIM_API URGraspComponent : public USphereComponent
@@ -77,7 +77,7 @@ protected:
 	// UPROPERTY()
 	// URTFPublisher* TFPublisher;
         UFUNCTION()
-          void PrintBroadcastRelease(AActor* InActor);
+          void PrintBroadcastRelease(AActor* InActor, URGraspComponent* GraspComp);
 
 	UPROPERTY()
 	UPrimitiveComponent* Gripper;

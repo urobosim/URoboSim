@@ -150,7 +150,7 @@ void URGripperControllerBase::Init()
 void URGripperControllerBase::GraspHit(UPrimitiveComponent* HitComp, AActor* OtherActor,
                             UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-  UE_LOG(LogTemp, Error, TEXT("%s: Hit %s %s"), *HitComp->GetName(), *OtherComp->GetName(), *HitComp->GetAttachParent()->GetName());
+  // UE_LOG(LogTemp, Error, TEXT("%s: Hit %s %s"), *HitComp->GetName(), *OtherComp->GetName(), *HitComp->GetAttachParent()->GetName());
   //check if the other component
   if(HitObjects.Contains(OtherComp))
     {

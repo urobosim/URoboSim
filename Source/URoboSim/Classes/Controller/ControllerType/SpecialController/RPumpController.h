@@ -86,16 +86,22 @@ public:
     float RadiusTrayOverlap = 1;
 
   UFUNCTION()
-    void ReleaseObject(AActor* Object);
+    void ReleaseObject(AActor* Object, URGraspComponent* GraspComp);
 
   UFUNCTION()
-    void SetObjectTray1(AActor* Object);
+    void CheckObjectTray1(AActor* Object, URGraspComponent* GraspComp);
 
   UFUNCTION()
-    void SetObjectTray2(AActor* Object);
+    void CheckObjectTray2(AActor* Object, URGraspComponent* GraspComp);
 
   UFUNCTION()
-    void SetObjectHolder(AActor* Object);
+    void SetObjectTray1(AActor* Object, URGraspComponent* GraspComp);
+
+  UFUNCTION()
+    void SetObjectTray2(AActor* Object, URGraspComponent* GraspComp);
+
+  UFUNCTION()
+    void SetObjectHolder(AActor* Object, URGraspComponent* GraspComp);
 protected:
 
   UFUNCTION()
@@ -139,4 +145,10 @@ protected:
     bool bDebugMode = false;
   UPROPERTY()
     int index = 0;
+
+  UPROPERTY()
+   FString ObjectInTray1 = "";
+
+  UPROPERTY()
+   FString ObjectInTray2 = "";
 };
