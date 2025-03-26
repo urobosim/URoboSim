@@ -5,6 +5,7 @@
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "world_control_msgs/srv/SetModelPose.h"
 #include "Tags.h"
+#include "DrawDebugHelpers.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRUpdateGraspPoseServer, Log, All)
 
@@ -39,7 +40,8 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRUpdateGraspPoseServerCallback::Callback
 
   FString UniqueId = UpdateGraspPoseRequest->GetId();
   FVector Location = FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetPosition().GetVector());
-  FRotator Rotator = FRotator(FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetOrientation().GetQuat()));
+  //FRotator Rotator = FRotator(FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetOrientation().GetQuat()));
+  FQuat Rotator = FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetOrientation().GetQuat());
 
   TArray<FString> GripperControllerList;
   // GripperControllerList.Add(TEXT("RGripperController"));
@@ -87,54 +89,15 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRUpdateGraspPoseServerCallback::Callback
                     URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(GC));
                     if (GripperController)
                       {
-                        UPrimitiveComponent* GripperTip1 = nullptr;
-                        UPrimitiveComponent* GripperTip2 = nullptr;
-                        FVector RotationAxis;
-
-                        FQuat Rotator;
-                        FQuat Rotator2;
-                        for(auto & GraspPart : GripperController->GraspParts)
-                          {
-                            if(GraspPart.Key->GetName().Contains(TEXT("tracebot_left_gripper_distal_phalanx_3")))
-                              {
-                                GripperTip1 = GraspPart.Key;
-                              }
-
-                            if(GraspPart.Key->GetName().Contains(TEXT("tracebot_left_gripper_distal_phalanx_4")))
-                              {
-                                GripperTip2 = GraspPart.Key;
-                              }
-                          }
-
-                        if(GripperTip1 && GripperTip2)
-                          {
-                            RotationAxis = GripperTip2->GetComponentLocation() - GripperTip1->GetComponentLocation();
-                            Rotator = FQuat(RotationAxis, FMath::DegreesToRadians(11));
-
-                            UE_LOG(LogRUpdateGraspPoseServer, Warning, TEXT("RotationAxis %s"), *RotationAxis.ToString());
-                            UE_LOG(LogRUpdateGraspPoseServer, Warning, TEXT("FQuat as Axis/Angle %s %f"), *Rotator.GetRotationAxis().ToString(), Rotator.GetAngle());
-
-
-
-                          }
-                        else
-                          {
-                            UE_LOG(LogRUpdateGraspPoseServer, Error, TEXT("GripperTip1 or GripperTip2 not found"));
-                          }
-
                         // AStaticMeshActor* FixatedObject = GripperController->GraspComponent->FixatedObject;
                         UPrimitiveComponent* FixatedObject = GripperController->GraspComponent->FixatedComponent;
                         if(FixatedObject)
                           {
-                            // if(FixatedObject == Actor)
-                            //   {
                                 UPhysicsConstraintComponent* Constraint = GripperController->GraspComponent->Constraint;
                                 bActorAttached = true;
-                                FixatedObject->AddWorldRotation(Rotator, false, NULL, ETeleportType::TeleportPhysics);
-                                Rotator2 = FQuat(FixatedObject->GetComponentQuat().GetAxisZ(), FMath::DegreesToRadians(80));
-                                FixatedObject->AddWorldRotation(Rotator2, false, NULL, ETeleportType::TeleportPhysics);
+                                //FixatedObject->SetWorldRotation(FQuat::MakeFromEuler(FVector(Rotator.X, Rotator.Y, Rotator.Z)), false, NULL, ETeleportType::TeleportPhysics);
+                                FixatedObject->SetWorldRotation(FQuat::MakeFromEuler(FVector(90.0, 11.3998, 270)), false, NULL, ETeleportType::TeleportPhysics);
                                 Constraint->InitComponentConstraint();
-                              // }
                           }
                       }
                   }

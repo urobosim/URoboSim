@@ -38,6 +38,11 @@ public:
 
 	TSharedPtr<FROSBridgeSrv::SrvResponse> Callback(TSharedPtr<FROSBridgeSrv::SrvRequest> Request) override;
 
+	UPROPERTY(EditAnywhere)
+		float Angle1 = 11;
+
+	UPROPERTY(EditAnywhere)
+		float Angle2 = -45;
 private:
 	UWorld *World;
 
