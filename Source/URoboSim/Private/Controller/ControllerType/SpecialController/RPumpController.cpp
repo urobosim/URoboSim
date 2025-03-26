@@ -90,8 +90,8 @@ void URPumpController::Init()
                     // Ref->SetCollisionResponseToChannel(ECollisionChannel::ECC_PhysicsBody, ECollisionResponse::ECR_Overlap);
 
                     Ref->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
-                    Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref, RadiusTrayOverlap);
-                    Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref, RadiusTrayOverlap);
+                    Tray1Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray1Overlap")), TraySlot1Frame, Ref, 0.1);
+                    Tray2Overlap = SetupOverlap(FName(GetName() + TEXT("_Tray2Overlap")), TraySlot2Frame, Ref, 4);
                   }
 
                 HolderRef = ParseChildFramesForRef(ChildFrames, HolderReferenceFrame);
@@ -146,7 +146,7 @@ USphereComponent* URPumpController::SetupOverlap(const FName& InName, const FVec
   Overlap->AttachToComponent(InReference, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
   Overlap->AddRelativeLocation(InOffset);
   Overlap->SetSphereRadius(InRadius, true);
-  Overlap->SetHiddenInGame(false , false);
+  Overlap->SetHiddenInGame(true , true);
   Overlap->SetCollisionResponseToChannel(ECollisionChannel::ECC_GameTraceChannel18, ECollisionResponse::ECR_Ignore);
   Overlap->OnComponentBeginOverlap.AddUniqueDynamic(this, &URPumpController::OnTrayAreaBeginOverlap);
   Overlap->OnComponentEndOverlap.AddUniqueDynamic(this, &URPumpController::OnTrayAreaEndOverlap);
