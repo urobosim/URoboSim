@@ -6,6 +6,7 @@
 #include "world_control_msgs/srv/SetModelPose.h"
 #include "Tags.h"
 #include "DrawDebugHelpers.h"
+#include "AssetUtils.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRUpdateGraspPoseServer, Log, All)
 
@@ -33,31 +34,23 @@ TSharedPtr<FROSBridgeSrv::SrvRequest> FRUpdateGraspPoseServerCallback::FromJson(
   return TSharedPtr<FROSBridgeSrv::SrvRequest>(Request);
 }
 
+
 TSharedPtr<FROSBridgeSrv::SrvResponse> FRUpdateGraspPoseServerCallback::Callback(TSharedPtr<FROSBridgeSrv::SrvRequest> Request)
 {
   TSharedPtr<FROSSetModelPoseSrv::Request> UpdateGraspPoseRequest =
       StaticCastSharedPtr<FROSSetModelPoseSrv::Request>(Request);
 
   FString UniqueId = UpdateGraspPoseRequest->GetId();
-  FVector Location = FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetPosition().GetVector());
-  //FRotator Rotator = FRotator(FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetOrientation().GetQuat()));
-  FQuat Rotator = FConversions::ROSToU(UpdateGraspPoseRequest->GetPose().GetOrientation().GetQuat());
+  FVector Location = FVector(-9.393488, -91.5171, 124);
+  FQuat Rotator = FQuat::MakeFromEuler(FVector(270, 178, 80));
 
   TArray<FString> GripperControllerList;
-  // GripperControllerList.Add(TEXT("RGripperController"));
-  // GripperControllerList.Add(TEXT("R1GripperController"));
-  // GripperControllerList.Add(TEXT("R2GripperController"));
-  // GripperControllerList.Add(TEXT("R3GripperController"));
-  // GripperControllerList.Add(TEXT("R4GripperController"));
-  // GripperControllerList.Add(TEXT("LGripperController"));
   GripperControllerList.Add(TEXT("L1GripperController"));
-  // GripperControllerList.Add(TEXT("L2GripperController"));
-  // GripperControllerList.Add(TEXT("L3GripperController"));
-  // GripperControllerList.Add(TEXT("L4GripperController"));
   TArray<FString> ActiveControllerList;
   bool bActorAttached = false;
   bool ServiceSuccess = false;
 
+  bool bSuccess = false;
   if (Owner)
   {
       if (!World)
@@ -70,35 +63,146 @@ TSharedPtr<FROSBridgeSrv::SrvResponse> FRUpdateGraspPoseServerCallback::Callback
         FGraphEventRef Task = FFunctionGraphTask::CreateAndDispatchWhenReady([&]() {
 
                 World = GEngine->GameViewport->GetWorld();
-                // TArray<AActor*> AllMatchingActors = FTags::GetActorsWithKeyValuePair(World, TEXT("SemLog"), TEXT("Id"), UniqueId);
-
-		// AActor* Actor = nullptr;
-		// if(AllMatchingActors.Num() > 0)
-		// 	Actor = AllMatchingActors.Pop();
-
-		// if (!Actor)
-		// {
-		// 	// Couldn't find Actor for ID
-		// 	UE_LOG(LogTemp, Warning, TEXT("Actor with id:\"%s\" does not exist and can therefore not be moved."), *UniqueId);
-		// 	ServiceSuccess = false;
-		// 	return;
-		// }
 
                 for(auto& GC: GripperControllerList)
                   {
                     URGripperControllerBase *GripperController = Cast<URGripperControllerBase>(Owner->GetController(GC));
                     if (GripperController)
                       {
-                        // AStaticMeshActor* FixatedObject = GripperController->GraspComponent->FixatedObject;
-                        UPrimitiveComponent* FixatedObject = GripperController->GraspComponent->FixatedComponent;
-                        if(FixatedObject)
+                        AStaticMeshActor* Actor = GripperController->GraspComponent->FixatedObject;
+
+			UAssetUtils* AssetUtil = NewObject<UAssetUtils>(Actor);
+                        if(Actor)
                           {
-                                UPhysicsConstraintComponent* Constraint = GripperController->GraspComponent->Constraint;
-                                bActorAttached = true;
-                                //FixatedObject->SetWorldRotation(FQuat::MakeFromEuler(FVector(Rotator.X, Rotator.Y, Rotator.Z)), false, NULL, ETeleportType::TeleportPhysics);
-                                FixatedObject->SetWorldRotation(FQuat::MakeFromEuler(FVector(90.0, 11.3998, 270)), false, NULL, ETeleportType::TeleportPhysics);
-                                Constraint->InitComponentConstraint();
-                          }
+
+			  TArray<UPhysicsConstraintComponent*> Constraints;
+			  Actor->GetComponents<UPhysicsConstraintComponent>(Constraints, false);
+
+			  TArray<UStaticMeshComponent*> Components;
+			  Actor->GetComponents<UStaticMeshComponent>(Components, false);
+
+			  UStaticMeshComponent* Oj1 = nullptr;
+			  UStaticMeshComponent* Oj2 = nullptr;
+
+			  UStaticMeshComponent* Root1 = nullptr;
+			  UStaticMeshComponent* Root2 = nullptr;
+			  UStaticMeshComponent* Parent1 = nullptr;
+			  UStaticMeshComponent* Parent2 = nullptr;
+
+			  // Prevent objects being checked twice if multiple constraints are connected to an object
+			  TArray<UStaticMeshComponent*> HandledObject;
+
+			  for(auto& Constraint : Constraints)
+			  {
+				  if(!Constraint->IsBroken())
+				  {
+					  //TODO: Should it be checked if physics is enabled or not?
+					  if(AActor* Actor1 = Constraint->ConstraintActor1)
+					  {
+						  Oj1 = Cast<UStaticMeshComponent>(Actor1->GetDefaultSubobjectByName(Constraint->ComponentName1.ComponentName));
+						  if(Oj1)
+						  {
+							  // Only change physics of Oj1 if it simulates Physics, else find the root component that has physics enable and therfore is movable
+							  if(!HandledObject.Contains(Oj1))
+							  {
+								  Parent1 = Cast<UStaticMeshComponent>(Oj1->GetAttachParent());
+								  if(Parent1)
+								  {
+									  while(Parent1)
+									  {
+										  if(Parent1->GetAttachParent())
+										  {
+											  Parent1 = Cast<UStaticMeshComponent>(Parent1->GetAttachParent());
+										  }
+										  else
+										  {
+											  Root1 = Parent1;
+											  break;
+										  }
+									  }
+								  }
+								  else
+								  {
+									  Root1 = Oj1;
+								  }
+								  Root1->SetSimulatePhysics(false);
+								  HandledObject.Add(Oj1);
+								  UE_LOG(LogTemp, Warning, TEXT("[%s]: Root1 Name %s"), *FString(__FUNCTION__), *Root1->GetName());
+								  if(Cast<USceneComponent>(Root1) != Actor->GetRootComponent())
+								  {
+									  Root1->AttachToComponent(Actor->GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, false), NAME_None);
+								  }
+							  }
+						  }
+					  }
+
+					  if(AActor* Actor2 = Constraint->ConstraintActor2)
+					  {
+						  Oj2 = Cast<UStaticMeshComponent>(Actor2->GetDefaultSubobjectByName(Constraint->ComponentName2.ComponentName));
+						  if(Oj2)
+						  {
+							  if(!HandledObject.Contains(Oj2))
+							  {
+								  // Only change physics of Oj1 if it simulates Physics, else find the root component that has physics enable and therfore is movable
+								  Parent2 = Cast<UStaticMeshComponent>(Oj2->GetAttachParent());
+								  if(Parent2)
+								  {
+									  while(Parent2)
+									  {
+										  if(Parent2->GetAttachParent())
+										  {
+											  Parent2 = Cast<UStaticMeshComponent>(Parent2->GetAttachParent());
+										  }
+										  else
+										  {
+											  Root2 = Parent2;
+											  break;
+										  }
+									  }
+								  }
+								  else
+								  {
+									  Root2 = Oj2;
+								  }
+								  Root2->SetSimulatePhysics(false);
+								  HandledObject.Add(Oj2);
+								  UE_LOG(LogTemp, Warning, TEXT("[%s]: Root2 Name %s"), *FString(__FUNCTION__), *Root2->GetName());
+
+								  if(Cast<USceneComponent>(Root2) != Actor->GetRootComponent())
+								  {
+									  Root2->AttachToComponent(Actor->GetRootComponent(), FAttachmentTransformRules(EAttachmentRule::KeepWorld, false), NAME_None);
+								  }
+							  }
+						  }
+					  }
+					  if(Root2)
+					  {
+						  UE_LOG(LogTemp, Warning, TEXT("[%s]: 1 %s"), *FString(__FUNCTION__), *Root2->GetName());
+					  }
+					  else
+					  {
+						  UE_LOG(LogTemp, Warning, TEXT("[%s]: 2"), *FString(__FUNCTION__));
+					  }
+
+					  //FTimerDelegate ConstraintInit = FTimerDelegate::CreateUObject( AssetUtil,  &UAssetUtils::ReinitConstraintAndSetPhysics, Constraint, Root1, Root2, true);
+					  //Actor->GetWorldTimerManager().SetTimerForNextTick(ConstraintInit);
+				  }
+			  }
+
+			  Actor->SetActorLocationAndRotation(Location, Rotator, false, nullptr, ETeleportType::ResetPhysics);
+			  bSuccess = true;
+
+			  for(auto& Constraint : Constraints)
+			  {
+				  if(!Constraint->IsBroken())
+				  {
+					  AssetUtil->ReinitConstraintAndSetPhysics(Constraint, Root1, Root2, true);
+				  }
+			  }
+			  UPhysicsConstraintComponent* GripperConstraint = GripperController->GraspComponent->Constraint;
+			  bActorAttached = true;
+			  GripperConstraint->InitComponentConstraint();
+			  }
                       }
                   }
                 if(!bActorAttached)
