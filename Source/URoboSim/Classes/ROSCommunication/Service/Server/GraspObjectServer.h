@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Controller/ControllerType/SpecialController/RGripperControllerBase.h"
 #include "RServiceServer.h"
 // clang-format off
 #include "GraspObjectServer.generated.h"

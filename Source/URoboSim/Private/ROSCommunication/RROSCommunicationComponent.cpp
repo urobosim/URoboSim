@@ -5,6 +5,7 @@
 #include "ROSCommunication/Publisher/RPublisher.h"
 #include "ROSCommunication/Subscriber/RSubscriber.h"
 #include "ROSCommunication/Service/Client/RServiceClient.h"
+#include "ROSCommunication/Service/Server/RServiceServer.h"
 #include "ROSCommunication/Action/Server/RActionServer.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRROSCommunicationComponent, Log, All);

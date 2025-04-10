@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ROSBridgeSrv.h"
+#include "geometry_msgs/PoseStamped.h"
 
 namespace urobosim_msgs
 {

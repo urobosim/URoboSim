@@ -1,5 +1,6 @@
 #include "ROSCommunication/Service/Server/CheckVisibilityServer.h"
 #include "Controller/RController.h"
+#include "Controller/ControllerType/SpecialController/RCameraController.h"
 #include "EngineUtils.h"
 #include "Runtime/Engine/Classes/Engine/StaticMeshActor.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"

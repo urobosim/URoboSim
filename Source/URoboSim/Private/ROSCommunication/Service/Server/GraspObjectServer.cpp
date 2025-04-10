@@ -1,5 +1,6 @@
 #include "ROSCommunication/Service/Server/GraspObjectServer.h"
 #include "Tags.h"
+#include "Conversions.h"
 #include "urobosim_msgs/GraspObject.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogRGraspObjectServer, Log, All)
